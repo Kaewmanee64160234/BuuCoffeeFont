@@ -16,7 +16,7 @@ function updateProduct(id: number, product: Product) {
 function deleteProduct(id: number) {
   return http.delete(`/products/${id}`);
 }
-function uplodeImage(file: File,productId:number) {
+function uploadImage(file: File,productId:number) {
   const formData = new FormData();
   formData.append("image", file);
   return http.post(`/upload/${productId}`, formData);
@@ -28,5 +28,5 @@ export default {
   createProduct,
   updateProduct,
   deleteProduct,
-  uplodeImage
+  uploadImage
 };

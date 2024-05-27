@@ -1,4 +1,4 @@
-import { ref, type Ref } from 'vue';
+import { ref } from 'vue';
 import axios from 'axios';
 import { defineStore } from 'pinia';
 import type { Ingredient } from '@/types/ingredient.type';
