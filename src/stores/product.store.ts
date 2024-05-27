@@ -4,7 +4,7 @@ import type { Product } from "@/types/product.type";
 import productService from "@/service/product.service";
 
 export const useProductStore = defineStore("product", () => {
-  const products = ref<Product>();
+  const products = ref<Product[]>();
   const product = ref<Product>();
 
   const getAllProducts = async () => {
