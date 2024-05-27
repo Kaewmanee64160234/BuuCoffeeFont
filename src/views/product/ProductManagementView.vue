@@ -12,18 +12,6 @@ onMounted(() => {
     console.log('Component is mounted')
     productStore.getAllProducts();
 })
-const headers = [
-    { text: 'ID', value: 'id' },
-    { text: 'Name', value: 'name' },
-    { text: 'Type', value: 'type' },
-    { text: 'Price', value: 'price', align: 'd-none' },
-    { text: 'Actions', value: 'actions', sortable: false }
-];
-
-
-function closeDialog() {
-    dialog.value = false;
-}
 
 
 onMounted(() => {
