@@ -22,11 +22,23 @@ function uploadImage(file: File,productId:number) {
   return http.post(`/upload/${productId}`, formData);
 }
 
+// get product by category name
+function getProductsByCategory(category: string) {
+  return http.get(`/products/category/${category}`);
+}
+
+//get image product
+function getImageProduct(id: number) {
+  return http.get(`/products/${id}/image/`);
+}
+
 export default {
   getAllProducts,
   getProductById,
   createProduct,
   updateProduct,
   deleteProduct,
-  uploadImage
+  uploadImage,
+  getProductsByCategory,
+  getImageProduct
 };

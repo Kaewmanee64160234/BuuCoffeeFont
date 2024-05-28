@@ -1,18 +1,22 @@
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { defineStore } from "pinia";
 import type { Product } from "@/types/product.type";
 import productService from "@/service/product.service";
+import { useCategoryStore } from "./category.store";
 
 export const useProductStore = defineStore("product", () => {
   const products = ref<Product[]>();
   const product = ref<Product>();
+  const searchQuery = ref<string>("");
+  
+
 
   const getAllProducts = async () => {
     try {
       const response = await productService.getAllProducts();
       if (response.status === 200) {
+        console.log('getAllProducts', response.data);
         products.value = response.data;
-        console.log(products.value);
       }
     } catch (error) {
       console.error(error);
@@ -79,6 +83,20 @@ export const useProductStore = defineStore("product", () => {
     }
   };
 
+  // getProductsByCategory
+  const getProductsByCategory = async (category: string) => {
+    try {
+      const response = await productService.getProductsByCategory(category);
+      if (response.status === 200) {
+        console.log('getProductsByCategory', response.data);
+        products.value = response.data;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+
   return {
     products,
     product,
@@ -88,6 +106,8 @@ export const useProductStore = defineStore("product", () => {
     createProduct,
     updateProduct,
     deleteProduct,
-    uploadImage
+    uploadImage,
+    searchQuery,
+    getProductsByCategory
   };
 });
