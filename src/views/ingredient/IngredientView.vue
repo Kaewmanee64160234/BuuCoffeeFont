@@ -16,7 +16,7 @@ onMounted(async () => {
       <v-card-title>
         <v-row>
           <v-col cols="9">
-            Ingredients
+            รายการวัตถุดิบ
           </v-col>
           <v-col cols="3">
             <!-- <v-text-field
@@ -40,6 +40,7 @@ onMounted(async () => {
         <thead>
           <tr>
             <th></th>
+            <th>Image</th>
             <th>Name</th>
             <th>Quantity in Stock</th>
             <th>Quantity per Unit</th>
@@ -52,6 +53,12 @@ onMounted(async () => {
         <tbody>
           <tr style="text-align: center" v-for="(item, index) in ingredientStore.ingredients" :key="index">
             <td>{{ index + 1 }}</td>
+            <td>
+
+    <v-img :src="`http://localhost:3000/ingredients/${item.IngredientId}/image`"></v-img>
+
+            </td>
+            
             <td>{{ item.nameIngredient }}</td>
             <td>{{ item.quantityInStock }}</td>
             <td>{{ item.quantityPerUnit }}</td>

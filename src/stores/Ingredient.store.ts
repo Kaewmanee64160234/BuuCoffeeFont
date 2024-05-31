@@ -7,6 +7,18 @@ import ingredientService from '@/service/ingredient.service';
 export const useIngredientStore = defineStore('ingredient', () => {
   const ingredient = ref<Ingredient | null>(null);
   const ingredients = ref<Ingredient[]>([]);
+  const search = ref<string>("");
+  const dialog = ref(false); // Dialog state
+  const editedIngredient = ref<Ingredient>({
+    IngredientId: 0,
+    nameIngredient: "",
+    supplier: "",
+    minimun: 0,
+    unit: "",
+    quantityInStock: 0,
+    quantityPerUnit: 0,
+    IngredientImage: ""
+  });
 
 
   const getAllIngredients = async () => {
@@ -21,9 +33,14 @@ export const useIngredientStore = defineStore('ingredient', () => {
     }
   };
 
+
+
   return {
     ingredient,
     ingredients,
+    search,
+    dialog,
+    editedIngredient,
     getAllIngredients,
   };
 });
