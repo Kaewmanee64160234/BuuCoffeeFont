@@ -18,6 +18,10 @@ export const useProductStore = defineStore("product", () => {
       haveTopping: false,
     },
     file: new File([""], "filename"),
+    productTypes:[
+      
+
+    ]
   });
   const searchQuery = ref<string>("");
   const createProductDialog = ref(false);
