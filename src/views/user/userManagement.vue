@@ -1,19 +1,14 @@
 <script lang="ts" setup>
-// import { useCategoryStore } from '@/stores/category.store';
-// import { useProductStore } from '@/stores/product.store';
-// import { computed, onMounted, ref, watch } from 'vue'
+import {useUserStore} from '@/stores/user.store';
+import { computed, onMounted, ref, watch } from 'vue'
 
-// const productStore = useProductStore()
-// const categoryStore = useCategoryStore()
-// const url = import.meta.env.VITE_URL_PORT
-// const paginate = ref(true)
-// const selectedCategory = ref(categoryStore.selectedCategory);
-// onMounted(async () => {
-//     // productStore.cat = ''
-//     await productStore.getAllProducts()
-//     await categoryStore.getAllCategories()
+const userStore = useUserStore()
+const url = import.meta.env.VITE_URL_PORT
+const paginate = ref(true)
+onMounted(async () => {
+    await userStore.getAllUsers()
 
-// })
+})
 
 </script>
 <template>
