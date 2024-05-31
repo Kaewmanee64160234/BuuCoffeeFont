@@ -2,6 +2,7 @@
 import { useCategoryStore } from '@/stores/category.store';
 import { useProductStore } from '@/stores/product.store';
 import { computed, onMounted, ref, watch } from 'vue'
+import  CreateProductDialog from '../../components/products/CreateProductDialog.vue'
 
 const productStore = useProductStore()
 const categoryStore = useCategoryStore()
@@ -15,11 +16,18 @@ onMounted(async () => {
 
 })
 
+// open dialog
+const openDialog = () => {
+
+    productStore.createProductDialog = true
+    console.log(productStore.createProductDialog)
+}
+
 </script>
 <template>
   <!-- <ConfirmDialog ref="confirmDlg"></ConfirmDialog> -->
   <!-- <ProductDialog></ProductDialog> -->
-
+<CreateProductDialog/>
   <v-container v-if="paginate">
     <v-card>
       <v-card-title>
@@ -37,7 +45,7 @@ onMounted(async () => {
             ></v-text-field>
           </v-col>
           <v-col>
-            <v-btn color="success" >
+            <v-btn @click="openDialog()" color="success" >
               <v-icon left>mdi-plus</v-icon>
               Add New Product
             </v-btn>
