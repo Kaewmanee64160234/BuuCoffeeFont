@@ -44,6 +44,7 @@ export const useIngredientStore = defineStore('ingredient', () => {
   }
 
   const getAllIngredients = async () => {
+
     try {
       const response = await ingredientService.getAllIngredients();
       if (response.status === 200) {
@@ -54,6 +55,7 @@ export const useIngredientStore = defineStore('ingredient', () => {
     }
   };
   const getAllHistoryImportIngredients = async () => {
+
     try {
       const response = await ingredientService.getAllHistoryImportIngredients();
       if (response.status === 200) {

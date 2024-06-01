@@ -160,10 +160,10 @@ onMounted(async () => {
     background-color: #c9302c;
 }
 
-th,
-td {
-    padding: 8px;
-    text-align: left;
+th, td {
+  padding-top: 12px !important; 
+  padding-bottom: 12px !important; 
+  text-align: center !important; 
 }
 
 th {

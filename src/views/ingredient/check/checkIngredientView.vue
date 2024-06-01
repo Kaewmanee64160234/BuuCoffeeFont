@@ -135,5 +135,9 @@ th {
   max-width: 100px;
   max-height: 100px;
 }
-
+th, td {
+  padding-top: 12px !important; 
+  padding-bottom: 12px !important; 
+  text-align: center !important; 
+}
 </style>

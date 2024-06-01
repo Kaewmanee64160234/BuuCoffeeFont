@@ -6,6 +6,6 @@ export interface Importingredient {
   store?: string;
   discount?: number;
   total?: number;
-  // user: User;
+  user?: number;
   importingredientitem: Importingredientitem[];
 }

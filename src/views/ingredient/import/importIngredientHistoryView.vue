@@ -1,15 +1,23 @@
 <script lang="ts" setup>
-import { useIngredientStore } from '@/stores/Ingredient.store';
+import { useHistoryIngredientImportStore } from '@/stores/historyIngredientimport.store';
 import { onMounted, ref } from 'vue';
-import { useRouter } from 'vue-router';
-const ingredientStore = useIngredientStore();
+import { useRouter } from 'vue-router'
+const ingredientStore = useHistoryIngredientImportStore();
 const router = useRouter();
 onMounted(async () => {
-    await ingredientStore.getAllHistoryImportIngredients;
+    await ingredientStore.getAllHistoryImportIngredients();
 });
+
 
 const navigateTo = (routeName: string) => {
     router.push({ name: routeName });
+};
+const formatDate = (date: any) => {
+    if (!date) return ''; // กรณีไม่มีข้อมูลวันที่
+
+    const jsDate = new Date(date.toString()); // แปลงข้อมูลวันที่เป็น string เป็นวัตถุ Date
+    const formattedDate = jsDate.toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' }); // กำหนดรูปแบบวันที่และเวลาตามที่ต้องการ
+    return formattedDate;
 };
 </script>
 
@@ -48,31 +56,31 @@ const navigateTo = (routeName: string) => {
 
             <v-table class="text-center mt-5">
                 <thead>
-                    <tr>
-                        <th></th>
-                        <th>วันที่</th>
-                        <th>ซัพพาย</th>
-                        <th>ราคารวม</th>
-                        <th>ส่วนลด</th>
-                        <th>ผู้รับผิดชอบ</th>
-                        <th>แอคชั่น</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(item, index) in ingredientStore.importingredients" :key="index">
-                        <td>{{ index + 1 }}</td>
+    <tr>
+        <th class="column-header">ลำดับ</th>
+        <th class="column-header">วันที่</th>
+        <th class="column-header">ซัพพาย</th>
+        <th class="column-header">ราคารวม</th>
+        <th class="column-header">ส่วนลด</th>
+        <th class="column-header">ผู้รับผิดชอบ</th>
+        <th class="column-header">แอคชั่น</th>
+    </tr>
+</thead>
+<tbody>
+    <tr v-for="(item, index) in ingredientStore.importIngredientsHistory" :key="index">
+        <td>{{ index + 1 }}</td>
+        <td>{{ formatDate(item.date) }}</td>
+        <td>{{ item.store }}</td>
+        <td>{{ item.total }}</td>
+        <td>{{ item.discount }}</td>
+        <td>{{ item.user }}</td>
+        <td>
+            <v-btn color="#FFDD83" class="mr-2" icon="mdi-pencil">ดู</v-btn>
+        </td>
+    </tr>
+</tbody>
 
-                        <td>{{ item.date }}</td>
-                        <td>{{ item.total }}</td>
-                        <td>{{ item.discount }}</td>
-                        <td>{{ item.store }}</td>
-                        <td>
-                            <v-btn color="#FFDD83" class="mr-2" icon="mdi-pencil"></v-btn>
-                            <v-btn color="#F55050" icon="mdi-delete"></v-btn>
-                        </td>
-                    </tr>
-                </tbody>
-                <tbody v-if="!ingredientStore.ingredients.length">
+                <tbody v-if="!ingredientStore.importIngredientsHistory.length">
                     <tr>
                         <td colspan="9" class="text-center">No data</td>
                     </tr>
@@ -94,4 +102,11 @@ const navigateTo = (routeName: string) => {
 .button-full-width {
     width: 100%;
 }
+th, td {
+  padding-top: 12px !important; 
+  padding-bottom: 12px !important; 
+  text-align: center !important; 
+}
+
+
 </style>

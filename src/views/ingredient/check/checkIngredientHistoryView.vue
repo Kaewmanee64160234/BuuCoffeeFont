@@ -79,4 +79,9 @@ const navigateTo = (routeName: string) => {
 .button-full-width {
     width: 100%;
 }
+th, td {
+  padding-top: 12px !important; 
+  padding-bottom: 12px !important; 
+  text-align: center !important; 
+}
 </style>
