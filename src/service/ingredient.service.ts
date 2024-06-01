@@ -3,6 +3,10 @@ import http from "./axios";
 function getAllIngredients() {
   return http.get("/ingredients");
 }
+
+function getAllHistoryImportIngredients() {
+  return http.get("/importingredients");
+}
 function createImportIngredients(ingredient: {
   importingredientitem: {
     ingredientId: number;
@@ -21,4 +25,5 @@ function createImportIngredients(ingredient: {
 export default {
   getAllIngredients,
   createImportIngredients,
+  getAllHistoryImportIngredients,
 };

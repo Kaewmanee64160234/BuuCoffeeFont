@@ -33,7 +33,11 @@ const router = createRouter({
       name: 'importingredients',
       component: () => import('../views/ingredient/import/importIngredientView.vue')
     },
-   
+    {
+      path: '/importingredient-history',
+      name: 'importingredientsHistory',
+      component: () => import('../views/ingredient/import/importIngredientHistoryView.vue')
+    },
   ]
 })
 

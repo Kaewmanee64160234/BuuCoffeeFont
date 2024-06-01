@@ -47,9 +47,9 @@ const navigateTo = (routeName: string) => {
                   <v-list-item @click="navigateTo('importingredients')">
                     <v-list-item-title>นำเข้าวัตถุดิบ</v-list-item-title>
                   </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>ประวัติการนำเข้า</v-list-item-title>
-                </v-list-item>
+                  <v-list-item @click="navigateTo('importingredientsHistory')">
+                    <v-list-item-title>ประวัติการนำเข้าวัตถุดิบ</v-list-item-title>
+                  </v-list-item>
               </v-list>
             </v-menu>
           </v-col>

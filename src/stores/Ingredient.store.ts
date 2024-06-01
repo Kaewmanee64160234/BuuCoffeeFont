@@ -2,10 +2,12 @@ import { ref } from 'vue';
 import { defineStore } from 'pinia';
 import type { Ingredient } from '@/types/ingredient.type';
 import ingredientService from '@/service/ingredient.service';
+import type { Importingredient } from '@/types/importIngredient.type';
 
 export const useIngredientStore = defineStore('ingredient', () => {
   const ingredient = ref<Ingredient | null>(null);
   const ingredients = ref<Ingredient[]>([]);
+  const importingredients = ref<Importingredient[]>([]);
   const search = ref<string>("");
   const dialog = ref(false); // สถานะของ Dialog
   const editedIngredient = ref<Ingredient>({
@@ -30,6 +32,7 @@ export const useIngredientStore = defineStore('ingredient', () => {
     }
   }
 
+
   function removeIngredient(index: number) {
     ingredientList.value.splice(index, 1);
   }
@@ -38,13 +41,24 @@ export const useIngredientStore = defineStore('ingredient', () => {
     try {
       const response = await ingredientService.getAllIngredients();
       if (response.status === 200) {
-        console.log('getAllIngredients', response.data);
         ingredients.value = response.data;
       }
     } catch (error) {
       console.error(error);
     }
   };
+  const getAllHistoryImportIngredients = async () => {
+    try {
+      const response = await ingredientService.getAllHistoryImportIngredients();
+      if (response.status === 200) {
+        console.log('getAllHistoryImportIngredients', response.data);
+        importingredients.value = response.data;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
 
   async function saveImportData() {
     const importingredientitem = ingredientList.value
@@ -84,9 +98,11 @@ export const useIngredientStore = defineStore('ingredient', () => {
     store,
     discount,
     total,
+    importingredients,
     getAllIngredients,
     Addingredient,
     saveImportData,
-    removeIngredient
+    removeIngredient,
+    getAllHistoryImportIngredients
   };
 });

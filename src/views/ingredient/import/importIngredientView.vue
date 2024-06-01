@@ -29,7 +29,7 @@ onMounted(async () => {
                         </v-btn>
                     </v-col>
                     <v-col cols="auto">
-                        <v-btn color="warning">
+                        <v-btn color="warning" :to="{ name: 'importingredientsHistory' }">
                             ประวัตินำเข้าวัตถุดิบ
                         </v-btn>
                     </v-col>
