@@ -4,150 +4,169 @@ import { onMounted } from 'vue';
 
 const ingredientStore = useIngredientStore();
 
-
 onMounted(async () => {
-  await ingredientStore.getAllIngredients();
+    await ingredientStore.getAllIngredients();
 });
 </script>
 
 <template>
-  <v-container>
-    <v-card>
-      <v-card-title>
-        <v-row>
-          <v-col cols="9">
-            นำเข้าวัตถุดิบ
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col cols="3">
-            <v-text-field 
-              label="ค้นหาวัตถุดิบ" 
-              append-inner-icon="mdi-magnify" 
-              hide-details 
-              dense
-              v-model="ingredientStore.search"
-            ></v-text-field>
-          </v-col>
-          <v-col>
-            <v-btn color="success">
-              <v-icon left>mdi-plus</v-icon>
-              รายการวัตถุดิบ
-            </v-btn>
-          </v-col>
-          <v-col>
-            <v-btn color="success">
-              <v-icon left>mdi-plus</v-icon>
-              ประวัตินำเข้าวัตถุดิบ
-            </v-btn>
-          </v-col>
-        </v-row>
-        <v-spacer></v-spacer>
-      </v-card-title>
-      <v-row>
-        <v-col>
-          <v-container>
+    <v-container fluid>
+        <v-card style="height: 100vh; width: 100vw; overflow-y: auto;">
+            <v-card-title>
+                <v-row>
+                    <v-col cols="9">
+                        นำเข้าวัตถุดิบ
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="3">
+                        <v-text-field label="ค้นหาวัตถุดิบ" append-inner-icon="mdi-magnify" hide-details dense
+                            v-model="ingredientStore.search"></v-text-field>
+                    </v-col>
+                    <v-col cols="auto">
+                        <v-btn color="success" :to="{ name: 'ingredients' }">
+                            รายการวัตถุดิบ
+                        </v-btn>
+                    </v-col>
+                    <v-col cols="auto">
+                        <v-btn color="warning">
+                            ประวัตินำเข้าวัตถุดิบ
+                        </v-btn>
+                    </v-col>
+                </v-row>
+                <v-spacer></v-spacer>
+            </v-card-title>
             <v-row>
-              <v-col 
-                cols="3" 
-                style="text-align: center" 
-                v-for="(item, index) in ingredientStore.ingredients" 
-                :key="index"
-              >
-                <v-card width="100%" @click="ingredientStore.Addingredient(item)">
-                  <v-card-item></v-card-item>
-                  <v-card-text>
-                    <v-img :src="`http://localhost:3000/ingredients/${item.IngredientId}/image`"></v-img>
-                  </v-card-text>
-                  <v-card-title>{{ item.nameIngredient }}</v-card-title>
-                  <v-card-title>{{ item.supplier }}</v-card-title>
-                </v-card>
-              </v-col>
+                <v-col cols="6">
+                    <v-container>
+                        <v-row>
+                            <v-col cols="3" style="text-align: center; padding: 8px;"
+                                v-for="(item, index) in ingredientStore.ingredients" :key="index">
+                                <v-card width="100%" @click="ingredientStore.Addingredient(item)"
+                                    style="height: 200px;">
+                                    <v-img :src="`http://localhost:3000/ingredients/${item.IngredientId}/image`"
+                                        height="100"></v-img>
+                                    <v-card-title style="font-size: 14px;">{{ item.nameIngredient }}</v-card-title>
+                                    <v-card-subtitle style="font-size: 12px;">{{ item.supplier }}</v-card-subtitle>
+                                </v-card>
+                            </v-col>
+                        </v-row>
+                    </v-container>
+                </v-col>
+                <v-col cols="6" class="d-flex flex-column">
+
+                    <v-card style="height: 400px; overflow-y: auto; width: 100%;">
+                        <v-table style="max-height: 100%; overflow-y: auto;">
+                            <thead>
+                                <tr>
+                                    <th>ลำดับ</th>
+                                    <th>ชื่อสินค้า</th>
+                                    <th>แบรนด์</th>
+                                    <th>จำนวน</th>
+                                    <th>ราคารวม</th>
+                                    <th>แอคชั่น</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(item, index) in ingredientStore.ingredientList" :key="index">
+                                    <td>{{ index + 1 }}</td>
+                                    <td>{{ item.ingredient.nameIngredient }}</td>
+                                    <td>{{ item.ingredient.supplier }}</td>
+                                    <td><input type="number" v-model.number="item.count" class="styled-input" /></td>
+                    <td><input type="number" v-model.number="item.totalunit" class="styled-input" /></td>
+                                    <td><button @click="ingredientStore.removeIngredient(index)">ลบ</button></td>
+                                </tr>
+                            </tbody>
+                        </v-table>
+                    </v-card>
+
+                    <v-row>
+                        <v-spacer></v-spacer>
+                        <v-col cols="6">
+                            <v-row>
+                                <v-col>ชื่อร้านค้า</v-col>
+                                <v-col>
+                                    <v-text-field label="กรุณากรอกชื่อร้านค้า" hide-details dense
+                                        v-model="ingredientStore.store"></v-text-field>
+                                </v-col>
+                            </v-row>
+                            <v-row>
+                                <v-col>ส่วนลด</v-col>
+                                <v-col>
+                                    <v-text-field label="กรุณากรอกส่วนลด" hide-details dense
+                                        v-model="ingredientStore.discount"></v-text-field>
+                                </v-col>
+                            </v-row>
+                        </v-col>
+                        <v-col cols="6">
+                            <v-row>
+                                <v-col>ราคารวมใบเสร็จ</v-col>
+                                <v-col>
+                                    <v-text-field label="กรุณากรอกราคารวมใบเสร็จ" hide-details dense
+                                        v-model="ingredientStore.total"></v-text-field>
+                                </v-col>
+                            </v-row>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col>
+                            <v-btn @click="ingredientStore.saveImportData" color="orange">
+                                <v-icon left>mdi-plus</v-icon>
+                                บันทึกข้อมูล
+                            </v-btn>
+                        </v-col>
+                    </v-row>
+                </v-col>
             </v-row>
-          </v-container>
-        </v-col>
-        <v-col>
-          <v-card style="max-height: 500px; overflow-y: auto;">
-            <v-table>
-              <thead>
-                <tr>
-                  <th>ลำดับ</th>
-                  <th>ชื่อสินค้า</th>
-                  <th>แบรนด์</th>
-                  <th>จำนวน</th>
-                  <th>ราคารวม</th>
-                  <th>แอคชั่น</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(item, index) in ingredientStore.ingredientList" :key="index">
-                  <td>{{ index + 1 }}</td>
-                  <td>{{ item.ingredient.nameIngredient }}</td>
-                  <td>{{ item.ingredient.supplier }}</td>
-                  <td><input type="number" v-model.number="item.count" /></td>
-                  <td><input type="number" v-model.number="item.totalunit" /></td>
-                  <td><button @click="ingredientStore.removeIngredient(index)">ลบ</button></td>
-                </tr>
-              </tbody>
-            </v-table>
-          </v-card>
-          <v-row>
-            <v-col>
-              <v-row>
-                <v-col>ชื่อร้านค้า</v-col>
-                <v-col>
-                  <v-text-field 
-                    label="กรุณากรอกชื่อร้านค้า" 
-                    hide-details 
-                    dense 
-                    v-model="ingredientStore.store"
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col>ส่วนลด</v-col>
-                <v-col>
-                  <v-text-field 
-                    label="กรุณากรอกส่วนลด" 
-                    hide-details 
-                    dense 
-                    v-model="ingredientStore.discount"
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-            </v-col>
-            <v-col>
-              <v-row>
-                <v-col>ราคารวมใบเสร็จ</v-col>
-                <v-col>
-                  <v-text-field 
-                    label="กรุณากรอกราคารวมใบเสร็จ" 
-                    hide-details 
-                    dense 
-                    v-model="ingredientStore.total"
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col>
-              <v-btn @click="ingredientStore.saveImportData">
-                <v-icon left>mdi-plus</v-icon>
-                บันทึกข้อมูล
-              </v-btn>
-            </v-col>
-          </v-row>
-        </v-col>
-      </v-row>
-    </v-card>
-  </v-container>
+        </v-card>
+    </v-container>
 </template>
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
 * {
-  font-family: 'Kanit', sans-serif;
+    font-family: 'Kanit', sans-serif;
 }
+.styled-input {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+        font-size: 14px;
+    }
+
+    .styled-input:focus {
+        border-color: #66afe9;
+        outline: none;
+        box-shadow: 0 0 8px rgba(102, 175, 233, 0.6);
+    }
+
+    .styled-button {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 4px;
+        background-color: #d9534f;
+        color: white;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .styled-button:hover {
+        background-color: #c9302c;
+    }
+
+    th, td {
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f9f9f9;
+    }
+
+    tbody tr:nth-child(odd) {
+        background-color: #f2f2f2;
+    }
 </style>

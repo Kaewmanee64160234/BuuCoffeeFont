@@ -1,13 +1,18 @@
 <script lang="ts" setup>
 import { useIngredientStore } from '@/stores/Ingredient.store';
-import { computed, onMounted, ref, watch } from 'vue';
-
+import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router'; 
 const ingredientStore = useIngredientStore();
-const url = import.meta.env.VITE_URL_PORT;
-
+const router = useRouter(); 
 onMounted(async () => {
-    await ingredientStore.getAllIngredients();
+  await ingredientStore.getAllIngredients();
 });
+
+const menu1 = ref(false);
+const menu2 = ref(false);
+const navigateTo = (routeName: string) => {
+  router.push({ name: routeName });
+};
 </script>
 
 <template>
@@ -19,23 +24,62 @@ onMounted(async () => {
             รายการวัตถุดิบ
           </v-col>
           <v-col cols="3">
-            <!-- <v-text-field
-              v-model="ingredientStore.searchQuery"
-              label="Search"
-              append-inner-icon="mdi-magnify"
-              hide-details
-              dense
-            ></v-text-field> -->
+            <v-text-field label="Search" append-inner-icon="mdi-magnify" hide-details dense></v-text-field>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col>
+            <v-btn color="success" class="button-full-width">
+              <v-icon left>mdi-filter</v-icon>
+              กรอง
+            </v-btn>
           </v-col>
           <v-col>
-            <v-btn color="success">
-              <v-icon left>mdi-plus</v-icon>
-              Add New Ingredient
+            <v-menu v-model="menu1" offset-y>
+              <template v-slot:activator="{ props }">
+                <v-btn color="success" class="button-full-width" v-bind="props">
+                  <v-icon left>mdi-plus</v-icon>
+                  นำเข้าวัตถุดิบ
+                </v-btn>
+              </template>
+              <v-list>
+             
+                  <v-list-item @click="navigateTo('importingredients')">
+                    <v-list-item-title>นำเข้าวัตถุดิบ</v-list-item-title>
+                  </v-list-item>
+                <v-list-item>
+                  <v-list-item-title>ประวัติการนำเข้า</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </v-col>
+          <v-col>
+            <v-menu v-model="menu2" offset-y>
+              <template v-slot:activator="{ props }">
+                <v-btn color="success" class="button-full-width" v-bind="props">
+                  <v-icon left>mdi-plus</v-icon>
+                  เช็ควัตถุดิบ 
+                </v-btn>
+              </template>
+              <v-list>
+                <v-list-item>
+                  <v-list-item-title> เช็ควัตถุดิบ </v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                  <v-list-item-title>ประวัติเช็ควัตถุดิบ </v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </v-col>
+          <v-col>
+            <v-btn color="success" class="button-full-width">
+              <v-icon left>mdi-check</v-icon>
+             เพิ่มวัตถุดิบ
             </v-btn>
           </v-col>
         </v-row>
-        <v-spacer></v-spacer>
       </v-card-title>
+
       <v-table class="text-center mt-5">
         <thead>
           <tr>
@@ -51,32 +95,46 @@ onMounted(async () => {
           </tr>
         </thead>
         <tbody>
-          <tr style="text-align: center" v-for="(item, index) in ingredientStore.ingredients" :key="index">
+          <tr v-for="(item, index) in ingredientStore.ingredients" :key="index">
             <td>{{ index + 1 }}</td>
             <td>
-
-    <v-img :src="`http://localhost:3000/ingredients/${item.IngredientId}/image`"></v-img>
-
+              <v-img :src="`http://localhost:3000/ingredients/${item.IngredientId}/image`" class="ingredient-image"></v-img>
             </td>
-            
             <td>{{ item.nameIngredient }}</td>
             <td>{{ item.quantityInStock }}</td>
             <td>{{ item.quantityPerUnit }}</td>
             <td>{{ item.supplier }}</td>
-            <td>{{ item.minimun}}</td>
+            <td>{{ item.minimun }}</td>
             <td>{{ item.unit }}</td>
             <td>
-              <v-btn color="#FFDD83" class="mr-5" icon="mdi-pencil"></v-btn>
-              <v-btn color="#F55050" class="mr-5" icon="mdi-delete"></v-btn>
+              <v-btn color="#FFDD83" class="mr-2" icon="mdi-pencil"></v-btn>
+              <v-btn color="#F55050" icon="mdi-delete"></v-btn>
             </td>
           </tr>
         </tbody>
         <tbody v-if="!ingredientStore.ingredients.length">
           <tr>
-            <td colspan="8" class="text-center">No data</td>
+            <td colspan="9" class="text-center">No data</td>
           </tr>
         </tbody>
       </v-table>
     </v-card>
   </v-container>
 </template>
+
+<style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+* {
+  font-family: 'Kanit', sans-serif;
+}
+
+.ingredient-image {
+  max-width: 50px;
+  max-height: 50px;
+}
+
+.button-full-width {
+  width: 100%;
+}
+</style>
