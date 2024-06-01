@@ -1,0 +1,139 @@
+<script lang="ts" setup>
+import { useIngredientStore } from '@/stores/Ingredient.store';
+import { onMounted } from 'vue';
+
+const ingredientStore = useIngredientStore();
+
+onMounted(async () => {
+    await ingredientStore.getAllIngredients();
+    ingredientStore.ingredients.forEach(item => {
+        ingredientStore.Addingredienttotable(item);
+    });
+});
+</script>
+
+<template>
+    <v-container fluid>
+        <v-card style="height: 100vh; width: 100vw; overflow-y: auto;">
+            <v-card-title>
+                <v-row>
+                    <v-col cols="9">
+                        เช็ควัตถุดิบ
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="3">
+                        <v-text-field label="ค้นหาวัตถุดิบ" append-inner-icon="mdi-magnify" hide-details dense
+                            v-model="ingredientStore.search"></v-text-field>
+                    </v-col>
+                    <v-col cols="auto">
+                        <v-btn color="success" :to="{ name: 'ingredients' }">
+                            รายการวัตถุดิบ
+                        </v-btn>
+                    </v-col>
+                    <v-col cols="auto">
+                        <v-btn color="warning" :to="{ name: 'checkingredientHistory' }">
+                            ประวัติเช็ควัตถุดิบ
+                        </v-btn>
+                    </v-col>
+                    <v-col>
+                            <v-btn>
+                                <v-icon left>mdi-plus</v-icon>
+                                บันทึกข้อมูล
+                            </v-btn>
+                        </v-col>
+                </v-row>
+                <v-spacer></v-spacer>
+            </v-card-title>
+            <v-row>
+                <v-col>
+
+     
+
+                    <v-card style=" overflow-y: auto; width: 100%;">
+                        <v-table style="max-height: 100%; overflow-y: auto;">
+                            <thead>
+                                <tr>
+                                    <th>ลำดับ</th>
+                                    <th>รูปภาพ</th>
+                                    <th>ชื่อวัตถุดิบ</th>
+                                    <th>ซัพพาย</th>
+                                    <th>ขั้นต่ำ</th>
+                                    <th>จำนวน</th>
+                                    <th>แอคชั่น</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(item, index) in ingredientStore.ingredientCheckList" :key="index">
+                                    <td>{{ index + 1 }}</td>
+                                    <td>
+                                        <v-img :src="`http://localhost:3000/ingredients/${item.ingredientcheck.IngredientId}/image`"
+                                            height="100"></v-img>
+                                    </td>
+                                    <td>{{ item.ingredientcheck.nameIngredient }}</td>
+                                    <td>{{ item.ingredientcheck.supplier }}</td>
+                                    <td>{{ item.ingredientcheck.minimun }}</td>
+                                    <td><input type="number" v-model.number="item.count" class="styled-input" /></td>
+                                    <td><button @click="ingredientStore.removeIngredient(index)">ลบ</button></td>
+                                </tr>
+                            </tbody>
+                        </v-table>
+                    </v-card>
+                </v-col>
+                
+      
+            </v-row>
+        </v-card>
+    </v-container>
+</template>
+
+<style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+* {
+    font-family: 'Kanit', sans-serif;
+}
+
+thead {
+  position: sticky;
+  top: 0;
+  background-color: #ffffff;
+  z-index: 2; /* ปรับค่า Z-index ตามต้องการเพื่อให้หัวตารางแสดงทับส่วนอื่นได้ */
+}
+
+th {
+  position: sticky;
+  top: 0;
+  background-color: #f9f9f9; /* เพิ่มสีพื้นหลังหัวตาราง */
+  z-index: 3; /* ปรับค่า Z-index ตามต้องการเพื่อให้หัวตารางแสดงทับส่วนอื่นได้ */
+}
+.v-data-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.v-data-table th,
+.v-data-table td {
+  border: 1px solid #dddddd;
+  padding: 8px;
+}
+
+.v-data-table th {
+  background-color: #f2f2f2;
+  text-align: left;
+}
+
+.v-data-table tbody tr:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+
+.v-data-table tbody tr:hover {
+  background-color: #f2f2f2;
+}
+
+.v-data-table img {
+  max-width: 100px;
+  max-height: 100px;
+}
+
+</style>

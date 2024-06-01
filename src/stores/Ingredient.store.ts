@@ -21,6 +21,7 @@ export const useIngredientStore = defineStore('ingredient', () => {
     IngredientImage: ""
   });
   const ingredientList = ref<{ ingredient: Ingredient; count: number; totalunit: number }[]>([]);
+  const ingredientCheckList = ref<{ ingredientcheck: Ingredient; count: number}[]>([]);
   const store = ref<string>("");
   const discount = ref<number>(0);
   const total = ref<number>(0);
@@ -31,7 +32,12 @@ export const useIngredientStore = defineStore('ingredient', () => {
       ingredientList.value.push({ ingredient: item, count: 1, totalunit: 0 });
     }
   }
-
+  function Addingredienttotable(item: Ingredient) {
+    const exists = ingredientCheckList.value.some(ingredient => ingredient.ingredientcheck.IngredientId === item.IngredientId);
+    if (!exists) {
+      ingredientCheckList.value.push({ ingredientcheck: item, count: 1 });
+    }
+  }
 
   function removeIngredient(index: number) {
     ingredientList.value.splice(index, 1);
@@ -99,10 +105,12 @@ export const useIngredientStore = defineStore('ingredient', () => {
     discount,
     total,
     importingredients,
+    ingredientCheckList,
     getAllIngredients,
     Addingredient,
     saveImportData,
     removeIngredient,
-    getAllHistoryImportIngredients
+    getAllHistoryImportIngredients,
+    Addingredienttotable
   };
 });

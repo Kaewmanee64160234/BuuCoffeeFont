@@ -62,10 +62,10 @@ const navigateTo = (routeName: string) => {
                 </v-btn>
               </template>
               <v-list>
-                <v-list-item>
+                <v-list-item @click="navigateTo('checkingredient')">
                   <v-list-item-title> เช็ควัตถุดิบ </v-list-item-title>
                 </v-list-item>
-                <v-list-item>
+                <v-list-item @click="navigateTo('checkingredientHistory')">
                   <v-list-item-title>ประวัติเช็ควัตถุดิบ </v-list-item-title>
                 </v-list-item>
               </v-list>

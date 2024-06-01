@@ -38,6 +38,16 @@ const router = createRouter({
       name: 'importingredientsHistory',
       component: () => import('../views/ingredient/import/importIngredientHistoryView.vue')
     },
+    {
+      path: '/checkingredient',
+      name: 'checkingredient',
+      component: () => import('../views/ingredient/check/checkIngredientView.vue')
+    },
+    {
+      path: '/checkingredient-history',
+      name: 'checkingredientHistory',
+      component: () => import('../views/ingredient/check/checkIngredientHistoryView.vue')
+    },
   ]
 })
 
