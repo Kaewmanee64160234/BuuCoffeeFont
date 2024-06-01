@@ -37,7 +37,7 @@ onMounted(async () => {
                 <v-spacer></v-spacer>
             </v-card-title>
             <v-row>
-                <v-col cols="6">
+                <v-col cols="6" class="d-flex flex-column">
                     <v-container>
                         <v-row>
                             <v-col cols="3" style="text-align: center; padding: 8px;"
@@ -73,7 +73,8 @@ onMounted(async () => {
                                     <td>{{ item.ingredient.nameIngredient }}</td>
                                     <td>{{ item.ingredient.supplier }}</td>
                                     <td><input type="number" v-model.number="item.count" class="styled-input" /></td>
-                    <td><input type="number" v-model.number="item.totalunit" class="styled-input" /></td>
+                                    <td><input type="number" v-model.number="item.totalunit" class="styled-input" />
+                                    </td>
                                     <td><button @click="ingredientStore.removeIngredient(index)">ลบ</button></td>
                                 </tr>
                             </tbody>
@@ -128,45 +129,48 @@ onMounted(async () => {
 * {
     font-family: 'Kanit', sans-serif;
 }
+
+
 .styled-input {
-        width: 100%;
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        box-sizing: border-box;
-        font-size: 14px;
-    }
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
 
-    .styled-input:focus {
-        border-color: #66afe9;
-        outline: none;
-        box-shadow: 0 0 8px rgba(102, 175, 233, 0.6);
-    }
+.styled-input:focus {
+    border-color: #66afe9;
+    outline: none;
+    box-shadow: 0 0 8px rgba(102, 175, 233, 0.6);
+}
 
-    .styled-button {
-        padding: 6px 12px;
-        border: none;
-        border-radius: 4px;
-        background-color: #d9534f;
-        color: white;
-        font-size: 14px;
-        cursor: pointer;
-    }
+.styled-button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    background-color: #d9534f;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+}
 
-    .styled-button:hover {
-        background-color: #c9302c;
-    }
+.styled-button:hover {
+    background-color: #c9302c;
+}
 
-    th, td {
-        padding: 8px;
-        text-align: left;
-    }
+th,
+td {
+    padding: 8px;
+    text-align: left;
+}
 
-    th {
-        background-color: #f9f9f9;
-    }
+th {
+    background-color: #f9f9f9;
+}
 
-    tbody tr:nth-child(odd) {
-        background-color: #f2f2f2;
-    }
+tbody tr:nth-child(odd) {
+    background-color: #f2f2f2;
+}
 </style>

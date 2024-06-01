@@ -98,10 +98,10 @@ const navigateTo = (routeName: string) => {
           <tr v-for="(item, index) in ingredientStore.ingredients" :key="index">
             <td>{{ index + 1 }}</td>
             <td>
-              <v-img :src="`http://localhost:3000/ingredients/${item.IngredientId}/image`" class="ingredient-image"></v-img>
+              <v-img :src="`http://localhost:3000/ingredients/${item.IngredientId}/image`" height="100"></v-img>
             </td>
             <td>{{ item.nameIngredient }}</td>
-            <td>{{ item.quantityInStock }}</td>
+            <td :style="{ color: item.quantityInStock < item.minimun ? 'red' : 'black' }">{{ item.quantityInStock }}</td>
             <td>{{ item.quantityPerUnit }}</td>
             <td>{{ item.supplier }}</td>
             <td>{{ item.minimun }}</td>
@@ -129,10 +129,7 @@ const navigateTo = (routeName: string) => {
   font-family: 'Kanit', sans-serif;
 }
 
-.ingredient-image {
-  max-width: 50px;
-  max-height: 50px;
-}
+
 
 .button-full-width {
   width: 100%;

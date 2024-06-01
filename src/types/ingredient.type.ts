@@ -3,8 +3,8 @@ export interface Ingredient {
   IngredientImage?: string;
   nameIngredient?: string;
   supplier?: string;
-  minimun?: number;
+  minimun: number;
   unit?: string;
-  quantityInStock?: number;
+  quantityInStock: number;
   quantityPerUnit?: number;
 }
