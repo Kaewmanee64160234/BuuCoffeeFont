@@ -5,6 +5,13 @@
         <span class="headline">Create Product</span>
       </v-card-title>
       <v-card-text>
+        {{ selectedIngredientsBlend }}
+        {{ selectedIngredientsCold }}
+        {{ selectedIngredientsHot }}
+        {{ ingredientQuantitiesBlend }}
+        {{ ingredientQuantitiesCold }}
+        {{ ingredientQuantitiesHot }}
+
         <v-container>
           <v-form ref="form" v-model="valid">
             <v-row>
@@ -19,16 +26,19 @@
               </v-col>
               <v-col cols="12" sm="6">
                 <v-select v-model="productStore.product.category.categoryName"
-                          :items="categoryStore.categoriesForCreate.map(category => category.categoryName)"
-                          label="Select Category" dense @change="checkCategory"></v-select>
+                  :items="categoryStore.categoriesForCreate.map(category => category.categoryName)"
+                  label="Select Category" dense @change="checkCategory"></v-select>
               </v-col>
             </v-row>
 
             <v-row v-if="isDrink">
               <v-row class="d-flex justify-space-between">
-                <v-checkbox label="Hot" v-model="productTypes.hot" @change="() => handleProductTypeChange('Hot', productTypes.hot)"></v-checkbox>
-                <v-checkbox label="Cold" v-model="productTypes.cold" @change="() => handleProductTypeChange('Cold', productTypes.cold)"></v-checkbox>
-                <v-checkbox label="Blend" v-model="productTypes.blend" @change="() => handleProductTypeChange('Blend', productTypes.blend)"></v-checkbox>
+                <v-checkbox label="Hot" v-model="productTypes.hot"
+                  @change="() => handleProductTypeChange('Hot', productTypes.hot)"></v-checkbox>
+                <v-checkbox label="Cold" v-model="productTypes.cold"
+                  @change="() => handleProductTypeChange('Cold', productTypes.cold)"></v-checkbox>
+                <v-checkbox label="Blend" v-model="productTypes.blend"
+                  @change="() => handleProductTypeChange('Blend', productTypes.blend)"></v-checkbox>
               </v-row>
 
               <v-container v-for="(type, index) in productDetails" :key="index">
@@ -56,18 +66,34 @@
                       <tbody>
                         <tr v-for="ingredient in ingredientStore.ingredients" :key="ingredient.IngredientId">
                           <td>
-                            <v-checkbox v-if="type.productTypeName === 'Hot'" v-model="selectedIngredientsHot" :value="ingredient.IngredientId" @change="() => handleHotIngredientSelect(type, ingredient)"></v-checkbox>
-                            <v-checkbox v-if="type.productTypeName === 'Cold'" v-model="selectedIngredientsCold" :value="ingredient.IngredientId" @change="() => handleColdIngredientSelect(type, ingredient)"></v-checkbox>
-                            <v-checkbox v-if="type.productTypeName === 'Blend'" v-model="selectedIngredientsBlend" :value="ingredient.IngredientId" @change="() => handleBlendIngredientSelect(type, ingredient)"></v-checkbox>
+                            <v-checkbox v-if="type.productTypeName === 'Hot'" v-model="type.selectedIngredients"
+                              :value="ingredient.IngredientId"
+                              @change="() => handleHotIngredientSelect(type, ingredient)"></v-checkbox>
+                            <v-checkbox v-if="type.productTypeName === 'Cold'" v-model="type.selectedIngredients"
+                              :value="ingredient.IngredientId"
+                              @change="() => handleColdIngredientSelect(type, ingredient)"></v-checkbox>
+                            <v-checkbox v-if="type.productTypeName === 'Blend'" v-model="type.selectedIngredients"
+                              :value="ingredient.IngredientId"
+                              @change="() => handleBlendIngredientSelect(type, ingredient)"></v-checkbox>
                           </td>
                           <td>
-                            <v-img :src="`http://localhost:3000/ingredients/${ingredient.IngredientId}/image`" height="100"></v-img>
+                            <v-img :src="`http://localhost:3000/ingredients/${ingredient.IngredientId}/image`"
+                              height="100"></v-img>
                           </td>
                           <td>{{ ingredient.nameIngredient }}</td>
                           <td>
-                            <v-text-field v-if="type.productTypeName === 'Hot' && selectedIngredientsHot.includes(ingredient.IngredientId)" v-model="ingredientQuantitiesHot[ingredient.IngredientId]" type="number" min="0" label="Quantity"></v-text-field>
-                            <v-text-field v-if="type.productTypeName === 'Cold' && selectedIngredientsCold.includes(ingredient.IngredientId)" v-model="ingredientQuantitiesCold[ingredient.IngredientId]" type="number" min="0" label="Quantity"></v-text-field>
-                            <v-text-field v-if="type.productTypeName === 'Blend' && selectedIngredientsBlend.includes(ingredient.IngredientId)" v-model="ingredientQuantitiesBlend[ingredient.IngredientId]" type="number" min="0" label="Quantity"></v-text-field>
+                            <v-text-field
+                              v-if="type.productTypeName === 'Hot' && selectedIngredientsHot.includes(ingredient.IngredientId)"
+                              v-model="ingredientQuantitiesHot[ingredient.IngredientId]" type="number" min="0"
+                              label="Quantity"></v-text-field>
+                            <v-text-field
+                              v-if="type.productTypeName === 'Cold' && selectedIngredientsCold.includes(ingredient.IngredientId)"
+                              v-model="ingredientQuantitiesCold[ingredient.IngredientId]" type="number" min="0"
+                              label="Quantity"></v-text-field>
+                            <v-text-field
+                              v-if="type.productTypeName === 'Blend' && selectedIngredientsBlend.includes(ingredient.IngredientId)"
+                              v-model="ingredientQuantitiesBlend[ingredient.IngredientId]" type="number" min="0"
+                              label="Quantity"></v-text-field>
                           </td>
                           <td>{{ ingredient.unit }}</td>
                         </tr>
@@ -149,6 +175,7 @@ onMounted(async () => {
 
 const handleProductTypeChange = (type: string, isChecked: boolean) => {
   const typeIndex = productDetails.value.findIndex(pt => pt.productTypeName === type);
+  console.log('Type Index:', typeIndex);
   if (isChecked && typeIndex === -1) {
     productDetails.value.push({
       productTypeName: type,
@@ -164,47 +191,47 @@ const handleProductTypeChange = (type: string, isChecked: boolean) => {
 };
 
 const handleHotIngredientSelect = (type: CustomProductType, ingredient: Ingredient) => {
-  const index = selectedIngredientsHot.value.indexOf(ingredient.IngredientId);
+  const index = selectedIngredientsHot.value.findIndex(id => id === ingredient.IngredientId);
   console.log('Index:', index);
-  if (index > -1) {
-    console.log('Ingredient Quantities for Hot-->:', JSON.parse(JSON.stringify(ingredientQuantitiesHot.value)));
-
+  if (index === -1) {
     selectedIngredientsHot.value.push(ingredient.IngredientId);
     ingredientQuantitiesHot.value[ingredient.IngredientId] = 0;
-    console.log('Ingredient Array:', selectedIngredientsHot.value);
   } else {
     selectedIngredientsHot.value.splice(index, 1);
-    //  ingredientQuantitiesHot.value[ingredient.IngredientId];
+    delete ingredientQuantitiesHot.value[ingredient.IngredientId];
   }
   console.log('Selected Ingredients for Hot:', JSON.parse(JSON.stringify(selectedIngredientsHot.value)));
   console.log('Ingredient Quantities for Hot:', JSON.parse(JSON.stringify(ingredientQuantitiesHot.value)));
 };
 
 const handleColdIngredientSelect = (type: CustomProductType, ingredient: Ingredient) => {
-  const index = selectedIngredientsCold.value.indexOf(ingredient.IngredientId);
-  if (index > -1) {
+  const index = selectedIngredientsCold.value.findIndex(id => id === ingredient.IngredientId);
+  console.log('Index:', index);
+  if (index === -1) {
     selectedIngredientsCold.value.push(ingredient.IngredientId);
     ingredientQuantitiesCold.value[ingredient.IngredientId] = 0;
   } else {
     selectedIngredientsCold.value.splice(index, 1);
-    // delete ingredientQuantitiesCold.value[ingredient.IngredientId];
+    delete ingredientQuantitiesCold.value[ingredient.IngredientId];
   }
   console.log('Selected Ingredients for Cold:', JSON.parse(JSON.stringify(selectedIngredientsCold.value)));
   console.log('Ingredient Quantities for Cold:', JSON.parse(JSON.stringify(ingredientQuantitiesCold.value)));
 };
 
 const handleBlendIngredientSelect = (type: CustomProductType, ingredient: Ingredient) => {
-  const index = selectedIngredientsBlend.value.indexOf(ingredient.IngredientId);
-  if (index > -1) {
+  const index = selectedIngredientsBlend.value.findIndex(id => id === ingredient.IngredientId);
+  console.log('Index:', index);
+  if (index === -1) {
     selectedIngredientsBlend.value.push(ingredient.IngredientId);
     ingredientQuantitiesBlend.value[ingredient.IngredientId] = 0;
   } else {
     selectedIngredientsBlend.value.splice(index, 1);
-    // delete ingredientQuantitiesBlend.value[ingredient.IngredientId];
+    delete ingredientQuantitiesBlend.value[ingredient.IngredientId];
   }
   console.log('Selected Ingredients for Blend:', JSON.parse(JSON.stringify(selectedIngredientsBlend.value)));
   console.log('Ingredient Quantities for Blend:', JSON.parse(JSON.stringify(ingredientQuantitiesBlend.value)));
 };
+
 
 const addRecipe = (type: CustomProductType) => {
   type.recipe.push({ ingredient: {} as Ingredient, quantity: 0 });
@@ -214,7 +241,7 @@ const checkCategory = () => {
   isDrink.value = productStore.product.category.categoryName === "เครื่องดื่ม";
 };
 
-const submitForm = () => {
+const submitForm = async () => {
   if (!form.value.validate()) return;
 
   const productData = {
@@ -222,18 +249,62 @@ const submitForm = () => {
     productPrice: productPrice.value,
     productImage: productImage.value,
     categoryId: selectedCategory.value,
-    productTypes: productDetails.value.map(type => ({
-      productTypeName: type.productTypeName,
-      productTypePrice: type.productTypePrice,
-      recipes: type.selectedIngredients.map(ingredientId => ({
-        ingredientId,
-        quantity: type.ingredientQuantities[ingredientId]
-      }))
-    }))
+    productTypes: [] as ProductType[]
   };
 
+  if (isDrink.value) {
+    if (selectedIngredientsHot.value.length > 0) {
+      productData.productTypes.push({
+        productTypeName: 'Hot',
+        productTypePrice: 0,
+        recipe: selectedIngredientsHot.value.map((ingredientId) => {
+          return {
+            ingredient: ingredientStore.ingredients.find(i => i.IngredientId === ingredientId)!,
+            quantity: ingredientQuantitiesHot.value[ingredientId]
+          };
+        })
+      });
+    }
+    if (selectedIngredientsCold.value.length > 0) {
+      productData.productTypes.push({
+        productTypeName: 'Cold',
+        productTypePrice: 0,
+        recipe: selectedIngredientsCold.value.map((ingredientId) => {
+          return {
+            ingredient: ingredientStore.ingredients.find(i => i.IngredientId === ingredientId)!,
+            quantity: ingredientQuantitiesCold.value[ingredientId]
+          };
+        })
+      });
+    }
+    if (selectedIngredientsBlend.value.length > 0) {
+      productData.productTypes.push({
+        productTypeName: 'Blend',
+        productTypePrice: 0,
+        recipe: selectedIngredientsBlend.value.map((ingredientId) => {
+          return {
+            ingredient: ingredientStore.ingredients.find(i => i.IngredientId === ingredientId)!,
+            quantity: ingredientQuantitiesBlend.value[ingredientId]
+          };
+        })
+      });
+    }
+  }
+
   console.log('Product Data:', JSON.parse(JSON.stringify(productData)));
-  dialog.value = false; // Close dialog after submit
+  productStore.product = {
+  category: categoryStore.categories.find(c => c.categoryName === productStore.product.category.categoryName)!,
+  productName:productData.productName,
+  productPrice:productData.productPrice,
+  productImage:productData.productImage,
+  productTypes:productData.productTypes,
+  productId:0,
+  file: new File([""], "filename")
+  
+
+  }
+  console.log('Product:', JSON.parse(JSON.stringify(productStore.product)));
+  await productStore.createProduct();
+  productStore.createProductDialog = false;
 };
 </script>
-

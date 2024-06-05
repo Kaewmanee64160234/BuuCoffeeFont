@@ -8,7 +8,30 @@ function getProductById(id: number) {
   return http.get(`/products/${id}`);
 }
 function createProduct(product: Product) {
-  return http.post("/products", product);
+
+  const product_ = {
+    productName: product.productName,
+    productPrice: product.productPrice,
+    productImage: product.productImage,
+    categoryId: product.category.categoryId,
+    productTypes: product.productTypes?.length! > 0 ? product.productTypes!.map((productType) => {
+      return {
+        productTypeName: productType.productTypeName,
+        productTypePrice: productType.productTypePrice,
+        recipes: productType.recipe?.map((recipe) => {
+          return {
+            ingredientId: recipe.ingredient.IngredientId,
+            quantity: recipe.quantity
+          };
+        })
+      };
+    }) : []
+  };
+
+console.log(JSON.stringify(product_));
+
+
+  return http.post("/products", product_);
 }
 function updateProduct(id: number, product: Product) {
   return http.put(`/products/${id}`, product);

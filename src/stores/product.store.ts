@@ -7,35 +7,31 @@ import { useCategoryStore } from "./category.store";
 
 export const useProductStore = defineStore("product", () => {
   const products = ref<Product[]>();
-  const product = ref<Product& { file: File }>({
+  const product = ref<Product & { file: File }>({
     productId: 0,
     productName: "",
     productPrice: 0,
     productImage: "",
-    category:{
-      categoryId:0,
+    category: {
+      categoryId: 0,
       categoryName: "",
       haveTopping: false,
     },
     file: new File([""], "filename"),
-    productTypes:[
-      
-
-    ]
+    productTypes: []
   });
+
   const searchQuery = ref<string>("");
   const createProductDialog = ref(false);
   const selectedCategoryName = ref<string>("");
   const categoryStore = useCategoryStore();
-  
+
   // watch if selectedCategoryName changes map products by category
   watch(selectedCategoryName, (value) => {
     if (value != "All") {
-      product.value.category = categoryStore.categoriesForCreate.map(category => category.categoryName === value ? category : product.value.category)[0];
-
-    } 
+      product.value.category = categoryStore.categoriesForCreate.find(category => category.categoryName === value) || product.value.category;
+    }
   });
-
 
   const getAllProducts = async () => {
     try {
@@ -49,7 +45,6 @@ export const useProductStore = defineStore("product", () => {
     }
   };
 
-  //get product by id
   const getProductById = async (id: number) => {
     try {
       const response = await productService.getProductById(id);
@@ -61,19 +56,18 @@ export const useProductStore = defineStore("product", () => {
     }
   };
 
-  //create product
   const createProduct = async () => {
     try {
       const response = await productService.createProduct(product.value!);
       if (response.status === 201) {
-        products.value = response.data;
+        getAllProducts();
+
       }
     } catch (error) {
       console.error(error);
     }
   };
 
-  //update product
   const updateProduct = async (id: number, product: Product) => {
     try {
       const response = await productService.updateProduct(id, product);
@@ -85,7 +79,6 @@ export const useProductStore = defineStore("product", () => {
     }
   };
 
-  //delete product
   const deleteProduct = async (id: number) => {
     try {
       const response = await productService.deleteProduct(id);
@@ -97,7 +90,6 @@ export const useProductStore = defineStore("product", () => {
     }
   };
 
-  //upload image
   const uploadImage = async (file: File, productId: number) => {
     try {
       const response = await productService.uploadImage(file, productId);
@@ -109,7 +101,6 @@ export const useProductStore = defineStore("product", () => {
     }
   };
 
-  // getProductsByCategory
   const getProductsByCategory = async (category: string) => {
     try {
       const response = await productService.getProductsByCategory(category);
@@ -122,11 +113,9 @@ export const useProductStore = defineStore("product", () => {
     }
   };
 
-
   return {
     products,
     product,
-
     getAllProducts,
     getProductById,
     createProduct,
