@@ -3,16 +3,19 @@ import { useCategoryStore } from '@/stores/category.store';
 import { useProductStore } from '@/stores/product.store';
 import { computed, onMounted, ref, watch } from 'vue'
 import  CreateProductDialog from '../../components/products/CreateProductDialog.vue'
+import { useIngredientStore } from '@/stores/Ingredient.store';
 
 const productStore = useProductStore()
 const categoryStore = useCategoryStore()
 const url = import.meta.env.VITE_URL_PORT
 const paginate = ref(true)
 const selectedCategory = ref(categoryStore.selectedCategory);
+const ingredientStore = useIngredientStore()
 onMounted(async () => {
     // productStore.cat = ''
     await productStore.getAllProducts()
     await categoryStore.getAllCategories()
+    await ingredientStore.getAllIngredients()
 
 })
 
@@ -27,7 +30,7 @@ const openDialog = () => {
 <template>
   <!-- <ConfirmDialog ref="confirmDlg"></ConfirmDialog> -->
   <!-- <ProductDialog></ProductDialog> -->
-<CreateProductDialog/>
+<CreateProductDialog />
   <v-container v-if="paginate">
     <v-card>
       <v-card-title>

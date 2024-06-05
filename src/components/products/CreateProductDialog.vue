@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useCategoryStore } from '@/stores/category.store';
+import { useIngredientStore } from '@/stores/Ingredient.store';
 import { useProductStore } from '@/stores/product.store';
 import { ref, watch } from 'vue';
 
@@ -7,6 +8,8 @@ import { ref, watch } from 'vue';
 const productStore = useProductStore();
 const categoryStore = useCategoryStore();
 const isDrink = ref(false);
+const ingredientStore = useIngredientStore();
+const selectedIngredients = ref<number[]>([]);
 const url = 'http://localhost:3000';
 const productTypes = ref({
   hot: false,
@@ -40,10 +43,21 @@ watch(() => productStore.product.category.categoryName, (newVal) => {
   }
 });
 
+
+// Function to handle checkbox change
+function toggleIngredientSelection(ingredientId: number) {
+  const index = selectedIngredients.value.indexOf(ingredientId);
+  if (index > -1) {
+    selectedIngredients.value.splice(index, 1); // Remove the ingredient if it's already selected
+  } else {
+    selectedIngredients.value.push(ingredientId); // Add the ingredient if it's not already selected
+  }
+}
+
 </script>
 <template>
   <div>
-    <v-dialog v-model="productStore.createProductDialog" max-width="600px">
+    <v-dialog v-model="productStore.createProductDialog" max-width="80vh">
       <v-card>
         <v-stepper :items="['Step 1', 'Step 2', 'Step 3']">
           <template v-slot:item.1>
@@ -86,41 +100,42 @@ watch(() => productStore.product.category.categoryName, (newVal) => {
           </template>
 
           <template v-slot:item.2>
-            <v-card title="Select Ingredients" flat>
+            <div>Selected Ingredients: {{ selectedIngredients }}</div>
+            <v-card title="Select Ingredients" class="stepper-content" flat>
               <v-container>
                 <v-row>
                   <v-col>
                     <v-table class="text-center mt-5">
                       <thead>
                         <tr>
-                          <th></th>
+                          <th>#</th>
+                          <th>Select</th>
                           <th>Image</th>
                           <th>Name</th>
-                          <th>Type</th>
-                          <th>Price</th>
-                          <!-- <th>Size</th> -->
-                          <th>Operations</th>
+                          <th>Quantity in Stock</th>
+                          <th>Supplier</th>
+                          <th>Unit</th>
                         </tr>
                       </thead>
                       <tbody>
-                        <tr style="text-align: center" v-for="(item, index) in productStore.products" :key="index">
+                        <tr v-for="(item, index) in ingredientStore.ingredients" :key="item.IngredientId">
                           <td>{{ index + 1 }}</td>
                           <td>
-                            <v-avatar size="80"><v-img
-                                :src="`${url}/products/image/${item.productId}`"></v-img></v-avatar>
+                            <v-checkbox v-model="selectedIngredients" :value="item.IngredientId"></v-checkbox>
                           </td>
-                          <td>{{ item.productName }}</td>
-                          <td>{{ item.category.categoryName }}</td>
-                          <td>{{ item.productName }}</td>
-                          <!-- <td>{{ item.size }}</td> -->
                           <td>
-                            <v-btn color="#FFDD83" class="mr-5" icon="mdi-pencil"></v-btn>
-                            <v-btn color="#F55050" class="mr-5" icon="mdi-delete"></v-btn>
+                            <v-img :src="`http://localhost:3000/ingredients/${item.IngredientId}/image`"
+                              height="100"></v-img>
                           </td>
+                          <td>{{ item.nameIngredient }}</td>
+                          <td :style="{ color: item.quantityInStock < item.minimun ? 'red' : 'black' }">
+                            {{ item.quantityInStock }}
+                          </td>
+                          <td>{{ item.supplier }}</td>
+                          <td>{{ item.unit }}</td>
                         </tr>
                       </tbody>
-
-                      <tbody v-if="!productStore.products">
+                      <tbody v-if="!ingredientStore.ingredients.length">
                         <tr>
                           <td colspan="7" class="text-center">No data</td>
                         </tr>
@@ -136,11 +151,19 @@ watch(() => productStore.product.category.categoryName, (newVal) => {
           <template v-slot:item.3>
             <v-card title="Step Three" flat>...</v-card>
           </template>
+
         </v-stepper>
       </v-card>
+
     </v-dialog>
 
   </div>
 </template>
 
-<style></style>
+<style scoped>
+.stepper-content {
+  max-height: 70vh;
+  /* Adjust based on your needs */
+  overflow-y: auto;
+}
+</style>
