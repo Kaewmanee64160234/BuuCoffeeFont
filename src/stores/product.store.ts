@@ -2,13 +2,39 @@ import { ref, watch } from "vue";
 import { defineStore } from "pinia";
 import type { Product } from "@/types/product.type";
 import productService from "@/service/product.service";
+import type { Category } from "@/types/category.type";
 import { useCategoryStore } from "./category.store";
 
 export const useProductStore = defineStore("product", () => {
   const products = ref<Product[]>();
-  const product = ref<Product>();
+  const product = ref<Product& { file: File }>({
+    productId: 0,
+    productName: "",
+    productPrice: 0,
+    productImage: "",
+    category:{
+      categoryId:0,
+      categoryName: "",
+      haveTopping: false,
+    },
+    file: new File([""], "filename"),
+    productTypes:[
+      
+
+    ]
+  });
   const searchQuery = ref<string>("");
+  const createProductDialog = ref(false);
+  const selectedCategoryName = ref<string>("");
+  const categoryStore = useCategoryStore();
   
+  // watch if selectedCategoryName changes map products by category
+  watch(selectedCategoryName, (value) => {
+    if (value != "All") {
+      product.value.category = categoryStore.categoriesForCreate.map(category => category.categoryName === value ? category : product.value.category)[0];
+
+    } 
+  });
 
 
   const getAllProducts = async () => {
@@ -36,9 +62,9 @@ export const useProductStore = defineStore("product", () => {
   };
 
   //create product
-  const createProduct = async (product: Product) => {
+  const createProduct = async () => {
     try {
-      const response = await productService.createProduct(product);
+      const response = await productService.createProduct(product.value!);
       if (response.status === 201) {
         products.value = response.data;
       }
@@ -108,6 +134,8 @@ export const useProductStore = defineStore("product", () => {
     deleteProduct,
     uploadImage,
     searchQuery,
-    getProductsByCategory
+    getProductsByCategory,
+    createProductDialog,
+    selectedCategoryName
   };
 });

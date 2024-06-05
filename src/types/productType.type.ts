@@ -2,9 +2,9 @@ import type { Product } from "./product.type";
 import type { Recipe } from "./recipe.type";
 
 export interface ProductType {
-    productTypeId: number;
+    productTypeId?: number;
     productTypeName: string;
-    product:Product;
-    recipe: Recipe[];
+    product?:Product;
+    recipe?: Recipe[];
 
 }
