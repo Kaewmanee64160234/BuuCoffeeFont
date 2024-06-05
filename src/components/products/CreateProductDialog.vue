@@ -86,8 +86,52 @@ watch(() => productStore.product.category.categoryName, (newVal) => {
           </template>
 
           <template v-slot:item.2>
-            <v-card title="Step Two" flat>...</v-card>
+            <v-card title="Select Ingredients" flat>
+              <v-container>
+                <v-row>
+                  <v-col>
+                    <v-table class="text-center mt-5">
+                      <thead>
+                        <tr>
+                          <th></th>
+                          <th>Image</th>
+                          <th>Name</th>
+                          <th>Type</th>
+                          <th>Price</th>
+                          <!-- <th>Size</th> -->
+                          <th>Operations</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr style="text-align: center" v-for="(item, index) in productStore.products" :key="index">
+                          <td>{{ index + 1 }}</td>
+                          <td>
+                            <v-avatar size="80"><v-img
+                                :src="`${url}/products/image/${item.productId}`"></v-img></v-avatar>
+                          </td>
+                          <td>{{ item.productName }}</td>
+                          <td>{{ item.category.categoryName }}</td>
+                          <td>{{ item.productName }}</td>
+                          <!-- <td>{{ item.size }}</td> -->
+                          <td>
+                            <v-btn color="#FFDD83" class="mr-5" icon="mdi-pencil"></v-btn>
+                            <v-btn color="#F55050" class="mr-5" icon="mdi-delete"></v-btn>
+                          </td>
+                        </tr>
+                      </tbody>
+
+                      <tbody v-if="!productStore.products">
+                        <tr>
+                          <td colspan="7" class="text-center">No data</td>
+                        </tr>
+                      </tbody>
+                    </v-table>
+                  </v-col>
+                </v-row>
+              </v-container>
+            </v-card>
           </template>
+
 
           <template v-slot:item.3>
             <v-card title="Step Three" flat>...</v-card>
