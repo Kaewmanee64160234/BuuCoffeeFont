@@ -19,16 +19,19 @@
               </v-col>
               <v-col cols="12" sm="6">
                 <v-select v-model="productStore.product.category.categoryName"
-                          :items="categoryStore.categoriesForCreate.map(category => category.categoryName)"
-                          label="Select Category" dense @change="checkCategory"></v-select>
+                  :items="categoryStore.categoriesForCreate.map(category => category.categoryName)"
+                  label="Select Category" dense @change="checkCategory"></v-select>
               </v-col>
             </v-row>
 
             <v-row v-if="isDrink">
               <v-row class="d-flex justify-space-between">
-                <v-checkbox label="Hot" v-model="productTypes.hot" @change="() => handleProductTypeChange('Hot', productTypes.hot)"></v-checkbox>
-                <v-checkbox label="Cold" v-model="productTypes.cold" @change="() => handleProductTypeChange('Cold', productTypes.cold)"></v-checkbox>
-                <v-checkbox label="Blend" v-model="productTypes.blend" @change="() => handleProductTypeChange('Blend', productTypes.blend)"></v-checkbox>
+                <v-checkbox label="Hot" v-model="productTypes.hot"
+                  @change="handleProductTypeChange('Hot', productTypes.hot)"></v-checkbox>
+                <v-checkbox label="Cold" v-model="productTypes.cold"
+                  @change="handleProductTypeChange('Cold', productTypes.cold)"></v-checkbox>
+                <v-checkbox label="Blend" v-model="productTypes.blend"
+                  @change="handleProductTypeChange('Blend', productTypes.blend)"></v-checkbox>
               </v-row>
 
               <v-container v-for="(type, index) in productDetails" :key="index">
@@ -51,14 +54,18 @@
                       <tbody>
                         <tr v-for="ingredient in ingredientStore.ingredients" :key="ingredient.IngredientId">
                           <td>
-                            <v-checkbox :value="ingredient.IngredientId" v-model="type.selectedIngredients" @change="() => handleIngredientSelect(type, ingredient)"></v-checkbox>
+                            <v-checkbox :value="ingredient.IngredientId" v-model="type.selectedIngredients"
+                              @change="() => handleIngredientSelect(type, ingredient)"></v-checkbox>
                           </td>
                           <td>
-                            <v-img :src="`http://localhost:3000/ingredients/${ingredient.IngredientId}/image`" height="100"></v-img>
+                            <v-img :src="`http://localhost:3000/ingredients/${ingredient.IngredientId}/image`"
+                              height="100"></v-img>
                           </td>
                           <td>{{ ingredient.nameIngredient }}</td>
                           <td>
-                            <v-text-field v-model="type.ingredientQuantities[ingredient.IngredientId]" type="number" min="0" label="Quantity" v-if="type.selectedIngredients.includes(ingredient.IngredientId)"></v-text-field>
+                            <v-text-field v-model="type.ingredientQuantities[ingredient.IngredientId]" type="number"
+                              min="0" label="Quantity"
+                              v-if="type.selectedIngredients.includes(ingredient.IngredientId)"></v-text-field>
                           </td>
                           <td>{{ ingredient.unit }}</td>
                         </tr>
@@ -79,6 +86,7 @@
     </v-card>
   </v-dialog>
 </template>
+
 
 <script lang="ts" setup>
 import { useCategoryStore } from '@/stores/category.store';
@@ -117,6 +125,7 @@ const productTypes = reactive({
 
 watch(() => productStore.product.category.categoryName, (newVal) => {
   isDrink.value = newVal === "เครื่องดื่ม";
+  checkCategory();
   if (!isDrink.value) {
     productTypes.hot = false;
     productTypes.cold = false;
@@ -142,12 +151,13 @@ const handleProductTypeChange = (type: string, isChecked: boolean) => {
       productTypeName: type,
       productTypePrice: 5,
       selectedIngredients: [] as number[],
-      ingredientQuantities: {} as IngredientQuantities,
+      ingredientQuantities: reactive({}) as IngredientQuantities,
       recipe: []
     });
   } else if (!isChecked && typeIndex !== -1) {
     productDetails.value.splice(typeIndex, 1);
   }
+  console.log(`Product Details for ${type}:`, productDetails.value);
 };
 
 const handleIngredientSelect = (type: CustomProductType, ingredient: Ingredient) => {
@@ -159,6 +169,8 @@ const handleIngredientSelect = (type: CustomProductType, ingredient: Ingredient)
     type.selectedIngredients.splice(index, 1);
     delete type.ingredientQuantities[ingredient.IngredientId];
   }
+  console.log(`Selected Ingredients for ${type.productTypeName}:`, JSON.parse(JSON.stringify(type.selectedIngredients)));
+  console.log(`Ingredient Quantities for ${type.productTypeName}:`, JSON.parse(JSON.stringify(type.ingredientQuantities)));
 };
 
 const checkCategory = () => {
@@ -183,7 +195,7 @@ const submitForm = () => {
     }))
   };
 
-  console.log(productData);
+  console.log('Product Data:', JSON.parse(JSON.stringify(productData)));
   dialog.value = false; // Close dialog after submit
 };
 </script>
