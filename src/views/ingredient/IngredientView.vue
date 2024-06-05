@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { useIngredientStore } from '@/stores/Ingredient.store';
+import IngredientDialog from "@/views/ingredient/IngredientDialog.vue"
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router'; 
 const ingredientStore = useIngredientStore();
@@ -16,6 +17,7 @@ const navigateTo = (routeName: string) => {
 </script>
 
 <template>
+  <IngredientDialog></IngredientDialog>
   <v-container>
     <v-card>
       <v-card-title>
@@ -72,7 +74,7 @@ const navigateTo = (routeName: string) => {
             </v-menu>
           </v-col>
           <v-col>
-            <v-btn color="success" class="button-full-width">
+            <v-btn color="success" class="button-full-width"  @click="ingredientStore.dialog = true">
               <v-icon left>mdi-check</v-icon>
              เพิ่มวัตถุดิบ
             </v-btn>
@@ -107,7 +109,14 @@ const navigateTo = (routeName: string) => {
             <td>{{ item.minimun }}</td>
             <td>{{ item.unit }}</td>
             <td>
-              <v-btn color="#FFDD83" class="mr-2" icon="mdi-pencil"></v-btn>
+              <v-btn
+                  color="#FFDD83"
+                  class="mr-5"
+                  icon="mdi-pencil"
+                  @click="ingredientStore.setEditedIngredient(item);
+"
+                ></v-btn>
+
               <v-btn color="#F55050" icon="mdi-delete"></v-btn>
             </td>
           </tr>
