@@ -2,14 +2,17 @@
 import { useCategoryStore } from '@/stores/category.store';
 import { useIngredientStore } from '@/stores/Ingredient.store';
 import { useProductStore } from '@/stores/product.store';
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 
-
+interface IngredientQuantities {
+  [key: number]: number; // Use number for both keys and values
+}
 const productStore = useProductStore();
 const categoryStore = useCategoryStore();
 const isDrink = ref(false);
 const ingredientStore = useIngredientStore();
 const selectedIngredients = ref<number[]>([]);
+const ingredientQuantities = ref<IngredientQuantities>({});
 const url = 'http://localhost:3000';
 const productTypes = ref({
   hot: false,
@@ -53,6 +56,22 @@ function toggleIngredientSelection(ingredientId: number) {
     selectedIngredients.value.push(ingredientId); // Add the ingredient if it's not already selected
   }
 }
+
+const selectedIngredientDetails = computed(() => {
+  return ingredientStore.ingredients.filter(ingredient =>
+    selectedIngredients.value.includes(ingredient.IngredientId)
+  );
+});
+
+// Initialize quantity for each ingredient
+watch(selectedIngredients, (newVal) => {
+  newVal.forEach(id => {
+    if (!(id in ingredientQuantities.value)) {
+      ingredientQuantities.value[id] = 0;  // Default quantity
+    }
+  });
+}, { immediate: true });
+
 
 </script>
 <template>
@@ -149,8 +168,51 @@ function toggleIngredientSelection(ingredientId: number) {
 
 
           <template v-slot:item.3>
-            <v-card title="Step Three" flat>...</v-card>
+            <v-card title="Confirm Ingredients and Quantities" flat>
+              <v-container>
+                <v-row>
+                  <v-col>
+                    <v-table>
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Image</th>
+                          <th>Name</th>
+                          <th>Quantity Per Unit</th>
+                          <th>Quantity</th>
+                          <th>Unit</th>
+
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="(item, index) in selectedIngredientDetails" :key="item.IngredientId">
+                          <td>{{ index + 1 }}</td>
+                          <td>
+                            <v-img :src="`http://localhost:3000/ingredients/${item.IngredientId}/image`"
+                              height="100"></v-img>
+                          </td>
+                          <td>{{ item.nameIngredient }}</td>
+                          <td>{{ item.quantityPerUnit }}</td>
+                          <td>
+                            <v-text-field v-model="ingredientQuantities[item.IngredientId]" type="number" min="0"
+                              label="Quantity"></v-text-field>
+                          </td>
+                          <td>{{ item.unit }}</td>
+
+                        </tr>
+                      </tbody>
+                      <tbody v-if="selectedIngredientDetails.length === 0">
+                        <tr>
+                          <td colspan="5" class="text-center">No selected ingredients</td>
+                        </tr>
+                      </tbody>
+                    </v-table>
+                  </v-col>
+                </v-row>
+              </v-container>
+            </v-card>
           </template>
+
 
         </v-stepper>
       </v-card>
