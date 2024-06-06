@@ -78,19 +78,19 @@ const loadProductData = () => {
 
     if (productType.productTypeName === 'Hot') {
       isHot.value = true;
-      selectedIngredientsHot.value = productDetails.value.find(pt => pt.productTypeName === 'Hot')?.selectedIngredients || [];
+      productStore.selectedIngredientsHot = productDetails.value.find(pt => pt.productTypeName === 'Hot')?.selectedIngredients || [];
       ingredientQuantitiesHot.value = productDetails.value.find(pt => pt.productTypeName === 'Hot')?.ingredientQuantities || {};
     }
 
     if (productType.productTypeName === 'Cold') {
       isCold.value = true;
-      selectedIngredientsCold.value = productDetails.value.find(pt => pt.productTypeName === 'Cold')?.selectedIngredients || [];
+      productStore.selectedIngredientsCold = productDetails.value.find(pt => pt.productTypeName === 'Cold')?.selectedIngredients || [];
       ingredientQuantitiesCold.value = productDetails.value.find(pt => pt.productTypeName === 'Cold')?.ingredientQuantities || {};
     }
 
     if (productType.productTypeName === 'Blend') {
       isBlend.value = true;
-      selectedIngredientsBlend.value = productDetails.value.find(pt => pt.productTypeName === 'Blend')?.selectedIngredients || [];
+      productStore.selectedIngredientsBlend = productDetails.value.find(pt => pt.productTypeName === 'Blend')?.selectedIngredients || [];
       ingredientQuantitiesBlend.value = productDetails.value.find(pt => pt.productTypeName === 'Blend')?.ingredientQuantities || {};
     }
   });
@@ -112,34 +112,34 @@ const handleProductTypeChange = (type: string, isChecked: boolean) => {
 };
 
 const handleHotIngredientSelect = (type: CustomProductType, ingredient: Ingredient) => {
-  const index = selectedIngredientsHot.value.findIndex(id => id === ingredient.IngredientId);
+  const index = productStore.selectedIngredientsHot.findIndex(id => id === ingredient.IngredientId);
   if (index === -1) {
-    selectedIngredientsHot.value.push(ingredient.IngredientId);
+    productStore.selectedIngredientsHot.push(ingredient.IngredientId);
     ingredientQuantitiesHot.value[ingredient.IngredientId] = 0;
   } else {
-    selectedIngredientsHot.value.splice(index, 1);
+    productStore.selectedIngredientsHot.splice(index, 1);
     delete ingredientQuantitiesHot.value[ingredient.IngredientId];
   }
 };
 
 const handleColdIngredientSelect = (type: CustomProductType, ingredient: Ingredient) => {
-  const index = selectedIngredientsCold.value.findIndex(id => id === ingredient.IngredientId);
+  const index = productStore.selectedIngredientsCold.findIndex(id => id === ingredient.IngredientId);
   if (index === -1) {
-    selectedIngredientsCold.value.push(ingredient.IngredientId);
+    productStore.selectedIngredientsCold.push(ingredient.IngredientId);
     ingredientQuantitiesCold.value[ingredient.IngredientId] = 0;
   } else {
-    selectedIngredientsCold.value.splice(index, 1);
+    productStore.selectedIngredientsCold.splice(index, 1);
     delete ingredientQuantitiesCold.value[ingredient.IngredientId];
   }
 };
 
 const handleBlendIngredientSelect = (type: CustomProductType, ingredient: Ingredient) => {
-  const index = selectedIngredientsBlend.value.findIndex(id => id === ingredient.IngredientId);
+  const index = productStore.selectedIngredientsBlend.findIndex(id => id === ingredient.IngredientId);
   if (index === -1) {
-    selectedIngredientsBlend.value.push(ingredient.IngredientId);
+    productStore.selectedIngredientsBlend.push(ingredient.IngredientId);
     ingredientQuantitiesBlend.value[ingredient.IngredientId] = 0;
   } else {
-    selectedIngredientsBlend.value.splice(index, 1);
+    productStore.selectedIngredientsBlend.splice(index, 1);
     delete ingredientQuantitiesBlend.value[ingredient.IngredientId];
   }
 };
@@ -165,76 +165,75 @@ const submitForm = async () => {
   if (!form.value.validate()) return;
 
   const productData = {
-    productName: productName.value,
-    productPrice: productPrice.value,
-    productImage: productImage.value,
-    categoryId: selectedCategory.value,
-    productTypes: [] as ProductType[]
+    productName: productStore.productName,
+    productPrice: productStore.productPrice,
+    productImage: productStore.product.productImage,
+    categoryId: categoryStore.categoriesForCreate.find(category => category.categoryName === selectedCategory.value)?.categoryId || null,
+    productTypes: [] as ProductType[] // Ensure productTypes is initialized
   };
 
   if (isDrink.value) {
-    if (selectedIngredientsHot.value.length > 0) {
+    if (productStore.selectedIngredientsHot.length > 0) {
       productData.productTypes.push({
         productTypeName: 'Hot',
         productTypePrice: 0,
-        recipe: selectedIngredientsHot.value.map((ingredientId) => {
+        recipe: productStore.selectedIngredientsHot.map((ingredientId) => {
           return {
             ingredient: ingredientStore.ingredients.find(i => i.IngredientId === ingredientId)!,
-            quantity: ingredientQuantitiesHot.value[ingredientId]
+            quantity: productStore.ingredientQuantitiesHot[ingredientId]
           };
         })
       });
     }
-    if (selectedIngredientsCold.value.length > 0) {
+    if (productStore.selectedIngredientsCold.length > 0) {
       productData.productTypes.push({
         productTypeName: 'Cold',
         productTypePrice: 0,
-        recipe: selectedIngredientsCold.value.map((ingredientId) => {
+        recipe: productStore.selectedIngredientsCold.map((ingredientId) => {
           return {
             ingredient: ingredientStore.ingredients.find(i => i.IngredientId === ingredientId)!,
-            quantity: ingredientQuantitiesCold.value[ingredientId]
+            quantity: productStore.ingredientQuantitiesCold[ingredientId]
           };
         })
       });
     }
-    if (selectedIngredientsBlend.value.length > 0) {
+    if (productStore.selectedIngredientsBlend.length > 0) {
       productData.productTypes.push({
         productTypeName: 'Blend',
         productTypePrice: 0,
-        recipe: selectedIngredientsBlend.value.map((ingredientId) => {
+        recipe: productStore.selectedIngredientsBlend.map((ingredientId) => {
           return {
             ingredient: ingredientStore.ingredients.find(i => i.IngredientId === ingredientId)!,
-            quantity: ingredientQuantitiesBlend.value[ingredientId]
+            quantity: productStore.ingredientQuantitiesBlend[ingredientId]
           };
         })
       });
     }
   }
 
-  const formData = new FormData();
-  formData.append('productName', productData.productName);
-  formData.append('productPrice', productData.productPrice.toString());
-  if (productImage.value instanceof File) {
-    formData.append('productImage', productImage.value);
-  }
-  formData.append('categoryId', productData.categoryId);
-
-  productData.productTypes.forEach((productType, index) => {
-    formData.append(`productTypes[${index}][productTypeName]`, productType.productTypeName);
-    formData.append(`productTypes[${index}][productTypePrice]`, productType.productTypePrice.toString());
-    productType.recipe.forEach((recipeItem, recipeIndex) => {
-      formData.append(`productTypes[${index}][recipe][${recipeIndex}][ingredientId]`, recipeItem.ingredient.IngredientId.toString());
-      formData.append(`productTypes[${index}][recipe][${recipeIndex}][quantity]`, recipeItem.quantity.toString());
-    });
-  });
-
   try {
-    const response = await axios.put(`/products/${productStore.product.productId}`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    });
-    console.log('Product updated successfully:', response.data);
+    productStore.product = {
+      category: categoryStore.categories.find(c => c.categoryName === productStore.product.category.categoryName)!,
+      productName: productData.productName,
+      productPrice: productData.productPrice,
+      productImage: '',
+      productTypes: productData.productTypes.map((productType) => {
+        return {
+          productTypeName: productType.productTypeName,
+          productTypePrice: productType.productTypePrice,
+          recipe: productType.recipe.map((recipeItem) => {
+            return {
+              ingredient: recipeItem.ingredient,
+              quantity: recipeItem.quantity
+            };
+          })
+        };
+      }),
+      productId: productStore.product.productId,
+      file: productImage.value
+    };
+    console.log('Product:', JSON.parse(JSON.stringify(productStore.product)));
+    await productStore.updateProduct(productStore.product.productId, productStore.product);
     productStore.updateProductDialog = false;
   } catch (error) {
     console.error('Error updating product:', error);
@@ -297,7 +296,7 @@ const submitForm = async () => {
                 <v-checkbox label="Blend" v-model="productStore.isBlend" @change="() => handleProductTypeChange('Blend', isBlend)"></v-checkbox>
               </v-row>
 
-              <v-container v-for="(type, index) in productStore.productTypes" :key="index">
+              <!-- <v-container v-for="(type, index) in productStore.productTypes" :key="index">
                 <v-row>
                   <v-col cols="12">
                     <v-subheader>{{ type.productTypeName }}</v-subheader>
@@ -341,7 +340,139 @@ const submitForm = async () => {
                     </v-table>
                   </v-col>
                 </v-row>
+              </v-container> -->
+              <!-- container for hot -->
+              <v-container v-if="productStore.isHot">
+                <v-row>
+                  <v-col cols="12">
+                    <v-subheader>Hot</v-subheader>
+                    <v-text-field v-model="productStore.productTypes[0].productTypePrice" label="Type price" type="number" required />
+                  </v-col>
+                  <v-col cols="12">
+                    <v-btn icon @click="() => addRecipe(productStore.productTypes[0])">
+                      <v-icon>mdi-plus</v-icon>
+                    </v-btn>
+                  </v-col>
+                  <v-col cols="12">
+                    <v-table>
+                      <thead>
+                        <tr>
+                          <th>Select</th>
+                          <th>Image</th>
+                          <th>Name</th>
+                          <th>Quantity</th>
+                          <th>Unit</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="ingredient in ingredientStore.ingredients" :key="ingredient.IngredientId">
+                          <td>
+                            <v-checkbox v-model="productStore.selectedIngredientsHot" :value="ingredient.IngredientId" @change="() => handleHotIngredientSelect(productStore.productTypes[0], ingredient)"></v-checkbox>
+                          </td>
+                          <td>
+                            <v-img :src="`http://localhost:3000/ingredients/${ingredient.IngredientId}/image`" height="100"></v-img>
+                          </td>
+                          <td>{{ ingredient.nameIngredient }}</td>
+                          <td>
+                            <v-text-field v-if="productStore.selectedIngredientsHot.includes(ingredient.IngredientId)" v-model="productStore.ingredientQuantitiesHot[ingredient.IngredientId]" type="number" min="0" label="Quantity"></v-text-field>
+                          </td>
+                          <td>{{ ingredient.unit }}</td>
+                        </tr>
+                      </tbody>
+                    </v-table>
+                  </v-col>
+                </v-row>
               </v-container>
+
+              <!-- container for cold -->
+
+              <v-container v-if="productStore.isCold">
+                <v-row>
+                  <v-col cols="12">
+                    <v-subheader>Cold</v-subheader>
+                    <v-text-field v-model="productStore.productTypes[1].productTypePrice" label="Type price" type="number" required />
+                  </v-col>
+                  <v-col cols="12">
+                    <v-btn icon @click="() => addRecipe(productStore.productTypes[1])">
+                      <v-icon>mdi-plus</v-icon>
+                    </v-btn>
+                  </v-col>
+                  <v-col cols="12">
+                    <v-table>
+                      <thead>
+                        <tr>
+                          <th>Select</th>
+                          <th>Image</th>
+                          <th>Name</th>
+                          <th>Quantity</th>
+                          <th>Unit</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="ingredient in ingredientStore.ingredients" :key="ingredient.IngredientId">
+                          <td>
+                            <v-checkbox v-model="productStore.selectedIngredientsCold" :value="ingredient.IngredientId" @change="() => handleColdIngredientSelect(productStore.productTypes[1], ingredient)"></v-checkbox>
+                          </td>
+                          <td>
+                            <v-img :src="`http://localhost:3000/ingredients/${ingredient.IngredientId}/image`" height="100"></v-img>
+                          </td>
+                          <td>{{ ingredient.nameIngredient }}</td>
+                          <td>
+                            <v-text-field v-if="productStore.selectedIngredientsCold.includes(ingredient.IngredientId)" v-model="productStore.ingredientQuantitiesCold[ingredient.IngredientId]" type="number" min="0" label="Quantity"></v-text-field>
+                          </td>
+                          <td>{{ ingredient.unit }}</td>
+                        </tr>
+                      </tbody>
+                    </v-table>
+                  </v-col>
+                </v-row>
+
+              </v-container>
+
+              <!-- container for blend -->
+
+              <v-container v-if="productStore.isBlend">
+                <v-row>
+                  <v-col cols="12">
+                    <v-subheader>Blend</v-subheader>
+                    <v-text-field v-model="productStore.productTypes[2].productTypePrice" label="Type price" type="number" required />
+                  </v-col>
+                  <v-col cols="12">
+                    <v-btn icon @click="() => addRecipe(productStore.productTypes[2])">
+                      <v-icon>mdi-plus</v-icon>
+                    </v-btn>
+                  </v-col>
+                  <v-col cols="12">
+                    <v-table>
+                      <thead>
+                        <tr>
+                          <th>Select</th>
+                          <th>Image</th>
+                          <th>Name</th>
+                          <th>Quantity</th>
+                          <th>Unit</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="ingredient in ingredientStore.ingredients" :key="ingredient.IngredientId">
+                          <td>
+                            <v-checkbox v-model="productStore.selectedIngredientsBlend" :value="ingredient.IngredientId" @change="() => handleBlendIngredientSelect(productStore.productTypes[2], ingredient)"></v-checkbox>
+                          </td>
+                          <td>
+                            <v-img :src="`http://localhost:3000/ingredients/${ingredient.IngredientId}/image`" height="100"></v-img>
+                          </td>
+                          <td>{{ ingredient.nameIngredient }}</td>
+                          <td>
+                            <v-text-field v-if="productStore.selectedIngredientsBlend.includes(ingredient.IngredientId)" v-model="productStore.ingredientQuantitiesBlend[ingredient.IngredientId]" type="number" min="0" label="Quantity"></v-text-field>
+                          </td>
+                          <td>{{ ingredient.unit }}</td>
+                        </tr>
+                      </tbody>
+                    </v-table>
+                  </v-col>
+                </v-row>
+              </v-container>
+
             </v-row>
           </v-form>
         </v-container>
