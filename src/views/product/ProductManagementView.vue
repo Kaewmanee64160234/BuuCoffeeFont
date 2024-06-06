@@ -6,6 +6,7 @@ import CreateProductDialog from '../../components/products/CreateProductDialog.v
 import UpdateProductDialog from '../../components/products/UpdateProductDialog.vue';
 import { useIngredientStore } from '@/stores/Ingredient.store';
 import type { Product } from '@/types/product.type';
+import type { IngredientQuantities } from '@/types/productType.type';
 
 const productStore = useProductStore();
 const categoryStore = useCategoryStore();
@@ -24,10 +25,81 @@ const openCreateDialog = () => {
   productStore.createProductDialog = true;
 };
 
-const openUpdateDialog = (product:Product) => {
-  productStore.product = product;
+const openUpdateDialog = (product: Product) => {
+  productStore.product = { ...product, file: new File([""], "") };
+  loadProductData();
   productStore.updateProductDialog = true;
 };
+
+const loadProductData = () => {
+  const product = productStore.product;
+
+  productStore.productName = product.productName || '';
+  productStore.productPrice = product.productPrice || 0;
+  productStore.selectedCategory = product.category?.categoryName || null;
+  productStore.imagePreview = product.productImage ? `${url}/products/${product.productId}/image` : null;
+
+  if (product.productTypes && Array.isArray(product.productTypes)) {
+    product.productTypes.forEach(productType => {
+      if (productType.productTypeName === 'Hot') {
+        productStore.isHot = true;
+        productStore.selectedIngredientsHot = productType.recipe?.map(recipeItem => recipeItem.ingredient.ingredientId) || [];
+        productStore.ingredientQuantitiesHot = productType.recipe?.reduce((acc, recipeItem) => {
+          acc[recipeItem.ingredient.ingredientId] = recipeItem.quantity;
+          return acc;
+        }, {} as IngredientQuantities) || {};
+      }
+
+      if (productType.productTypeName === 'Cold') {
+        productStore.isCold = true;
+        productStore.selectedIngredientsCold = productType.recipe?.map(recipeItem => recipeItem.ingredient.ingredientId) || [];
+        productStore.ingredientQuantitiesCold = productType.recipe?.reduce((acc, recipeItem) => {
+          acc[recipeItem.ingredient.ingredientId] = recipeItem.quantity;
+          return acc;
+        }, {} as IngredientQuantities) || {};
+      }
+
+      if (productType.productTypeName === 'Blend') {
+        productStore.isBlend = true;
+        productStore.selectedIngredientsBlend = productType.recipe?.map(recipeItem => recipeItem.ingredient.ingredientId) || [];
+        productStore.ingredientQuantitiesBlend = productType.recipe?.reduce((acc, recipeItem) => {
+          acc[recipeItem.ingredient.ingredientId] = recipeItem.quantity;
+          return acc;
+        }, {} as IngredientQuantities) || {};
+      }
+
+      productStore.productTypes.push({
+        productTypeName: productType.productTypeName,
+        productTypePrice: productType.productTypePrice,
+        selectedIngredients: productType.recipe?.map(recipeItem => recipeItem.ingredient.ingredientId) || [],
+        ingredientQuantities: productType.recipe?.reduce((acc, recipeItem) => {
+          acc[recipeItem.ingredient.ingredientId] = recipeItem.quantity;
+          return acc;
+        }, {} as IngredientQuantities) || {},
+        recipe: productType.recipe || []
+      });
+    });
+  } else {
+    productStore.productTypes = [];
+  }
+
+  console.log(productStore.productTypes);
+  console.log(productStore.productName);
+  console.log(productStore.productPrice);
+  console.log(productStore.selectedCategory);
+  console.log(productStore.imagePreview);
+  console.log(productStore.isHot);
+  console.log(productStore.selectedIngredientsHot);
+  console.log(productStore.ingredientQuantitiesHot);
+  console.log(productStore.isCold);
+  console.log(productStore.selectedIngredientsCold);
+  console.log(productStore.ingredientQuantitiesCold);
+  console.log(productStore.isBlend);
+  console.log(productStore.selectedIngredientsBlend);
+  console.log(productStore.ingredientQuantitiesBlend);
+};
+
+
 </script>
 
 <template>

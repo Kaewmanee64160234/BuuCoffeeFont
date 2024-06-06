@@ -1,13 +1,17 @@
-import { ref, watch } from "vue";
+import { reactive, ref, watch } from "vue";
 import { defineStore } from "pinia";
-import type { Product } from "@/types/product.type";
+import { mapToProduct, type Product } from "@/types/product.type";
 import productService from "@/service/product.service";
 import type { Category } from "@/types/category.type";
 import { useCategoryStore } from "./category.store";
+import type { IngredientQuantities, ProductType } from "@/types/productType.type";
 
 export const useProductStore = defineStore("product", () => {
-  const products = ref<Product[]>();
+  const products = ref<Product[]>([]);
   const updateProductDialog = ref(false);
+  const createProductDialog = ref(false);
+  const searchQuery = ref<string>("");
+
   const product = ref<Product & { file: File }>({
     productId: 0,
     productName: "",
@@ -22,13 +26,26 @@ export const useProductStore = defineStore("product", () => {
     productTypes: [],
   });
 
-  const searchQuery = ref<string>("");
-  const createProductDialog = ref(false);
-  const selectedCategoryName = ref<string>("");
+  const productName = ref<string>("");
+  const productPrice = ref<number>(0);
+  const selectedCategory = ref<string | null>(null);
+  const imagePreview = ref<string | null>(null);
+
+  const selectedIngredientsHot = ref<number[]>([]);
+  const selectedIngredientsCold = ref<number[]>([]);
+  const selectedIngredientsBlend = ref<number[]>([]);
+  const ingredientQuantitiesHot = ref<IngredientQuantities>({});
+  const ingredientQuantitiesCold = ref<IngredientQuantities>({});
+  const ingredientQuantitiesBlend = ref<IngredientQuantities>({});
+  const productTypes = ref<ProductType[]>([]);
+  const isHot = ref<boolean>(false);
+  const isCold = ref<boolean>(false);
+  const isBlend = ref<boolean>(false);
+
   const categoryStore = useCategoryStore();
 
-  // watch if selectedCategoryName changes map products by category
-  watch(selectedCategoryName, (value) => {
+  // watch if selectedCategory changes map products by category
+  watch(selectedCategory, (value) => {
     if (value != "All") {
       product.value.category =
         categoryStore.categoriesForCreate.find(
@@ -41,8 +58,10 @@ export const useProductStore = defineStore("product", () => {
     try {
       const response = await productService.getAllProducts();
       if (response.status === 200) {
-        console.log("getAllProducts", response.data);
-        products.value = response.data;
+        console.log(response.data);
+      //  use map to Product with array products
+        products.value = response.data.map( (product: any) => mapToProduct(product));
+
       }
     } catch (error) {
       console.error(error);
@@ -62,12 +81,9 @@ export const useProductStore = defineStore("product", () => {
 
   const createProduct = async () => {
     try {
-      console.log("createProduct", product.value);
       const response = await productService.createProduct(product.value!);
-
       if (response.status === 201) {
         await uploadImage(product.value.file, response.data.productId);
-
         await getAllProducts();
       }
     } catch (error) {
@@ -75,11 +91,11 @@ export const useProductStore = defineStore("product", () => {
     }
   };
 
-  const updateProduct = async (id: number, product: Product) => {
+  const updateProduct = async (id: number, updatedProduct: Product) => {
     try {
-      const response = await productService.updateProduct(id, product);
+      const response = await productService.updateProduct(id, updatedProduct);
       if (response.status === 200) {
-        products.value = response.data;
+        await getAllProducts();
       }
     } catch (error) {
       console.error(error);
@@ -90,7 +106,7 @@ export const useProductStore = defineStore("product", () => {
     try {
       const response = await productService.deleteProduct(id);
       if (response.status === 200) {
-        products.value = response.data;
+        await getAllProducts();
       }
     } catch (error) {
       console.error(error);
@@ -112,7 +128,6 @@ export const useProductStore = defineStore("product", () => {
     try {
       const response = await productService.getProductsByCategory(category);
       if (response.status === 200) {
-        console.log("getProductsByCategory", response.data);
         products.value = response.data;
       }
     } catch (error) {
@@ -123,6 +138,10 @@ export const useProductStore = defineStore("product", () => {
   return {
     products,
     product,
+    productName,
+    productPrice,
+    selectedCategory,
+    imagePreview,
     getAllProducts,
     getProductById,
     createProduct,
@@ -132,7 +151,16 @@ export const useProductStore = defineStore("product", () => {
     searchQuery,
     getProductsByCategory,
     createProductDialog,
-    selectedCategoryName,
-    updateProductDialog
+    updateProductDialog,
+    selectedIngredientsHot,
+    selectedIngredientsCold,
+    selectedIngredientsBlend,
+    ingredientQuantitiesHot,
+    ingredientQuantitiesCold,
+    ingredientQuantitiesBlend,
+    productTypes,
+    isHot,
+    isCold,
+    isBlend,
   };
 });
