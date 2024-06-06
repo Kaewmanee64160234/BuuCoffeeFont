@@ -5,18 +5,14 @@
         <span class="headline">Create Product</span>
       </v-card-title>
       <v-card-text>
-        {{ selectedIngredientsBlend }}
-        {{ selectedIngredientsCold }}
-        {{ selectedIngredientsHot }}
-        {{ ingredientQuantitiesBlend }}
-        {{ ingredientQuantitiesCold }}
-        {{ ingredientQuantitiesHot }}
-
         <v-container>
           <v-form ref="form" v-model="valid">
             <v-row>
               <v-col cols="12" sm="6">
-                <v-file-input v-model="productImage" label="Product image" prepend-icon="mdi-camera" accept="image/*" />
+                <v-file-input v-model="productImage" label="Product image" prepend-icon="mdi-camera" accept="image/*" @change="handleImageUpload" />
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-img v-if="imagePreview" :src="imagePreview" max-height="200"></v-img>
               </v-col>
               <v-col cols="12" sm="6">
                 <v-text-field v-model="productName" label="Product name" required />
@@ -115,8 +111,6 @@
   </v-dialog>
 </template>
 
-
-
 <script lang="ts" setup>
 import { useCategoryStore } from '@/stores/category.store';
 import { useIngredientStore } from '@/stores/Ingredient.store';
@@ -140,6 +134,7 @@ const valid = ref(false);
 const productName = ref('');
 const productPrice = ref(0);
 const productImage = ref(new File([], ''));
+const imagePreview = ref<string | null>(null);
 const selectedCategory = ref(null);
 const productStore = useProductStore();
 const isDrink = ref(false);
@@ -232,6 +227,14 @@ const handleBlendIngredientSelect = (type: CustomProductType, ingredient: Ingred
   console.log('Ingredient Quantities for Blend:', JSON.parse(JSON.stringify(ingredientQuantitiesBlend.value)));
 };
 
+const handleImageUpload = (event: Event) => {
+  const input = event.target as HTMLInputElement;
+  if (input.files && input.files[0]) {
+    const file = input.files[0];
+    productImage.value = file;
+    imagePreview.value = URL.createObjectURL(file);
+  }
+};
 
 const addRecipe = (type: CustomProductType) => {
   type.recipe.push({ ingredient: {} as Ingredient, quantity: 0 });
@@ -293,16 +296,14 @@ const submitForm = async () => {
 
   console.log('Product Data:', JSON.parse(JSON.stringify(productData)));
   productStore.product = {
-  category: categoryStore.categories.find(c => c.categoryName === productStore.product.category.categoryName)!,
-  productName:productData.productName,
-  productPrice:productData.productPrice,
-  productImage:'',
-  productTypes:productData.productTypes,
-  productId:0,
-  file: productImage.value
-  
-
-  }
+    category: categoryStore.categories.find(c => c.categoryName === productStore.product.category.categoryName)!,
+    productName: productData.productName,
+    productPrice: productData.productPrice,
+    productImage: '',
+    productTypes: productData.productTypes,
+    productId: 0,
+    file: productImage.value
+  };
   console.log('Product:', JSON.parse(JSON.stringify(productStore.product)));
   await productStore.createProduct();
   productStore.createProductDialog = false;

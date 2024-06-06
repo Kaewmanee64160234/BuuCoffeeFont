@@ -7,6 +7,7 @@ import { useCategoryStore } from "./category.store";
 
 export const useProductStore = defineStore("product", () => {
   const products = ref<Product[]>();
+  const updateProductDialog = ref(false);
   const product = ref<Product & { file: File }>({
     productId: 0,
     productName: "",
@@ -132,5 +133,6 @@ export const useProductStore = defineStore("product", () => {
     getProductsByCategory,
     createProductDialog,
     selectedCategoryName,
+    updateProductDialog
   };
 });

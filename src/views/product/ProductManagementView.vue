@@ -1,36 +1,38 @@
 <script lang="ts" setup>
 import { useCategoryStore } from '@/stores/category.store';
 import { useProductStore } from '@/stores/product.store';
-import { computed, onMounted, ref, watch } from 'vue'
-import  CreateProductDialog from '../../components/products/CreateProductDialog.vue'
+import { computed, onMounted, ref, watch } from 'vue';
+import CreateProductDialog from '../../components/products/CreateProductDialog.vue';
+import UpdateProductDialog from '../../components/products/UpdateProductDialog.vue';
 import { useIngredientStore } from '@/stores/Ingredient.store';
+import type { Product } from '@/types/product.type';
 
-const productStore = useProductStore()
-const categoryStore = useCategoryStore()
-const url = import.meta.env.VITE_URL_PORT
-const paginate = ref(true)
+const productStore = useProductStore();
+const categoryStore = useCategoryStore();
+const url = import.meta.env.VITE_URL_PORT;
+const paginate = ref(true);
 const selectedCategory = ref(categoryStore.selectedCategory);
-const ingredientStore = useIngredientStore()
+const ingredientStore = useIngredientStore();
+
 onMounted(async () => {
-    // productStore.cat = ''
-    await productStore.getAllProducts()
-    await categoryStore.getAllCategories()
-    await ingredientStore.getAllIngredients()
+  await productStore.getAllProducts();
+  await categoryStore.getAllCategories();
+  await ingredientStore.getAllIngredients();
+});
 
-})
+const openCreateDialog = () => {
+  productStore.createProductDialog = true;
+};
 
-// open dialog
-const openDialog = () => {
-
-    productStore.createProductDialog = true
-    console.log(productStore.createProductDialog)
-}
-
+const openUpdateDialog = (product:Product) => {
+  productStore.product = product;
+  productStore.updateProductDialog = true;
+};
 </script>
+
 <template>
-  <!-- <ConfirmDialog ref="confirmDlg"></ConfirmDialog> -->
-  <!-- <ProductDialog></ProductDialog> -->
-<CreateProductDialog />
+  <CreateProductDialog />
+  <UpdateProductDialog />
   <v-container v-if="paginate">
     <v-card>
       <v-card-title>
@@ -39,32 +41,21 @@ const openDialog = () => {
             Products
           </v-col>
           <v-col cols="3">
-            <v-text-field
-              v-model="productStore.searchQuery"
-              label="Search"
-              append-inner-icon="mdi-magnify"
-              hide-details
-              dense
-            ></v-text-field>
+            <v-text-field v-model="productStore.searchQuery" label="Search" append-inner-icon="mdi-magnify" hide-details
+              dense></v-text-field>
           </v-col>
           <v-col>
-            <v-btn @click="openDialog()" color="success" >
+            <v-btn @click="openCreateDialog" color="success">
               <v-icon left>mdi-plus</v-icon>
               Add New Product
             </v-btn>
           </v-col>
           <v-col cols="3">
-            <v-select
-              v-model="categoryStore.selectedCategory"
-              label="Select Category"
-              :items="categoryStore.categories.map(category => category.categoryName)"
-              dense
-            ></v-select>
-
-            </v-col>
-          </v-row>
-
-          <v-spacer> </v-spacer>
+            <v-select v-model="categoryStore.selectedCategory" label="Select Category"
+              :items="categoryStore.categories.map(category => category.categoryName)" dense></v-select>
+          </v-col>
+        </v-row>
+        <v-spacer></v-spacer>
       </v-card-title>
       <v-table class="text-center mt-5">
         <thead>
@@ -74,7 +65,6 @@ const openDialog = () => {
             <th>Name</th>
             <th>Type</th>
             <th>Price</th>
-            <!-- <th>Size</th> -->
             <th>Operations</th>
           </tr>
         </thead>
@@ -86,22 +76,19 @@ const openDialog = () => {
             </td>
             <td>{{ item.productName }}</td>
             <td>{{ item.category.categoryName }}</td>
-            <td>{{ item.productName }}</td>
-            <!-- <td>{{ item.size }}</td> -->
+            <td>{{ item.productPrice }}</td>
             <td>
-              <v-btn color="#FFDD83" class="mr-5" icon="mdi-pencil" ></v-btn>
-              <v-btn color="#F55050" class="mr-5" icon="mdi-delete" ></v-btn>
+              <v-btn color="#FFDD83" class="mr-5" icon="mdi-pencil" @click="openUpdateDialog(item)"></v-btn>
+              <v-btn color="#F55050" class="mr-5" icon="mdi-delete"></v-btn>
             </td>
           </tr>
         </tbody>
-
         <tbody v-if="!productStore.products">
           <tr>
             <td colspan="7" class="text-center">No data</td>
           </tr>
         </tbody>
       </v-table>
-      
     </v-card>
   </v-container>
   <v-container v-else>
@@ -111,13 +98,9 @@ const openDialog = () => {
           <div class="col-md-9">
             Products
           </div>
-        
-          
-
-          <v-spacer> </v-spacer>
+          <v-spacer></v-spacer>
         </div>
       </v-card-title>
-
       <v-table class="text-center mt-5">
         <thead>
           <tr>
@@ -139,12 +122,11 @@ const openDialog = () => {
             <td>{{ item.category.categoryName }}</td>
             <td>{{ item.productPrice }}</td>
             <td>
-              <v-btn color="#FFDD83" class="mr-5" icon="mdi-pencil"></v-btn>
-              <v-btn color="#F55050" class="mr-5" icon="mdi-delete" ></v-btn>
+              <v-btn color="#FFDD83" class="mr-5" icon="mdi-pencil" @click="openUpdateDialog(item)"></v-btn>
+              <v-btn color="#F55050" class="mr-5" icon="mdi-delete"></v-btn>
             </td>
           </tr>
         </tbody>
-
         <tbody v-if="!productStore.products">
           <tr>
             <td colspan="7" class="text-center">No data</td>
