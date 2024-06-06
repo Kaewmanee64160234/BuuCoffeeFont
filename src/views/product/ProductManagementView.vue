@@ -82,7 +82,7 @@ const openDialog = () => {
           <tr style="text-align: center" v-for="(item, index) in productStore.products" :key="index">
             <td>{{ index + 1 }}</td>
             <td>
-              <v-avatar size="80"><v-img :src="`${url}/products/image/${item.productId}`"></v-img></v-avatar>
+              <v-avatar size="80"><v-img :src="`${url}/products/${item.productId}/image`"></v-img></v-avatar>
             </td>
             <td>{{ item.productName }}</td>
             <td>{{ item.category.categoryName }}</td>

@@ -139,7 +139,7 @@ const form = ref(null);
 const valid = ref(false);
 const productName = ref('');
 const productPrice = ref(0);
-const productImage = ref('');
+const productImage = ref(new File([], ''));
 const selectedCategory = ref(null);
 const productStore = useProductStore();
 const isDrink = ref(false);
@@ -296,10 +296,10 @@ const submitForm = async () => {
   category: categoryStore.categories.find(c => c.categoryName === productStore.product.category.categoryName)!,
   productName:productData.productName,
   productPrice:productData.productPrice,
-  productImage:productData.productImage,
+  productImage:'',
   productTypes:productData.productTypes,
   productId:0,
-  file: new File([""], "filename")
+  file: productImage.value
   
 
   }

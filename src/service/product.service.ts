@@ -41,8 +41,14 @@ function deleteProduct(id: number) {
 }
 function uploadImage(file: File,productId:number) {
   const formData = new FormData();
-  formData.append("image", file);
-  return http.post(`/upload/${productId}`, formData);
+  formData.append('file', file, file.name);
+  console.log('FormData Contents:', file);
+  return http.post(`/products/upload/${productId}`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    }
+  });
+
 }
 
 // get product by category name
@@ -54,6 +60,8 @@ function getProductsByCategory(category: string) {
 function getImageProduct(id: number) {
   return http.get(`/products/${id}/image/`);
 }
+
+
 
 export default {
   getAllProducts,

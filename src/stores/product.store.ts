@@ -18,7 +18,7 @@ export const useProductStore = defineStore("product", () => {
       haveTopping: false,
     },
     file: new File([""], "filename"),
-    productTypes: []
+    productTypes: [],
   });
 
   const searchQuery = ref<string>("");
@@ -29,7 +29,10 @@ export const useProductStore = defineStore("product", () => {
   // watch if selectedCategoryName changes map products by category
   watch(selectedCategoryName, (value) => {
     if (value != "All") {
-      product.value.category = categoryStore.categoriesForCreate.find(category => category.categoryName === value) || product.value.category;
+      product.value.category =
+        categoryStore.categoriesForCreate.find(
+          (category) => category.categoryName === value
+        ) || product.value.category;
     }
   });
 
@@ -37,7 +40,7 @@ export const useProductStore = defineStore("product", () => {
     try {
       const response = await productService.getAllProducts();
       if (response.status === 200) {
-        console.log('getAllProducts', response.data);
+        console.log("getAllProducts", response.data);
         products.value = response.data;
       }
     } catch (error) {
@@ -58,10 +61,13 @@ export const useProductStore = defineStore("product", () => {
 
   const createProduct = async () => {
     try {
+      console.log("createProduct", product.value);
       const response = await productService.createProduct(product.value!);
-      if (response.status === 201) {
-        getAllProducts();
 
+      if (response.status === 201) {
+        await uploadImage(product.value.file, response.data.productId);
+
+        await getAllProducts();
       }
     } catch (error) {
       console.error(error);
@@ -93,8 +99,8 @@ export const useProductStore = defineStore("product", () => {
   const uploadImage = async (file: File, productId: number) => {
     try {
       const response = await productService.uploadImage(file, productId);
-      if (response.status === 200) {
-        products.value = response.data;
+      if (response.status === 201) {
+        console.log("uploadImage", response.data);
       }
     } catch (error) {
       console.error(error);
@@ -105,7 +111,7 @@ export const useProductStore = defineStore("product", () => {
     try {
       const response = await productService.getProductsByCategory(category);
       if (response.status === 200) {
-        console.log('getProductsByCategory', response.data);
+        console.log("getProductsByCategory", response.data);
         products.value = response.data;
       }
     } catch (error) {
@@ -125,6 +131,6 @@ export const useProductStore = defineStore("product", () => {
     searchQuery,
     getProductsByCategory,
     createProductDialog,
-    selectedCategoryName
+    selectedCategoryName,
   };
 });
