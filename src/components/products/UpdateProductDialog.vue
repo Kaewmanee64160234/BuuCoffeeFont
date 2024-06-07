@@ -43,11 +43,9 @@ watch(() => productStore.product.category?.categoryName, (newVal) => {
 });
 
 onMounted(async () => {
-  loadProductData();
   await categoryStore.getAllCategories();
   await ingredientStore.getAllIngredients();
 });
-
 
 const handleProductTypeChange = (type: string, isChecked: boolean) => {
   const typeIndex = productStore.productTypes.findIndex(pt => pt.productTypeName === type);
@@ -74,7 +72,6 @@ const handleProductTypeChange = (type: string, isChecked: boolean) => {
   }
 };
 
-
 const handleImageUpload = (event: Event) => {
   const input = event.target as HTMLInputElement;
   if (input.files && input.files[0]) {
@@ -83,47 +80,58 @@ const handleImageUpload = (event: Event) => {
     imagePreview.value = URL.createObjectURL(file);
   }
 };
+
 const handleHotIngredientSelect = (ingredient: Ingredient) => {
   const ingredientId = ingredient.IngredientId;
-  const index = productStore.selectedIngredientsHot.indexOf(ingredientId);
-
+  const keys = Object.keys(productStore.ingredientQuantitiesHot);
+  const index = keys.find(key => key === ingredientId.toString()) ? keys.indexOf(ingredientId.toString()) : -1;
+  console.log('Index:', index);
+  console.log('Keys:', keys);
+  console.log('IngredientId:', productStore.ingredientQuantitiesHot[ingredientId]);
   if (index === -1) {
-    // If ingredient is not found, add it
     productStore.selectedIngredientsHot.push(ingredientId);
     productStore.ingredientQuantitiesHot[ingredientId] = 0;
+    productStore.selectedIngredientsHot.splice(ingredientId, 1);
+
   } else {
-    // If ingredient is found, remove it
-    productStore.selectedIngredientsHot.splice(index, 1);
+    productStore.selectedIngredientsHot.splice(index + 1, 1);
     delete productStore.ingredientQuantitiesHot[ingredientId];
   }
 };
 
+
 const handleColdIngredientSelect = (ingredient: Ingredient) => {
   const ingredientId = ingredient.IngredientId;
-  const index = productStore.selectedIngredientsCold.indexOf(ingredientId);
-
+  const keys = Object.keys(productStore.ingredientQuantitiesCold);
+  const index = keys.find(key => key === ingredientId.toString()) ? keys.indexOf(ingredientId.toString()) : -1;
+  console.log('Index:', index);
+  console.log('Keys:', keys);
+  console.log('IngredientId:', productStore.ingredientQuantitiesCold[ingredientId]);
   if (index === -1) {
-    // If ingredient is not found, add it
     productStore.selectedIngredientsCold.push(ingredientId);
     productStore.ingredientQuantitiesCold[ingredientId] = 0;
+    productStore.selectedIngredientsCold.splice(ingredientId, 1);
+
   } else {
-    // If ingredient is found, remove it
-    productStore.selectedIngredientsCold.splice(index, 1);
+    productStore.selectedIngredientsCold.splice(index + 1, 1);
     delete productStore.ingredientQuantitiesCold[ingredientId];
   }
 };
 
 const handleBlendIngredientSelect = (ingredient: Ingredient) => {
   const ingredientId = ingredient.IngredientId;
-  const index = productStore.selectedIngredientsBlend.indexOf(ingredientId);
-
+  const keys = Object.keys(productStore.ingredientQuantitiesBlend);
+  const index = keys.find(key => key === ingredientId.toString()) ? keys.indexOf(ingredientId.toString()) : -1;
+  console.log('Index:', index);
+  console.log('Keys:', keys);
+  console.log('IngredientId:', productStore.ingredientQuantitiesBlend[ingredientId]);
   if (index === -1) {
-    // If ingredient is not found, add it
     productStore.selectedIngredientsBlend.push(ingredientId);
     productStore.ingredientQuantitiesBlend[ingredientId] = 0;
+    productStore.selectedIngredientsBlend.splice(ingredientId, 1);
+
   } else {
-    // If ingredient is found, remove it
-    productStore.selectedIngredientsBlend.splice(index, 1);
+    productStore.selectedIngredientsBlend.splice(index + 1, 1);
     delete productStore.ingredientQuantitiesBlend[ingredientId];
   }
 };
@@ -138,8 +146,6 @@ const loadProductData = () => {
   imagePreview.value = product.productImage ? `${import.meta.env.VITE_URL_PORT}/products/${product.productId}/image` : null;
 };
 
-// checkCategory
-
 const checkCategory = () => {
   isDrink.value = selectedCategory.value === 'เครื่องดื่ม';
   if (!isDrink.value) {
@@ -150,7 +156,6 @@ const checkCategory = () => {
   }
 };
 
-
 const submitForm = async () => {
   if (!form.value.validate()) return;
 
@@ -159,7 +164,7 @@ const submitForm = async () => {
     productPrice: productStore.productPrice,
     productImage: productStore.product.productImage,
     categoryId: categoryStore.categoriesForCreate.find(category => category.categoryName === selectedCategory.value)?.categoryId || null,
-    productTypes: [] as ProductType[] // Ensure productTypes is initialized
+    productTypes: [] as ProductType[]
   };
 
   if (isDrink.value) {
@@ -213,15 +218,14 @@ const submitForm = async () => {
       file: productImage.value
     };
     console.log('Product:', JSON.stringify(productStore.product));
-    // await productStore.updateProduct(productStore.product.productId, productStore.product);
+    await productStore.updateProduct( productStore.product.productId, productStore.product);
     productStore.updateProductDialog = false;
   } catch (error) {
     console.error('Error updating product:', error);
   }
 };
-
-
 </script>
+
 
 
 <template>
@@ -231,22 +235,12 @@ const submitForm = async () => {
         <span class="headline">Update Product</span>
       </v-card-title>
       <v-card-text>
-
-        <!-- {{ productStore.product}} -->
-        <!-- {{ productStore.productName}}
-        {{ productStore.productPrice}}
-        {{ productStore.selectedCategory}}
-        {{ productStore.imagePreview}}
-        {{ productStore.productTypes}} -->
         selectedIngredientsHot: {{ productStore.selectedIngredientsHot }}
         ingredientQuantitiesHot: {{ productStore.ingredientQuantitiesHot }}
         selectedIngredientsCold: {{ productStore.selectedIngredientsCold }}
         ingredientQuantitiesCold: {{ productStore.ingredientQuantitiesCold }}
         selectedIngredientsBlend: {{ productStore.selectedIngredientsBlend }}
         ingredientQuantitiesBlend: {{ productStore.ingredientQuantitiesBlend }}
-
-
-
 
         <v-container>
           <v-form ref="form" v-model="valid">
@@ -274,14 +268,13 @@ const submitForm = async () => {
             <v-row v-if="isDrink">
               <v-row class="d-flex justify-space-between">
                 <v-checkbox label="Hot" v-model="productStore.isHot"
-                  @change="() => handleProductTypeChange('Hot', isHot)"></v-checkbox>
+                  @change="handleProductTypeChange('Hot', isHot)"></v-checkbox>
                 <v-checkbox label="Cold" v-model="productStore.isCold"
-                  @change="() => handleProductTypeChange('Cold', isCold)"></v-checkbox>
+                  @change="handleProductTypeChange('Cold', isCold)"></v-checkbox>
                 <v-checkbox label="Blend" v-model="productStore.isBlend"
-                  @change="() => handleProductTypeChange('Blend', isBlend)"></v-checkbox>
+                  @change="handleProductTypeChange('Blend', isBlend)"></v-checkbox>
               </v-row>
 
-              <!-- container for hot -->
               <v-container v-if="productStore.isHot">
                 <v-row>
                   <v-col cols="12">
@@ -304,7 +297,6 @@ const submitForm = async () => {
                             <v-checkbox :value="ingredient.IngredientId" v-model="productStore.selectedIngredientsHot"
                               @change="handleHotIngredientSelect(ingredient)">
                             </v-checkbox>
-
                           </td>
                           <td>
                             <v-img :src="`http://localhost:3000/ingredients/${ingredient.IngredientId}/image`"
@@ -346,7 +338,6 @@ const submitForm = async () => {
                             <v-checkbox :value="ingredient.IngredientId" v-model="productStore.selectedIngredientsCold"
                               @change="handleColdIngredientSelect(ingredient)">
                             </v-checkbox>
-
                           </td>
                           <td>
                             <v-img :src="`http://localhost:3000/ingredients/${ingredient.IngredientId}/image`"
@@ -406,10 +397,6 @@ const submitForm = async () => {
                   </v-col>
                 </v-row>
               </v-container>
-
-
-
-
             </v-row>
           </v-form>
         </v-container>
