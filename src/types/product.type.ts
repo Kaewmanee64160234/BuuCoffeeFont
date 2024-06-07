@@ -29,9 +29,9 @@ export function mapToProduct(data: any): Product {
             recipeId: recipe.recipeId,
             quantity: recipe.quantity,
             ingredient: recipe.ingredient ? {
-              ingredientId: recipe.ingredient.IngredientId,
-              ingredientName: recipe.ingredient.nameIngredient,
-              ingredientImage: recipe.ingredient.IngredientImage,
+              IngredientId: recipe.ingredient.IngredientId,
+              nameIngredient: recipe.ingredient.nameIngredient,
+              IngredientImage: recipe.ingredient.IngredientImage,
               supplier: recipe.ingredient.supplier,
               minimum: recipe.ingredient.minimun,
               unit: recipe.ingredient.unit,

@@ -83,20 +83,6 @@ const loadProductData = () => {
     productStore.productTypes = [];
   }
 
-  console.log(productStore.productTypes);
-  console.log(productStore.productName);
-  console.log(productStore.productPrice);
-  console.log(productStore.selectedCategory);
-  console.log(productStore.imagePreview);
-  console.log(productStore.isHot);
-  console.log(productStore.selectedIngredientsHot);
-  console.log(productStore.ingredientQuantitiesHot);
-  console.log(productStore.isCold);
-  console.log(productStore.selectedIngredientsCold);
-  console.log(productStore.ingredientQuantitiesCold);
-  console.log(productStore.isBlend);
-  console.log(productStore.selectedIngredientsBlend);
-  console.log(productStore.ingredientQuantitiesBlend);
 };
 
 
