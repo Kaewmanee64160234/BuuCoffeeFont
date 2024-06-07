@@ -29,6 +29,7 @@ const openUpdateDialog = (product: Product) => {
   productStore.product = { ...product, file: new File([""], "") };
   loadProductData();
   productStore.updateProductDialog = true;
+
 };
 
 const loadProductData = () => {

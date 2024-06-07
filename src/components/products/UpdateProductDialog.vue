@@ -224,6 +224,34 @@ const submitForm = async () => {
     console.error('Error updating product:', error);
   }
 };
+
+// closeDialog
+const closeDialog = () => {
+  productStore.product = {
+    category: { categoryId: 0, categoryName: '' },
+    productName: '',
+    productPrice: 0,
+    productImage: '',
+    productTypes: [],
+    productId: 0,
+    file: new File([""], "")
+  };
+  // clear all data in productStore
+  productStore.productName = '';
+  productStore.productPrice = 0;
+  productStore.selectedCategory = '';
+  productStore.imagePreview = null;
+  productStore.isHot = false;
+  productStore.isCold = false;
+  productStore.isBlend = false;
+  productStore.selectedIngredientsHot = [];
+  productStore.ingredientQuantitiesHot = {};
+  productStore.selectedIngredientsCold = [];
+  productStore.ingredientQuantitiesCold = {};
+  productStore.selectedIngredientsBlend = [];
+  productStore.ingredientQuantitiesBlend = {};
+  productStore.updateProductDialog = false;
+};
 </script>
 
 
@@ -403,7 +431,7 @@ const submitForm = async () => {
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" @click="productStore.updateProductDialog = false">Close</v-btn>
+        <v-btn color="blue darken-1" @click="closeDialog()">Close</v-btn>
         <v-btn color="blue darken-1" @click="submitForm" :disabled="!valid">Save</v-btn>
       </v-card-actions>
     </v-card>
