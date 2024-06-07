@@ -177,7 +177,7 @@ const handleProductTypeChange = (type: string, isChecked: boolean) => {
       productTypePrice: 5,
       selectedIngredients: [] as number[],
       ingredientQuantities: reactive({}) as IngredientQuantities,
-      recipe: []
+      recipes: []
     });
   } else if (!isChecked && typeIndex !== -1) {
     productDetails.value.splice(typeIndex, 1);
@@ -237,7 +237,7 @@ const handleImageUpload = (event: Event) => {
 };
 
 const addRecipe = (type: CustomProductType) => {
-  type.recipe.push({ ingredient: {} as Ingredient, quantity: 0 });
+  type.recipes.push({ ingredient: {} as Ingredient, quantity: 0 });
 };
 
 const checkCategory = () => {
@@ -260,7 +260,7 @@ const submitForm = async () => {
       productData.productTypes.push({
         productTypeName: 'Hot',
         productTypePrice: 0,
-        recipe: selectedIngredientsHot.value.map((ingredientId) => {
+        recipes: selectedIngredientsHot.value.map((ingredientId) => {
           return {
             ingredient: ingredientStore.ingredients.find(i => i.IngredientId === ingredientId)!,
             quantity: ingredientQuantitiesHot.value[ingredientId]
@@ -272,7 +272,7 @@ const submitForm = async () => {
       productData.productTypes.push({
         productTypeName: 'Cold',
         productTypePrice: 0,
-        recipe: selectedIngredientsCold.value.map((ingredientId) => {
+        recipes: selectedIngredientsCold.value.map((ingredientId) => {
           return {
             ingredient: ingredientStore.ingredients.find(i => i.IngredientId === ingredientId)!,
             quantity: ingredientQuantitiesCold.value[ingredientId]
@@ -284,7 +284,7 @@ const submitForm = async () => {
       productData.productTypes.push({
         productTypeName: 'Blend',
         productTypePrice: 0,
-        recipe: selectedIngredientsBlend.value.map((ingredientId) => {
+        recipes: selectedIngredientsBlend.value.map((ingredientId) => {
           return {
             ingredient: ingredientStore.ingredients.find(i => i.IngredientId === ingredientId)!,
             quantity: ingredientQuantitiesBlend.value[ingredientId]

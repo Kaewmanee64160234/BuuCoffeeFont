@@ -43,27 +43,27 @@ const loadProductData = () => {
     product.productTypes.forEach(productType => {
       if (productType.productTypeName === 'Hot') {
         productStore.isHot = true;
-        productStore.selectedIngredientsHot = productType.recipe?.map(recipeItem => recipeItem.ingredient.ingredientId) || [];
-        productStore.ingredientQuantitiesHot = productType.recipe?.reduce((acc, recipeItem) => {
-          acc[recipeItem.ingredient.ingredientId] = recipeItem.quantity;
+        productStore.selectedIngredientsHot = productType.recipes?.map(recipeItem => recipeItem.ingredient.IngredientId) || [];
+        productStore.ingredientQuantitiesHot = productType.recipes?.reduce((acc, recipeItem) => {
+          acc[recipeItem.ingredient.IngredientId] = recipeItem.quantity;
           return acc;
         }, {} as IngredientQuantities) || {};
       }
 
       if (productType.productTypeName === 'Cold') {
         productStore.isCold = true;
-        productStore.selectedIngredientsCold = productType.recipe?.map(recipeItem => recipeItem.ingredient.ingredientId) || [];
-        productStore.ingredientQuantitiesCold = productType.recipe?.reduce((acc, recipeItem) => {
-          acc[recipeItem.ingredient.ingredientId] = recipeItem.quantity;
+        productStore.selectedIngredientsCold = productType.recipes?.map(recipeItem => recipeItem.ingredient.IngredientId) || [];
+        productStore.ingredientQuantitiesCold = productType.recipes?.reduce((acc, recipeItem) => {
+          acc[recipeItem.ingredient.IngredientId] = recipeItem.quantity;
           return acc;
         }, {} as IngredientQuantities) || {};
       }
 
       if (productType.productTypeName === 'Blend') {
         productStore.isBlend = true;
-        productStore.selectedIngredientsBlend = productType.recipe?.map(recipeItem => recipeItem.ingredient.ingredientId) || [];
-        productStore.ingredientQuantitiesBlend = productType.recipe?.reduce((acc, recipeItem) => {
-          acc[recipeItem.ingredient.ingredientId] = recipeItem.quantity;
+        productStore.selectedIngredientsBlend = productType.recipes?.map(recipeItem => recipeItem.ingredient.IngredientId) || [];
+        productStore.ingredientQuantitiesBlend = productType.recipes?.reduce((acc, recipeItem) => {
+          acc[recipeItem.ingredient.IngredientId] = recipeItem.quantity;
           return acc;
         }, {} as IngredientQuantities) || {};
       }
@@ -71,12 +71,12 @@ const loadProductData = () => {
       productStore.productTypes.push({
         productTypeName: productType.productTypeName,
         productTypePrice: productType.productTypePrice,
-        selectedIngredients: productType.recipe?.map(recipeItem => recipeItem.ingredient.ingredientId) || [],
-        ingredientQuantities: productType.recipe?.reduce((acc, recipeItem) => {
-          acc[recipeItem.ingredient.ingredientId] = recipeItem.quantity;
+        selectedIngredients: productType.recipes?.map(recipeItem => recipeItem.ingredient.IngredientId) || [],
+        ingredientQuantities: productType.recipes?.reduce((acc, recipeItem) => {
+          acc[recipeItem.ingredient.IngredientId] = recipeItem.quantity;
           return acc;
         }, {} as IngredientQuantities) || {},
-        recipe: productType.recipe || []
+        recipes: productType.recipes || []
       });
     });
   } else {

@@ -19,7 +19,7 @@ function createProduct(product: Product) {
             return {
               productTypeName: productType.productTypeName,
               productTypePrice: productType.productTypePrice,
-              recipes: productType.recipe?.map((recipe) => {
+              recipes: productType.recipes?.map((recipe) => {
                 return {
                   ingredientId: recipe.ingredient.IngredientId,
                   quantity: recipe.quantity,

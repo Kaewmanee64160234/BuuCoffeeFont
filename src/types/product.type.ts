@@ -24,7 +24,7 @@ export function mapToProduct(data: any): Product {
         selectedIngredients: productType.selectedIngredients,
         ingredientQuantities: productType.ingredientQuantities,
         product: productType.product,
-        recipe: productType.recipes ? productType.recipes.map((recipe: any) => {
+        recipes: productType.recipes ? productType.recipes.map((recipe: any) => {
           return {
             recipeId: recipe.recipeId,
             quantity: recipe.quantity,

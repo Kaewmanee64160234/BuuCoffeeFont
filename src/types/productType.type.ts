@@ -9,7 +9,7 @@ export interface ProductType {
   selectedIngredients?: number[];
   ingredientQuantities?: IngredientQuantities;
   product?: Product;
-  recipe?: Recipe[];
+  recipes?: Recipe[];
 }
 
 export interface IngredientQuantities {
