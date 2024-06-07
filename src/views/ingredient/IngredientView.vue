@@ -86,13 +86,13 @@ const navigateTo = (routeName: string) => {
         <thead>
           <tr>
             <th></th>
-            <th>Image</th>
-            <th>Name</th>
-            <th>Quantity in Stock</th>
-            <th>Quantity per Unit</th>
-            <th>Supplier</th>
-            <th>Minimum</th>
-            <th>Unit</th>
+            <th>รูปภาพ</th>
+            <th>ชื่อวัตถุดิบ</th>
+            <th>ผู้จัดจำหน่าย</th>
+            <th>จำนวนเหลือในคลัง</th>
+            <th>จำนวนต่อหน่วย</th>
+            <th>จำนวนขั้นต่ำ</th>
+            <th>หน่วยที่ถูกใช้ไป</th>
             <th>Operations</th>
           </tr>
         </thead>
@@ -100,14 +100,14 @@ const navigateTo = (routeName: string) => {
           <tr v-for="(item, index) in ingredientStore.ingredients" :key="index">
             <td>{{ index + 1 }}</td>
             <td>
-              <v-img :src="`http://localhost:3000/ingredients/${item.IngredientId}/image`" height="100"></v-img>
+              <v-img :src="`http://localhost:3000/ingredients/${item.ingredientId}/image`" height="100"></v-img>
             </td>
-            <td>{{ item.nameIngredient }}</td>
-            <td :style="{ color: item.quantityInStock < item.minimun ? 'red' : 'black' }">{{ item.quantityInStock }}</td>
-            <td>{{ item.quantityPerUnit }}</td>
-            <td>{{ item.supplier }}</td>
-            <td>{{ item.minimun }}</td>
-            <td>{{ item.unit }}</td>
+            <td>{{ item.ingredientName }}</td>
+            <td>{{ item.igredientSupplier }}</td>
+            <td :style="{ color: item.igredientQuantityInStock < item.igredientMinimun ? 'red' : 'black' }">{{ item.igredientQuantityInStock }} {{ item.igredientUnit }}</td>
+            <td>{{ item.igredientQuantityPerUnit }} {{ item.igredientQuantityPerSubUnit}}</td>
+            <td>{{ item.igredientMinimun }} {{ item.igredientUnit }}</td>
+            <td>{{ item.igredientRemining }}  {{ item.igredientQuantityPerSubUnit}}</td>
             <td>
               <v-btn
                   color="#FFDD83"

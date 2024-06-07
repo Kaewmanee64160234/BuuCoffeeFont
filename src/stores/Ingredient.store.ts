@@ -17,26 +17,30 @@ export const useIngredientStore = defineStore("ingredient", () => {
   const search = ref<string>("");
   const dialog = ref(false); // สถานะของ Dialog
   const editedIngredient = ref<Ingredient & { files: File[] }>({
-    nameIngredient: "",
-    supplier: "",
-    minimun: 0,
-    unit: "",
-    quantityInStock: 0,
-    quantityPerUnit: 0,
-    IngredientImage: "no_image.jpg",
+    ingredientName: "",
+    igredientSupplier: "",
+    igredientMinimun: 0,
+    igredientUnit: "",
+    igredientQuantityInStock: 0,
+    igredientQuantityPerUnit: 0,
+    igredientQuantityPerSubUnit: "",
+    igredientRemining:0,
+    igredientImages: "no_image.jpg",
     files: [],
   });
   watch(dialog, (newDialog, oldDialog) => {
     if (!newDialog) {
       editedIngredient.value = {
-        nameIngredient: "",
-        supplier: "",
-        minimun: 0,
-        unit: "",
-        quantityInStock: 0,
-        quantityPerUnit: 0,
-        IngredientImage: "no_image.jpg",
-        files: [],
+        ingredientName: "",
+        igredientSupplier: "",
+    igredientMinimun: 0,
+    igredientUnit: "",
+    igredientQuantityInStock: 0,
+    igredientQuantityPerUnit: 0,
+    igredientQuantityPerSubUnit: "",
+    igredientRemining:0,
+    igredientImages: "no_image.jpg",
+    files: [],
       };
     }
   });
@@ -53,7 +57,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
 
   function Addingredient(item: Ingredient) {
     const exists = ingredientList.value.some(
-      (ingredient) => ingredient.ingredient.IngredientId === item.IngredientId
+      (ingredient) => ingredient.ingredient.ingredientId === item.ingredientId
     );
     if (!exists) {
       ingredientList.value.push({ ingredient: item, count: 1, totalunit: 0 });
@@ -62,7 +66,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
   function Addingredienttotable(item: Ingredient) {
     const exists = ingredientCheckList.value.some(
       (ingredient) =>
-        ingredient.ingredientcheck.IngredientId === item.IngredientId
+        ingredient.ingredientcheck.ingredientId === item.ingredientId
     );
     if (!exists) {
       ingredientCheckList.value.push({ ingredientcheck: item, count: 1 });
@@ -97,9 +101,9 @@ export const useIngredientStore = defineStore("ingredient", () => {
 
   async function saveImportData() {
     const importingredientitem = ingredientList.value
-      .filter((item) => item.ingredient.IngredientId !== undefined)
+      .filter((item) => item.ingredient.ingredientId !== undefined)
       .map((item) => ({
-        ingredientId: item.ingredient.IngredientId!,
+        ingredientId: item.ingredient.ingredientId!,
         pricePerUnit: item.totalunit,
         Quantity: item.count,
       }));
@@ -127,9 +131,9 @@ export const useIngredientStore = defineStore("ingredient", () => {
   async function saveIngredient() {
     loadingStore.isLoading = true;
     try {
-      if (editedIngredient.value.IngredientId) {
+      if (editedIngredient.value.ingredientId) {
         const res = await ingredientService.updateIngredient(
-          editedIngredient.value.IngredientId,
+          editedIngredient.value.ingredientId,
           editedIngredient.value
         );
       } else {
