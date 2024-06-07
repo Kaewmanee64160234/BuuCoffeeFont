@@ -2,6 +2,7 @@ import { ref, watch } from "vue";
 import { defineStore } from "pinia";
 import type { User } from "@/types/user.type";
 import userService from "@/service/user.service";
+import AddUserDialog from "@/components/user/AddUserDialog.vue";
 
 export const useUserStore = defineStore("user", () => {
   const users = ref<User[]>();
@@ -70,6 +71,7 @@ export const useUserStore = defineStore("user", () => {
     }
   };
 
+  
 
   return {
     users,

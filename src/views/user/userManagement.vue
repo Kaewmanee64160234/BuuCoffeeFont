@@ -1,19 +1,21 @@
 <script lang="ts" setup>
 import {useUserStore} from '@/stores/user.store';
 import { computed, onMounted, ref, watch } from 'vue'
+import AddUserDialog from '@/components/user/AddUserDialog.vue';
 
 const userStore = useUserStore()
 const url = import.meta.env.VITE_URL_PORT
 const paginate = ref(true)
+const addUserDialog = ref(false)
 onMounted(async () => {
     await userStore.getAllUsers()
-
 })
+
 
 </script>
 <template>
   <!-- <ConfirmDialog ref="confirmDlg"></ConfirmDialog> -->
-  <!-- <ProductDialog></ProductDialog> -->
+  <AddUserDialog v-model:dialog="addUserDialog"></AddUserDialog>
 
   <v-container >
     <v-card class="flex-container">
@@ -26,7 +28,8 @@ onMounted(async () => {
             <v-row style="margin-left: 6%;">
               <v-col class="pa-2 ma-2" cols="3">
                 <v-text-field
-                  label="Search"
+                  v-model="userStore.searchQuery"
+                  label="ค้นหาผู้ใช้งาน"
                   append-inner-icon="mdi-magnify"
                   hide-details
                   dense
@@ -53,7 +56,7 @@ onMounted(async () => {
               </v-col>
               <v-spacer></v-spacer>
               <v-col class="mt-4" cols="3" width="30%">
-                <v-btn color="success" >
+                <v-btn color="success" @click="addUserDialog = true">
                   <v-icon left>mdi-plus</v-icon>
                   Add New User
                 </v-btn>
@@ -66,7 +69,7 @@ onMounted(async () => {
           <v-spacer> </v-spacer>
       </v-card-title>
       <v-card width="90%" style="margin-left: 5%; margin-top: 3%;">
-        <v-table class="text-center mt-5">
+        <v-table class="text-center">
           <thead>
             <tr>
               <th></th>
@@ -78,19 +81,19 @@ onMounted(async () => {
             </tr>
           </thead>
           <tbody>
-            <tr style="text-align: center" >
-              <td>1</td>
-              <td>พรชิตา</td>
-              <td>pornchitar@gmail.com</td>
-              <td>ยังไม่ลาออก</td>
-              <td>พนักงานขายข้าว</td>
+            <tr style="text-align: center" v-for="(item, index) in userStore.users" :key="index">
+              <td>{{ index + 1 }}</td>
+              <td>{{item.userName}}</td>
+              <td>{{item.userEmail}}</td>
+              <td>{{item.userStatus}}</td>
+              <td>{{item.userRole}}</td>
               <td>
                 <v-btn color="#FFDD83" class="mr-5" icon="mdi-pencil" ></v-btn>
               </td>
             </tr>
           </tbody>
   
-          <tbody>
+          <tbody v-if="!userStore.users">
             <tr>
               <td colspan="7" class="text-center">No data</td>
             </tr>
