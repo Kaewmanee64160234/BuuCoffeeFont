@@ -105,9 +105,7 @@ export const useProductStore = defineStore("product", () => {
   const deleteProduct = async (id: number) => {
     try {
       const response = await productService.deleteProduct(id);
-      if (response.status === 200) {
         await getAllProducts();
-      }
     } catch (error) {
       console.error(error);
     }

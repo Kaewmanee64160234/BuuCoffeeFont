@@ -5,6 +5,7 @@ import { useProductStore } from '@/stores/product.store';
 import type { Ingredient } from '@/types/ingredient.type';
 import type { ProductType } from '@/types/productType.type';
 import { ref, reactive, onMounted, watch } from 'vue';
+import Swal from 'sweetalert2';
 
 interface IngredientQuantities {
   [key: number]: number;
@@ -220,8 +221,10 @@ const submitForm = async () => {
     console.log('Product:', JSON.stringify(productStore.product));
     await productStore.updateProduct( productStore.product.productId, productStore.product);
     closeDialog();
+    showSuccessDialog('Product created successfully!');
   } catch (error) {
     console.error('Error updating product:', error);
+    Swal.fire('Error', 'An error occurred while creating the product.', 'error');
   }
 };
 
@@ -252,6 +255,16 @@ const closeDialog = () => {
   productStore.ingredientQuantitiesBlend = {};
   productStore.updateProductDialog = false;
 };
+
+const showSuccessDialog = (message: string) => {
+  Swal.fire({
+    title: 'Success!',
+    text: message,
+    icon: 'success',
+    confirmButtonText: 'OK'
+  });
+};
+
 </script>
 
 

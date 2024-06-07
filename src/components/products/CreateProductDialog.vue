@@ -118,6 +118,7 @@ import { useProductStore } from '@/stores/product.store';
 import type { Ingredient } from '@/types/ingredient.type';
 import type { ProductType } from '@/types/productType.type';
 import { ref, reactive, onMounted, watch } from 'vue';
+import Swal from 'sweetalert2';
 
 interface IngredientQuantities {
   [key: number]: number;
@@ -358,6 +359,8 @@ const submitForm = async () => {
   console.log('Product:', JSON.parse(JSON.stringify(productStore.product)));
   await productStore.createProduct();
   clearData();
+  showSuccessDialog('Product created successfully!');
+
 };
 
 // clearData and close dialog
@@ -379,5 +382,15 @@ const clearData = () => {
   ingredientQuantitiesBlend.value = {};
   productStore.createProductDialog = false;
 };
+
+const showSuccessDialog = (message: string) => {
+  Swal.fire({
+    title: 'Success!',
+    text: message,
+    icon: 'success',
+    confirmButtonText: 'OK'
+  });
+};
+
 
 </script>

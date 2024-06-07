@@ -7,6 +7,7 @@ import UpdateProductDialog from '../../components/products/UpdateProductDialog.v
 import { useIngredientStore } from '@/stores/Ingredient.store';
 import type { Product } from '@/types/product.type';
 import type { IngredientQuantities } from '@/types/productType.type';
+import Swal from 'sweetalert2';
 
 const productStore = useProductStore();
 const categoryStore = useCategoryStore();
@@ -86,6 +87,34 @@ const loadProductData = () => {
 
 };
 
+const confirmDelete = async (deleteAction: () => Promise<void>) => {
+  const result = await Swal.fire({
+    title: 'Are you sure?',
+    text: "You won't be able to revert this!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Yes, delete it!'
+  });
+
+  if (result.isConfirmed) {
+    await deleteAction();
+    Swal.fire('Deleted!', 'Your item has been deleted.', 'success');
+  }
+};
+
+const deleteProduct = async (productId: number) => {
+  try {
+    await confirmDelete(async () => {
+      // Your delete logic here
+      await productStore.deleteProduct(productId);
+    });
+  } catch (error) {
+    console.error('Error deleting product:', error);
+    Swal.fire('Error', 'An error occurred while deleting the product.', 'error');
+  }
+};
 
 </script>
 
@@ -138,7 +167,7 @@ const loadProductData = () => {
             <td>{{ item.productPrice }}</td>
             <td>
               <v-btn color="#FFDD83" class="mr-5" icon="mdi-pencil" @click="openUpdateDialog(item)"></v-btn>
-              <v-btn color="#F55050" class="mr-5" icon="mdi-delete"></v-btn>
+              <v-btn color="#F55050" class="mr-5" icon="mdi-delete" @click="deleteProduct(item.productId)" ></v-btn>
             </td>
           </tr>
         </tbody>
@@ -182,7 +211,7 @@ const loadProductData = () => {
             <td>{{ item.productPrice }}</td>
             <td>
               <v-btn color="#FFDD83" class="mr-5" icon="mdi-pencil" @click="openUpdateDialog(item)"></v-btn>
-              <v-btn color="#F55050" class="mr-5" icon="mdi-delete"></v-btn>
+              <v-btn color="#F55050" class="mr-5" icon="mdi-delete" ></v-btn>
             </td>
           </tr>
         </tbody>
