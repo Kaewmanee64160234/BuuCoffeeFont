@@ -94,9 +94,9 @@ export const useProductStore = defineStore("product", () => {
   const updateProduct = async (id: number, updatedProduct: Product) => {
     try {
       const response = await productService.updateProduct(id, updatedProduct);
-      if (response.status === 200) {
+   console.log("updateProduct", response.status);
         await getAllProducts();
-      }
+      
     } catch (error) {
       console.error(error);
     }

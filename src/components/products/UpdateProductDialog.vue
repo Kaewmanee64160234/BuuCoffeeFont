@@ -219,7 +219,7 @@ const submitForm = async () => {
     };
     console.log('Product:', JSON.stringify(productStore.product));
     await productStore.updateProduct( productStore.product.productId, productStore.product);
-    productStore.updateProductDialog = false;
+    closeDialog();
   } catch (error) {
     console.error('Error updating product:', error);
   }
