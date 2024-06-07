@@ -10,6 +10,9 @@ export const useCategoryStore = defineStore("category", () => {
   const categoriesForCreate = ref<Category[]>([]);
   const selectedCategory = ref("");
   const productStore = useProductStore();
+  const searchQuery = ref<string>("");
+  const createCategoryDialog = ref(false);
+  const updateCategoryDialog = ref(false);
 
   watch(selectedCategory, (value) => {
     if (value === "All") {
@@ -28,11 +31,11 @@ export const useCategoryStore = defineStore("category", () => {
 
         categories.value = res.data;
         // push category All
-        categories.value.push({
-          categoryId: 0,
-          categoryName: "All",
-          haveTopping: false,
-        });
+        // categories.value.push({
+        //   categoryId: 0,
+        //   categoryName: "All",
+        //   haveTopping: false,
+        // });
       }
     } catch (error) {
       console.error(error);
@@ -98,6 +101,9 @@ export const useCategoryStore = defineStore("category", () => {
     deleteCategory,
     getCategoryById,
     selectedCategory,
-    categoriesForCreate
+    categoriesForCreate,
+    searchQuery,
+    createCategoryDialog,
+    updateCategoryDialog,
   };
 });
