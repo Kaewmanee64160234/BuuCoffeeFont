@@ -21,7 +21,7 @@ function createProduct(product: Product) {
               productTypePrice: productType.productTypePrice,
               recipes: productType.recipes?.map((recipe) => {
                 return {
-                  ingredientId: recipe.ingredient.IngredientId,
+                  IngredientId: recipe.ingredient.IngredientId,
                   quantity: recipe.quantity,
                 };
               }),

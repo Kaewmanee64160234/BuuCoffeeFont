@@ -104,7 +104,7 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" @click="productStore.createProductDialog = false">Close</v-btn>
+        <v-btn color="blue darken-1" @click="clearData()">Cancel</v-btn>
         <v-btn color="blue darken-1" @click="submitForm" :disabled="!valid">Save</v-btn>
       </v-card-actions>
     </v-card>
@@ -246,6 +246,29 @@ const checkCategory = () => {
 
 const submitForm = async () => {
   if (!form.value.validate()) return;
+  if (! productStore.product.category.categoryName) {
+    alert('Please select a valid category.');
+    return;
+  }
+
+  // productName.value
+  if(!productName.value) {
+    alert('Please enter a product name.');
+    return;
+  }
+
+  // productPrice.value
+  if(productPrice.value <= 0) {
+    alert('Please enter a valid product price.');
+    return;
+  }
+
+  // selectedCategory.value
+  if(!productStore.product.category.categoryName) {
+    alert('Please select a category.');
+    return;
+  }
+
 
   const productData = {
     productName: productName.value,
@@ -254,8 +277,36 @@ const submitForm = async () => {
     categoryId: selectedCategory.value,
     productTypes: [] as ProductType[]
   };
-
+  
   if (isDrink.value) {
+    const hotSelected = selectedIngredientsHot.value.length > 0;
+    const coldSelected = selectedIngredientsCold.value.length > 0;
+    const blendSelected = selectedIngredientsBlend.value.length > 0;
+
+    if (!hotSelected && !coldSelected && !blendSelected) {
+      alert('Please select at least one product type for drinks.');
+      return;
+    }
+
+    for (const ingredientId of selectedIngredientsHot.value) {
+      if (ingredientQuantitiesHot.value[ingredientId] <= 0) {
+        alert('Ingredient quantities for Hot must be greater than zero.');
+        return;
+      }
+    }
+    for (const ingredientId of selectedIngredientsCold.value) {
+      if (ingredientQuantitiesCold.value[ingredientId] <= 0) {
+        alert('Ingredient quantities for Cold must be greater than zero.');
+        return;
+      }
+    }
+    for (const ingredientId of selectedIngredientsBlend.value) {
+      if (ingredientQuantitiesBlend.value[ingredientId] <= 0) {
+        alert('Ingredient quantities for Blend must be greater than zero.');
+        return;
+      }
+    }
+
     if (selectedIngredientsHot.value.length > 0) {
       productData.productTypes.push({
         productTypeName: 'Hot',
@@ -306,6 +357,27 @@ const submitForm = async () => {
   };
   console.log('Product:', JSON.parse(JSON.stringify(productStore.product)));
   await productStore.createProduct();
+  clearData();
+};
+
+// clearData and close dialog
+const clearData = () => {
+  productName.value = '';
+  productPrice.value = 0;
+  productImage.value = new File([], '');
+  imagePreview.value = null;
+  selectedCategory.value = null;
+  productTypes.hot = false;
+  productTypes.cold = false;
+  productTypes.blend = false;
+  productDetails.value = [];
+  selectedIngredientsHot.value = [];
+  selectedIngredientsCold.value = [];
+  selectedIngredientsBlend.value = [];
+  ingredientQuantitiesHot.value = {};
+  ingredientQuantitiesCold.value = {};
+  ingredientQuantitiesBlend.value = {};
   productStore.createProductDialog = false;
 };
+
 </script>
