@@ -70,7 +70,7 @@ async function save() {
           
                     label="กรุณากรอกชื่อแบรนด์"
                     required
-                    v-model="IngredientStore.editedIngredient.igredientSupplier"
+                    v-model="IngredientStore.editedIngredient.ingredientSupplier"
                     :rules="[(v) => !!v || 'กรุณากรอกชื่อแบรนด์']"
                   ></v-text-field>
                 </v-col>
@@ -78,7 +78,7 @@ async function save() {
                   <v-text-field
          
                     label="กรุณากรอกปริมาณต่อหน่วย"
-                    v-model.number="IngredientStore.editedIngredient.igredientQuantityPerUnit"
+                    v-model.number="IngredientStore.editedIngredient.ingredientQuantityPerUnit"
                   ></v-text-field>
                 </v-col>
               </v-row>
@@ -87,14 +87,14 @@ async function save() {
                   <v-text-field
      
                     label="กรุณากรอกหน่วย"
-                    v-model="IngredientStore.editedIngredient.igredientUnit"
+                    v-model="IngredientStore.editedIngredient.ingredientUnit"
                   ></v-text-field>
                 </v-col>
                 <v-col cols="12" sm="6" md="4">
                   <v-text-field
           
                     label="กรุณากรอกขั้นต่ำ"
-                    v-model.number="IngredientStore.editedIngredient.igredientMinimun"
+                    v-model.number="IngredientStore.editedIngredient.ingredientMinimun"
                     :rules="[
                       (v) => !!v || 'กรุณากรอกขั้นต่ำ',
                       (v) => v >= 0 || 'ขั้นต่ำต้องมากกว่า 0',

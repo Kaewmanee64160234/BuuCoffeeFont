@@ -47,7 +47,7 @@ onMounted(async () => {
                                     <v-img :src="`http://localhost:3000/ingredients/${item.ingredientId}/image`"
                                         height="100"></v-img>
                                     <v-card-title style="font-size: 14px;">{{ item.ingredientName }}</v-card-title>
-                                    <v-card-subtitle style="font-size: 12px;">{{ item.igredientSupplier}}</v-card-subtitle>
+                                    <v-card-subtitle style="font-size: 12px;">{{ item.ingredientSupplier}}</v-card-subtitle>
                                 </v-card>
                             </v-col>
                         </v-row>
@@ -71,7 +71,7 @@ onMounted(async () => {
                                 <tr v-for="(item, index) in ingredientStore.ingredientList" :key="index">
                                     <td>{{ index + 1 }}</td>
                                     <td>{{ item.ingredient.ingredientName }}</td>
-                                    <td>{{ item.ingredient.igredientSupplier }}</td>
+                                    <td>{{ item.ingredient.ingredientSupplier }}</td>
                                     <td><input type="number" v-model.number="item.count" class="styled-input" /></td>
                                     <td><input type="number" v-model.number="item.totalunit" class="styled-input" />
                                     </td>
