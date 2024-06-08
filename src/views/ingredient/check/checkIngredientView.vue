@@ -67,12 +67,12 @@ onMounted(async () => {
                                 <tr v-for="(item, index) in ingredientStore.ingredientCheckList" :key="index">
                                     <td>{{ index + 1 }}</td>
                                     <td>
-                                        <v-img :src="`http://localhost:3000/ingredients/${item.ingredientcheck.IngredientId}/image`"
+                                        <v-img :src="`http://localhost:3000/ingredients/${item.ingredientcheck.ingredientId}/image`"
                                             height="100"></v-img>
                                     </td>
-                                    <td>{{ item.ingredientcheck.nameIngredient }}</td>
-                                    <td>{{ item.ingredientcheck.supplier }}</td>
-                                    <td>{{ item.ingredientcheck.minimun }}</td>
+                                    <td>{{ item.ingredientcheck.ingredientName }}</td>
+                                    <td>{{ item.ingredientcheck.igredientSupplier }}</td>
+                                    <td>{{ item.ingredientcheck.igredientMinimun }}</td>
                                     <td><input type="number" v-model.number="item.count" class="styled-input" /></td>
                                     <td><button @click="ingredientStore.removeIngredient(index)">ลบ</button></td>
                                 </tr>
