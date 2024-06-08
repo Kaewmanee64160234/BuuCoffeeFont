@@ -14,13 +14,13 @@ const paginate = ref(true);
 onMounted(async () => {
   await ingredientStore.getAllIngredients();
 });
-// onMounted(async () => {
-//   if (paginate.value) {
-//     ingredientStore.cat = "";
-//   } else {
-//     await ingredientStore.getAllIngredients();
-//   }
-// });
+const deleteIngredient = async (id?: number) => {
+  if (id !== undefined) {
+    await ingredientStore.deleteIngredient(id);
+  } else {
+    console.error("Ingredient ID is undefined");
+  }
+};
 
 
 const navigateTo = (routeName: string) => {
@@ -131,7 +131,7 @@ watch(paginate, async (newPage, oldPage) => {
             <td>{{ item.ingredientRemining }} {{ item.ingredientQuantityPerSubUnit }}</td>
             <td>
               <v-btn color="#FFDD83" class="mr-5" icon="mdi-pencil" @click="ingredientStore.setEditedIngredient(item)"></v-btn>
-              <v-btn color="#FFDD83" class="mr-5" icon="mdi-delete" ></v-btn>
+              <v-btn color="#FFDD83" class="mr-5" icon="mdi-delete" @click="deleteIngredient(item.ingredientId)"></v-btn>
             </td>
           </tr>
         </tbody>

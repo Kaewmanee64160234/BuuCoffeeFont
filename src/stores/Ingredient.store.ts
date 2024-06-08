@@ -51,7 +51,6 @@ export const useIngredientStore = defineStore("ingredient", () => {
   const order = ref("ASC");
   const orderBy = ref("");
   const lastPage = ref(0);
-  const cat = ref("");
   watch(page, async (newPage, oldPage) => {
     await getAllIngredients();
   });
@@ -84,6 +83,15 @@ export const useIngredientStore = defineStore("ingredient", () => {
     } catch (e) {
       console.log(e);
       messageStore.showError("Oops!, cannot get ingredients.");
+    }
+  }
+  async function searchIngredients(name: string) {
+    try {
+      const res = await ingredientService.searchIngredientsByName(name);
+      ingredients.value = res.data;
+    } catch (e) {
+      console.log(e);
+      messageStore.showError("Oops!, cannot search ingredients.");
     }
   }
 
@@ -178,6 +186,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
         const res = await ingredientService.updateIngredient(
           editedIngredient.value.ingredientId,
           editedIngredient.value
+          
         );
       } else {
         const res = await ingredientService.saveIngredient(editedIngredient.value);
@@ -189,23 +198,21 @@ export const useIngredientStore = defineStore("ingredient", () => {
     }
     loadingStore.isLoading = false;
   }
-  function setEditedIngredient(ingredient: Ingredient) {
+  async function setEditedIngredient(ingredient: Ingredient) {
     editedIngredient.value = JSON.parse(JSON.stringify(ingredient));
+    await getAllIngredients(); 
     dialog.value = true;
   }
-  async function deleteIngredient(id: number) {
+  
+  const deleteIngredient = async (id: number) => {
     try {
       await ingredientService.deleteIngredient(id);
-      // await getMaterials();
+      await getAllIngredients();
     } catch (e) {
       console.log(e);
       messageStore.showError("Cannot delete Ingredient");
     }
-  }
-
-
-
-
+  };
   return {
     ingredient,
     ingredients,
@@ -232,7 +239,8 @@ export const useIngredientStore = defineStore("ingredient", () => {
     getAllHistoryImportIngredients,
     Addingredienttotable,
     saveIngredient,
-    deleteIngredient
+    deleteIngredient,
+    searchIngredients
     
   };
 });
