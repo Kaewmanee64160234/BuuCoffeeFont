@@ -24,10 +24,19 @@ function deleteCategory(id: number) {
   return http.delete(`/categories/${id}`);
 }
 
+function searchCategories(query: string) {
+  return http.get(`/categories/search`, {
+    params: {
+      query,
+    },
+  });
+}
+
 export default {
   getAllCategories,
   getCategoryById,
   createCategory,
   updateCategory,
-  deleteCategory
+  deleteCategory,
+  searchCategories
 };

@@ -22,6 +22,16 @@ export const useCategoryStore = defineStore("category", () => {
     }
   });
 
+  // watch for searchQuery
+  watch(searchQuery, (value) => {
+    if (value === "") {
+      getAllCategories();
+    } else {
+      searchCategory();
+    }
+  });
+
+
   //createCategory use category service
   const getAllCategories = async () => {
     try {
@@ -89,6 +99,16 @@ export const useCategoryStore = defineStore("category", () => {
       }
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  // searchCategories
+  const searchCategory = async () => {
+    try {
+      const response = await categoryService.searchCategories(searchQuery.value);
+      categories.value = response.data;
+    } catch (error) {
+      console.error('Error searching categories:', error);
     }
   };
 
