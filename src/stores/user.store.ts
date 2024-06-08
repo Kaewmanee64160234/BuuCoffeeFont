@@ -8,7 +8,7 @@ export const useUserStore = defineStore("user", () => {
   const users = ref<User[]>([]);
   const user = ref<User | null>(null);
   const searchQuery = ref<string>("");
-  
+  const updateUserDialog = ref(false);
 
 
   const getAllUsers = async () => {
@@ -100,6 +100,7 @@ export const useUserStore = defineStore("user", () => {
     deleteUser,
     searchQuery,
     sortUsers,
-    filterUsers
+    filterUsers,
+    updateUserDialog
   };
 });
