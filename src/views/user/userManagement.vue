@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import {useUserStore} from '@/stores/user.store';
-import { computed, onMounted, ref, watch } from 'vue'
+import { useUserStore } from '@/stores/user.store';
+import { computed, onMounted, ref, watch } from 'vue';
 import AddUserDialog from '@/components/user/AddUserDialog.vue';
 
-const userStore = useUserStore()
+const userStore = useUserStore();
 const addUserDialog = ref(false);
 const filter = ref('');
 const sortOrder = ref('');
@@ -26,7 +26,7 @@ const filteredUsers = computed(() => {
   } else if (sortOrder.value === 'oldest') {
     userStore.sortUsers('oldest');
   }
-  
+
   return users;
 });
 
@@ -57,15 +57,15 @@ watch([filter, sortOrder], () => {
                 ></v-text-field>
               </v-col>
               
-              <v-col cols="3" class="pa-2 mt-2">
+              <v-col class="pa-2 mt-2">
                 <v-select
-                v-model="sortOrder"
+                v-model="filter"
                 class="placeholder-color forumSize0"
                 style="font-size: 35px; margin-left: 5%;"
                 label="จัดเรียงตาม/สถานะผู้ใช้งาน"
-                :items="[
-                  { label: 'ข้อมูลล่าสุด -> เก่าสุด', value: 'latest' },
-                  { label: 'ข้อมูลเก่าสุด -> ล่าสุด', value: 'oldest' },
+                 :items="[
+                  //{ label: 'ข้อมูลล่าสุด -> เก่าสุด', value: 'latest' },
+                  //{ label: 'ข้อมูลเก่าสุด -> ล่าสุด', value: 'oldest' },
                   { label: 'ผู้ใช้งานที่ลาออกแล้ว', value: 'resigned' },
                   { label: 'ผู้ใช้งานที่ยังไม่ลาออก', value: 'active' }
                 ]"
