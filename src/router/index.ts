@@ -53,6 +53,12 @@ const router = createRouter({
       name: 'category',
       component: () => import('../views/category/CategoryView.vue')
     },
+    // toppings
+    {
+      path: '/topping',
+      name: 'topping',
+      component: () => import('../views/topping/ToppingView.vue')
+    },
   ]
 })
 
