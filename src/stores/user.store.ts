@@ -5,8 +5,8 @@ import userService from "@/service/user.service";
 import AddUserDialog from "@/components/user/AddUserDialog.vue";
 
 export const useUserStore = defineStore("user", () => {
-  const users = ref<User[]>();
-  const user = ref<User>();
+  const users = ref<User[]>([]);
+  const user = ref<User | null>(null);
   const searchQuery = ref<string>("");
   
 
@@ -36,21 +36,23 @@ export const useUserStore = defineStore("user", () => {
   };
 
   //create user
-  const createUser = async (user: User) => {
+  const createUser = async (newUser: User) => {
     try {
-      const response = await userService.createUser(user);
+      const response = await userService.createUser(newUser);
       if (response.status === 201) {
-        users.value = response.data;
+        console.log('createUser', response.data);
+        users.value.push(response.data);
+        await getAllUsers();
       }
     } catch (error) {
-      console.error(error);
+      console.error("Error creating user:", error);
     }
   };
 
   //update user
-  const updateUser = async (id: number, user: User) => {
+  const updateUser = async (id: number, updatedUser: User) => {
     try {
-      const response = await userService.updateUser(id, user);
+      const response = await userService.updateUser(id, updatedUser);
       if (response.status === 200) {
         users.value = response.data;
       }
@@ -71,17 +73,33 @@ export const useUserStore = defineStore("user", () => {
     }
   };
 
-  
+  const sortUsers = (order: string) => {
+    if (order === 'latest') {
+      users.value.sort((a, b) => b.userId - a.userId);
+    } else if (order === 'oldest') {
+      users.value.sort((a, b) => a.userId - b.userId);
+    }
+  };
+
+  const filterUsers = (status: string) => {
+    if (status === 'resigned') {
+      return users.value.filter(user => user.userStatus === 'ลาออกแล้ว');
+    } else if (status === 'active') {
+      return users.value.filter(user => user.userStatus === 'ยังไม่ลาออก');
+    }
+    return users.value;
+  };
 
   return {
     users,
     user,
-
     getAllUsers,
     getUserById,
     createUser,
     updateUser,
     deleteUser,
     searchQuery,
+    sortUsers,
+    filterUsers
   };
 });

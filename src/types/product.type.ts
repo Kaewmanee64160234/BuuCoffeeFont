@@ -8,5 +8,5 @@ export interface Product{
     productImage: string;
     productPrice: number;
     category: Category;
-    productType?:ProductType[];
+    productTypes?:ProductType[];
 }

@@ -4,20 +4,41 @@ import { computed, onMounted, ref, watch } from 'vue'
 import AddUserDialog from '@/components/user/AddUserDialog.vue';
 
 const userStore = useUserStore()
-const url = import.meta.env.VITE_URL_PORT
-const paginate = ref(true)
-const addUserDialog = ref(false)
+const addUserDialog = ref(false);
+const filter = ref('');
+const sortOrder = ref('');
+
 onMounted(async () => {
-    await userStore.getAllUsers()
-})
+    await userStore.getAllUsers();
+});
 
+const filteredUsers = computed(() => {
+  let users = userStore.users;
 
+  if (filter.value === 'resigned') {
+    users = userStore.filterUsers('resigned');
+  } else if (filter.value === 'active') {
+    users = userStore.filterUsers('active');
+  }
+
+  if (sortOrder.value === 'latest') {
+    userStore.sortUsers('latest');
+  } else if (sortOrder.value === 'oldest') {
+    userStore.sortUsers('oldest');
+  }
+  
+  return users;
+});
+
+watch([filter, sortOrder], () => {
+  filteredUsers.value; // Trigger re-computation
+});
 </script>
+
 <template>
-  <!-- <ConfirmDialog ref="confirmDlg"></ConfirmDialog> -->
   <AddUserDialog v-model:dialog="addUserDialog"></AddUserDialog>
 
-  <v-container >
+  <v-container>
     <v-card class="flex-container">
       <v-card-title>
         <v-row>
@@ -37,23 +58,22 @@ onMounted(async () => {
               </v-col>
               
               <v-col cols="3" class="pa-2 mt-2">
-                <v-flex>
-                  <!-- <input type="text" placeholder="หลักสูตร" class="placeholder-color forumSize0" /> -->
-                  <v-select
-                    class="placeholder-color forumSize0"
-                    style="font-size: 35px; margin-left: 5%;"
-                    label="จัดเรียงตาม" 
-                    :items="[
-                      'ข้อมูลล่าสุด -> เก่าสุด',
-                      'ผู้ใช้งานที่ลาออกแล้ว',
-                      'ผู้ใช้งานที่ยังไม่ลาออก',
-                    ]"
-                  >
-                  </v-select>
-                  
-                </v-flex>
-                
+                <v-select
+                v-model="sortOrder"
+                class="placeholder-color forumSize0"
+                style="font-size: 35px; margin-left: 5%;"
+                label="จัดเรียงตาม/สถานะผู้ใช้งาน"
+                :items="[
+                  { label: 'ข้อมูลล่าสุด -> เก่าสุด', value: 'latest' },
+                  { label: 'ข้อมูลเก่าสุด -> ล่าสุด', value: 'oldest' },
+                  { label: 'ผู้ใช้งานที่ลาออกแล้ว', value: 'resigned' },
+                  { label: 'ผู้ใช้งานที่ยังไม่ลาออก', value: 'active' }
+                ]"
+                item-text="label"
+                item-value="value"
+              ></v-select>
               </v-col>
+              
               <v-spacer></v-spacer>
               <v-col class="mt-4" cols="3" width="30%">
                 <v-btn color="success" @click="addUserDialog = true">
@@ -72,36 +92,33 @@ onMounted(async () => {
         <v-table class="text-center">
           <thead>
             <tr>
-              <th></th>
-              <th>ชื่อผู้ใช้</th>
-              <th>อีเมลล์</th>
-              <th>สถานะผู้ใช้งาน</th>
-              <th>ตำแหน่งผู้ใช้งาน</th>
-              <th>Operations</th>
+              <th class="text-center"></th>
+              <th class="text-center">ชื่อผู้ใช้</th>
+              <th class="text-center">อีเมลล์</th>
+              <th class="text-center">สถานะผู้ใช้งาน</th>
+              <th class="text-center">ตำแหน่งผู้ใช้งาน</th>
+              <th class="text-center">Operations</th>
             </tr>
           </thead>
           <tbody>
-            <tr style="text-align: center" v-for="(item, index) in userStore.users" :key="index">
-              <td>{{ index + 1 }}</td>
-              <td>{{item.userName}}</td>
-              <td>{{item.userEmail}}</td>
-              <td>{{item.userStatus}}</td>
-              <td>{{item.userRole}}</td>
-              <td>
-                <v-btn color="#FFDD83" class="mr-5" icon="mdi-pencil" ></v-btn>
+            <tr v-for="(item, index) in filteredUsers" :key="index">
+              <td class="text-center">{{ index + 1 }}</td>
+              <td class="text-center">{{ item.userName }}</td>
+              <td class="text-center">{{ item.userEmail }}</td>
+              <td class="text-center">{{ item.userStatus }}</td>
+              <td class="text-center">{{ item.userRole }}</td>
+              <td class="text-center">
+                <v-btn color="#FFDD83" icon="mdi-pencil"></v-btn>
               </td>
             </tr>
           </tbody>
-  
-          <tbody v-if="!userStore.users">
+          <tbody v-if="!filteredUsers.length">
             <tr>
-              <td colspan="7" class="text-center">No data</td>
+              <td colspan="6" class="text-center">No data</td>
             </tr>
           </tbody>
         </v-table>
       </v-card>
-      
-      
     </v-card>
   </v-container>
 </template>
@@ -109,7 +126,7 @@ onMounted(async () => {
 <style>
 .flex-container {
   display: flex;
-  flex-direction: column; /* ปรับให้เนื้อหาวางแนวตั้ง */
-  height: 95vh; /* ปรับความสูงให้เต็มหน้าจอ */
+  flex-direction: column;
+  height: 95vh;
 }
 </style>
