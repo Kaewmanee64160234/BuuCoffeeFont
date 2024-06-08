@@ -18,28 +18,28 @@ export const useIngredientStore = defineStore("ingredient", () => {
   const dialog = ref(false); // สถานะของ Dialog
   const editedIngredient = ref<Ingredient & { files: File[] }>({
     ingredientName: "",
-    igredientSupplier: "",
-    igredientMinimun: 0,
-    igredientUnit: "",
-    igredientQuantityInStock: 0,
-    igredientQuantityPerUnit: 0,
-    igredientQuantityPerSubUnit: "",
-    igredientRemining:0,
-    igredientImages: "no_image.jpg",
+    ingredientSupplier: "",
+    ingredientMinimun: 0,
+    ingredientUnit: "",
+    ingredientQuantityInStock: 0,
+    ingredientQuantityPerUnit: 0,
+    ingredientQuantityPerSubUnit: "",
+    ingredientRemining:0,
+    ingredientImages: "no_image.jpg",
     files: [],
   });
   watch(dialog, (newDialog, oldDialog) => {
     if (!newDialog) {
       editedIngredient.value = {
         ingredientName: "",
-        igredientSupplier: "",
-    igredientMinimun: 0,
-    igredientUnit: "",
-    igredientQuantityInStock: 0,
-    igredientQuantityPerUnit: 0,
-    igredientQuantityPerSubUnit: "",
-    igredientRemining:0,
-    igredientImages: "no_image.jpg",
+        ingredientSupplier: "",
+    ingredientMinimun: 0,
+    ingredientUnit: "",
+    ingredientQuantityInStock: 0,
+    ingredientQuantityPerUnit: 0,
+    ingredientQuantityPerSubUnit: "",
+    ingredientRemining:0,
+    ingredientImages: "no_image.jpg",
     files: [],
       };
     }

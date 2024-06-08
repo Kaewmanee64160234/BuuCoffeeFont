@@ -103,11 +103,11 @@ const navigateTo = (routeName: string) => {
               <v-img :src="`http://localhost:3000/ingredients/${item.ingredientId}/image`" height="100"></v-img>
             </td>
             <td>{{ item.ingredientName }}</td>
-            <td>{{ item.igredientSupplier }}</td>
-            <td :style="{ color: item.igredientQuantityInStock < item.igredientMinimun ? 'red' : 'black' }">{{ item.igredientQuantityInStock }} {{ item.igredientUnit }}</td>
-            <td>{{ item.igredientQuantityPerUnit }} {{ item.igredientQuantityPerSubUnit}}</td>
-            <td>{{ item.igredientMinimun }} {{ item.igredientUnit }}</td>
-            <td>{{ item.igredientRemining }}  {{ item.igredientQuantityPerSubUnit}}</td>
+            <td>{{ item.ingredientSupplier }}</td>
+            <td :style="{ color: item.ingredientQuantityInStock < item.ingredientMinimun ? 'red' : 'black' }">{{ item.ingredientQuantityInStock }} {{ item.ingredientUnit }}</td>
+            <td>{{ item.ingredientQuantityPerUnit }} {{ item.ingredientQuantityPerSubUnit}}</td>
+            <td>{{ item.ingredientMinimun }} {{ item.ingredientUnit }}</td>
+            <td>{{ item.ingredientRemining }}  {{ item.ingredientQuantityPerSubUnit}}</td>
             <td>
               <v-btn
                   color="#FFDD83"

@@ -71,8 +71,8 @@ onMounted(async () => {
                                             height="100"></v-img>
                                     </td>
                                     <td>{{ item.ingredientcheck.ingredientName }}</td>
-                                    <td>{{ item.ingredientcheck.igredientSupplier }}</td>
-                                    <td>{{ item.ingredientcheck.igredientMinimun }}</td>
+                                    <td>{{ item.ingredientcheck.ingredientSupplier }}</td>
+                                    <td>{{ item.ingredientcheck.ingredientMinimun }}</td>
                                     <td><input type="number" v-model.number="item.count" class="styled-input" /></td>
                                     <td><button @click="ingredientStore.removeIngredient(index)">ลบ</button></td>
                                 </tr>
