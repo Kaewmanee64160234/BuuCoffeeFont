@@ -71,11 +71,12 @@ function updateImageProduct(productId: number, formData: FormData) {
 }
 
 //  getProductPaginate by add query page and size
-function getProductPaginate(page: number, size: number) {
+function getProductPaginate(page: number, size: number,search : string) {
     return http.get(`/products/paginate`, {
       params: {
         page,
-        limit: size
+        limit: size,
+        search
       }
     });
   

@@ -143,7 +143,7 @@ const deleteProduct = async (productId: number) => {
           </v-col>
           <v-col cols="12" md="3">
             <v-select 
-              v-model="selectedCategory" 
+              v-model="productStore.selectedCategory" 
               label="Select Category"
               :items="categoryStore.categories.map(category => category.categoryName)" 
               dense 

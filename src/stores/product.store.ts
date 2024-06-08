@@ -51,20 +51,21 @@ export const useProductStore = defineStore("product", () => {
 
   const categoryStore = useCategoryStore();
 
-  // watch if selectedCategory changes map products by category
-  watch(selectedCategory, (value) => {
-    if (value != "All") {
-      product.value.category =
-        categoryStore.categoriesForCreate.find(
-          (category) => category.categoryName === value
-        ) || product.value.category;
+  // watch if selectedCategory 
+  watch(selectedCategory, (newCategory) => {
+    console.log("selectedCategory", newCategory);
+    if (newCategory) {
+      getProductsByCategory(newCategory);
+
     }
   });
 
   // watch productStore.currentPage
-  watch(currentPage, () => {
+  watch([currentPage, itemsPerPage, searchQuery], () => {
     getProductPaginate();
   });
+
+
 
   const getAllProducts = async () => {
     try {
@@ -85,7 +86,8 @@ export const useProductStore = defineStore("product", () => {
     try {
       const response = await productService.getProductPaginate(
         currentPage.value,
-        itemsPerPage.value
+        itemsPerPage.value,
+        searchQuery.value
       );
       console.log("getProductPaginate", response.data);
       if (response.status === 200) {
