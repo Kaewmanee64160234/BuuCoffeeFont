@@ -34,7 +34,8 @@ const isCold = ref(false);
 const isBlend = ref(false);
 
 watch(() => productStore.product.category?.categoryName, (newVal) => {
-  isDrink.value = newVal === "เครื่องดื่ม";
+  const category = categoryStore.categories.find(c => c.categoryName === newVal);
+  isDrink.value = category?.haveTopping === true;
   if (!isDrink.value) {
     isHot.value = false;
     isCold.value = false;
@@ -42,7 +43,6 @@ watch(() => productStore.product.category?.categoryName, (newVal) => {
     productDetails.value = [];
   }
 });
-
 onMounted(async () => {
   await categoryStore.getAllCategories();
   await ingredientStore.getAllIngredients();
@@ -83,7 +83,7 @@ const handleImageUpload = (event: Event) => {
 };
 
 const handleHotIngredientSelect = (ingredient: Ingredient) => {
-  const ingredientId = ingredient.IngredientId;
+  const ingredientId = ingredient.ingredientId;
   const keys = Object.keys(productStore.ingredientQuantitiesHot);
   const index = keys.find(key => key === ingredientId.toString()) ? keys.indexOf(ingredientId.toString()) : -1;
   console.log('Index:', index);
@@ -102,7 +102,7 @@ const handleHotIngredientSelect = (ingredient: Ingredient) => {
 
 
 const handleColdIngredientSelect = (ingredient: Ingredient) => {
-  const ingredientId = ingredient.IngredientId;
+  const ingredientId = ingredient.ingredientId;
   const keys = Object.keys(productStore.ingredientQuantitiesCold);
   const index = keys.find(key => key === ingredientId.toString()) ? keys.indexOf(ingredientId.toString()) : -1;
   console.log('Index:', index);
@@ -120,7 +120,7 @@ const handleColdIngredientSelect = (ingredient: Ingredient) => {
 };
 
 const handleBlendIngredientSelect = (ingredient: Ingredient) => {
-  const ingredientId = ingredient.IngredientId;
+  const ingredientId = ingredient.ingredientId;
   const keys = Object.keys(productStore.ingredientQuantitiesBlend);
   const index = keys.find(key => key === ingredientId.toString()) ? keys.indexOf(ingredientId.toString()) : -1;
   console.log('Index:', index);
@@ -148,7 +148,8 @@ const loadProductData = () => {
 };
 
 const checkCategory = () => {
-  isDrink.value = selectedCategory.value === 'เครื่องดื่ม';
+  const category = categoryStore.categories.find(c => c.categoryName === selectedCategory.value);
+  isDrink.value = category?.haveTopping === true;
   if (!isDrink.value) {
     isHot.value = false;
     isCold.value = false;
@@ -175,7 +176,7 @@ const submitForm = async () => {
         productTypePrice: 0,
         recipes: productStore.selectedIngredientsHot.map((ingredientId) => {
           return {
-            ingredient: ingredientStore.ingredients.find(i => i.IngredientId === ingredientId)!,
+            ingredient: ingredientStore.ingredients.find(i => i.ingredientId === ingredientId)!,
             quantity: productStore.ingredientQuantitiesHot[ingredientId]
           };
         })
@@ -187,7 +188,7 @@ const submitForm = async () => {
         productTypePrice: 0,
         recipes: productStore.selectedIngredientsCold.map((ingredientId) => {
           return {
-            ingredient: ingredientStore.ingredients.find(i => i.IngredientId === ingredientId)!,
+            ingredient: ingredientStore.ingredients.find(i => i.ingredientId === ingredientId)!,
             quantity: productStore.ingredientQuantitiesCold[ingredientId]
           };
         })
@@ -199,7 +200,7 @@ const submitForm = async () => {
         productTypePrice: 0,
         recipes: productStore.selectedIngredientsBlend.map((ingredientId) => {
           return {
-            ingredient: ingredientStore.ingredients.find(i => i.IngredientId === ingredientId)!,
+            ingredient: ingredientStore.ingredients.find(i => i.ingredientId === ingredientId)!,
             quantity: productStore.ingredientQuantitiesBlend[ingredientId]
           };
         })
@@ -219,7 +220,7 @@ const submitForm = async () => {
       file: productImage.value
     };
     console.log('Product:', JSON.stringify(productStore.product));
-    await productStore.updateProduct( productStore.product.productId, productStore.product);
+    await productStore.updateProduct(productStore.product.productId, productStore.product);
     closeDialog();
     showSuccessDialog('Product created successfully!');
   } catch (error) {
@@ -276,13 +277,16 @@ const showSuccessDialog = (message: string) => {
         <span class="headline">Update Product</span>
       </v-card-title>
       <v-card-text>
-        selectedIngredientsHot: {{ productStore.selectedIngredientsHot }}
-        ingredientQuantitiesHot: {{ productStore.ingredientQuantitiesHot }}
-        selectedIngredientsCold: {{ productStore.selectedIngredientsCold }}
-        ingredientQuantitiesCold: {{ productStore.ingredientQuantitiesCold }}
-        selectedIngredientsBlend: {{ productStore.selectedIngredientsBlend }}
-        ingredientQuantitiesBlend: {{ productStore.ingredientQuantitiesBlend }}
+{{  productStore.selectedIngredientsBlend }}
+{{ productStore.ingredientQuantitiesBlend }}
 
+{{ productStore.selectedIngredientsCold }}
+
+{{ productStore.ingredientQuantitiesCold }}
+
+{{ productStore.selectedIngredientsHot }}
+
+{{ productStore.ingredientQuantitiesHot }}
         <v-container>
           <v-form ref="form" v-model="valid">
             <v-row>
@@ -333,23 +337,23 @@ const showSuccessDialog = (message: string) => {
                         </tr>
                       </thead>
                       <tbody>
-                        <tr v-for="ingredient in ingredientStore.ingredients" :key="ingredient.IngredientId">
+                        <tr v-for="ingredient in ingredientStore.ingredients" :key="ingredient.ingredientId">
                           <td>
-                            <v-checkbox :value="ingredient.IngredientId" v-model="productStore.selectedIngredientsHot"
+                            <v-checkbox :value="ingredient.ingredientId" v-model="productStore.selectedIngredientsHot"
                               @change="handleHotIngredientSelect(ingredient)">
                             </v-checkbox>
                           </td>
                           <td>
-                            <v-img :src="`http://localhost:3000/ingredients/${ingredient.IngredientId}/image`"
+                            <v-img :src="`http://localhost:3000/ingredients/${ingredient.ingredientId}/image`"
                               height="100"></v-img>
                           </td>
-                          <td>{{ ingredient.nameIngredient }}</td>
+                          <td>{{ ingredient.ingredientName }}</td>
                           <td>
-                            <v-text-field v-if="productStore.selectedIngredientsHot.includes(ingredient.IngredientId)"
-                              v-model="productStore.ingredientQuantitiesHot[ingredient.IngredientId]" type="number"
+                            <v-text-field v-if="productStore.selectedIngredientsHot.includes(ingredient.ingredientId)"
+                              v-model="productStore.ingredientQuantitiesHot[ingredient.ingredientId]" type="number"
                               min="0" label="Quantity"></v-text-field>
                           </td>
-                          <td>{{ ingredient.unit }}</td>
+                          <td>{{ ingredient.igredientUnit }}</td>
                         </tr>
                       </tbody>
                     </v-table>
@@ -374,23 +378,23 @@ const showSuccessDialog = (message: string) => {
                         </tr>
                       </thead>
                       <tbody>
-                        <tr v-for="ingredient in ingredientStore.ingredients" :key="ingredient.IngredientId">
+                        <tr v-for="ingredient in ingredientStore.ingredients" :key="ingredient.ingredientId">
                           <td>
-                            <v-checkbox :value="ingredient.IngredientId" v-model="productStore.selectedIngredientsCold"
+                            <v-checkbox :value="ingredient.ingredientId" v-model="productStore.selectedIngredientsCold"
                               @change="handleColdIngredientSelect(ingredient)">
                             </v-checkbox>
                           </td>
                           <td>
-                            <v-img :src="`http://localhost:3000/ingredients/${ingredient.IngredientId}/image`"
+                            <v-img :src="`http://localhost:3000/ingredients/${ingredient.ingredientId}/image`"
                               height="100"></v-img>
                           </td>
-                          <td>{{ ingredient.nameIngredient }}</td>
+                          <td>{{ ingredient.ingredientName }}</td>
                           <td>
-                            <v-text-field v-if="productStore.selectedIngredientsCold.includes(ingredient.IngredientId)"
-                              v-model="productStore.ingredientQuantitiesCold[ingredient.IngredientId]" type="number"
+                            <v-text-field v-if="productStore.selectedIngredientsCold.includes(ingredient.ingredientId)"
+                              v-model="productStore.ingredientQuantitiesCold[ingredient.ingredientId]" type="number"
                               min="0" label="Quantity"></v-text-field>
                           </td>
-                          <td>{{ ingredient.unit }}</td>
+                          <td>{{ ingredient.igredientUnit }}</td>
                         </tr>
                       </tbody>
                     </v-table>
@@ -415,23 +419,23 @@ const showSuccessDialog = (message: string) => {
                         </tr>
                       </thead>
                       <tbody>
-                        <tr v-for="ingredient in ingredientStore.ingredients" :key="ingredient.IngredientId">
+                        <tr v-for="ingredient in ingredientStore.ingredients" :key="ingredient.ingredientId">
                           <td>
-                            <v-checkbox :value="ingredient.IngredientId" v-model="productStore.selectedIngredientsBlend"
+                            <v-checkbox :value="ingredient.ingredientId" v-model="productStore.selectedIngredientsBlend"
                               @change="handleBlendIngredientSelect(ingredient)">
                             </v-checkbox>
                           </td>
                           <td>
-                            <v-img :src="`http://localhost:3000/ingredients/${ingredient.IngredientId}/image`"
+                            <v-img :src="`http://localhost:3000/ingredients/${ingredient.ingredientId}/image`"
                               height="100"></v-img>
                           </td>
-                          <td>{{ ingredient.nameIngredient }}</td>
+                          <td>{{ ingredient.ingredientName }}</td>
                           <td>
-                            <v-text-field v-if="productStore.selectedIngredientsBlend.includes(ingredient.IngredientId)"
-                              v-model="productStore.ingredientQuantitiesBlend[ingredient.IngredientId]" type="number"
+                            <v-text-field v-if="productStore.selectedIngredientsBlend.includes(ingredient.ingredientId)"
+                              v-model="productStore.ingredientQuantitiesBlend[ingredient.ingredientId]" type="number"
                               min="0" label="Quantity"></v-text-field>
                           </td>
-                          <td>{{ ingredient.unit }}</td>
+                          <td>{{ ingredient.igredientUnit }}</td>
                         </tr>
                       </tbody>
                     </v-table>

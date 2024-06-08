@@ -24,11 +24,11 @@ function createImportIngredients(ingredient: {
 }
 async function saveIngredient(ingredient: Ingredient & { files: File[] }) {
   const formData = new FormData();
-  formData.append('nameIngredient', ingredient.nameIngredient || '');
-  formData.append('supplier', ingredient.supplier || '');
-  formData.append('minimun', `${ingredient.minimun}`);
-  formData.append('unit', ingredient.unit || '');
-  formData.append('quantityPerUnit', `${ingredient.quantityPerUnit || 0}`);
+  formData.append('nameIngredient', ingredient.ingredientName || '');
+  formData.append('supplier', ingredient.ingredientSupplier || '');
+  formData.append('minimun', `${ingredient.ingredientMinimun}`);
+  formData.append('unit', ingredient.ingredientUnit || '');
+  formData.append('quantityPerUnit', `${ingredient.ingredientQuantityPerUnit || 0}`);
   
   if (ingredient.files && ingredient.files.length > 0) {
     formData.append('IngredientImage', ingredient.files[0]);

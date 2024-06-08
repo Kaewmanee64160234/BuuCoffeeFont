@@ -9,7 +9,8 @@
           <v-form ref="form" v-model="valid">
             <v-row>
               <v-col cols="12" sm="6">
-                <v-file-input v-model="productImage" label="Product image" prepend-icon="mdi-camera" accept="image/*" @change="handleImageUpload" />
+                <v-file-input v-model="productImage" label="Product image" prepend-icon="mdi-camera" accept="image/*"
+                  @change="handleImageUpload" />
               </v-col>
               <v-col cols="12" sm="6">
                 <v-img v-if="imagePreview" :src="imagePreview" max-height="200"></v-img>
@@ -60,38 +61,38 @@
                         </tr>
                       </thead>
                       <tbody>
-                        <tr v-for="ingredient in ingredientStore.ingredients" :key="ingredient.IngredientId">
+                        <tr v-for="ingredient in ingredientStore.ingredients" :key="ingredient.ingredientId">
                           <td>
                             <v-checkbox v-if="type.productTypeName === 'Hot'" v-model="type.selectedIngredients"
-                              :value="ingredient.IngredientId"
+                              :value="ingredient.ingredientId"
                               @change="() => handleHotIngredientSelect(type, ingredient)"></v-checkbox>
                             <v-checkbox v-if="type.productTypeName === 'Cold'" v-model="type.selectedIngredients"
-                              :value="ingredient.IngredientId"
+                              :value="ingredient.ingredientId"
                               @change="() => handleColdIngredientSelect(type, ingredient)"></v-checkbox>
                             <v-checkbox v-if="type.productTypeName === 'Blend'" v-model="type.selectedIngredients"
-                              :value="ingredient.IngredientId"
+                              :value="ingredient.ingredientId"
                               @change="() => handleBlendIngredientSelect(type, ingredient)"></v-checkbox>
                           </td>
                           <td>
-                            <v-img :src="`http://localhost:3000/ingredients/${ingredient.IngredientId}/image`"
+                            <v-img :src="`http://localhost:3000/ingredients/${ingredient.ingredientId}/image`"
                               height="100"></v-img>
                           </td>
-                          <td>{{ ingredient.nameIngredient }}</td>
+                          <td>{{ ingredient.ingredientName }}</td>
                           <td>
                             <v-text-field
-                              v-if="type.productTypeName === 'Hot' && selectedIngredientsHot.includes(ingredient.IngredientId)"
-                              v-model="ingredientQuantitiesHot[ingredient.IngredientId]" type="number" min="0"
+                              v-if="type.productTypeName === 'Hot' && selectedIngredientsHot.includes(ingredient.ingredientId)"
+                              v-model="ingredientQuantitiesHot[ingredient.ingredientId]" type="number" min="0"
                               label="Quantity"></v-text-field>
                             <v-text-field
-                              v-if="type.productTypeName === 'Cold' && selectedIngredientsCold.includes(ingredient.IngredientId)"
-                              v-model="ingredientQuantitiesCold[ingredient.IngredientId]" type="number" min="0"
+                              v-if="type.productTypeName === 'Cold' && selectedIngredientsCold.includes(ingredient.ingredientId)"
+                              v-model="ingredientQuantitiesCold[ingredient.ingredientId]" type="number" min="0"
                               label="Quantity"></v-text-field>
                             <v-text-field
-                              v-if="type.productTypeName === 'Blend' && selectedIngredientsBlend.includes(ingredient.IngredientId)"
-                              v-model="ingredientQuantitiesBlend[ingredient.IngredientId]" type="number" min="0"
+                              v-if="type.productTypeName === 'Blend' && selectedIngredientsBlend.includes(ingredient.ingredientId)"
+                              v-model="ingredientQuantitiesBlend[ingredient.ingredientId]" type="number" min="0"
                               label="Quantity"></v-text-field>
                           </td>
-                          <td>{{ ingredient.unit }}</td>
+                          <td>{{ ingredient.igredientUnit }}</td>
                         </tr>
                       </tbody>
                     </v-table>
@@ -155,7 +156,8 @@ const productTypes = reactive({
 });
 
 watch(() => productStore.product.category.categoryName, (newVal) => {
-  isDrink.value = newVal === "เครื่องดื่ม";
+  const category = categoryStore.categories.find(c => c.categoryName === newVal);
+  isDrink.value = category?.haveTopping === true;
   if (!isDrink.value) {
     productTypes.hot = false;
     productTypes.cold = false;
@@ -163,6 +165,7 @@ watch(() => productStore.product.category.categoryName, (newVal) => {
     productDetails.value = [];
   }
 });
+
 
 onMounted(async () => {
   await categoryStore.getAllCategories();
@@ -187,42 +190,42 @@ const handleProductTypeChange = (type: string, isChecked: boolean) => {
 };
 
 const handleHotIngredientSelect = (type: CustomProductType, ingredient: Ingredient) => {
-  const index = selectedIngredientsHot.value.findIndex(id => id === ingredient.IngredientId);
+  const index = selectedIngredientsHot.value.findIndex(id => id === ingredient.ingredientId);
   console.log('Index:', index);
   if (index === -1) {
-    selectedIngredientsHot.value.push(ingredient.IngredientId);
-    ingredientQuantitiesHot.value[ingredient.IngredientId] = 0;
+    selectedIngredientsHot.value.push(ingredient.ingredientId);
+    ingredientQuantitiesHot.value[ingredient.ingredientId] = 0;
   } else {
     selectedIngredientsHot.value.splice(index, 1);
-    delete ingredientQuantitiesHot.value[ingredient.IngredientId];
+    delete ingredientQuantitiesHot.value[ingredient.ingredientId];
   }
   console.log('Selected Ingredients for Hot:', JSON.parse(JSON.stringify(selectedIngredientsHot.value)));
   console.log('Ingredient Quantities for Hot:', JSON.parse(JSON.stringify(ingredientQuantitiesHot.value)));
 };
 
 const handleColdIngredientSelect = (type: CustomProductType, ingredient: Ingredient) => {
-  const index = selectedIngredientsCold.value.findIndex(id => id === ingredient.IngredientId);
+  const index = selectedIngredientsCold.value.findIndex(id => id === ingredient.ingredientId);
   console.log('Index:', index);
   if (index === -1) {
-    selectedIngredientsCold.value.push(ingredient.IngredientId);
-    ingredientQuantitiesCold.value[ingredient.IngredientId] = 0;
+    selectedIngredientsCold.value.push(ingredient.ingredientId);
+    ingredientQuantitiesCold.value[ingredient.ingredientId] = 0;
   } else {
     selectedIngredientsCold.value.splice(index, 1);
-    delete ingredientQuantitiesCold.value[ingredient.IngredientId];
+    delete ingredientQuantitiesCold.value[ingredient.ingredientId];
   }
   console.log('Selected Ingredients for Cold:', JSON.parse(JSON.stringify(selectedIngredientsCold.value)));
   console.log('Ingredient Quantities for Cold:', JSON.parse(JSON.stringify(ingredientQuantitiesCold.value)));
 };
 
 const handleBlendIngredientSelect = (type: CustomProductType, ingredient: Ingredient) => {
-  const index = selectedIngredientsBlend.value.findIndex(id => id === ingredient.IngredientId);
+  const index = selectedIngredientsBlend.value.findIndex(id => id === ingredient.ingredientId);
   console.log('Index:', index);
   if (index === -1) {
-    selectedIngredientsBlend.value.push(ingredient.IngredientId);
-    ingredientQuantitiesBlend.value[ingredient.IngredientId] = 0;
+    selectedIngredientsBlend.value.push(ingredient.ingredientId);
+    ingredientQuantitiesBlend.value[ingredient.ingredientId] = 0;
   } else {
     selectedIngredientsBlend.value.splice(index, 1);
-    delete ingredientQuantitiesBlend.value[ingredient.IngredientId];
+    delete ingredientQuantitiesBlend.value[ingredient.ingredientId];
   }
   console.log('Selected Ingredients for Blend:', JSON.parse(JSON.stringify(selectedIngredientsBlend.value)));
   console.log('Ingredient Quantities for Blend:', JSON.parse(JSON.stringify(ingredientQuantitiesBlend.value)));
@@ -247,25 +250,25 @@ const checkCategory = () => {
 
 const submitForm = async () => {
   if (!form.value.validate()) return;
-  if (! productStore.product.category.categoryName) {
+  if (!productStore.product.category.categoryName) {
     alert('Please select a valid category.');
     return;
   }
 
   // productName.value
-  if(!productName.value) {
+  if (!productName.value) {
     alert('Please enter a product name.');
     return;
   }
 
   // productPrice.value
-  if(productPrice.value <= 0) {
+  if (productPrice.value <= 0) {
     alert('Please enter a valid product price.');
     return;
   }
 
   // selectedCategory.value
-  if(!productStore.product.category.categoryName) {
+  if (!productStore.product.category.categoryName) {
     alert('Please select a category.');
     return;
   }
@@ -278,7 +281,7 @@ const submitForm = async () => {
     categoryId: selectedCategory.value,
     productTypes: [] as ProductType[]
   };
-  
+
   if (isDrink.value) {
     const hotSelected = selectedIngredientsHot.value.length > 0;
     const coldSelected = selectedIngredientsCold.value.length > 0;
@@ -314,7 +317,7 @@ const submitForm = async () => {
         productTypePrice: 0,
         recipes: selectedIngredientsHot.value.map((ingredientId) => {
           return {
-            ingredient: ingredientStore.ingredients.find(i => i.IngredientId === ingredientId)!,
+            ingredient: ingredientStore.ingredients.find(i => i.ingredientId === ingredientId)!,
             quantity: ingredientQuantitiesHot.value[ingredientId]
           };
         })
@@ -326,7 +329,7 @@ const submitForm = async () => {
         productTypePrice: 0,
         recipes: selectedIngredientsCold.value.map((ingredientId) => {
           return {
-            ingredient: ingredientStore.ingredients.find(i => i.IngredientId === ingredientId)!,
+            ingredient: ingredientStore.ingredients.find(i => i.ingredientId === ingredientId)!,
             quantity: ingredientQuantitiesCold.value[ingredientId]
           };
         })
@@ -338,7 +341,7 @@ const submitForm = async () => {
         productTypePrice: 0,
         recipes: selectedIngredientsBlend.value.map((ingredientId) => {
           return {
-            ingredient: ingredientStore.ingredients.find(i => i.IngredientId === ingredientId)!,
+            ingredient: ingredientStore.ingredients.find(i => i.ingredientId === ingredientId)!,
             quantity: ingredientQuantitiesBlend.value[ingredientId]
           };
         })
