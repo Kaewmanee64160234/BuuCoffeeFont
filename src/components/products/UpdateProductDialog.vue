@@ -303,10 +303,10 @@ const showSuccessDialog = (message: string) => {
                 <v-img :src="imagePreview || `http://localhost:3000/products/${productStore.product.productId}/image`" max-height="200" />
               </v-col>
               <v-col cols="12" sm="6">
-                <v-text-field v-model="productStore.productName" label="Product name" required />
+                <v-text-field  variant="solo" v-model="productStore.productName" label="Product name" required />
               </v-col>
               <v-col cols="12" sm="6">
-                <v-text-field v-model="productStore.productPrice" label="Price" type="number" required />
+                <v-text-field  variant="solo" v-model="productStore.productPrice" label="Price" type="number" required />
               </v-col>
               <v-col cols="12" sm="6">
                 <v-select v-model="productStore.selectedCategory"
@@ -351,7 +351,7 @@ const showSuccessDialog = (message: string) => {
                           </td>
                           <td>{{ ingredient.ingredientName }}</td>
                           <td>
-                            <v-text-field v-if="productStore.selectedIngredientsHot.includes(ingredient.ingredientId)"
+                            <v-text-field  variant="solo" v-if="productStore.selectedIngredientsHot.includes(ingredient.ingredientId)"
                               v-model="productStore.ingredientQuantitiesHot[ingredient.ingredientId]" type="number"
                               min="0" label="Quantity"></v-text-field>
                           </td>
@@ -390,7 +390,7 @@ const showSuccessDialog = (message: string) => {
                           </td>
                           <td>{{ ingredient.ingredientName }}</td>
                           <td>
-                            <v-text-field v-if="productStore.selectedIngredientsCold.includes(ingredient.ingredientId)"
+                            <v-text-field  variant="solo" v-if="productStore.selectedIngredientsCold.includes(ingredient.ingredientId)"
                               v-model="productStore.ingredientQuantitiesCold[ingredient.ingredientId]" type="number"
                               min="0" label="Quantity"></v-text-field>
                           </td>
@@ -429,7 +429,7 @@ const showSuccessDialog = (message: string) => {
                           </td>
                           <td>{{ ingredient.ingredientName }}</td>
                           <td>
-                            <v-text-field v-if="productStore.selectedIngredientsBlend.includes(ingredient.ingredientId)"
+                            <v-text-field  variant="solo" v-if="productStore.selectedIngredientsBlend.includes(ingredient.ingredientId)"
                               v-model="productStore.ingredientQuantitiesBlend[ingredient.ingredientId]" type="number"
                               min="0" label="Quantity"></v-text-field>
                           </td>

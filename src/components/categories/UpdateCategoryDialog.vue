@@ -9,7 +9,7 @@
                     <v-form ref="form" v-model="valid">
                         <v-row>
                             <v-col cols="12">
-                                <v-text-field v-model="categoryName" label="Category Name" required></v-text-field>
+                                <v-text-field  variant="solo" v-model="categoryName" label="Category Name" required></v-text-field>
                             </v-col>
                             <v-col cols="12">
                                 <v-checkbox v-model="haveTopping" label="Have Topping"></v-checkbox>

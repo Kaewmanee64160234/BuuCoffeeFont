@@ -70,6 +70,17 @@ function updateImageProduct(productId: number, formData: FormData) {
   });
 }
 
+//  getProductPaginate by add query page and size
+function getProductPaginate(page: number, size: number) {
+    return http.get(`/products/paginate`, {
+      params: {
+        page,
+        limit: size
+      }
+    });
+  
+}
+
 export default {
   getAllProducts,
   getProductById,
@@ -79,5 +90,6 @@ export default {
   uploadImage,
   getProductsByCategory,
   getImageProduct,
-  updateImageProduct
+  updateImageProduct,
+  getProductPaginate
 };

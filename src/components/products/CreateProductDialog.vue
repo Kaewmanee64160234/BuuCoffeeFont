@@ -16,10 +16,10 @@
                 <v-img v-if="imagePreview" :src="imagePreview" max-height="200"></v-img>
               </v-col>
               <v-col cols="12" sm="6">
-                <v-text-field v-model="productName" label="Product name" required />
+                <v-text-field  variant="solo" v-model="productName" label="Product name" required />
               </v-col>
               <v-col cols="12" sm="6">
-                <v-text-field v-model="productPrice" label="Price" type="number" required />
+                <v-text-field  variant="solo" v-model="productPrice" label="Price" type="number" required />
               </v-col>
               <v-col cols="12" sm="6">
                 <v-select v-model="productStore.product.category.categoryName"
@@ -42,7 +42,7 @@
                 <v-row>
                   <v-col cols="12">
                     <v-subheader>{{ type.productTypeName }}</v-subheader>
-                    <v-text-field v-model="type.productTypePrice" label="Type price" type="number" required />
+                    <v-text-field  variant="solo" v-model="type.productTypePrice" label="Type price" type="number" required />
                   </v-col>
                   <v-col cols="12">
                     <v-btn icon @click="() => addRecipe(type)">
@@ -79,15 +79,15 @@
                           </td>
                           <td>{{ ingredient.ingredientName }}</td>
                           <td>
-                            <v-text-field
+                            <v-text-field  variant="solo"
                               v-if="type.productTypeName === 'Hot' && selectedIngredientsHot.includes(ingredient.ingredientId)"
                               v-model="ingredientQuantitiesHot[ingredient.ingredientId]" type="number" min="0"
                               label="Quantity"></v-text-field>
-                            <v-text-field
+                            <v-text-field  variant="solo"
                               v-if="type.productTypeName === 'Cold' && selectedIngredientsCold.includes(ingredient.ingredientId)"
                               v-model="ingredientQuantitiesCold[ingredient.ingredientId]" type="number" min="0"
                               label="Quantity"></v-text-field>
-                            <v-text-field
+                            <v-text-field  variant="solo"
                               v-if="type.productTypeName === 'Blend' && selectedIngredientsBlend.includes(ingredient.ingredientId)"
                               v-model="ingredientQuantitiesBlend[ingredient.ingredientId]" type="number" min="0"
                               label="Quantity"></v-text-field>

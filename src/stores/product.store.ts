@@ -45,6 +45,10 @@ export const useProductStore = defineStore("product", () => {
   const isCold = ref<boolean>(false);
   const isBlend = ref<boolean>(false);
 
+  const totalProducts = ref(0);
+  const currentPage = ref(1);
+  const itemsPerPage = ref(5);
+
   const categoryStore = useCategoryStore();
 
   // watch if selectedCategory changes map products by category
@@ -55,6 +59,11 @@ export const useProductStore = defineStore("product", () => {
           (category) => category.categoryName === value
         ) || product.value.category;
     }
+  });
+
+  // watch productStore.currentPage
+  watch(currentPage, () => {
+    getProductPaginate();
   });
 
   const getAllProducts = async () => {
@@ -69,6 +78,26 @@ export const useProductStore = defineStore("product", () => {
       }
     } catch (error) {
       console.error(error);
+    }
+  };
+  // getproduct pageginate
+  const getProductPaginate = async () => {
+    try {
+      const response = await productService.getProductPaginate(
+        currentPage.value,
+        itemsPerPage.value
+      );
+      console.log("getProductPaginate", response.data);
+      if (response.status === 200) {
+        products.value = response.data.data.map((product: any) =>
+          mapToProduct(product)
+        );
+        console.log("products", products.value);
+        totalProducts.value = response.data.total;
+      }
+    } catch (error) {
+      // console.error(error);
+      console.log("error", error);
     }
   };
 
@@ -88,7 +117,7 @@ export const useProductStore = defineStore("product", () => {
       const response = await productService.createProduct(product.value!);
       if (response.status === 201) {
         await uploadImage(product.value.file, response.data.productId);
-        await getAllProducts();
+        await getProductPaginate();
       }
     } catch (error) {
       console.error(error);
@@ -99,8 +128,9 @@ export const useProductStore = defineStore("product", () => {
     try {
       const response = await productService.updateProduct(id, updatedProduct);
       console.log("updateProduct", response.status);
-      if(response.status === 200){
-        await getAllProducts();
+      if (response.status === 200) {
+        await getProductPaginate();
+
       }
     } catch (error) {
       console.error(error);
@@ -182,5 +212,9 @@ export const useProductStore = defineStore("product", () => {
     isCold,
     isBlend,
     updateImageProduct,
+    getProductPaginate,
+    totalProducts,
+    currentPage,
+    itemsPerPage,
   };
 });
