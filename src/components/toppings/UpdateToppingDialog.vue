@@ -46,8 +46,8 @@ const submitForm = async () => {
 
   const updatedTopping: Topping = {
     toppingId: toppingStore.topping!.toppingId,
-    toppingName: toppingName.value,
-    toppingPrice: toppingPrice.value,
+    toppingName: toppingStore.topping!.toppingName,
+    toppingPrice: toppingStore.topping!.toppingPrice,
   };
 
   try {
