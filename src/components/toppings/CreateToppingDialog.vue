@@ -31,6 +31,7 @@
   import { ref } from 'vue';
   import { useToppingStore } from '@/stores/topping.store';
   import type { Topping } from '@/types/topping.type';
+import Swal from 'sweetalert2';
   
   const toppingStore = useToppingStore();
   const form = ref(null);
