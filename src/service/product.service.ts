@@ -61,6 +61,15 @@ function getImageProduct(id: number) {
   return http.get(`/products/${id}/image/`);
 }
 
+// update-image/:productId
+function updateImageProduct(productId: number, formData: FormData) {
+  return http.post(`/products/update-image/${productId}`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+}
+
 export default {
   getAllProducts,
   getProductById,
@@ -70,4 +79,5 @@ export default {
   uploadImage,
   getProductsByCategory,
   getImageProduct,
+  updateImageProduct
 };

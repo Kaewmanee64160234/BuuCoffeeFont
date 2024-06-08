@@ -219,10 +219,23 @@ const submitForm = async () => {
       productId: productStore.product.productId,
       file: productImage.value
     };
+
+    // if have image file in productImage uplode image 
+
     console.log('Product:', JSON.stringify(productStore.product));
+
     await productStore.updateProduct(productStore.product.productId, productStore.product);
-    closeDialog();
-    showSuccessDialog('Product created successfully!');
+    if (productImage.value.name !== '') {
+      const formData = new FormData();
+      formData.append('file', productImage.value);
+      await productStore.updateImageProduct(productStore.product.productId, formData);
+      imagePreview.value = URL.createObjectURL(productImage.value);
+    }
+  
+
+      closeDialog();
+     showSuccessDialog('Product created successfully!');
+    // relode page
   } catch (error) {
     console.error('Error updating product:', error);
     Swal.fire('Error', 'An error occurred while creating the product.', 'error');
@@ -255,6 +268,8 @@ const closeDialog = () => {
   productStore.selectedIngredientsBlend = [];
   productStore.ingredientQuantitiesBlend = {};
   productStore.updateProductDialog = false;
+  location.reload();
+
 };
 
 const showSuccessDialog = (message: string) => {
@@ -277,16 +292,6 @@ const showSuccessDialog = (message: string) => {
         <span class="headline">Update Product</span>
       </v-card-title>
       <v-card-text>
-{{  productStore.selectedIngredientsBlend }}
-{{ productStore.ingredientQuantitiesBlend }}
-
-{{ productStore.selectedIngredientsCold }}
-
-{{ productStore.ingredientQuantitiesCold }}
-
-{{ productStore.selectedIngredientsHot }}
-
-{{ productStore.ingredientQuantitiesHot }}
         <v-container>
           <v-form ref="form" v-model="valid">
             <v-row>
@@ -295,7 +300,7 @@ const showSuccessDialog = (message: string) => {
                   @change="handleImageUpload" />
               </v-col>
               <v-col cols="12" sm="6">
-                <v-img :src="`${productStore.imagePreview}`" max-height="200" />
+                <v-img :src="imagePreview || `http://localhost:3000/products/${productStore.product.productId}/image`" max-height="200" />
               </v-col>
               <v-col cols="12" sm="6">
                 <v-text-field v-model="productStore.productName" label="Product name" required />
@@ -309,7 +314,6 @@ const showSuccessDialog = (message: string) => {
                   label="Select Category" dense @change="checkCategory"></v-select>
               </v-col>
             </v-row>
-
             <v-row v-if="isDrink">
               <v-row class="d-flex justify-space-between">
                 <v-checkbox label="Hot" v-model="productStore.isHot"
@@ -319,7 +323,6 @@ const showSuccessDialog = (message: string) => {
                 <v-checkbox label="Blend" v-model="productStore.isBlend"
                   @change="handleProductTypeChange('Blend', isBlend)"></v-checkbox>
               </v-row>
-
               <v-container v-if="productStore.isHot">
                 <v-row>
                   <v-col cols="12">
@@ -344,8 +347,7 @@ const showSuccessDialog = (message: string) => {
                             </v-checkbox>
                           </td>
                           <td>
-                            <v-img :src="`http://localhost:3000/ingredients/${ingredient.ingredientId}/image`"
-                              height="100"></v-img>
+                            <v-img :src="`http://localhost:3000/ingredients/${ingredient.ingredientId}/image`" height="100"></v-img>
                           </td>
                           <td>{{ ingredient.ingredientName }}</td>
                           <td>
@@ -360,7 +362,6 @@ const showSuccessDialog = (message: string) => {
                   </v-col>
                 </v-row>
               </v-container>
-
               <v-container v-if="productStore.isCold">
                 <v-row>
                   <v-col cols="12">
@@ -385,8 +386,7 @@ const showSuccessDialog = (message: string) => {
                             </v-checkbox>
                           </td>
                           <td>
-                            <v-img :src="`http://localhost:3000/ingredients/${ingredient.ingredientId}/image`"
-                              height="100"></v-img>
+                            <v-img :src="`http://localhost:3000/ingredients/${ingredient.ingredientId}/image`" height="100"></v-img>
                           </td>
                           <td>{{ ingredient.ingredientName }}</td>
                           <td>
@@ -401,7 +401,6 @@ const showSuccessDialog = (message: string) => {
                   </v-col>
                 </v-row>
               </v-container>
-
               <v-container v-if="productStore.isBlend">
                 <v-row>
                   <v-col cols="12">
@@ -426,8 +425,7 @@ const showSuccessDialog = (message: string) => {
                             </v-checkbox>
                           </td>
                           <td>
-                            <v-img :src="`http://localhost:3000/ingredients/${ingredient.ingredientId}/image`"
-                              height="100"></v-img>
+                            <v-img :src="`http://localhost:3000/ingredients/${ingredient.ingredientId}/image`" height="100"></v-img>
                           </td>
                           <td>{{ ingredient.ingredientName }}</td>
                           <td>

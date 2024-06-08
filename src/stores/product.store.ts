@@ -4,7 +4,10 @@ import { mapToProduct, type Product } from "@/types/product.type";
 import productService from "@/service/product.service";
 import type { Category } from "@/types/category.type";
 import { useCategoryStore } from "./category.store";
-import type { IngredientQuantities, ProductType } from "@/types/productType.type";
+import type {
+  IngredientQuantities,
+  ProductType,
+} from "@/types/productType.type";
 
 export const useProductStore = defineStore("product", () => {
   const products = ref<Product[]>([]);
@@ -59,9 +62,10 @@ export const useProductStore = defineStore("product", () => {
       const response = await productService.getAllProducts();
       if (response.status === 200) {
         console.log(response.data);
-      //  use map to Product with array products
-        products.value = response.data.map( (product: any) => mapToProduct(product));
-
+        //  use map to Product with array products
+        products.value = response.data.map((product: any) =>
+          mapToProduct(product)
+        );
       }
     } catch (error) {
       console.error(error);
@@ -94,9 +98,10 @@ export const useProductStore = defineStore("product", () => {
   const updateProduct = async (id: number, updatedProduct: Product) => {
     try {
       const response = await productService.updateProduct(id, updatedProduct);
-   console.log("updateProduct", response.status);
+      console.log("updateProduct", response.status);
+      if(response.status === 200){
         await getAllProducts();
-      
+      }
     } catch (error) {
       console.error(error);
     }
@@ -105,7 +110,7 @@ export const useProductStore = defineStore("product", () => {
   const deleteProduct = async (id: number) => {
     try {
       const response = await productService.deleteProduct(id);
-        await getAllProducts();
+      await getAllProducts();
     } catch (error) {
       console.error(error);
     }
@@ -127,6 +132,22 @@ export const useProductStore = defineStore("product", () => {
       const response = await productService.getProductsByCategory(category);
       if (response.status === 200) {
         products.value = response.data;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // updateImageProduct
+
+  const updateImageProduct = async (productId: number, formData: FormData) => {
+    try {
+      const response = await productService.updateImageProduct(
+        productId,
+        formData
+      );
+      if (response.status === 201) {
+        console.log("updateImageProduct", response.data);
       }
     } catch (error) {
       console.error(error);
@@ -160,5 +181,6 @@ export const useProductStore = defineStore("product", () => {
     isHot,
     isCold,
     isBlend,
+    updateImageProduct,
   };
 });
