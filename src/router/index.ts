@@ -48,6 +48,17 @@ const router = createRouter({
       name: 'checkingredientHistory',
       component: () => import('../views/ingredient/check/checkIngredientHistoryView.vue')
     },
+    {
+      path: '/category',
+      name: 'category',
+      component: () => import('../views/category/CategoryView.vue')
+    },
+    // toppings
+    {
+      path: '/topping',
+      name: 'topping',
+      component: () => import('../views/topping/ToppingView.vue')
+    },
   ]
 })
 

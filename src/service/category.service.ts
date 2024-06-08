@@ -10,11 +10,14 @@ function getCategoryById(id: number) {
 }
 
 function createCategory(category: Category) {
+  console.log(JSON.stringify(category));
   return http.post("/categories", category);
 }
 
 function updateCategory(id: number, category: Category) {
-  return http.put(`/categories/${id}`, category);
+  console.log(JSON.stringify(category));
+  
+  return http.patch(`/categories/${id}`, category);
 }
 
 function deleteCategory(id: number) {

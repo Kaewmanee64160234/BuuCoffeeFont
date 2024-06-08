@@ -8,18 +8,47 @@ function getProductById(id: number) {
   return http.get(`/products/${id}`);
 }
 function createProduct(product: Product) {
-  return http.post("/products", product);
+  const product_ = {
+    productName: product.productName,
+    productPrice: product.productPrice,
+    productImage: product.productImage,
+    categoryId: product.category.categoryId,
+    productTypes:
+      product.productTypes?.length! > 0
+        ? product.productTypes!.map((productType) => {
+            return {
+              productTypeName: productType.productTypeName,
+              productTypePrice: productType.productTypePrice,
+              recipes: productType.recipes?.map((recipe) => {
+                return {
+                  IngredientId: recipe.ingredient.ingredientId,
+                  quantity: recipe.quantity,
+                };
+              }),
+            };
+          })
+        : [],
+  };
+
+  console.log(JSON.stringify(product_));
+
+  return http.post("/products", product_);
 }
 function updateProduct(id: number, product: Product) {
-  return http.put(`/products/${id}`, product);
+  return http.patch(`/products/${id}`, product);
 }
 function deleteProduct(id: number) {
   return http.delete(`/products/${id}`);
 }
-function uploadImage(file: File,productId:number) {
+function uploadImage(file: File, productId: number) {
   const formData = new FormData();
-  formData.append("image", file);
-  return http.post(`/upload/${productId}`, formData);
+  formData.append("file", file, file.name);
+  console.log("FormData Contents:", file);
+  return http.post(`/products/upload/${productId}`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 }
 
 // get product by category name
@@ -32,6 +61,15 @@ function getImageProduct(id: number) {
   return http.get(`/products/${id}/image/`);
 }
 
+// update-image/:productId
+function updateImageProduct(productId: number, formData: FormData) {
+  return http.post(`/products/update-image/${productId}`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+}
+
 export default {
   getAllProducts,
   getProductById,
@@ -40,5 +78,6 @@ export default {
   deleteProduct,
   uploadImage,
   getProductsByCategory,
-  getImageProduct
+  getImageProduct,
+  updateImageProduct
 };
