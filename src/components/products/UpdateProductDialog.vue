@@ -268,7 +268,6 @@ const closeDialog = () => {
   productStore.selectedIngredientsBlend = [];
   productStore.ingredientQuantitiesBlend = {};
   productStore.updateProductDialog = false;
-  location.reload();
 
 };
 
@@ -278,7 +277,9 @@ const showSuccessDialog = (message: string) => {
     text: message,
     icon: 'success',
     confirmButtonText: 'OK'
-  });
+  })
+
+
 };
 
 </script>

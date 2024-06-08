@@ -5,108 +5,117 @@
         <span class="headline">Create Product</span>
       </v-card-title>
       <v-card-text>
-        <v-container>
-          <v-form ref="form" v-model="valid">
-            <v-row>
-              <v-col cols="12" sm="6">
-                <v-file-input v-model="productImage" label="Product image" prepend-icon="mdi-camera" accept="image/*"
-                  @change="handleImageUpload" />
-              </v-col>
-              <v-col cols="12" sm="6">
-                <v-img v-if="imagePreview" :src="imagePreview" max-height="200"></v-img>
-              </v-col>
-              <v-col cols="12" sm="6">
-                <v-text-field  variant="solo" v-model="productName" label="Product name" required />
-              </v-col>
-              <v-col cols="12" sm="6">
-                <v-text-field  variant="solo" v-model="productPrice" label="Price" type="number" required />
-              </v-col>
-              <v-col cols="12" sm="6">
-                <v-select v-model="productStore.product.category.categoryName"
-                  :items="categoryStore.categoriesForCreate.map(category => category.categoryName)"
-                  label="Select Category" dense @change="checkCategory"></v-select>
-              </v-col>
-            </v-row>
+        <v-stepper v-model="e1">
+          <template v-slot:default="{ prev, next }">
+            <v-stepper-header>
+              <v-stepper-item :complete="e1 > 1" step="1" :value="1" editable>
+                Product Details
+              </v-stepper-item>
+              <v-divider></v-divider>
+              <v-stepper-item v-if="isDrink" :complete="e1 > 2" step="2" :value="2" editable>
+                Select Product Type
+              </v-stepper-item>
+              <v-divider v-if="isDrink"></v-divider>
+              <template v-for="(step, index) in computedSteps" :key="index">
+                <v-stepper-item :complete="e1 > step.value" :step="step.label" :value="step.value" editable>
+                  {{ step.label }}
+                </v-stepper-item>
+                <v-divider v-if="index < computedSteps.length - 1"></v-divider>
+              </template>
+            </v-stepper-header>
 
-            <v-row v-if="isDrink">
-              <v-row class="d-flex justify-space-between">
-                <v-checkbox label="Hot" v-model="productTypes.hot"
-                  @change="() => handleProductTypeChange('Hot', productTypes.hot)"></v-checkbox>
-                <v-checkbox label="Cold" v-model="productTypes.cold"
-                  @change="() => handleProductTypeChange('Cold', productTypes.cold)"></v-checkbox>
-                <v-checkbox label="Blend" v-model="productTypes.blend"
-                  @change="() => handleProductTypeChange('Blend', productTypes.blend)"></v-checkbox>
-              </v-row>
+            <v-stepper-window>
+              <v-stepper-window-item :value="1">
+                <v-form ref="form" v-model="valid">
+                  <v-row>
+                    <v-col cols="12" sm="6">
+                      <v-file-input v-model="productImage" label="Product image" prepend-icon="mdi-camera" accept="image/*" @change="handleImageUpload" />
+                    </v-col>
+                    <v-col cols="12" sm="6">
+                      <v-img v-if="imagePreview" :src="imagePreview" max-height="200"></v-img>
+                    </v-col>
+                    <v-col cols="12" sm="6">
+                      <v-text-field variant="solo" v-model="productName" label="Product name" required />
+                    </v-col>
+                    <v-col cols="12" sm="6">
+                      <v-text-field variant="solo" v-model="productPrice" label="Price" type="number" required />
+                    </v-col>
+                    <v-col cols="12" sm="6">
+                      <v-select v-model="productStore.product.category.categoryName" :items="categoryStore.categoriesForCreate.map(category => category.categoryName)" label="Select Category" dense @change="checkCategory" />
+                    </v-col>
+                  </v-row>
+                </v-form>
+              </v-stepper-window-item>
 
-              <v-container v-for="(type, index) in productDetails" :key="index">
-                <v-row>
-                  <v-col cols="12">
-                    <v-subheader>{{ type.productTypeName }}</v-subheader>
-                    <v-text-field  variant="solo" v-model="type.productTypePrice" label="Type price" type="number" required />
-                  </v-col>
-                  <v-col cols="12">
-                    <v-btn icon @click="() => addRecipe(type)">
-                      <v-icon>mdi-plus</v-icon>
-                    </v-btn>
-                  </v-col>
-                  <v-col cols="12">
-                    <v-table>
-                      <thead>
-                        <tr>
-                          <th>Select</th>
-                          <th>Image</th>
-                          <th>Name</th>
-                          <th>Quantity</th>
-                          <th>Unit</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr v-for="ingredient in ingredientStore.ingredients" :key="ingredient.ingredientId">
-                          <td>
-                            <v-checkbox v-if="type.productTypeName === 'Hot'" v-model="type.selectedIngredients"
-                              :value="ingredient.ingredientId"
-                              @change="() => handleHotIngredientSelect(type, ingredient)"></v-checkbox>
-                            <v-checkbox v-if="type.productTypeName === 'Cold'" v-model="type.selectedIngredients"
-                              :value="ingredient.ingredientId"
-                              @change="() => handleColdIngredientSelect(type, ingredient)"></v-checkbox>
-                            <v-checkbox v-if="type.productTypeName === 'Blend'" v-model="type.selectedIngredients"
-                              :value="ingredient.ingredientId"
-                              @change="() => handleBlendIngredientSelect(type, ingredient)"></v-checkbox>
-                          </td>
-                          <td>
-                            <v-img :src="`http://localhost:3000/ingredients/${ingredient.ingredientId}/image`"
-                              height="100"></v-img>
-                          </td>
-                          <td>{{ ingredient.ingredientName }}</td>
-                          <td>
-                            <v-text-field  variant="solo"
-                              v-if="type.productTypeName === 'Hot' && selectedIngredientsHot.includes(ingredient.ingredientId)"
-                              v-model="ingredientQuantitiesHot[ingredient.ingredientId]" type="number" min="0"
-                              label="Quantity"></v-text-field>
-                            <v-text-field  variant="solo"
-                              v-if="type.productTypeName === 'Cold' && selectedIngredientsCold.includes(ingredient.ingredientId)"
-                              v-model="ingredientQuantitiesCold[ingredient.ingredientId]" type="number" min="0"
-                              label="Quantity"></v-text-field>
-                            <v-text-field  variant="solo"
-                              v-if="type.productTypeName === 'Blend' && selectedIngredientsBlend.includes(ingredient.ingredientId)"
-                              v-model="ingredientQuantitiesBlend[ingredient.ingredientId]" type="number" min="0"
-                              label="Quantity"></v-text-field>
-                          </td>
-                          <td>{{ ingredient.igredientUnit }}</td>
-                        </tr>
-                      </tbody>
-                    </v-table>
-                  </v-col>
-                </v-row>
-              </v-container>
-            </v-row>
-          </v-form>
-        </v-container>
+              <v-stepper-window-item v-if="isDrink" :value="2">
+                <v-form ref="form" v-model="valid">
+                  <v-row class="d-flex justify-space-between">
+                    <v-checkbox label="Hot" v-model="productTypes.hot" @change="() => handleProductTypeChange('Hot', productTypes.hot)" />
+                    <v-checkbox label="Cold" v-model="productTypes.cold" @change="() => handleProductTypeChange('Cold', productTypes.cold)" />
+                    <v-checkbox label="Blend" v-model="productTypes.blend" @change="() => handleProductTypeChange('Blend', productTypes.blend)" />
+                  </v-row>
+                </v-form>
+              </v-stepper-window-item>
+
+              <v-stepper-window-item v-for="(step, index) in computedSteps" :key="`content-${index+3}`" :value="step.value">
+                <v-form ref="form" v-model="valid">
+                  <v-container>
+                    <v-row>
+                      <v-col cols="12">
+                        <v-subheader>{{ step.label }}</v-subheader>
+                        <v-text-field variant="solo" v-model="getProductType(step.label).productTypePrice" label="Type price" type="number" required />
+                      </v-col>
+                      <v-col cols="12">
+                        <v-btn icon @click="() => addRecipe(getProductType(step.label))">
+                          <v-icon>mdi-plus</v-icon>
+                        </v-btn>
+                      </v-col>
+                      <v-col cols="12">
+                        <v-table>
+                          <thead>
+                            <tr>
+                              <th>Select</th>
+                              <th>Image</th>
+                              <th>Name</th>
+                              <th>Quantity</th>
+                              <th>Unit</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr v-for="ingredient in ingredientStore.ingredients" :key="ingredient.ingredientId">
+                              <td>
+                                <v-checkbox v-if="step.label === 'Hot'" v-model="getProductType(step.label).selectedIngredients" :value="ingredient.ingredientId" @change="() => handleHotIngredientSelect(getProductType(step.label), ingredient)" />
+                                <v-checkbox v-if="step.label === 'Cold'" v-model="getProductType(step.label).selectedIngredients" :value="ingredient.ingredientId" @change="() => handleColdIngredientSelect(getProductType(step.label), ingredient)" />
+                                <v-checkbox v-if="step.label === 'Blend'" v-model="getProductType(step.label).selectedIngredients" :value="ingredient.ingredientId" @change="() => handleBlendIngredientSelect(getProductType(step.label), ingredient)" />
+                              </td>
+                              <td>
+                                <v-img :src="`http://localhost:3000/ingredients/${ingredient.ingredientId}/image`" height="100" />
+                              </td>
+                              <td>{{ ingredient.ingredientName }}</td>
+                              <td>
+                                <v-text-field variant="solo" v-if="step.label === 'Hot' && selectedIngredientsHot.includes(ingredient.ingredientId)" v-model="ingredientQuantitiesHot[ingredient.ingredientId]" type="number" min="0" label="Quantity" />
+                                <v-text-field variant="solo" v-if="step.label === 'Cold' && selectedIngredientsCold.includes(ingredient.ingredientId)" v-model="ingredientQuantitiesCold[ingredient.ingredientId]" type="number" min="0" label="Quantity" />
+                                <v-text-field variant="solo" v-if="step.label === 'Blend' && selectedIngredientsBlend.includes(ingredient.ingredientId)" v-model="ingredientQuantitiesBlend[ingredient.ingredientId]" type="number" min="0" label="Quantity" />
+                              </td>
+                              <td>{{ ingredient.ingredientUnit }}</td>
+                            </tr>
+                          </tbody>
+                        </v-table>
+                      </v-col>
+                    </v-row>
+                  </v-container>
+                </v-form>
+              </v-stepper-window-item>
+            </v-stepper-window>
+
+            <v-stepper-actions :disabled="disabled" @click:next="next" @click:prev="prev"></v-stepper-actions>
+          </template>
+        </v-stepper>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" @click="clearData()">Cancel</v-btn>
-        <v-btn color="blue darken-1" @click="submitForm" :disabled="!valid">Save</v-btn>
+        <v-btn color="primary" @click="clearData">Close</v-btn>
+        <v-btn color="primary" @click="submitForm" :disabled="!valid">Save</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -118,7 +127,7 @@ import { useIngredientStore } from '@/stores/Ingredient.store';
 import { useProductStore } from '@/stores/product.store';
 import type { Ingredient } from '@/types/ingredient.type';
 import type { ProductType } from '@/types/productType.type';
-import { ref, reactive, onMounted, watch } from 'vue';
+import { ref, reactive, onMounted, watch, computed } from 'vue';
 import Swal from 'sweetalert2';
 
 interface IngredientQuantities {
@@ -131,6 +140,9 @@ interface CustomProductType extends ProductType {
 }
 
 const dialog = ref(false);
+const step = ref(1);
+const steps = ref(5);
+const e1 = ref(1);
 const form = ref(null);
 const valid = ref(false);
 const productName = ref('');
@@ -155,6 +167,16 @@ const productTypes = reactive({
   blend: false
 });
 
+const computedSteps = computed(() => {
+  const stepsArray = [];
+  if (isDrink.value) {
+    if (productTypes.hot) stepsArray.push({ label: 'Hot', value: 3 });
+    if (productTypes.cold) stepsArray.push({ label: 'Cold', value: 4 });
+    if (productTypes.blend) stepsArray.push({ label: 'Blend', value: 5 });
+  }
+  return stepsArray;
+});
+
 watch(() => productStore.product.category.categoryName, (newVal) => {
   const category = categoryStore.categories.find(c => c.categoryName === newVal);
   isDrink.value = category?.haveTopping === true;
@@ -166,7 +188,6 @@ watch(() => productStore.product.category.categoryName, (newVal) => {
   }
 });
 
-
 onMounted(async () => {
   await categoryStore.getAllCategories();
   await ingredientStore.getAllIngredients();
@@ -174,7 +195,6 @@ onMounted(async () => {
 
 const handleProductTypeChange = (type: string, isChecked: boolean) => {
   const typeIndex = productDetails.value.findIndex(pt => pt.productTypeName === type);
-  console.log('Type Index:', typeIndex);
   if (isChecked && typeIndex === -1) {
     productDetails.value.push({
       productTypeName: type,
@@ -186,12 +206,10 @@ const handleProductTypeChange = (type: string, isChecked: boolean) => {
   } else if (!isChecked && typeIndex !== -1) {
     productDetails.value.splice(typeIndex, 1);
   }
-  console.log(`Product Details for ${type}:`, JSON.parse(JSON.stringify(productDetails.value)));
 };
 
 const handleHotIngredientSelect = (type: CustomProductType, ingredient: Ingredient) => {
   const index = selectedIngredientsHot.value.findIndex(id => id === ingredient.ingredientId);
-  console.log('Index:', index);
   if (index === -1) {
     selectedIngredientsHot.value.push(ingredient.ingredientId);
     ingredientQuantitiesHot.value[ingredient.ingredientId] = 0;
@@ -199,13 +217,10 @@ const handleHotIngredientSelect = (type: CustomProductType, ingredient: Ingredie
     selectedIngredientsHot.value.splice(index, 1);
     delete ingredientQuantitiesHot.value[ingredient.ingredientId];
   }
-  console.log('Selected Ingredients for Hot:', JSON.parse(JSON.stringify(selectedIngredientsHot.value)));
-  console.log('Ingredient Quantities for Hot:', JSON.parse(JSON.stringify(ingredientQuantitiesHot.value)));
 };
 
 const handleColdIngredientSelect = (type: CustomProductType, ingredient: Ingredient) => {
   const index = selectedIngredientsCold.value.findIndex(id => id === ingredient.ingredientId);
-  console.log('Index:', index);
   if (index === -1) {
     selectedIngredientsCold.value.push(ingredient.ingredientId);
     ingredientQuantitiesCold.value[ingredient.ingredientId] = 0;
@@ -213,13 +228,10 @@ const handleColdIngredientSelect = (type: CustomProductType, ingredient: Ingredi
     selectedIngredientsCold.value.splice(index, 1);
     delete ingredientQuantitiesCold.value[ingredient.ingredientId];
   }
-  console.log('Selected Ingredients for Cold:', JSON.parse(JSON.stringify(selectedIngredientsCold.value)));
-  console.log('Ingredient Quantities for Cold:', JSON.parse(JSON.stringify(ingredientQuantitiesCold.value)));
 };
 
 const handleBlendIngredientSelect = (type: CustomProductType, ingredient: Ingredient) => {
   const index = selectedIngredientsBlend.value.findIndex(id => id === ingredient.ingredientId);
-  console.log('Index:', index);
   if (index === -1) {
     selectedIngredientsBlend.value.push(ingredient.ingredientId);
     ingredientQuantitiesBlend.value[ingredient.ingredientId] = 0;
@@ -227,8 +239,9 @@ const handleBlendIngredientSelect = (type: CustomProductType, ingredient: Ingred
     selectedIngredientsBlend.value.splice(index, 1);
     delete ingredientQuantitiesBlend.value[ingredient.ingredientId];
   }
-  console.log('Selected Ingredients for Blend:', JSON.parse(JSON.stringify(selectedIngredientsBlend.value)));
-  console.log('Ingredient Quantities for Blend:', JSON.parse(JSON.stringify(ingredientQuantitiesBlend.value)));
+};
+const getProductType = (typeName: string): CustomProductType => {
+  return productDetails.value.find(pt => pt.productTypeName === typeName) as CustomProductType;
 };
 
 const handleImageUpload = (event: Event) => {
@@ -240,6 +253,8 @@ const handleImageUpload = (event: Event) => {
   }
 };
 
+
+
 const addRecipe = (type: CustomProductType) => {
   type.recipes.push({ ingredient: {} as Ingredient, quantity: 0 });
 };
@@ -249,30 +264,25 @@ const checkCategory = () => {
 };
 
 const submitForm = async () => {
-  if (!form.value.validate()) return;
   if (!productStore.product.category.categoryName) {
     alert('Please select a valid category.');
     return;
   }
 
-  // productName.value
   if (!productName.value) {
     alert('Please enter a product name.');
     return;
   }
 
-  // productPrice.value
   if (productPrice.value <= 0) {
     alert('Please enter a valid product price.');
     return;
   }
 
-  // selectedCategory.value
   if (!productStore.product.category.categoryName) {
     alert('Please select a category.');
     return;
   }
-
 
   const productData = {
     productName: productName.value,
@@ -349,7 +359,6 @@ const submitForm = async () => {
     }
   }
 
-  console.log('Product Data:', JSON.parse(JSON.stringify(productData)));
   productStore.product = {
     category: categoryStore.categories.find(c => c.categoryName === productStore.product.category.categoryName)!,
     productName: productData.productName,
@@ -359,14 +368,11 @@ const submitForm = async () => {
     productId: 0,
     file: productImage.value
   };
-  console.log('Product:', JSON.parse(JSON.stringify(productStore.product)));
   await productStore.createProduct();
   clearData();
   showSuccessDialog('Product created successfully!');
-
 };
 
-// clearData and close dialog
 const clearData = () => {
   productName.value = '';
   productPrice.value = 0;
@@ -395,5 +401,18 @@ const showSuccessDialog = (message: string) => {
   });
 };
 
+function next() {
+  if (e1.value < steps.value) {
+    e1.value++;
+  }
+}
 
+function prev() {
+  if (e1.value > 1) {
+    e1.value--;
+  }
+}
+const disabled = computed(() => {
+  return e1.value === 1 ? 'prev' : e1.value === steps.value ? 'next' : undefined;
+});
 </script>

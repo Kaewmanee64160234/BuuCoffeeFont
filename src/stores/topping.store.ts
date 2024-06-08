@@ -15,7 +15,7 @@ export const useToppingStore = defineStore("topping", () => {
     const searchQuery = ref<string>("");
     const totalToppings = ref(0);
     const currentPage = ref(1);
-    const itemsPerPage = ref(10);
+    const itemsPerPage = ref(5);
 
     // watch for pagination
     watch([currentPage, itemsPerPage, searchQuery], () => {
