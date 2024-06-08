@@ -44,10 +44,10 @@ onMounted(async () => {
                                 v-for="(item, index) in ingredientStore.ingredients" :key="index">
                                 <v-card width="100%" @click="ingredientStore.Addingredient(item)"
                                     style="height: 200px;">
-                                    <v-img :src="`http://localhost:3000/ingredients/${item.IngredientId}/image`"
+                                    <v-img :src="`http://localhost:3000/ingredients/${item.ingredientId}/image`"
                                         height="100"></v-img>
-                                    <v-card-title style="font-size: 14px;">{{ item.nameIngredient }}</v-card-title>
-                                    <v-card-subtitle style="font-size: 12px;">{{ item.supplier }}</v-card-subtitle>
+                                    <v-card-title style="font-size: 14px;">{{ item.ingredientName }}</v-card-title>
+                                    <v-card-subtitle style="font-size: 12px;">{{ item.igredientSupplier}}</v-card-subtitle>
                                 </v-card>
                             </v-col>
                         </v-row>
@@ -70,8 +70,8 @@ onMounted(async () => {
                             <tbody>
                                 <tr v-for="(item, index) in ingredientStore.ingredientList" :key="index">
                                     <td>{{ index + 1 }}</td>
-                                    <td>{{ item.ingredient.nameIngredient }}</td>
-                                    <td>{{ item.ingredient.supplier }}</td>
+                                    <td>{{ item.ingredient.ingredientName }}</td>
+                                    <td>{{ item.ingredient.igredientSupplier }}</td>
                                     <td><input type="number" v-model.number="item.count" class="styled-input" /></td>
                                     <td><input type="number" v-model.number="item.totalunit" class="styled-input" />
                                     </td>
