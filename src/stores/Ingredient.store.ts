@@ -18,32 +18,75 @@ export const useIngredientStore = defineStore("ingredient", () => {
   const dialog = ref(false); // สถานะของ Dialog
   const editedIngredient = ref<Ingredient & { files: File[] }>({
     ingredientName: "",
-    igredientSupplier: "",
-    igredientMinimun: 0,
-    igredientUnit: "",
-    igredientQuantityInStock: 0,
-    igredientQuantityPerUnit: 0,
-    igredientQuantityPerSubUnit: "",
-    igredientRemining:0,
-    igredientImages: "no_image.jpg",
+    ingredientSupplier: "",
+    ingredientMinimun: 0,
+    ingredientUnit: "",
+    ingredientQuantityInStock: 0,
+    ingredientQuantityPerUnit: 0,
+    ingredientQuantityPerSubUnit: "",
+    ingredientRemining:0,
+    ingredientImage: "no_image.jpg",
     files: [],
   });
   watch(dialog, (newDialog, oldDialog) => {
     if (!newDialog) {
       editedIngredient.value = {
         ingredientName: "",
-        igredientSupplier: "",
-    igredientMinimun: 0,
-    igredientUnit: "",
-    igredientQuantityInStock: 0,
-    igredientQuantityPerUnit: 0,
-    igredientQuantityPerSubUnit: "",
-    igredientRemining:0,
-    igredientImages: "no_image.jpg",
+        ingredientSupplier: "",
+    ingredientMinimun: 0,
+    ingredientUnit: "",
+    ingredientQuantityInStock: 0,
+    ingredientQuantityPerUnit: 0,
+    ingredientQuantityPerSubUnit: "",
+    ingredientRemining:0,
+    ingredientImage: "no_image.jpg",
     files: [],
       };
     }
   });
+  // about pagination
+  const page = ref(1);
+  const take = ref(5);
+  const keyword = ref("");
+  const order = ref("ASC");
+  const orderBy = ref("");
+  const lastPage = ref(0);
+  const cat = ref("");
+  watch(page, async (newPage, oldPage) => {
+    await getAllIngredients();
+  });
+  watch(keyword, async (newKey, oldKey) => {
+    if (keyword.value.length >= 3) {
+      await getAllIngredients();
+    }
+    if (keyword.value.length === 0) {
+      await getAllIngredients();
+    }
+  });
+  watch(lastPage, async (newlastPage, oldlastPage) => {
+    if (newlastPage < page.value) {
+      page.value = 1;
+    }
+  });
+
+  async function getAllIngredients() {
+    try {
+      const res = await ingredientService.getAllIngredients({
+        page: page.value,
+        take: take.value,
+        keyword: keyword.value,
+        order: order.value,
+        orderBy: orderBy.value,
+      });
+      ingredients.value = res.data.data;
+
+      lastPage.value = res.data.lastPage;
+    } catch (e) {
+      console.log(e);
+      messageStore.showError("Oops!, cannot get ingredients.");
+    }
+  }
+
 
   const ingredientList = ref<
     { ingredient: Ingredient; count: number; totalunit: number }[]
@@ -77,16 +120,16 @@ export const useIngredientStore = defineStore("ingredient", () => {
     ingredientList.value.splice(index, 1);
   }
 
-  const getAllIngredients = async () => {
-    try {
-      const response = await ingredientService.getAllIngredients();
-      if (response.status === 200) {
-        ingredients.value = response.data;
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  // const getAllIngredients = async () => {
+  //   try {
+  //     const response = await ingredientService.getAllIngredients();
+  //     if (response.status === 200) {
+  //       ingredients.value = response.data;
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
   const getAllHistoryImportIngredients = async () => {
     try {
       const response = await ingredientService.getAllHistoryImportIngredients();
@@ -150,9 +193,17 @@ export const useIngredientStore = defineStore("ingredient", () => {
     editedIngredient.value = JSON.parse(JSON.stringify(ingredient));
     dialog.value = true;
   }
-  
+  async function deleteIngredient(id: number) {
+    try {
+      await ingredientService.deleteIngredient(id);
+      // await getMaterials();
+    } catch (e) {
+      console.log(e);
+      messageStore.showError("Cannot delete Ingredient");
+    }
+  }
 
-  
+
 
 
   return {
@@ -160,6 +211,12 @@ export const useIngredientStore = defineStore("ingredient", () => {
     ingredients,
     search,
     dialog,
+    page,
+    keyword,
+    take,
+    order,
+    orderBy,
+    lastPage,
     editedIngredient,
     setEditedIngredient,
     ingredientList,
@@ -175,5 +232,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
     getAllHistoryImportIngredients,
     Addingredienttotable,
     saveIngredient,
+    deleteIngredient
+    
   };
 });

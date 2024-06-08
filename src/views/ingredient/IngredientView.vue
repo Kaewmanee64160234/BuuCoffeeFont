@@ -1,24 +1,46 @@
 <script lang="ts" setup>
 import { useIngredientStore } from '@/stores/Ingredient.store';
 import IngredientDialog from "@/views/ingredient/IngredientDialog.vue"
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from "vue";
 import { useRouter } from 'vue-router'; 
+
 const ingredientStore = useIngredientStore();
 const router = useRouter(); 
-onMounted(async () => {
-  await ingredientStore.getAllIngredients();
-});
 
 const menu1 = ref(false);
 const menu2 = ref(false);
+const paginate = ref(true);
+
+onMounted(async () => {
+  await ingredientStore.getAllIngredients();
+});
+// onMounted(async () => {
+//   if (paginate.value) {
+//     ingredientStore.cat = "";
+//   } else {
+//     await ingredientStore.getAllIngredients();
+//   }
+// });
+
+
 const navigateTo = (routeName: string) => {
   router.push({ name: routeName });
 };
+
+watch(paginate, async (newPage, oldPage) => {
+  if (paginate.value) {
+    // ingredientStore.cat = "";
+    await ingredientStore.getAllIngredients();
+  } else {
+    await ingredientStore.getAllIngredients();
+  }
+});
+
 </script>
 
 <template>
   <IngredientDialog></IngredientDialog>
-  <v-container>
+  <v-container v-if="paginate">
     <v-card>
       <v-card-title>
         <v-row>
@@ -26,7 +48,7 @@ const navigateTo = (routeName: string) => {
             รายการวัตถุดิบ
           </v-col>
           <v-col cols="3">
-            <v-text-field label="Search" append-inner-icon="mdi-magnify" hide-details dense></v-text-field>
+            <v-text-field label="Search" append-inner-icon="mdi-magnify" hide-details dense v-model="ingredientStore.keyword"></v-text-field>
           </v-col>
         </v-row>
         <v-row>
@@ -45,13 +67,12 @@ const navigateTo = (routeName: string) => {
                 </v-btn>
               </template>
               <v-list>
-             
-                  <v-list-item @click="navigateTo('importingredients')">
-                    <v-list-item-title>นำเข้าวัตถุดิบ</v-list-item-title>
-                  </v-list-item>
-                  <v-list-item @click="navigateTo('importingredientsHistory')">
-                    <v-list-item-title>ประวัติการนำเข้าวัตถุดิบ</v-list-item-title>
-                  </v-list-item>
+                <v-list-item @click="navigateTo('importingredients')">
+                  <v-list-item-title>นำเข้าวัตถุดิบ</v-list-item-title>
+                </v-list-item>
+                <v-list-item @click="navigateTo('importingredientsHistory')">
+                  <v-list-item-title>ประวัติการนำเข้าวัตถุดิบ</v-list-item-title>
+                </v-list-item>
               </v-list>
             </v-menu>
           </v-col>
@@ -74,9 +95,9 @@ const navigateTo = (routeName: string) => {
             </v-menu>
           </v-col>
           <v-col>
-            <v-btn color="success" class="button-full-width"  @click="ingredientStore.dialog = true">
+            <v-btn color="success" class="button-full-width" @click="ingredientStore.dialog = true">
               <v-icon left>mdi-check</v-icon>
-             เพิ่มวัตถุดิบ
+              เพิ่มวัตถุดิบ
             </v-btn>
           </v-col>
         </v-row>
@@ -103,21 +124,14 @@ const navigateTo = (routeName: string) => {
               <v-img :src="`http://localhost:3000/ingredients/${item.ingredientId}/image`" height="100"></v-img>
             </td>
             <td>{{ item.ingredientName }}</td>
-            <td>{{ item.igredientSupplier }}</td>
-            <td :style="{ color: item.igredientQuantityInStock < item.igredientMinimun ? 'red' : 'black' }">{{ item.igredientQuantityInStock }} {{ item.igredientUnit }}</td>
-            <td>{{ item.igredientQuantityPerUnit }} {{ item.igredientQuantityPerSubUnit}}</td>
-            <td>{{ item.igredientMinimun }} {{ item.igredientUnit }}</td>
-            <td>{{ item.igredientRemining }}  {{ item.igredientQuantityPerSubUnit}}</td>
+            <td>{{ item.ingredientSupplier }}</td>
+            <td :style="{ color: item.ingredientQuantityInStock <= item.ingredientMinimun ? 'red' : 'black' }">{{ item.ingredientQuantityInStock }} {{ item.ingredientUnit }}</td>
+            <td>{{ item.ingredientQuantityPerUnit }} {{ item.ingredientQuantityPerSubUnit}}</td>
+            <td>{{ item.ingredientMinimun }} {{ item.ingredientUnit }}</td>
+            <td>{{ item.ingredientRemining }} {{ item.ingredientQuantityPerSubUnit }}</td>
             <td>
-              <v-btn
-                  color="#FFDD83"
-                  class="mr-5"
-                  icon="mdi-pencil"
-                  @click="ingredientStore.setEditedIngredient(item);
-"
-                ></v-btn>
-
-              <v-btn color="#F55050" icon="mdi-delete"></v-btn>
+              <v-btn color="#FFDD83" class="mr-5" icon="mdi-pencil" @click="ingredientStore.setEditedIngredient(item)"></v-btn>
+              <v-btn color="#FFDD83" class="mr-5" icon="mdi-delete" ></v-btn>
             </td>
           </tr>
         </tbody>
@@ -127,6 +141,15 @@ const navigateTo = (routeName: string) => {
           </tr>
         </tbody>
       </v-table>
+
+      <v-pagination
+            justify="center"
+            v-model="ingredientStore.page"
+            :length="ingredientStore.lastPage"
+            rounded="circle"
+          ></v-pagination>
+
+  
     </v-card>
   </v-container>
 </template>
@@ -137,8 +160,6 @@ const navigateTo = (routeName: string) => {
 * {
   font-family: 'Kanit', sans-serif;
 }
-
-
 
 .button-full-width {
   width: 100%;
