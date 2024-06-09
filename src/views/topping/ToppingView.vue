@@ -14,7 +14,7 @@
               hide-details 
               dense 
               variant="solo"
-              @input="toppingStore.getToppingPaginate"
+              @input="toppingStore.getToppingsPaginate"
             ></v-text-field>
           </v-col>
           <v-col>

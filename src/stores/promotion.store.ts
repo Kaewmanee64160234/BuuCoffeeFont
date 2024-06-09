@@ -12,6 +12,7 @@ export const usePromotionStore = defineStore("promotion", () => {
   
     // Watch for searchQuery
     watch(searchQuery, (value) => {
+      console.log(value);
       if (value === "") {
         getAllPromotions();
       } else {
@@ -83,6 +84,7 @@ export const usePromotionStore = defineStore("promotion", () => {
       try {
         const response = await promotionService.searchPromotions(searchQuery.value);
         promotions.value = response.data;
+        console.log(response.data);
       } catch (error) {
         console.error('Error searching promotions:', error);
       }

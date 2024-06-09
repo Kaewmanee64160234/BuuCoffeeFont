@@ -42,7 +42,7 @@
                 <td>{{ promotion.promotionId }}</td>
                 <td>{{ promotion.promotionName }}</td>
                 <td>{{ promotion.promotionType }}</td>
-                <td>{{ promotion.discountValue }}</td>
+                <td>{{ promotion.discountValue === null ? '-' : promotion.discountValue }}</td>
                 <td>
                   <v-btn color="#FFDD83" icon="mdi-pencil" class="mr-2" @click="openUpdateDialog(promotion)">
                   </v-btn>
