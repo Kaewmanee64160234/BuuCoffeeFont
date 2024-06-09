@@ -123,6 +123,8 @@ const deleteProduct = async (productId: number) => {
   <v-container>
     <v-card>
       <v-card-title>
+        <v-row style="padding: 20px;"><h3>สินค้า</h3></v-row>
+
         <v-row>
           <v-col cols="12" md="3">
             <v-text-field 
@@ -144,7 +146,7 @@ const deleteProduct = async (productId: number) => {
           <v-col cols="12" md="3">
             <v-select 
               v-model="productStore.selectedCategory" 
-              label="Select Category"
+              label="เลือกหมวดหมู่"
               :items="categoryStore.categories.map(category => category.categoryName)" 
               dense 
               hide-details
@@ -158,12 +160,12 @@ const deleteProduct = async (productId: number) => {
         <v-table class="text-center mt-5">
           <thead>
             <tr>
-              <th style="text-align: center">#</th>
-              <th style="text-align: center">Image</th>
-              <th style="text-align: center">Name</th>
-              <th style="text-align: center">Type</th>
-              <th style="text-align: center">Price</th>
-              <th style="text-align: center">Operations</th>
+              <th style="text-align: center;font-weight: bold;"></th>
+              <th style="text-align: center;font-weight: bold;">รูปภาพ</th>
+              <th style="text-align: center;font-weight: bold;">ชื่อสินค้า</th>
+              <th style="text-align: center;font-weight: bold;">ประเภทสินค้า</th>
+              <th style="text-align: center;font-weight: bold;">ราคา</th>
+              <th style="text-align: center;font-weight: bold;">การกระทำ</th>
             </tr>
           </thead>
           <tbody>
@@ -187,7 +189,7 @@ const deleteProduct = async (productId: number) => {
           </tbody>
           <tbody v-if="!productStore.products || productStore.products.length === 0">
             <tr>
-              <td colspan="6" class="text-center">No data</td>
+              <td colspan="6" class="text-center">ไม่มีข้อมูล</td>
             </tr>
           </tbody>
         </v-table>

@@ -1,70 +1,59 @@
 <template>
     <v-dialog v-model="promotionStore.createPromotionDialog" max-width="600px">
-        <v-card>
-            <v-card-title>
-                <span class="headline">Create Promotion</span>
-            </v-card-title>
-            <v-card-text>
-                <v-stepper v-model="step" :items="items" show-actions>
-                    <template v-slot:item.1>
-                        <h3 class="text-h6">Promotion Details</h3>
-                        <br>
-                        <v-form ref="form1">
-                            <v-text-field v-model="promotionName" label="Promotion Name" required></v-text-field>
-                            <v-text-field v-model="startDate" label="Start Date" type="date" required></v-text-field>
-                            <v-checkbox v-model="noEndDate" label="No End Date"></v-checkbox>
-                            <v-text-field v-if="!noEndDate" v-model="endDate" label="End Date"
-                                type="date"></v-text-field>
-                            <v-select v-model="promotionType"
-                                :items="promotionTypes.map(promotionType => promotionType.value)" item-text="text"
-                                item-value="value" label="Promotion Type" required></v-select>
-                            <v-textarea v-model="description" label="Description" required></v-textarea>
-                        </v-form>
-                    </template>
-
-                    <template v-slot:item.2>
-                        <h3 class="text-h6">Promotion Type Details</h3>
-                        <br>
-                        <v-form ref="form2">
-                            <template v-if="promotionType === 'discountPrice'">
-                                <v-text-field v-model="discountValue" label="Discount Value" type="number"
-                                    required></v-text-field>
-                            </template>
-                            <template v-if="promotionType === 'buy1get1'">
-                                <v-autocomplete v-model="buyProductId"
-                                    :items="productStore.products.map(product => product.productName)"
-                                    item-text="productName" item-value="id" label="Buy Product"
-                                    required></v-autocomplete>
-                                <v-autocomplete v-model="freeProductId"
-                                    :items="productStore.products.map(product => product.productName)"
-                                    item-text="productName" item-value="id" label="Free Product"
-                                    required></v-autocomplete>
-                            </template>
-                            <template v-if="promotionType === 'usePoints'">
-                                <v-text-field v-model="pointsRequired" label="Points Required" type="number"
-                                    required></v-text-field>
-                                <v-text-field v-model="discountValue" label="Discount Value" type="number"
-                                    required></v-text-field>
-                            </template>
-                            <template v-if="promotionType === 'discountPercentage'">
-                                <v-text-field v-model="discountPercentage" label="Discount Percentage" type="number"
-                                    required></v-text-field>
-                                <v-text-field v-model="minimumPrice" label="Minimum Price for Discount" type="number"
-                                    required></v-text-field>
-                            </template>
-                        </v-form>
-                    </template>
-                </v-stepper>
-            </v-card-text>
-            <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn v-if="step > 1" @click="previousStep">Back</v-btn>
-                <v-btn v-if="step < items.length" @click="nextStep">Next</v-btn>
-                <v-btn v-if="step === items.length" @click="createPromotion">Create</v-btn>
-            </v-card-actions>
-        </v-card>
+      <v-card>
+        <v-card-title>
+          <span class="headline">สร้างโปรโมชั่น</span>
+        </v-card-title>
+        <v-card-text>
+          <v-stepper v-model="step" :items="items" show-actions>
+            <template v-slot:item.1>
+              <h3 class="text-h6">รายละเอียดโปรโมชั่น</h3>
+              <br>
+              <v-form ref="form1">
+                <v-text-field v-model="promotionName" label="ชื่อโปรโมชั่น" required></v-text-field>
+                <v-text-field v-model="startDate" label="วันที่เริ่มต้น" type="date" required></v-text-field>
+                <v-checkbox v-model="noEndDate" label="ไม่มีวันสิ้นสุด"></v-checkbox>
+                <v-text-field v-if="!noEndDate" v-model="endDate" label="วันที่สิ้นสุด" type="date"></v-text-field>
+                <v-select v-model="promotionType" :items="promotionTypes.map(promotionType => promotionType.value)"
+                  item-text="text" item-value="value" label="ประเภทโปรโมชั่น" required></v-select>
+                <v-textarea v-model="description" label="คำอธิบาย" required></v-textarea>
+              </v-form>
+            </template>
+  
+            <template v-slot:item.2>
+              <h3 class="text-h6">รายละเอียดประเภทโปรโมชั่น</h3>
+              <br>
+              <v-form ref="form2">
+                <template v-if="promotionType === 'discountPrice'">
+                  <v-text-field v-model="discountValue" label="มูลค่าส่วนลด" type="number" required></v-text-field>
+                </template>
+                <template v-if="promotionType === 'buy1get1'">
+                  <v-autocomplete v-model="buyProductId" :items="productStore.products.map(product => product.productName)"
+                    item-text="productName" item-value="id" label="ซื้อสินค้า" required></v-autocomplete>
+                  <v-autocomplete v-model="freeProductId" :items="productStore.products.map(product => product.productName)"
+                    item-text="productName" item-value="id" label="สินค้าฟรี" required></v-autocomplete>
+                </template>
+                <template v-if="promotionType === 'usePoints'">
+                  <v-text-field v-model="pointsRequired" label="คะแนนที่ต้องใช้" type="number" required></v-text-field>
+                  <v-text-field v-model="discountValue" label="มูลค่าส่วนลด" type="number" required></v-text-field>
+                </template>
+                <template v-if="promotionType === 'discountPercentage'">
+                  <v-text-field v-model="discountPercentage" label="เปอร์เซ็นต์ส่วนลด" type="number" required></v-text-field>
+                  <v-text-field v-model="minimumPrice" label="ราคาขั้นต่ำสำหรับส่วนลด" type="number" required></v-text-field>
+                </template>
+              </v-form>
+            </template>
+          </v-stepper>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn v-if="step > 1" @click="previousStep">ย้อนกลับ</v-btn>
+          <v-btn v-if="step < items.length" @click="nextStep">ถัดไป</v-btn>
+          <v-btn v-if="step === items.length" @click="createPromotion">สร้าง</v-btn>
+        </v-card-actions>
+      </v-card>
     </v-dialog>
-</template>
+  </template>
 
 <script lang="ts" setup>
 import { ref } from 'vue';

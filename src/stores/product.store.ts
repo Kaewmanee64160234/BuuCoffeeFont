@@ -55,7 +55,12 @@ export const useProductStore = defineStore("product", () => {
   watch(selectedCategory, (newCategory) => {
     console.log("selectedCategory", newCategory);
     if (newCategory) {
-      getProductsByCategory(newCategory);
+      if(newCategory === 'All'){
+        getProductPaginate()
+      }else{
+        getProductsByCategory(newCategory);
+
+      }
 
     }
   });

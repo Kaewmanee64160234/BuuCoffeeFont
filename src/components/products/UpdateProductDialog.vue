@@ -2,18 +2,18 @@
   <v-dialog v-model="productStore.updateProductDialog" persistent max-width="800px">
     <v-card>
       <v-card-title>
-        <span class="headline">Update Product</span>
+        <span class="headline">แก้ไขสินค้า</span>
       </v-card-title>
       <v-card-text>
         <v-stepper v-model="e1">
           <template v-slot:default="{ prev, next }">
             <v-stepper-header>
               <v-stepper-item :complete="e1 > 1" step="1" :value="1" editable>
-                Product Details
+                รายละเอียดสินค้า
               </v-stepper-item>
               <v-divider></v-divider>
               <v-stepper-item v-if="isDrink" :complete="e1 > 2" step="2" :value="2" editable>
-                Select Product Type
+                เลือกประเภทสินค้า
               </v-stepper-item>
               <v-divider v-if="isDrink"></v-divider>
               <template v-if="isDrink" v-for="(step, index) in computedSteps" :key="index">
@@ -28,23 +28,21 @@
               <v-stepper-window-item :value="1">
                 <v-form ref="form" v-model="valid">
                   <v-row>
+                    <v-col cols="12" sm="12">
+                      <v-img max-height="100" style="border-radius: 50%;" :src="imagePreview || `http://localhost:3000/products/${productStore.product.productId}/image`" />
+                    </v-col>
+                    <v-col cols="12" sm="12">
+                      <v-file-input v-model="productImage" label="รูปภาพสินค้า" prepend-icon="mdi-camera" accept="image/*" @change="handleImageUpload" />
+                    </v-col>
+                   
                     <v-col cols="12" sm="6">
-                      <v-file-input v-model="productImage" label="Product image" prepend-icon="mdi-camera" accept="image/*"
-                        @change="handleImageUpload" />
+                      <v-text-field variant="solo" v-model="productStore.productName" label="ชื่อสินค้า" required />
                     </v-col>
                     <v-col cols="12" sm="6">
-                      <v-img :src="imagePreview || `http://localhost:3000/products/${productStore.product.productId}/image`" max-height="200" />
+                      <v-text-field variant="solo" v-model="productStore.productPrice" label="ราคา" type="number" required />
                     </v-col>
                     <v-col cols="12" sm="6">
-                      <v-text-field variant="solo" v-model="productStore.productName" label="Product name" required />
-                    </v-col>
-                    <v-col cols="12" sm="6">
-                      <v-text-field variant="solo" v-model="productStore.productPrice" label="Price" type="number" required />
-                    </v-col>
-                    <v-col cols="12" sm="6">
-                      <v-select v-model="productStore.selectedCategory"
-                        :items="categoryStore.categoriesForCreate.map(category => category.categoryName)"
-                        label="Select Category" dense @change="checkCategory"></v-select>
+                      <v-select v-model="productStore.selectedCategory" :items="categoryStore.categoriesForCreate.map(category => category.categoryName)" label="เลือกหมวดหมู่" dense @change="checkCategory"></v-select>
                     </v-col>
                   </v-row>
                 </v-form>
@@ -53,12 +51,9 @@
               <v-stepper-window-item v-if="isDrink" :value="2">
                 <v-form ref="form" v-model="valid">
                   <v-row class="d-flex justify-space-between">
-                    <v-checkbox label="Hot" v-model="productStore.isHot"
-                      @change="handleProductTypeChange('Hot', productStore.isHot)"></v-checkbox>
-                    <v-checkbox label="Cold" v-model="productStore.isCold"
-                      @change="handleProductTypeChange('Cold', productStore.isCold)"></v-checkbox>
-                    <v-checkbox label="Blend" v-model="productStore.isBlend"
-                      @change="handleProductTypeChange('Blend', productStore.isBlend)"></v-checkbox>
+                    <v-checkbox label="ร้อน" v-model="productStore.isHot" @change="handleProductTypeChange('Hot', productStore.isHot)"></v-checkbox>
+                    <v-checkbox label="เย็น" v-model="productStore.isCold" @change="handleProductTypeChange('Cold', productStore.isCold)"></v-checkbox>
+                    <v-checkbox label="ปั่น" v-model="productStore.isBlend" @change="handleProductTypeChange('Blend', productStore.isBlend)"></v-checkbox>
                   </v-row>
                 </v-form>
               </v-stepper-window-item>
@@ -74,24 +69,21 @@
                         <v-table>
                           <thead>
                             <tr>
-                              <th>Select</th>
-                              <th>Image</th>
-                              <th>Name</th>
-                              <th>Quantity</th>
-                              <th>Unit</th>
+                              <th>เลือก</th>
+                              <th>รูปภาพ</th>
+                              <th>ชื่อ</th>
+                              <th>จำนวน</th>
+                              <th>หน่วย</th>
                             </tr>
                           </thead>
                           <tbody>
                             <tr v-for="ingredient in ingredientStore.ingredients" :key="ingredient.ingredientId">
                               <td>
-                                <v-checkbox v-if="step.label === 'Hot'" :value="ingredient.ingredientId" v-model="productStore.selectedIngredientsHot"
-                                  @change="handleHotIngredientSelect(ingredient)">
+                                <v-checkbox v-if="step.label === 'ร้อน'" :value="ingredient.ingredientId" v-model="productStore.selectedIngredientsHot" @change="handleHotIngredientSelect(ingredient)">
                                 </v-checkbox>
-                                <v-checkbox v-if="step.label === 'Cold'" :value="ingredient.ingredientId" v-model="productStore.selectedIngredientsCold"
-                                  @change="handleColdIngredientSelect(ingredient)">
+                                <v-checkbox v-if="step.label === 'เย็น'" :value="ingredient.ingredientId" v-model="productStore.selectedIngredientsCold" @change="handleColdIngredientSelect(ingredient)">
                                 </v-checkbox>
-                                <v-checkbox v-if="step.label === 'Blend'" :value="ingredient.ingredientId" v-model="productStore.selectedIngredientsBlend"
-                                  @change="handleBlendIngredientSelect(ingredient)">
+                                <v-checkbox v-if="step.label === 'ปั่น'" :value="ingredient.ingredientId" v-model="productStore.selectedIngredientsBlend" @change="handleBlendIngredientSelect(ingredient)">
                                 </v-checkbox>
                               </td>
                               <td>
@@ -99,15 +91,9 @@
                               </td>
                               <td>{{ ingredient.ingredientName }}</td>
                               <td>
-                                <v-text-field variant="solo" v-if="step.label === 'Hot' && productStore.selectedIngredientsHot.includes(ingredient.ingredientId)"
-                                  v-model="productStore.ingredientQuantitiesHot[ingredient.ingredientId]" type="number"
-                                  min="0" label="Quantity"></v-text-field>
-                                <v-text-field variant="solo" v-if="step.label === 'Cold' && productStore.selectedIngredientsCold.includes(ingredient.ingredientId)"
-                                  v-model="productStore.ingredientQuantitiesCold[ingredient.ingredientId]" type="number"
-                                  min="0" label="Quantity"></v-text-field>
-                                <v-text-field variant="solo" v-if="step.label === 'Blend' && productStore.selectedIngredientsBlend.includes(ingredient.ingredientId)"
-                                  v-model="productStore.ingredientQuantitiesBlend[ingredient.ingredientId]" type="number"
-                                  min="0" label="Quantity"></v-text-field>
+                                <v-text-field variant="solo" v-if="step.label === 'ร้อน' && productStore.selectedIngredientsHot.includes(ingredient.ingredientId)" v-model="productStore.ingredientQuantitiesHot[ingredient.ingredientId]" type="number" min="0" label="จำนวน"></v-text-field>
+                                <v-text-field variant="solo" v-if="step.label === 'เย็น' && productStore.selectedIngredientsCold.includes(ingredient.ingredientId)" v-model="productStore.ingredientQuantitiesCold[ingredient.ingredientId]" type="number" min="0" label="จำนวน"></v-text-field>
+                                <v-text-field variant="solo" v-if="step.label === 'ปั่น' && productStore.selectedIngredientsBlend.includes(ingredient.ingredientId)" v-model="productStore.ingredientQuantitiesBlend[ingredient.ingredientId]" type="number" min="0" label="จำนวน"></v-text-field>
                               </td>
                               <td>{{ ingredient.ingredientUnit }}</td>
                             </tr>
@@ -126,13 +112,12 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" @click="closeDialog()">Close</v-btn>
-        <v-btn color="blue darken-1" @click="submitForm" :disabled="!valid">Save</v-btn>
+        <v-btn color="blue darken-1" @click="closeDialog()">ปิด</v-btn>
+        <v-btn color="blue darken-1" @click="submitForm" :disabled="!valid">บันทึก</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
-
 
 <script lang="ts" setup>
 import { useCategoryStore } from '@/stores/category.store';

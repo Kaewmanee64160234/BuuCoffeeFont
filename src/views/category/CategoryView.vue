@@ -28,17 +28,17 @@
         <v-table class="text-center mt-5">
           <thead>
             <tr>
-              <th style="text-align: center;">Category ID</th>
-              <th style="text-align: center;">Category Name</th>
-              <th style="text-align: center;">Have Topping</th>
-              <th style="text-align: center;">Actions</th>
+              <th style="text-align: center;font-weight: bold;"></th>
+              <th style="text-align: center;font-weight: bold;">ชื่อประเภทสินค้า</th>
+              <th style="text-align: center;font-weight: bold;">ประเภทสินค้านี้สามารถใส่ท็อปปิ้งได้</th>
+              <th style="text-align: center;font-weight: bold;">การกระทำ</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="category in categoryStore.categories" :key="category.categoryId" style="text-align: center;">
               <td>{{ category.categoryId }}</td>
               <td>{{ category.categoryName }}</td>
-              <td>{{ category.haveTopping ? 'มี' : 'ไม่มี' }}</td>
+              <td>{{ category.haveTopping ? 'ได้' : 'ไม่ได้' }}</td>
               <td>
                 <v-btn color="#FFDD83" icon="mdi-pencil" class="mr-2" @click="openUpdateDialog(category)">
                 </v-btn>
@@ -49,7 +49,7 @@
           </tbody>
           <tbody v-if="!categoryStore.categories || categoryStore.categories.length === 0">
             <tr>
-              <td colspan="4" class="text-center">No data</td>
+              <td colspan="4" class="text-center">ไม่มีข้อมูล</td>
             </tr>
           </tbody>
         </v-table>
@@ -59,6 +59,7 @@
     <UpdateCategoryDialog />
   </v-container>
 </template>
+
   
   <script lang="ts" setup>
   import { useCategoryStore } from '@/stores/category.store';

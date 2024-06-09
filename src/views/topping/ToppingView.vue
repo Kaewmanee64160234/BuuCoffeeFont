@@ -4,12 +4,12 @@
       <v-card-title>
         <v-row>
           <v-col cols="9">
-            Toppings
+            ท็อปปิ้ง
           </v-col>
           <v-col cols="3">
             <v-text-field 
               v-model="toppingStore.searchQuery" 
-              label="Search" 
+              label="ค้นหา" 
               append-inner-icon="mdi-magnify" 
               hide-details 
               dense 
@@ -20,7 +20,7 @@
           <v-col>
             <v-btn @click="openCreateDialog" color="success">
               <v-icon left>mdi-plus</v-icon>
-              Add New Topping
+              เพิ่มท็อปปิ้งใหม่
             </v-btn>
           </v-col>
         </v-row>
@@ -30,10 +30,10 @@
         <v-table class="text-center mt-5">
           <thead>
             <tr>
-              <th style="text-align: center;">Topping ID</th>
-              <th style="text-align: center;">Topping Name</th>
-              <th style="text-align: center;">Topping Price</th>
-              <th style="text-align: center;">Actions</th>
+              <th style="text-align: center;font-weight: bold;">รหัสท็อปปิ้ง</th>
+              <th style="text-align: center;font-weight: bold;">ชื่ท็อปปิ้ง</th>
+              <th style="text-align: center;font-weight: bold;">ราคาท็อปปิ้ง</th>
+              <th style="text-align: center;font-weight: bold;">การกระทำ</th>
             </tr>
           </thead>
           <tbody>
@@ -49,7 +49,7 @@
           </tbody>
           <tbody v-if="!toppingStore.toppings || toppingStore.toppings.length === 0">
             <tr>
-              <td colspan="4" class="text-center">No data</td>
+              <td colspan="4" class="text-center">ไม่มีข้อมูล</td>
             </tr>
           </tbody>
         </v-table>
@@ -61,6 +61,7 @@
     <UpdateToppingDialog />
   </v-container>
 </template>
+
 
 <script lang="ts" setup>
 import { useToppingStore } from '@/stores/topping.store';

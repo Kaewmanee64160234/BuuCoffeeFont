@@ -14,9 +14,9 @@ export const useCategoryStore = defineStore("category", () => {
   const createCategoryDialog = ref(false);
   const updateCategoryDialog = ref(false);
 
-  watch(selectedCategory, (value) => {
+  watch(selectedCategory, async (value) => {
     if (value === "All") {
-      productStore.getAllProducts();
+      await productStore.getProductPaginate();
     } else {
       productStore.getProductsByCategory(value);
     }
@@ -37,15 +37,20 @@ export const useCategoryStore = defineStore("category", () => {
     try {
       const res = await categoryService.getAllCategories();
       if (res.data) {
-        categoriesForCreate.value = res.data;
 
         categories.value = res.data;
+  
         // push category All
-        // categories.value.push({
-        //   categoryId: 0,
-        //   categoryName: "All",
-        //   haveTopping: false,
-        // });
+        categories.value.push({
+          categoryId: 0,
+          categoryName: "All",
+          haveTopping: false,
+        });
+        // pop last category out
+        categoriesForCreate.value = categories.value.slice(0, categories.value.length - 1);
+
+
+
       }
     } catch (error) {
       console.error(error);
