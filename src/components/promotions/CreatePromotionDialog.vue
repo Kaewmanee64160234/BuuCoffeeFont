@@ -71,6 +71,7 @@ import { ref } from 'vue';
 import { usePromotionStore } from '@/stores/promotion.store';
 import { useProductStore } from '@/stores/product.store';
 import type { Promotion } from '@/types/promotion.type';
+import Swal from 'sweetalert2';
 
 const promotionStore = usePromotionStore();
 const productStore = useProductStore();
@@ -143,6 +144,11 @@ const createPromotion = async () => {
     };
 
     await promotionStore.createPromotion(newPromotion);
+    Swal.fire({
+    icon: 'success',
+    title: 'Success',
+    text: 'Promotion updated successfully',
+  });
     closeDialog();
 };
 </script>

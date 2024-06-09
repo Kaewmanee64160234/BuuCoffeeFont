@@ -14,7 +14,9 @@
               <v-text-field v-model="startDate" label="Start Date" type="date" required></v-text-field>
               <v-checkbox v-model="noEndDate" label="No End Date"></v-checkbox>
               <v-text-field v-if="!noEndDate" v-model="endDate" label="End Date" type="date"></v-text-field>
-              <v-select v-model="promotionType" :items="promotionTypes" item-text="text" item-value="value" label="Promotion Type" required></v-select>
+              <v-select v-model="promotionType"
+                                :items="promotionTypes.map(promotionType => promotionType.value)" item-text="text"
+                                item-value="value" label="Promotion Type" required></v-select>
               <v-textarea v-model="description" label="Description" required></v-textarea>
             </v-form>
           </template>
@@ -27,8 +29,14 @@
                 <v-text-field v-model="discountValue" label="Discount Value" type="number" required></v-text-field>
               </template>
               <template v-if="promotionType === 'buy1get1'">
-                <v-autocomplete v-model="buyProductId" :items="productStore.products" item-text="productName" item-value="id" label="Buy Product" required></v-autocomplete>
-                <v-autocomplete v-model="freeProductId" :items="productStore.products" item-text="productName" item-value="id" label="Free Product" required></v-autocomplete>
+                <v-autocomplete v-model="buyProductId"
+                                    :items="productStore.products.map(product => product.productName)"
+                                    item-text="productName" item-value="id" label="Buy Product"
+                                    required></v-autocomplete>
+                                <v-autocomplete v-model="freeProductId"
+                                    :items="productStore.products.map(product => product.productName)"
+                                    item-text="productName" item-value="id" label="Free Product"
+                                    required></v-autocomplete>
               </template>
               <template v-if="promotionType === 'usePoints'">
                 <v-text-field v-model="pointsRequired" label="Points Required" type="number" required></v-text-field>
@@ -57,6 +65,7 @@ import { ref, onMounted, watch } from 'vue';
 import { usePromotionStore } from '@/stores/promotion.store';
 import { useProductStore } from '@/stores/product.store';
 import type { Promotion } from '@/types/promotion.type';
+import Swal from 'sweetalert2';
 
 const promotionStore = usePromotionStore();
 const productStore = useProductStore();
@@ -140,7 +149,7 @@ const closeDialog = () => {
   step.value = 1;
   // clear promotionStore.promotion
   promotionStore.promotion = null;
-  
+
   promotionStore.updatePromotionDialog = false;
 };
 
@@ -157,8 +166,8 @@ const updatePromotion = async () => {
     endDate: noEndDate.value ? null : (endDate.value ? new Date(endDate.value) : null),
     discountValue: promotionType.value === 'discountPrice' || promotionType.value === 'usePoints' ? discountValue.value : null,
     conditionQuantity: promotionType.value === 'discountPrice' || promotionType.value === 'usePoints' ? 1 : null,
-    buyProductId: promotionType.value === 'buy1get1' ? buyProductId.value : null,
-    freeProductId: promotionType.value === 'buy1get1' ? freeProductId.value : null,
+    buyProductId: promotionType.value === 'buy1get1' ? productStore.products.find(product => product.productName === buyProductId.value)?.productId : null, // Find the product id from the product store (assuming the product store has the products loaded
+    freeProductId: promotionType.value === 'buy1get1' ? productStore.products.find(product => product.productName === freeProductId.value)?.productId : null,
     conditionValue1: promotionType.value === 'discountPercentage' ? discountPercentage.value : null,
     conditionValue2: promotionType.value === 'discountPercentage' ? minimumPrice.value : null,
     promotionDescription: description.value,
@@ -166,6 +175,13 @@ const updatePromotion = async () => {
   };
 
   await promotionStore.updatePromotion(promotionId.value!, updatedPromotion);
+  // add sweet alter fire
+  Swal.fire({
+    icon: 'success',
+    title: 'Success',
+    text: 'Promotion updated successfully',
+  });
+
   closeDialog();
 };
 </script>
