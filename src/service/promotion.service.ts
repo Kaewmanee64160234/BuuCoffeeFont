@@ -11,6 +11,7 @@ function getAllPromotions() {
   }
   
   function createPromotion(promotion: Promotion) {
+    console.log("Promotion created",JSON.stringify(promotion));
     return http.post("/promotions", promotion);
   }
   

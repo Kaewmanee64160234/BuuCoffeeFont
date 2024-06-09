@@ -1,4 +1,6 @@
 <template>
+    <CreatePromotionDialog />
+    <UpdatePromotionDialog />
     <v-container>
       <v-card>
         <v-card-title>
@@ -36,15 +38,15 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="promotion in promotionStore.promotions" :key="promotion.promId" style="text-align: center;">
-                <td>{{ promotion.promId }}</td>
+              <tr v-for="promotion in promotionStore.promotions" :key="promotion.promotionId" style="text-align: center;">
+                <td>{{ promotion.promotionId }}</td>
                 <td>{{ promotion.promotionName }}</td>
                 <td>{{ promotion.promotionType }}</td>
                 <td>{{ promotion.discountValue }}</td>
                 <td>
                   <v-btn color="#FFDD83" icon="mdi-pencil" class="mr-2" @click="openUpdateDialog(promotion)">
                   </v-btn>
-                  <v-btn color="#F55050" icon="mdi-delete" @click="deletePromotion(promotion.promId)">
+                  <v-btn color="#F55050" icon="mdi-delete" @click="deletePromotion(promotion.promotionId)">
                   </v-btn>
                 </td>
               </tr>
@@ -57,8 +59,7 @@
           </v-table>
         </v-card-text>
       </v-card>
-      <CreatePromotionDialog />
-      <UpdatePromotionDialog />
+      
     </v-container>
   </template>
     

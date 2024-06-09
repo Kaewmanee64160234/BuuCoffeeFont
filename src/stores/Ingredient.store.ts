@@ -81,7 +81,8 @@ export const useIngredientStore = defineStore("ingredient", () => {
     try {
       const response = await ingredientService.getAllIngredients();
       if (response.status === 200) {
-        ingredients.value = response.data;
+        ingredients.value = response.data.data;
+        console.log(response.data);
       }
     } catch (error) {
       console.error(error);

@@ -59,6 +59,13 @@ const router = createRouter({
       name: 'topping',
       component: () => import('../views/topping/ToppingView.vue')
     },
+    // promotion
+    {
+      path: '/promotion',
+      name: 'promotion',
+      component: () => import('../views/promotion/PromotionView.vue')
+    },
+    
   ]
 })
 

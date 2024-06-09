@@ -48,7 +48,7 @@ export const usePromotionStore = defineStore("promotion", () => {
       try {
         const res = await promotionService.updatePromotion(id, promotion);
         if (res.data) {
-          const index = promotions.value.findIndex((p) => p.promId === id);
+          const index = promotions.value.findIndex((p) => p.promotionId === id);
           promotions.value[index] = res.data;
         }
       } catch (error) {
@@ -60,7 +60,7 @@ export const usePromotionStore = defineStore("promotion", () => {
     const deletePromotion = async (id: number) => {
       try {
         await promotionService.deletePromotion(id);
-        promotions.value = promotions.value.filter((p) => p.promId !== id);
+        promotions.value = promotions.value.filter((p) => p.promotionId !== id);
       } catch (error) {
         console.error(error);
       }
