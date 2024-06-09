@@ -1,6 +1,6 @@
 export interface Ingredient {
   ingredientId?: number; // ไม่เก็บ
-  ingredientImages?: string;
+  ingredientImage?: string;
   ingredientName?: string;
   ingredientSupplier?: string;
   ingredientMinimun: number;

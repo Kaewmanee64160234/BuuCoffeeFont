@@ -1,12 +1,29 @@
 <script lang="ts" setup>
+import { ref, watch, onMounted } from 'vue';
 import { useIngredientStore } from '@/stores/Ingredient.store';
-import { onMounted } from 'vue';
 
 const ingredientStore = useIngredientStore();
+const searchQuery = ref('');
 
 onMounted(async () => {
     await ingredientStore.getAllIngredients();
 });
+
+watch(searchQuery, async (newQuery) => {
+  if (newQuery.length >= 3) {
+    await ingredientStore.searchIngredients(newQuery);
+  } else if (newQuery.length === 0) {
+    await ingredientStore.getAllIngredients();
+  }
+});
+
+function onSearch() {
+  if (searchQuery.value.length >= 3) {
+    ingredientStore.searchIngredients(searchQuery.value);
+  } else if (searchQuery.value.length === 0) {
+    ingredientStore.getAllIngredients();
+  }
+}
 </script>
 
 <template>
@@ -20,8 +37,12 @@ onMounted(async () => {
                 </v-row>
                 <v-row>
                     <v-col cols="3">
-                        <v-text-field label="ค้นหาวัตถุดิบ" append-inner-icon="mdi-magnify" hide-details dense
-                            v-model="ingredientStore.search"></v-text-field>
+                        <v-text-field 
+                            label="ค้นหาวัตถุดิบ" 
+                            append-inner-icon="mdi-magnify" 
+                            hide-details dense 
+                            v-model="searchQuery"
+                        ></v-text-field>
                     </v-col>
                     <v-col cols="auto">
                         <v-btn color="success" :to="{ name: 'ingredients' }">
@@ -129,7 +150,6 @@ onMounted(async () => {
 * {
     font-family: 'Kanit', sans-serif;
 }
-
 
 .styled-input {
     width: 100%;
