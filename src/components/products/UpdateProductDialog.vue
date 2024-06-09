@@ -54,11 +54,11 @@
                 <v-form ref="form" v-model="valid">
                   <v-row class="d-flex justify-space-between">
                     <v-checkbox label="Hot" v-model="productStore.isHot"
-                      @change="handleProductTypeChange('Hot', isHot)"></v-checkbox>
+                      @change="handleProductTypeChange('Hot', productStore.isHot)"></v-checkbox>
                     <v-checkbox label="Cold" v-model="productStore.isCold"
-                      @change="handleProductTypeChange('Cold', isCold)"></v-checkbox>
+                      @change="handleProductTypeChange('Cold', productStore.isCold)"></v-checkbox>
                     <v-checkbox label="Blend" v-model="productStore.isBlend"
-                      @change="handleProductTypeChange('Blend', isBlend)"></v-checkbox>
+                      @change="handleProductTypeChange('Blend', productStore.isBlend)"></v-checkbox>
                   </v-row>
                 </v-form>
               </v-stepper-window-item>
@@ -95,7 +95,7 @@
                                 </v-checkbox>
                               </td>
                               <td>
-                                <v-img :src="`http://localhost:3000/ingredients/${ingredient.ingredientId}/image`" height="100"></v-img>
+                                <v-img :src="`${url}/ingredients/${ingredient.ingredientId}/image`" height="100"></v-img>
                               </td>
                               <td>{{ ingredient.ingredientName }}</td>
                               <td>
@@ -133,6 +133,7 @@
   </v-dialog>
 </template>
 
+
 <script lang="ts" setup>
 import { useCategoryStore } from '@/stores/category.store';
 import { useIngredientStore } from '@/stores/Ingredient.store';
@@ -164,32 +165,54 @@ const isDrink = ref(false);
 const productDetails = ref<CustomProductType[]>([]);
 const categoryStore = useCategoryStore();
 const ingredientStore = useIngredientStore();
-const isHot = ref(false);
-const isCold = ref(false);
-const isBlend = ref(false);
+
 const e1 = ref(1);
 
 watch(() => productStore.product.category?.categoryName, (newVal) => {
   const category = categoryStore.categories.find(c => c.categoryName === newVal);
   isDrink.value = category?.haveTopping === true;
   if (!isDrink.value) {
-    isHot.value = false;
-    isCold.value = false;
-    isBlend.value = false;
+    productStore.isHot = false;
+    productStore.isCold = false;
+    productStore.isBlend = false;
     productDetails.value = [];
   }
 });
 onMounted(async () => {
   await categoryStore.getAllCategories();
   await ingredientStore.getAllIngredients();
+
+  // Auto add steps if ingredients are present
+  if (productStore.selectedIngredientsHot.length > 0) {
+    productStore.isHot = true;
+  }
+  if (productStore.selectedIngredientsCold.length > 0) {
+    productStore.isCold = true;
+  }
+  if (productStore.selectedIngredientsBlend.length > 0) {
+    productStore.isBlend = true;
+  }
 });
 
 const computedSteps = computed(() => {
   const stepsArray = [];
+  let stepValue = 2; // Start from 2 because step 1 is Product Details and step 2 is Select Product Type
   if (isDrink.value) {
-    if (isHot.value) stepsArray.push({ label: 'Hot', value: 3 });
-    if (isCold.value) stepsArray.push({ label: 'Cold', value: 4 });
-    if (isBlend.value) stepsArray.push({ label: 'Blend', value: 5 });
+    if (productStore.isHot) {
+      stepValue++;
+
+      stepsArray.push({ label: 'Hot', value: stepValue });
+    }
+    if (productStore.isCold) {
+      stepValue++;
+
+      stepsArray.push({ label: 'Cold', value: stepValue });
+    }
+    if (productStore.isBlend) {
+      stepValue++;
+
+      stepsArray.push({ label: 'Blend', value: stepValue });
+    }
   }
   return stepsArray;
 });
@@ -280,15 +303,15 @@ const checkCategory = () => {
   const category = categoryStore.categories.find(c => c.categoryName === selectedCategory.value);
   isDrink.value = category?.haveTopping === true;
   if (!isDrink.value) {
-    isHot.value = false;
-    isCold.value = false;
-    isBlend.value = false;
+    productStore.isHot = false;
+    productStore.isCold = false;
+    productStore.isBlend = false;
     productDetails.value = [];
   }
 };
 
 const submitForm = async () => {
-  if (!form.value.validate()) return;
+  // if (!form.value.validate()) return;
 
   const productData = {
     productName: productStore.productName,
@@ -349,7 +372,7 @@ const submitForm = async () => {
       file: productImage.value
     };
 
-    // if have image file in productImage uplode image 
+    // if have image file in productImage upload image 
 
     console.log('Product:', JSON.stringify(productStore.product));
 
@@ -363,7 +386,7 @@ const submitForm = async () => {
 
     closeDialog();
     showSuccessDialog('Product updated successfully!');
-    // relode page
+    // reload page
   } catch (error) {
     console.error('Error updating product:', error);
     Swal.fire('Error', 'An error occurred while updating the product.', 'error');
@@ -408,17 +431,26 @@ const showSuccessDialog = (message: string) => {
 };
 
 function next() {
-  if (e1.value < computedSteps.value + 2) {
+  console.log("Current Step (before next):", e1.value);
+  const maxStep = computedSteps.value.length + 2; // +2 because step 1 is Product Details and step 2 is Select Product Type
+  if (e1.value < maxStep) {
     e1.value++;
   }
+  console.log("Current Step (after next):", e1.value);
 }
 
 function prev() {
+  console.log("Current Step (before prev):", e1.value);
   if (e1.value > 1) {
     e1.value--;
   }
+  console.log("Current Step (after prev):", e1.value);
 }
+
+
 const disabled = computed(() => {
-  return e1.value === 1 ? 'prev' : e1.value === computedSteps.value + 2 ? 'next' : undefined;
+  return e1.value === 1 ? 'prev' : e1.value === computedSteps.value.length + 2 ? 'next' : undefined;
 });
+
 </script>
+
