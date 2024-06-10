@@ -51,9 +51,9 @@
               <v-stepper-window-item v-if="isDrink" :value="2">
                 <v-form ref="form" v-model="valid">
                   <v-row class="d-flex justify-space-between">
-                    <v-checkbox label="ร้อน" v-model="productTypes.hot" @change="() => handleProductTypeChange('Hot', productTypes.hot)" />
-                    <v-checkbox label="เย็น" v-model="productTypes.cold" @change="() => handleProductTypeChange('Cold', productTypes.cold)" />
-                    <v-checkbox label="ปั่น" v-model="productTypes.blend" @change="() => handleProductTypeChange('Blend', productTypes.blend)" />
+                    <v-checkbox label="ร้อน" v-model="productTypes.hot" @change="() => handleProductTypeChange('ร้อน', productTypes.hot)" />
+                    <v-checkbox label="เย็น" v-model="productTypes.cold" @change="() => handleProductTypeChange('เย็น', productTypes.cold)" />
+                    <v-checkbox label="ปั่น" v-model="productTypes.blend" @change="() => handleProductTypeChange('ปั่น', productTypes.blend)" />
                   </v-row>
                 </v-form>
               </v-stepper-window-item>
@@ -171,9 +171,9 @@ const productTypes = reactive({
 const computedSteps = computed(() => {
   const stepsArray = [];
   if (isDrink.value) {
-    if (productTypes.hot) stepsArray.push({ label: 'Hot', value: 3 });
-    if (productTypes.cold) stepsArray.push({ label: 'Cold', value: 4 });
-    if (productTypes.blend) stepsArray.push({ label: 'Blend', value: 5 });
+    if (productTypes.hot) stepsArray.push({ label: 'ร้อน', value: 3 });
+    if (productTypes.cold) stepsArray.push({ label: 'เย็น', value: 4 });
+    if (productTypes.blend) stepsArray.push({ label: 'ปั่น', value: 5 });
   }
   return stepsArray;
 });
@@ -242,7 +242,10 @@ const handleBlendIngredientSelect = (type: CustomProductType, ingredient: Ingred
   }
 };
 const getProductType = (typeName: string): CustomProductType => {
-  return productDetails.value.find(pt => pt.productTypeName === typeName) as CustomProductType;
+  console.log("getProductType called with typeName: " + typeName);
+  const pddt =  productDetails.value.find(pt => pt.productTypeName === typeName) as CustomProductType;
+console.log("getProductType called with typeName: " + pddt);
+  return pddt;
 };
 
 const handleImageUpload = (event: Event) => {
@@ -324,7 +327,7 @@ const submitForm = async () => {
 
     if (selectedIngredientsHot.value.length > 0) {
       productData.productTypes.push({
-        productTypeName: 'Hot',
+        productTypeName: 'ร้อน',
         productTypePrice: 0,
         recipes: selectedIngredientsHot.value.map((ingredientId) => {
           return {
@@ -336,7 +339,7 @@ const submitForm = async () => {
     }
     if (selectedIngredientsCold.value.length > 0) {
       productData.productTypes.push({
-        productTypeName: 'Cold',
+        productTypeName: 'เย็น',
         productTypePrice: 0,
         recipes: selectedIngredientsCold.value.map((ingredientId) => {
           return {
@@ -348,7 +351,7 @@ const submitForm = async () => {
     }
     if (selectedIngredientsBlend.value.length > 0) {
       productData.productTypes.push({
-        productTypeName: 'Blend',
+        productTypeName: 'ปั่น',
         productTypePrice: 0,
         recipes: selectedIngredientsBlend.value.map((ingredientId) => {
           return {

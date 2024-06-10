@@ -11,7 +11,6 @@ export const usePosStore = defineStore('pos', () => {
   const receiptPromotions = ref<ReceiptPromotion[]>([]);
   const customerPhone = ref<string>('');
   const customerPoints = ref<number>(0);
-  const selectedProduct = ref<Product | null>(null);
 
   const addToCart = (product: Product, productTypeToppings: any[] = []) => {
     const existingItem = selectedItems.value.find(item => 
@@ -34,9 +33,7 @@ export const usePosStore = defineStore('pos', () => {
     }
   };
 
-  const selectProduct = (product: Product) => {
-    selectedProduct.value = product;
-  };
+
 
   const removeItem = (index: number) => {
     selectedItems.value.splice(index, 1);
@@ -59,6 +56,5 @@ export const usePosStore = defineStore('pos', () => {
     removeItem,
     totalPrice,
     applyPromotion,
-    selectProduct
   };
 });

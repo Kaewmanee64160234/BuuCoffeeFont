@@ -44,6 +44,8 @@ export const useProductStore = defineStore("product", () => {
   const isHot = ref<boolean>(false);
   const isCold = ref<boolean>(false);
   const isBlend = ref<boolean>(false);
+  const selectedProduct = ref<Product>();
+  const toppingDailog = ref(false);
 
   const totalProducts = ref(0);
   const currentPage = ref(1);
@@ -69,6 +71,11 @@ export const useProductStore = defineStore("product", () => {
   watch([currentPage, itemsPerPage, searchQuery], () => {
     getProductPaginate();
   });
+
+  // setSelectedProduct
+  const setSelectedProduct = (product: Product) => {
+    selectedProduct.value = product;
+  };
 
 
 
@@ -223,5 +230,8 @@ export const useProductStore = defineStore("product", () => {
     totalProducts,
     currentPage,
     itemsPerPage,
+    selectedProduct,
+    setSelectedProduct,
+    toppingDailog
   };
 });

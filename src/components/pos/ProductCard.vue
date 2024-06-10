@@ -1,5 +1,5 @@
 <template>
-  <v-card class="product-card">
+  <v-card class="product-card" >
     <v-img :src="product.productImage" height="200px"></v-img>
     <v-card-title class="text-center">{{ product.productName }}</v-card-title>
     <v-card-subtitle class="text-center">{{ product.productPrice }}</v-card-subtitle>
@@ -22,11 +22,20 @@ const posStore = usePosStore();
 
 function handleAddToCart() {
   if (props.product.category.haveTopping) {
-    posStore.selectProduct(props.product);
+    productStore.setSelectedProduct(props.product);
+    openToppingDialog();
+
   } else {
     posStore.addToCart(props.product);
   }
 }
+
+// open toppingDialog
+function openToppingDialog() {
+  productStore.toppingDailog = true;
+}
+
+
 </script>
 
 <style scoped>
