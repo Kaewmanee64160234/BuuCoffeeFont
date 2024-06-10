@@ -65,6 +65,12 @@ const router = createRouter({
       name: 'promotion',
       component: () => import('../views/promotion/PromotionView.vue')
     },
+    // pos
+    {
+      path: '/pos',
+      name: 'pos',
+      component: () => import('../views/pos/PosView.vue')
+    },
     
   ]
 })
