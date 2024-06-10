@@ -15,32 +15,34 @@ export const usePosStore = defineStore("pos", () => {
   const totalPrice = ref<number>(0);
   const netPrice = ref<number>(0);
 
-  const addToCart = (product: Product, productTypeTopping: ProductTypeTopping) => {
+  const addToCart = (product: Product, productTypeTopping: ProductTypeTopping | null) => {
     const index = selectedItems.value.findIndex((item) => item.product.productId === product.productId);
-    const quantity = productTypeTopping.quantity;
+    const quantity = productTypeTopping ? productTypeTopping.quantity : 1;
 
     if (index === -1) {
       selectedItems.value.push({
         product: product,
-        productTypeToppings: [productTypeTopping],
+        productTypeToppings: productTypeTopping ? [productTypeTopping] : [],
         quantity: quantity,
-        receiptSubTotal: calculateSubTotal(product, [productTypeTopping], quantity),
+        receiptSubTotal: calculateSubTotal(product, productTypeTopping ? [productTypeTopping] : [], quantity),
       });
     } else {
       const item = selectedItems.value[index];
       console.log('productTypeToppings', item.productTypeToppings);
 
-      const toppingIndex = item.productTypeToppings.findIndex(t => 
-        t.topping && t.topping.toppingId === productTypeTopping.topping.toppingId && 
-        t.productType && t.productType.productTypeId === productTypeTopping.productType.productTypeId
-      );
+      if (productTypeTopping) {
+        const toppingIndex = item.productTypeToppings.findIndex(t =>
+          t.topping && t.topping.toppingId === productTypeTopping.topping.toppingId &&
+          t.productType && t.productType.productTypeId === productTypeTopping.productType.productTypeId
+        );
 
-      if (toppingIndex === -1) {
-        item.productTypeToppings.push(productTypeTopping);
-      } else {
-        item.productTypeToppings[toppingIndex].quantity += productTypeTopping.quantity;
+        if (toppingIndex === -1) {
+          item.productTypeToppings.push(productTypeTopping);
+        } else {
+          item.productTypeToppings[toppingIndex].quantity += productTypeTopping.quantity;
+        }
       }
-      
+
       item.quantity += quantity;
       item.receiptSubTotal = calculateSubTotal(item.product, item.productTypeToppings, item.quantity);
     }
@@ -60,7 +62,7 @@ export const usePosStore = defineStore("pos", () => {
 
     const productTypePrice = productTypeToppings.length > 0 ? parseFloat(productTypeToppings[0].productType.productTypePrice + '') : 0;
     const productPrice = parseFloat(product.productPrice + '');
-    const productSubTotal = (parseFloat(productPrice+'') + parseFloat(productTypePrice+'') + parseFloat(subTotalTopping+'')) * quantity;
+    const productSubTotal = (productPrice + productTypePrice + subTotalTopping) * quantity;
 
     console.log(`Product Price: ${productPrice}, Product Type Price: ${productTypePrice}, Topping SubTotal: ${subTotalTopping}, Quantity: ${quantity}, SubTotal: ${productSubTotal}`);
 

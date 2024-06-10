@@ -89,14 +89,18 @@ function decreaseQuantity() {
 }
 
 function confirmSelection() {
-  if (!selectedType.value) return;
-
-  const productTypeTopping: ProductTypeTopping = {
+  const productTypeTopping: ProductTypeTopping | null = selectedType.value ? {
     productType: selectedType.value,
-    topping: selectedToppings.value.length > 0 ? selectedToppings.value[0] : null, // Example for one topping
+    topping: selectedToppings.value.length > 0 ? selectedToppings.value[0] : null,
     quantity: quantity.value,
-  };
-console.log('productTypeTopping', productTypeTopping);
+  } : null;
+
+  // if (productStore.selectedProduct?.category.haveTopping && selectedToppings.value.length === 0) {
+  //   // Handle the case where the product category requires toppings but none are selected
+  //   alert('Please select at least one topping.');
+  //   return;
+  // }
+
   posStore.addToCart(productStore.selectedProduct, productTypeTopping);
   closeDialog();
 }
