@@ -16,11 +16,19 @@ function updateUser(id: number, user: User) {
 function deleteUser(id: number) {
   return http.delete(`/users/${id}`);
 }
+function searchUsers(query: string) {
+  return http.get(`/users/search`, {
+    params: {
+      query,
+    },
+  });
+}
 
 export default {
   getAllUsers,
   getUserById,
   createUser,
   updateUser,
-  deleteUser
+  deleteUser,
+  searchUsers
 };

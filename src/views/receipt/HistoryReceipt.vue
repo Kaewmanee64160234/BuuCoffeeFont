@@ -6,34 +6,11 @@
   
   const receiptStore = useReceiptStore();
   const historyReceiptDialog = ref(false);
-  const filter = ref('');
-  const sortOrder = ref('');
   
   onMounted(async () => {
     await receiptStore.getAllReceipts();
   });
-  
-  const filterReceipts = computed(() => {
-    let receipts = receiptStore.receipts;
-  
-    if (filter.value === 'member') {
-      receipts = receiptStore.filterReceipts('member');
-    } else if (filter.value === 'notmember') {
-      receipts = receiptStore.filterReceipts('notmember');
-    }
-  
-    if (sortOrder.value === 'latest') {
-      receiptStore.sortReceipts('latest');
-    } else if (sortOrder.value === 'oldest') {
-      receiptStore.sortReceipts('oldest');
-    }
-  
-    return receipts;
-  });
-  
-  watch([filter, sortOrder], () => {
-    filterReceipts.value; // Trigger re-computation
-  });
+ 
   
   const openEditreceiptDialog = (receipt: Receipt) => {
     receiptStore.historyReceiptDialog = true;
@@ -94,7 +71,7 @@
                   <v-btn color="#FFDD83" icon="mdi-eye" @click="openEditreceiptDialog(item)"></v-btn>
                 </td>
               </tr> -->
-              <tr v-for="(item, index) in filterReceipts" :key="index">
+              <tr v-for="(item, index) in receiptStore.receipts" :key="index">
                 <td class="text-center">1</td>
                 <td class="text-center">30 เมษายน พ.ศ.2567</td>
                 <td class="text-center">5.00</td>

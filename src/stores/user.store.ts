@@ -1,4 +1,4 @@
-import { ref } from "vue";
+import { ref, watch} from "vue";
 import { defineStore } from "pinia";
 import type { User } from "@/types/user.type";
 import userService from "@/service/user.service";
@@ -8,6 +8,15 @@ export const useUserStore = defineStore("user", () => {
   const user = ref<User | null>(null);
   const searchQuery = ref<string>("");
   const updateUserDialog = ref(false);
+
+  watch(searchQuery, (value) => {
+    console.log(value);
+    if (value === "") {
+      getAllUsers();
+    } else {
+      searchUser();
+    }
+  });
 
   const getAllUsers = async () => {
     try {
@@ -73,6 +82,15 @@ export const useUserStore = defineStore("user", () => {
     user.value = selectedUser;
   };
 
+  const searchUser = async () => {
+    try {
+      const response = await userService.searchUsers(searchQuery.value);
+      users.value = response.data;
+      console.log(response.data);
+    } catch (error) {
+      console.error('Error searching users:', error);
+    }
+  };
   return {
     users,
     user,
@@ -83,6 +101,7 @@ export const useUserStore = defineStore("user", () => {
     deleteUser,
     searchQuery,
     updateUserDialog,
-    setUserForEdit
+    setUserForEdit,
+    searchUser
   };
 });

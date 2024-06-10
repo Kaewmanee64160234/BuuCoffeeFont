@@ -69,7 +69,7 @@
   import Swal from 'sweetalert2';
   import CreatePromotionDialog from '@/components/promotions/CreatePromotionDialog.vue';
   import UpdatePromotionDialog from '@/components/promotions/UpdatePromotionDialog.vue';
-import type { Promotion } from '@/types/promotion.type';
+  import type { Promotion } from '@/types/promotion.type';
   
   const promotionStore = usePromotionStore();
   

@@ -1,3 +1,38 @@
+<script lang="ts" setup>
+import { useUserStore } from '@/stores/user.store';
+import { computed, onMounted, ref } from 'vue';
+import AddUserDialog from '@/components/user/AddUserDialog.vue';
+import EditUserDialog from '@/components/user/EditUserDialog.vue';
+import type { User } from '@/types/user.type';
+
+const userStore = useUserStore();
+const addUserDialog = ref(false);
+
+onMounted(async () => {
+  await userStore.getAllUsers();
+});
+
+const openEditUserDialog = (user: User) => {
+  userStore.setUserForEdit(user);
+  userStore.updateUserDialog = true;
+};
+
+const handleSearchKeydown = (event: KeyboardEvent) => {
+  if (event.key === 'Enter') {
+    // Optionally, you could trigger search here if needed
+  }
+};
+
+const filteredUsers = computed(() => {
+  if (!userStore.searchQuery) {
+    return userStore.users;
+  }
+  return userStore.users.filter(user =>
+    user.userName.toLowerCase().includes(userStore.searchQuery.toLowerCase())
+  );
+});
+</script>
+
 <template>
   <AddUserDialog v-model:dialog="addUserDialog"></AddUserDialog>
   <EditUserDialog v-model:dialog="userStore.updateUserDialog" :user="userStore.user"></EditUserDialog>
@@ -10,31 +45,30 @@
             จัดการผู้ใช้งาน
           </v-col>
           
-            <v-row style="margin-left: 6%;">
-              <v-col class="pa-2 ma-2" cols="3">
-                <v-text-field
-                  v-model="userStore.searchQuery"
-                  label="ค้นหาผู้ใช้งาน"
-                  append-inner-icon="mdi-magnify"
-                  hide-details
-                  dense
-                ></v-text-field>
-              </v-col>
-              
-              
-              <v-spacer></v-spacer>
-              <v-col class="mt-4" cols="3" width="30%">
-                <v-btn color="success" @click="addUserDialog = true">
-                  <v-icon left>mdi-plus</v-icon>
-                  Add New User
-                </v-btn>
-              </v-col>
-            </v-row>
+          <v-row style="margin-left: 6%;">
+            <v-col class="pa-2 ma-2" cols="3">
+              <v-text-field
+                v-model="userStore.searchQuery"
+                label="ค้นหาผู้ใช้งาน"
+                append-inner-icon="mdi-magnify"
+                hide-details
+                dense
+                @keydown="handleSearchKeydown"
+              ></v-text-field>
+            </v-col>
             
-          
+            <v-spacer></v-spacer>
+            <v-col class="mt-4" cols="3" width="30%">
+              <v-btn color="success" @click="addUserDialog = true">
+                <v-icon left>mdi-plus</v-icon>
+                Add New User
+              </v-btn>
+            </v-col>
           </v-row>
-
-          <v-spacer> </v-spacer>
+          
+        </v-row>
+        
+        <v-spacer> </v-spacer>
       </v-card-title>
       <v-card width="90%" style="margin-left: 5%; margin-top: 3%;">
         <v-table class="text-center">
@@ -70,50 +104,6 @@
     </v-card>
   </v-container>
 </template>
-
-<script lang="ts" setup>
-import { useUserStore } from '@/stores/user.store';
-import { computed, onMounted, ref, watch } from 'vue';
-import AddUserDialog from '@/components/user/AddUserDialog.vue';
-import EditUserDialog from '@/components/user/EditUserDialog.vue';
-import type { User } from '@/types/user.type';
-
-const userStore = useUserStore();
-const addUserDialog = ref(false);
-const filter = ref('');
-const sortOrder = ref('');
-
-onMounted(async () => {
-  await userStore.getAllUsers();
-});
-
-const openEditUserDialog = (user: User) => {
-  userStore.setUserForEdit(user);
-  userStore.updateUserDialog = true;
-};
-
-const filteredUsers = computed(() => {
-  let users = userStore.users;
-
-  if (filter.value === 'resigned') {
-    users = userStore.filterUsers('resigned');
-  } else if (filter.value === 'active') {
-    users = userStore.filterUsers('active');
-  }
-
-  if (sortOrder.value === 'latest') {
-    userStore.sortUsers('latest');
-  } else if (sortOrder.value === 'oldest') {
-    userStore.sortUsers('oldest');
-  }
-
-  return users;
-});
-
-watch([filter, sortOrder], () => {
-  filteredUsers.value; // Trigger re-computation
-});
-</script>
 
 <style>
 .flex-container {
