@@ -18,7 +18,7 @@ export interface Reciept {
     receiptPromotions: ReceiptPromotion[];
   }
 export interface ReceiptItem {
-    receiptItemId: number;
+    receiptItemId?: number;
     quantity: number;
     receiptSubTotal: number;
     product: Product;
