@@ -1,4 +1,3 @@
-// stores/posStore.ts
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import type { Product } from "@/types/product.type";
@@ -16,8 +15,20 @@ export const usePosStore = defineStore("pos", () => {
   const netPrice = ref<number>(0);
 
   const addToCart = (product: Product, productTypeTopping: ProductTypeTopping | null) => {
-    const index = selectedItems.value.findIndex((item) => item.product.productId === product.productId);
     const quantity = productTypeTopping ? productTypeTopping.quantity : 1;
+
+    const index = selectedItems.value.findIndex((item) => {
+      if (item.product.productId === product.productId) {
+        if (productTypeTopping) {
+          return item.productTypeToppings.some(t =>
+            t.topping?.toppingId === productTypeTopping.topping?.toppingId &&
+            t.productType?.productTypeId === productTypeTopping.productType?.productTypeId
+          );
+        }
+        return true;
+      }
+      return false;
+    });
 
     if (index === -1) {
       selectedItems.value.push({
@@ -70,6 +81,9 @@ export const usePosStore = defineStore("pos", () => {
   };
 
   const calculateTotalPrice = () => {
+    totalPrice.value = 0;
+    netPrice.value = 0;
+    
     let total = 0;
     let totalDiscountValue = 0;
 

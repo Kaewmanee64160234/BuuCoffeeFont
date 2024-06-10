@@ -45,12 +45,7 @@ function selectSweetness(level: number) {
   selectedSweetness.value = level;
 }
 
-function addTopping(topping: Topping) {
-  const existingTopping = selectedToppings.value.find(t => t.toppingId === topping.toppingId);
-  if (!existingTopping) {
-    selectedToppings.value.push({ ...topping, quantity: 1 });
-  }
-}
+
 
 function increaseToppingQuantity(topping: Topping) {
   const selectedTopping = selectedToppings.value.find(t => t.toppingId === topping.toppingId);
@@ -93,6 +88,9 @@ function confirmSelection() {
     productType: selectedType.value,
     topping: selectedToppings.value.length > 0 ? selectedToppings.value[0] : null,
     quantity: quantity.value,
+    sweetness: selectedSweetness.value,
+    
+
   } : null;
   posStore.addToCart(productStore.selectedProduct, productTypeTopping);
   closeDialog();
@@ -200,7 +198,6 @@ watch(() => productStore.selectedProduct, (newVal) => {
       <v-card-actions class="justify-center">
         <v-btn color="primary" @click="confirmSelection">ยืนยันการทำรายการ</v-btn>
       </v-card-actions>
-      {{ posStore.selectedItems }}
     </v-card>
   </v-dialog>
 </template>
