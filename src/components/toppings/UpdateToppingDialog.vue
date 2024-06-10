@@ -2,18 +2,17 @@
   <v-dialog v-model="toppingStore.updateToppingDialog" persistent max-width="600px">
     <v-card>
       <v-card-title>
-        <span class="headline">Update Topping</span>
+        <span class="headline">แก้ไขท็อปปิ้ง</span>
       </v-card-title>
       <v-card-text>
         <v-container>
           <v-form ref="form" v-model="valid">
             <v-row>
               <v-col cols="12">
-                <v-text-field v-model="toppingStore.topping!.toppingName" label="Topping Name" required></v-text-field>
+                <v-text-field v-model="toppingStore.topping!.toppingName" label="ชื่อท็อปปิ้ง" required></v-text-field>
               </v-col>
               <v-col cols="12">
-                <v-text-field v-model="toppingStore.topping!.toppingPrice" label="Topping Price" type="number"
-                  required></v-text-field>
+                <v-text-field v-model="toppingStore.topping!.toppingPrice" label="ราคาท็อปปิ้ง" type="number" required></v-text-field>
               </v-col>
             </v-row>
           </v-form>
@@ -21,8 +20,8 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" @click="toppingStore.updateToppingDialog = false">Close</v-btn>
-        <v-btn color="blue darken-1" @click="submitForm" :disabled="!valid">Save</v-btn>
+        <v-btn color="blue darken-1" @click="toppingStore.updateToppingDialog = false">ปิด</v-btn>
+        <v-btn color="blue darken-1" @click="submitForm" :disabled="!valid">บันทึก</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

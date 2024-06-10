@@ -14,28 +14,43 @@ export const useCategoryStore = defineStore("category", () => {
   const createCategoryDialog = ref(false);
   const updateCategoryDialog = ref(false);
 
-  watch(selectedCategory, (value) => {
+  watch(selectedCategory, async (value) => {
     if (value === "All") {
-      productStore.getAllProducts();
+      await productStore.getProductPaginate();
     } else {
       productStore.getProductsByCategory(value);
     }
   });
+
+  // watch for searchQuery
+  watch(searchQuery, (value) => {
+    if (value === "") {
+      getAllCategories();
+    } else {
+      searchCategory();
+    }
+  });
+
 
   //createCategory use category service
   const getAllCategories = async () => {
     try {
       const res = await categoryService.getAllCategories();
       if (res.data) {
-        categoriesForCreate.value = res.data;
 
         categories.value = res.data;
+  
         // push category All
-        // categories.value.push({
-        //   categoryId: 0,
-        //   categoryName: "All",
-        //   haveTopping: false,
-        // });
+        categories.value.push({
+          categoryId: 0,
+          categoryName: "All",
+          haveTopping: false,
+        });
+        // pop last category out
+        categoriesForCreate.value = categories.value.slice(0, categories.value.length - 1);
+
+
+
       }
     } catch (error) {
       console.error(error);
@@ -89,6 +104,16 @@ export const useCategoryStore = defineStore("category", () => {
       }
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  // searchCategories
+  const searchCategory = async () => {
+    try {
+      const response = await categoryService.searchCategories(searchQuery.value);
+      categories.value = response.data;
+    } catch (error) {
+      console.error('Error searching categories:', error);
     }
   };
 

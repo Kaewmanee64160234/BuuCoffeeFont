@@ -31,10 +31,23 @@ function deleteTopping(id: number)
   return http.delete(`/toppings/${id}`);
 }
 
+// paginate
+function getToppingPaginate(page: number, limit: number, search: string) {
+  return http.get(`/toppings/paginate`, {
+    params: {
+      page: page.toString(),
+      limit: limit.toString(),
+      search,
+    },
+  });
+
+}
+
 export default {
   getAllToppings,
   getToppingById,
   createTopping,
   updateTopping,
-  deleteTopping
+  deleteTopping,
+  getToppingPaginate
 };

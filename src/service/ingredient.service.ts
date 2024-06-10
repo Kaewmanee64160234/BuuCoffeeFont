@@ -63,7 +63,9 @@ function deleteIngredient(id: number) {
 }
 
 
-
+function searchIngredientsByName(name: string) {
+  return http.get("/ingredients/search", { params: { name } });
+}
 
 export default {
   getAllIngredients,
@@ -71,5 +73,6 @@ export default {
   getAllHistoryImportIngredients,
   saveIngredient,
   updateIngredient,
-  deleteIngredient
+  deleteIngredient,
+  searchIngredientsByName
 };

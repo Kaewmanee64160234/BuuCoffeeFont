@@ -1,13 +1,14 @@
+
 <script lang="ts" setup>
 import { useCategoryStore } from '@/stores/category.store';
 import { useProductStore } from '@/stores/product.store';
-import { computed, onMounted, ref, watch } from 'vue';
+import { onMounted, ref } from 'vue';
 import CreateProductDialog from '../../components/products/CreateProductDialog.vue';
 import UpdateProductDialog from '../../components/products/UpdateProductDialog.vue';
 import { useIngredientStore } from '@/stores/Ingredient.store';
 import type { Product } from '@/types/product.type';
-import type { IngredientQuantities } from '@/types/productType.type';
 import Swal from 'sweetalert2';
+import type { IngredientQuantities } from '@/types/productType.type';
 
 const productStore = useProductStore();
 const categoryStore = useCategoryStore();
@@ -17,9 +18,11 @@ const selectedCategory = ref(categoryStore.selectedCategory);
 const ingredientStore = useIngredientStore();
 
 onMounted(async () => {
-  await productStore.getAllProducts();
+  // await productStore.getAllProducts();
   await categoryStore.getAllCategories();
   await ingredientStore.getAllIngredients();
+  await productStore.getProductPaginate();
+
 });
 
 const openCreateDialog = () => {
@@ -30,7 +33,6 @@ const openUpdateDialog = (product: Product) => {
   productStore.product = { ...product, file: new File([""], "") };
   loadProductData();
   productStore.updateProductDialog = true;
-
 };
 
 const loadProductData = () => {
@@ -84,7 +86,6 @@ const loadProductData = () => {
   } else {
     productStore.productTypes = [];
   }
-
 };
 
 const confirmDelete = async (deleteAction: () => Promise<void>) => {
@@ -107,7 +108,6 @@ const confirmDelete = async (deleteAction: () => Promise<void>) => {
 const deleteProduct = async (productId: number) => {
   try {
     await confirmDelete(async () => {
-      // Your delete logic here
       await productStore.deleteProduct(productId);
     });
   } catch (error) {
@@ -115,112 +115,89 @@ const deleteProduct = async (productId: number) => {
     Swal.fire('Error', 'An error occurred while deleting the product.', 'error');
   }
 };
-
 </script>
 
 <template>
   <CreateProductDialog />
   <UpdateProductDialog />
-  <v-container v-if="paginate">
+  <v-container>
     <v-card>
       <v-card-title>
+        <v-row style="padding: 20px;"><h3>สินค้า</h3></v-row>
+
         <v-row>
-          <v-col cols="9">
-            Products
+          <v-col cols="12" md="3">
+            <v-text-field 
+              v-model="productStore.searchQuery" 
+              label="ค้นหาสินค้า" 
+              append-inner-icon="mdi-magnify"
+              hide-details 
+              dense 
+              variant="solo"
+            ></v-text-field>
           </v-col>
-          <v-col cols="3">
-            <v-text-field v-model="productStore.searchQuery" label="Search" append-inner-icon="mdi-magnify" hide-details
-              dense></v-text-field>
-          </v-col>
-          <v-col>
-            <v-btn @click="openCreateDialog" color="success">
+          <v-spacer></v-spacer>
+          <v-col cols="12" md="3" class="d-flex justify-center align-center">
+            <v-btn @click="openCreateDialog" style="background-color: #8ad879; color: white" block>
               <v-icon left>mdi-plus</v-icon>
-              Add New Product
+              เพิ่มสินค้า
             </v-btn>
           </v-col>
-          <v-col cols="3">
-            <v-select v-model="categoryStore.selectedCategory" label="Select Category"
-              :items="categoryStore.categories.map(category => category.categoryName)" dense></v-select>
+          <v-col cols="12" md="3">
+            <v-select 
+              v-model="productStore.selectedCategory" 
+              label="เลือกหมวดหมู่"
+              :items="categoryStore.categories.map(category => category.categoryName)" 
+              dense 
+              hide-details
+              variant="solo"
+            ></v-select>
           </v-col>
         </v-row>
         <v-spacer></v-spacer>
       </v-card-title>
-      <v-table class="text-center mt-5">
-        <thead>
-          <tr>
-            <th></th>
-            <th>Image</th>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Price</th>
-            <th>Operations</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr style="text-align: center" v-for="(item, index) in productStore.products" :key="index">
-            <td>{{ index + 1 }}</td>
-            <td>
-              <v-avatar size="80"><v-img :src="`${url}/products/${item.productId}/image`"></v-img></v-avatar>
-            </td>
-            <td>{{ item.productName }}</td>
-            <td>{{ item.category.categoryName }}</td>
-            <td>{{ item.productPrice }}</td>
-            <td>
-              <v-btn color="#FFDD83" class="mr-5" icon="mdi-pencil" @click="openUpdateDialog(item)"></v-btn>
-              <v-btn color="#F55050" class="mr-5" icon="mdi-delete" @click="deleteProduct(item.productId)" ></v-btn>
-            </td>
-          </tr>
-        </tbody>
-        <tbody v-if="!productStore.products">
-          <tr>
-            <td colspan="7" class="text-center">No data</td>
-          </tr>
-        </tbody>
-      </v-table>
-    </v-card>
-  </v-container>
-  <v-container v-else>
-    <v-card>
-      <v-card-title>
-        <div class="row">
-          <div class="col-md-9">
-            Products
-          </div>
-          <v-spacer></v-spacer>
-        </div>
-      </v-card-title>
-      <v-table class="text-center mt-5">
-        <thead>
-          <tr>
-            <th></th>
-            <th>Image</th>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Price</th>
-            <th>Operations</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr style="text-align: center" v-for="(item, index) in productStore.products" :key="index">
-            <td>{{ index + 1 }}</td>
-            <td>
-              <v-avatar size="80"><v-img :src="`${url}/products/image/${item.productId}`"></v-img></v-avatar>
-            </td>
-            <td>{{ item.productName }}</td>
-            <td>{{ item.category.categoryName }}</td>
-            <td>{{ item.productPrice }}</td>
-            <td>
-              <v-btn color="#FFDD83" class="mr-5" icon="mdi-pencil" @click="openUpdateDialog(item)"></v-btn>
-              <v-btn color="#F55050" class="mr-5" icon="mdi-delete" ></v-btn>
-            </td>
-          </tr>
-        </tbody>
-        <tbody v-if="!productStore.products">
-          <tr>
-            <td colspan="7" class="text-center">No data</td>
-          </tr>
-        </tbody>
-      </v-table>
+      <v-card-text>
+        <v-table class="text-center mt-5">
+          <thead>
+            <tr>
+              <th style="text-align: center;font-weight: bold;"></th>
+              <th style="text-align: center;font-weight: bold;">รูปภาพ</th>
+              <th style="text-align: center;font-weight: bold;">ชื่อสินค้า</th>
+              <th style="text-align: center;font-weight: bold;">ประเภทสินค้า</th>
+              <th style="text-align: center;font-weight: bold;">ราคา</th>
+              <th style="text-align: center;font-weight: bold;">การกระทำ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in productStore.products" :key="index" style="text-align: center">
+              <td>{{ index + 1 + (productStore.currentPage - 1) * productStore.itemsPerPage }}</td>
+              <td>
+                <v-avatar size="80">
+                  <v-img :src="`${url}/products/${item.productId}/image`"></v-img>
+                </v-avatar>
+              </td>
+              <td>{{ item.productName }}</td>
+              <td>{{ item.category.categoryName }}</td>
+              <td>{{ item.productPrice }}</td>
+              <td>
+                <v-btn color="#FFDD83" icon="mdi-pencil" class="mr-2" @click="openUpdateDialog(item)">
+                </v-btn>
+                <v-btn color="#F55050" icon="mdi-delete" @click="deleteProduct(item.productId)">
+                </v-btn>
+              </td>
+            </tr>
+          </tbody>
+          <tbody v-if="!productStore.products || productStore.products.length === 0">
+            <tr>
+              <td colspan="6" class="text-center">ไม่มีข้อมูล</td>
+            </tr>
+          </tbody>
+        </v-table>
+      
+
+        <v-pagination justify="center" v-model="productStore.currentPage" :length="Math.ceil(productStore.totalProducts / productStore.itemsPerPage)" 
+        rounded="circle"></v-pagination>
+      </v-card-text>
     </v-card>
   </v-container>
 </template>

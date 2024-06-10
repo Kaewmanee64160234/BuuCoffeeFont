@@ -3,7 +3,7 @@
 import toppingService from "@/service/topping.service";
 import type { Topping } from "@/types/topping.type";
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 
 
 export const useToppingStore = defineStore("topping", () => {
@@ -13,6 +13,16 @@ export const useToppingStore = defineStore("topping", () => {
     const updateToppingDialog = ref(false);
     const createToppingDialog = ref(false);
     const searchQuery = ref<string>("");
+    const totalToppings = ref(0);
+    const currentPage = ref(1);
+    const itemsPerPage = ref(5);
+
+    // watch for pagination
+    watch([currentPage, itemsPerPage, searchQuery], () => {
+        getToppingsPaginate();
+      });
+    
+
 
     const createTopping = async (topping: Topping) => {
         try {
@@ -72,6 +82,21 @@ export const useToppingStore = defineStore("topping", () => {
         }
     }
 
+    // getToppingsPaginate
+    const getToppingsPaginate = async () => {
+        try {
+          const response = await toppingService.getToppingPaginate(currentPage.value, itemsPerPage.value, searchQuery.value);
+          console.log('getToppingPaginate', response.data);
+          if (response.status === 200) {
+            toppings.value = response.data.data;
+            totalToppings.value = response.data.total;
+          }
+        } catch (error) {
+          console.error('Error getting toppings:', error);
+        }
+      };
+
+
     return {
         toppings,
         topping,
@@ -82,7 +107,13 @@ export const useToppingStore = defineStore("topping", () => {
         updateTopping,
         deleteTopping,
         getAllToppings,
-        getToppingById
+        getToppingById,
+        getToppingsPaginate,
+        totalToppings,
+        currentPage,
+        itemsPerPage,
+        
+
     }
 
 

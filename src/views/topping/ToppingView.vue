@@ -4,47 +4,64 @@
       <v-card-title>
         <v-row>
           <v-col cols="9">
-            Toppings
+            ท็อปปิ้ง
           </v-col>
           <v-col cols="3">
-            <v-text-field v-model="toppingStore.searchQuery" label="Search" append-inner-icon="mdi-magnify" hide-details
-              dense></v-text-field>
+            <v-text-field 
+              v-model="toppingStore.searchQuery" 
+              label="ค้นหา" 
+              append-inner-icon="mdi-magnify" 
+              hide-details 
+              dense 
+              variant="solo"
+              @input="toppingStore.getToppingsPaginate"
+            ></v-text-field>
           </v-col>
           <v-col>
             <v-btn @click="openCreateDialog" color="success">
               <v-icon left>mdi-plus</v-icon>
-              Add New Topping
+              เพิ่มท็อปปิ้งใหม่
             </v-btn>
           </v-col>
         </v-row>
         <v-spacer></v-spacer>
       </v-card-title>
-      <v-table>
-        <thead>
-          <tr>
-            <th v-for="header in headers" :key="header.value" style="text-align: center;">
-              {{ header.text }}
-            </th>
-          </tr>
-
-        </thead>
-        <tbody>
-          <tr v-for="topping in toppingStore.toppings" :key="topping.toppingId" style="text-align: center;">
-            <td>{{ topping.toppingId }}</td>
-            <td>{{ topping.toppingName }}</td>
-            <td>{{ topping.toppingPrice }}</td>
-            <td>
-              <v-btn color="#FFDD83" class="mr-5" icon="mdi-pencil" @click="openUpdateDialog(topping)"></v-btn>
-              <v-btn color="#F55050" class="mr-5" icon="mdi-delete" @click="deleteTopping(topping.toppingId)"></v-btn>
-            </td>
-          </tr>
-        </tbody>
-      </v-table>
+      <v-card-text>
+        <v-table class="text-center mt-5">
+          <thead>
+            <tr>
+              <th style="text-align: center;font-weight: bold;">รหัสท็อปปิ้ง</th>
+              <th style="text-align: center;font-weight: bold;">ชื่ท็อปปิ้ง</th>
+              <th style="text-align: center;font-weight: bold;">ราคาท็อปปิ้ง</th>
+              <th style="text-align: center;font-weight: bold;">การกระทำ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="topping in toppingStore.toppings" :key="topping.toppingId" style="text-align: center;">
+              <td>{{ topping.toppingId }}</td>
+              <td>{{ topping.toppingName }}</td>
+              <td>{{ topping.toppingPrice }}</td>
+              <td>
+                <v-btn color="#FFDD83" class="mr-5" icon="mdi-pencil" @click="openUpdateDialog(topping)"></v-btn>
+                <v-btn color="#F55050" class="mr-5" icon="mdi-delete" @click="deleteTopping(topping.toppingId)"></v-btn>
+              </td>
+            </tr>
+          </tbody>
+          <tbody v-if="!toppingStore.toppings || toppingStore.toppings.length === 0">
+            <tr>
+              <td colspan="4" class="text-center">ไม่มีข้อมูล</td>
+            </tr>
+          </tbody>
+        </v-table>
+        <v-pagination justify="center" v-model="toppingStore.currentPage" :length="Math.ceil(toppingStore.totalToppings / toppingStore.itemsPerPage)" 
+        rounded="circle"></v-pagination>
+      </v-card-text>
     </v-card>
     <CreateToppingDialog />
     <UpdateToppingDialog />
   </v-container>
 </template>
+
 
 <script lang="ts" setup>
 import { useToppingStore } from '@/stores/topping.store';
@@ -64,7 +81,7 @@ const headers = ref([
 ]);
 
 onMounted(async () => {
-  await toppingStore.getAllToppings();
+  await toppingStore.getToppingsPaginate()
 });
 
 const openCreateDialog = () => {
