@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import type { Reciept } from "./recipt.type";
 
 export interface Customer {
@@ -6,3 +7,4 @@ export interface Customer {
     customerNumberOfStamp: number;
     customerPhone: string;
   }
+

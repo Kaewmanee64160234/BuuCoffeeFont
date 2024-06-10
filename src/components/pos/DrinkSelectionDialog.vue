@@ -101,71 +101,77 @@ watch(() => productStore.selectedProduct, (newVal) => {
 
 
 <template>
-    <v-dialog v-model="productStore.toppingDailog" max-width="600">
-        <v-card>
-            <v-card-title>
-                <v-row>
-
-                    <v-col cols="12" md="6">
-                        <span>{{ productStore.selectedProduct?.productName }}</span>
-
-                    </v-col>
-                    <v-col cols="12" md="6" style="justify-content: end;">
-
-                        <v-btn icon @click="closeDialog">
-                            <v-icon>mdi-close</v-icon>
-                        </v-btn>
-
-                    </v-col>
-                </v-row>
-
-
-            </v-card-title>
-            <v-card-subtitle>{{ productStore.selectedProduct?.productName }} {{
-                productStore.selectedProduct?.productPrice }} $</v-card-subtitle>
-            <v-card-text>
-                <v-img :src="productStore.selectedProduct?.productImage" class="mb-4"></v-img>
-
-                <div>
-                    <span>ตัวเลือก</span>
-                    <v-btn v-for="type in productStore.selectedProduct?.productTypes" :key="type.productTypeId"
-                        :class="{ 'active': selectedType === type }" @click="selectType(type)">
-                        {{ type.productTypeName }} {{ type.productTypePrice }}
-                    </v-btn>
-                </div>
-
-                <div>
-                    <span>ระดับความหวาน</span>
-                    <v-btn v-for="level in sweetnessLevels" :key="level"
-                        :class="{ 'active': selectedSweetness === level }" @click="selectSweetness(level)">
-                        {{ level }}%
-                    </v-btn>
-                </div>
-
-                <div>
-                    <span>ท็อปปิ้ง</span>
-                    <div class="topping-container">
-                        <v-btn icon="mdi-chevron-left" @click="prevTopping"></v-btn>
-                        <v-btn v-for="topping in displayedToppings" :key="topping.toppingId"
-                            :class="{ 'active': selectedToppings.includes(topping) }" @click="toggleTopping(topping)">
-                            {{ topping.toppingName }} {{ topping.toppingPrice }}
-                        </v-btn>
-                        <v-btn icon="mdi-chevron-right" @click="nextTopping"></v-btn>
-                    </div>
-                </div>
-
-                <div class="quantity-container">
-                    <v-btn @click="decreaseQuantity" icon="mdi-minus"></v-btn>
-                    <span>{{ quantity }}</span>
-                    <v-btn @click="increaseQuantity" icon="mdi-plus"></v-btn>
-                </div>
-            </v-card-text>
-
-            <v-card-actions>
-                <v-btn color="primary" @click="confirmSelection">ยืนยันการทำรายการ</v-btn>
-            </v-card-actions>
-        </v-card>
-    </v-dialog>
+  <v-dialog v-model="productStore.toppingDailog" max-width="600">
+    <v-card>
+      <v-card-title>
+        <v-row>
+          <v-col cols="12" md="6">
+            <span>{{ productStore.selectedProduct?.productName }}</span>
+          </v-col>
+          <v-col cols="12" md="6" style="text-align: right;">
+            <v-btn icon @click="closeDialog">
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card-title>
+      <v-card-subtitle>
+        {{ productStore.selectedProduct?.productName }} {{ productStore.selectedProduct?.productPrice }} $
+      </v-card-subtitle>
+      <v-card-text>
+        <v-img :src="productStore.selectedProduct?.productImage" class="mb-4"></v-img>
+        <div>
+          <span>ตัวเลือก</span>
+          <v-chip
+            variant="outlined"
+            v-for="type in productStore.selectedProduct?.productTypes"
+            :key="type.productTypeId"
+            :class="{ 'active': selectedType === type }"
+            @click="selectType(type)"
+          >
+            {{ type.productTypeName }} {{ type.productTypePrice }}
+          </v-chip>
+        </div>
+        <div>
+          <span>ระดับความหวาน</span>
+          <v-chip
+            variant="outlined"
+            v-for="level in sweetnessLevels"
+            :key="level"
+            :color="{ 'active': selectedSweetness === level }"
+            :class="{ 'active': selectedSweetness === level }"
+            @click="selectSweetness(level)"
+          >
+            {{ level }}%
+          </v-chip>
+        </div>
+        <div>
+          <span>ท็อปปิ้ง</span>
+          <div class="topping-container">
+            <v-btn icon="mdi-chevron-left" @click="prevTopping"></v-btn>
+            <v-chip
+              variant="outlined"
+              v-for="topping in displayedToppings"
+              :key="topping.toppingId"
+              :class="{ 'active': selectedToppings.includes(topping) }"
+              @click="toggleTopping(topping)"
+            >
+              {{ topping.toppingName }} {{ topping.toppingPrice }}
+            </v-chip>
+            <v-btn icon="mdi-chevron-right" @click="nextTopping"></v-btn>
+          </div>
+        </div>
+        <div class="quantity-container">
+          <v-btn @click="decreaseQuantity" icon="mdi-minus"></v-btn>
+          <span>{{ quantity }}</span>
+          <v-btn @click="increaseQuantity" icon="mdi-plus"></v-btn>
+        </div>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn color="primary" @click="confirmSelection">ยืนยันการทำรายการ</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 
