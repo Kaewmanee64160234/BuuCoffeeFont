@@ -4,13 +4,14 @@ import { usePosStore } from '@/stores/pos.store';
 import type { Topping } from '@/types/topping.type';
 import type { ProductType } from '@/types/productType.type';
 import { useProductStore } from '@/stores/product.store';
+import { useToppingStore } from '@/stores/topping.store';
 
 const posStore = usePosStore();
 const productStore = useProductStore();
+const toppingStore = useToppingStore();
 
 const showDialog = ref(false);
 
-const product = computed(() => productStore.setSelectedProduct);
 
 const quantity = ref(1);
 const selectedType = ref(null);
@@ -22,24 +23,23 @@ const currentToppingIndex = ref(0);
 
 const sweetnessLevels = ref([0, 25, 50, 100, 125]);
 
-const toppings = ref([
-    { productTypeToppingId: 1, productTypeToppingName: '+10 บุก', productTypeToppingPrice: 10 },
-    { productTypeToppingId: 2, productTypeToppingName: '+20 น้ำผึ้ง', productTypeToppingPrice: 20 },
-    { productTypeToppingId: 3, productTypeToppingName: '+20 ไข่มุก', productTypeToppingPrice: 20 },
-    { productTypeToppingId: 4, productTypeToppingName: '+20 ไข่กบ', productTypeToppingPrice: 20 },
-    { productTypeToppingId: 5, productTypeToppingName: '+20 ไข่เต่า', productTypeToppingPrice: 20 },
-    { productTypeToppingId: 6, productTypeToppingName: '+20 ไข่นกกะต่อย', productTypeToppingPrice: 20 },
-    // Add more toppings as needed
-]);
+
 
 const displayedToppings = computed(() => {
-    return toppings.value.slice(currentToppingIndex.value, currentToppingIndex.value + 3);
+    return toppingStore.toppings.slice(currentToppingIndex.value, currentToppingIndex.value + 3);
 });
 
 function closeDialog() {
     showDialog.value = false;
     productStore.setSelectedProduct(null);
     productStore.toppingDailog = false;
+    // clear data
+    selectedType.value = null;
+    selectedSweetness.value = null;
+    selectedToppings.value = [];
+    currentToppingIndex.value = 0;
+    quantity.value = 1;
+
 }
 
 function selectType(type: ProductType) {
@@ -65,7 +65,7 @@ function prevTopping() {
 }
 
 function nextTopping() {
-    if (currentToppingIndex.value < toppings.value.length - 3) {
+    if (currentToppingIndex.value < toppingStore.toppings.length - 3) {
         currentToppingIndex.value += 1;
     }
 }
@@ -104,12 +104,25 @@ watch(() => productStore.selectedProduct, (newVal) => {
     <v-dialog v-model="productStore.toppingDailog" max-width="600">
         <v-card>
             <v-card-title>
-                <span>{{ productStore.selectedProduct?.productName }}</span>
-                <v-btn icon @click="closeDialog">
-                    <v-icon>mdi-close</v-icon>
-                </v-btn>
+                <v-row>
+
+                    <v-col cols="12" md="6">
+                        <span>{{ productStore.selectedProduct?.productName }}</span>
+
+                    </v-col>
+                    <v-col cols="12" md="6" style="justify-content: end;">
+
+                        <v-btn icon @click="closeDialog">
+                            <v-icon>mdi-close</v-icon>
+                        </v-btn>
+
+                    </v-col>
+                </v-row>
+
+
             </v-card-title>
-            <v-card-subtitle>{{ productStore.selectedProduct?.productName }} $</v-card-subtitle>
+            <v-card-subtitle>{{ productStore.selectedProduct?.productName }} {{
+                productStore.selectedProduct?.productPrice }} $</v-card-subtitle>
             <v-card-text>
                 <v-img :src="productStore.selectedProduct?.productImage" class="mb-4"></v-img>
 
@@ -133,18 +146,18 @@ watch(() => productStore.selectedProduct, (newVal) => {
                     <span>ท็อปปิ้ง</span>
                     <div class="topping-container">
                         <v-btn icon="mdi-chevron-left" @click="prevTopping"></v-btn>
-                        <v-btn v-for="topping in displayedToppings" :key="topping.productTypeToppingId"
+                        <v-btn v-for="topping in displayedToppings" :key="topping.toppingId"
                             :class="{ 'active': selectedToppings.includes(topping) }" @click="toggleTopping(topping)">
-                            {{ topping.productTypeToppingName }} {{ topping.productTypeToppingPrice }}
+                            {{ topping.toppingName }} {{ topping.toppingPrice }}
                         </v-btn>
                         <v-btn icon="mdi-chevron-right" @click="nextTopping"></v-btn>
                     </div>
                 </div>
 
                 <div class="quantity-container">
-                    <v-btn  @click="decreaseQuantity" icon="mdi-minus"></v-btn>
+                    <v-btn @click="decreaseQuantity" icon="mdi-minus"></v-btn>
                     <span>{{ quantity }}</span>
-                    <v-btn  @click="increaseQuantity" icon="mdi-plus"></v-btn>
+                    <v-btn @click="increaseQuantity" icon="mdi-plus"></v-btn>
                 </div>
             </v-card-text>
 

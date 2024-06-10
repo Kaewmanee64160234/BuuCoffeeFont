@@ -26,10 +26,12 @@ import DrinkSelectionDialog from '@/components/pos/DrinkSelectionDialog.vue';
 import { useProductStore } from '@/stores/product.store';
 import { useCategoryStore } from '@/stores/category.store';
 import { usePromotionStore } from '@/stores/promotion.store';
+import { useToppingStore } from '@/stores/topping.store';
 
 const productStore = useProductStore();
 const categoryStore = useCategoryStore();
 const promotionStore = usePromotionStore();
+const toppingStore = useToppingStore();
 
 const filteredProducts = computed(() => {
     return productStore.products.filter(product => {
@@ -43,6 +45,7 @@ onMounted(async () => {
     await productStore.getAllProducts();
     await categoryStore.getAllCategories(); 
     await promotionStore.getAllPromotions();
+    await toppingStore.getAllToppings();
 });
 </script>
 
