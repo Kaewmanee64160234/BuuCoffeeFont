@@ -70,6 +70,18 @@ const router = createRouter({
       name: 'promotion',
       component: () => import('../views/promotion/PromotionView.vue')
     },
+//Edit
+    {
+      path: '/report',
+      name: 'report',
+      component: () => import('../views/report/ReportFinance.vue')
+    },
+    // pos
+    {
+      path: '/pos',
+      name: 'pos',
+      component: () => import('../views/pos/PosView.vue')
+    },
     
   ]
 })

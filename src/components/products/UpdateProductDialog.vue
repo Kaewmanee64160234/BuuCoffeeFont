@@ -51,9 +51,9 @@
               <v-stepper-window-item v-if="isDrink" :value="2">
                 <v-form ref="form" v-model="valid">
                   <v-row class="d-flex justify-space-between">
-                    <v-checkbox label="ร้อน" v-model="productStore.isHot" @change="handleProductTypeChange('Hot', productStore.isHot)"></v-checkbox>
-                    <v-checkbox label="เย็น" v-model="productStore.isCold" @change="handleProductTypeChange('Cold', productStore.isCold)"></v-checkbox>
-                    <v-checkbox label="ปั่น" v-model="productStore.isBlend" @change="handleProductTypeChange('Blend', productStore.isBlend)"></v-checkbox>
+                    <v-checkbox label="ร้อน" v-model="productStore.isHot" @change="handleProductTypeChange('ร้อน', productStore.isHot)"></v-checkbox>
+                    <v-checkbox label="เย็น" v-model="productStore.isCold" @change="handleProductTypeChange('เย็น', productStore.isCold)"></v-checkbox>
+                    <v-checkbox label="ปั่น" v-model="productStore.isBlend" @change="handleProductTypeChange('ปั่น', productStore.isBlend)"></v-checkbox>
                   </v-row>
                 </v-form>
               </v-stepper-window-item>
@@ -186,17 +186,17 @@ const computedSteps = computed(() => {
     if (productStore.isHot) {
       stepValue++;
 
-      stepsArray.push({ label: 'Hot', value: stepValue });
+      stepsArray.push({ label: 'ร้อน', value: stepValue });
     }
     if (productStore.isCold) {
       stepValue++;
 
-      stepsArray.push({ label: 'Cold', value: stepValue });
+      stepsArray.push({ label: 'เย็น', value: stepValue });
     }
     if (productStore.isBlend) {
       stepValue++;
 
-      stepsArray.push({ label: 'Blend', value: stepValue });
+      stepsArray.push({ label: 'ปั่น', value: stepValue });
     }
   }
   return stepsArray;
