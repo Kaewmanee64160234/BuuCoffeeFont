@@ -94,15 +94,16 @@ function confirmSelection() {
     topping: selectedToppings.value.length > 0 ? selectedToppings.value[0] : null,
     quantity: quantity.value,
   } : null;
-
-  // if (productStore.selectedProduct?.category.haveTopping && selectedToppings.value.length === 0) {
-  //   // Handle the case where the product category requires toppings but none are selected
-  //   alert('Please select at least one topping.');
-  //   return;
-  // }
-
   posStore.addToCart(productStore.selectedProduct, productTypeTopping);
   closeDialog();
+}
+function toggleTopping(topping: Topping) {
+  const existingToppingIndex = selectedToppings.value.findIndex(t => t.toppingId === topping.toppingId);
+  if (existingToppingIndex !== -1) {
+    selectedToppings.value.splice(existingToppingIndex, 1);
+  } else {
+    selectedToppings.value.push({ ...topping, quantity: 1 });
+  }
 }
 
 watch(() => productStore.selectedProduct, (newVal) => {
@@ -170,7 +171,7 @@ watch(() => productStore.selectedProduct, (newVal) => {
                 <v-chip
                   variant="outlined"
                   :color="selectedToppings.some(t => t.toppingId === topping.toppingId) ? '#f5a623' : 'gray'"
-                  @click="addTopping(topping)"
+                  @click="toggleTopping(topping)"
                 >
                   {{ topping.toppingName }} {{ topping.toppingPrice }}
                 </v-chip>
