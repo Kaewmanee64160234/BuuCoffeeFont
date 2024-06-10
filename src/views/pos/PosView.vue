@@ -1,81 +1,54 @@
 <template>
     <v-app>
       <v-container>
-        <promotion-cards-carousel @apply-promotion="handleApplyPromotion"></promotion-cards-carousel>
-        <search-bar @search="handleSearch"></search-bar>
-        <category-tabs @category-changed="handleCategoryChange"></category-tabs>
+        <promotion-cards-carousel></promotion-cards-carousel>
+        <search-bar></search-bar>
+        <category-tabs></category-tabs>
         <v-row>
-          <v-col v-for="product in filteredProducts" :key="product.id" cols="12" md="4">
-            <product-card :product="product" @add-to-cart="addToCart"></product-card>
+          <v-col v-for="product in filteredProducts" :key="product.productId" cols="12" md="4">
+            <product-card :product="product"></product-card>
           </v-col>
         </v-row>
-        <selected-items-list :selected-items="selectedItems" @remove-item="removeItem"></selected-items-list>
+        <selected-items-list></selected-items-list>
+        <drink-selection-dialog></drink-selection-dialog>
       </v-container>
     </v-app>
   </template>
-  
-  <script lang="ts" setup>
-  import { ref, computed } from 'vue';
-  import PromotionCardsCarousel from '@/components/pos/PromotionCardsCarousel.vue';
-  import SearchBar from '@/components/pos/SearchBar.vue';
-  import CategoryTabs from '@/components/pos/CategoryTabs.vue';
-  import ProductCard from '@/components/pos/ProductCard.vue';
-  import SelectedItemsList from '@/components/pos/SelectedItemsList.vue';
-  
-  interface Product {
-    id: number;
-    name: string;
-    image: string;
-    price: number;
-    category: string;
-  }
-  
-  interface SelectedItem {
-    id: number;
-    name: string;
-    quantity: number;
-    price: number;
-  }
-  
-  const products = ref<Product[]>([
-    // Your product data here
-  ]);
-  
-  const selectedItems = ref<SelectedItem[]>([]);
-  const searchQuery = ref('');
-  const selectedCategory = ref<string>('');
-  
-  const filteredProducts = computed(() => {
-    return products.value.filter((product) => {
-      const matchesCategory = selectedCategory.value ? product.category === selectedCategory.value : true;
-      const matchesSearch = searchQuery.value ? product.name.toLowerCase().includes(searchQuery.value.toLowerCase()) : true;
-      return matchesCategory && matchesSearch;
+
+<script lang="ts" setup>
+import { computed, onMounted } from 'vue';
+import PromotionCardsCarousel from '@/components/pos/PromotionCardsCarousel.vue';
+import SearchBar from '@/components/pos/SearchBar.vue';
+import CategoryTabs from '@/components/pos/CategoryTabs.vue';
+import ProductCard from '@/components/pos/ProductCard.vue';
+import SelectedItemsList from '@/components/pos/SelectedItemsList.vue';
+import DrinkSelectionDialog from '@/components/pos/DrinkSelectionDialog.vue';
+import { useProductStore } from '@/stores/product.store';
+import { useCategoryStore } from '@/stores/category.store';
+import { usePromotionStore } from '@/stores/promotion.store';
+
+const productStore = useProductStore();
+const categoryStore = useCategoryStore();
+const promotionStore = usePromotionStore();
+
+const filteredProducts = computed(() => {
+    return productStore.products.filter(product => {
+        const matchesCategory = productStore.selectedCategory ? product.category.categoryName === productStore.selectedCategory : true;
+        const matchesSearch = productStore.searchQuery ? product.productName.toLowerCase().includes(productStore.searchQuery.toLowerCase()) : true;
+        return matchesCategory && matchesSearch;
     });
-  });
-  
-  function handleApplyPromotion(promotion: any) {
-    // Handle promotion application logic
-  }
-  
-  function handleSearch(query: string) {
-    searchQuery.value = query;
-  }
-  
-  function handleCategoryChange(category: string) {
-    selectedCategory.value = category;
-  }
-  
-  function addToCart(product: Product) {
-    const existingItem = selectedItems.value.find((item) => item.id === product.id);
-    if (existingItem) {
-      existingItem.quantity += 1;
-    } else {
-      selectedItems.value.push({ ...product, quantity: 1 });
-    }
-  }
-  
-  function removeItem(index: number) {
-    selectedItems.value.splice(index, 1);
-  }
-  </script>
-  
+});
+
+onMounted(async () => {
+    await productStore.getAllProducts();
+    await categoryStore.getAllCategories(); 
+    await promotionStore.getAllPromotions();
+});
+</script>
+
+<style scoped>
+.v-container {
+    background-color: #faf4ee;
+    /* Match the background color */
+}
+</style>

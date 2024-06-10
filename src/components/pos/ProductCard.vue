@@ -1,30 +1,45 @@
 <template>
-    <v-card>
-      <v-img :src="product.image" height="200px"></v-img>
-      <v-card-title>{{ product.name }}</v-card-title>
-      <v-card-subtitle>{{ product.price }}</v-card-subtitle>
-      <v-card-actions>
-        <v-btn color="orange" @click="addToCart(product)">Add to Cart</v-btn>
-      </v-card-actions>
-    </v-card>
-  </template>
-  
-  <script lang="ts" setup>
-  import { defineProps, defineEmits } from 'vue';
-  
-  interface Product {
-    id: number;
-    name: string;
-    image: string;
-    price: number;
-    category: string;
+  <v-card class="product-card">
+    <v-img :src="product.productImage" height="200px"></v-img>
+    <v-card-title class="text-center">{{ product.productName }}</v-card-title>
+    <v-card-subtitle class="text-center">{{ product.productPrice }}</v-card-subtitle>
+    <v-card-actions class="justify-center">
+      <v-btn color="primary" @click="handleAddToCart">เพิ่มในตะกร้า</v-btn>
+    </v-card-actions>
+  </v-card>
+</template>
+
+<script lang="ts" setup>
+import { usePosStore } from '@/stores/pos.store';
+import { useProductStore } from '@/stores/product.store';
+import type { Product } from '@/types/product.type';
+
+
+
+const props = defineProps<{ product: Product }>();
+const productStore = useProductStore();
+const posStore = usePosStore();
+
+function handleAddToCart() {
+  if (props.product.category.haveTopping) {
+    posStore.selectProduct(props.product);
+  } else {
+    posStore.addToCart(props.product);
   }
-  
-  const props = defineProps<{ product: Product }>();
-  const emit = defineEmits(['add-to-cart']);
-  
-  function addToCart(product: Product) {
-    emit('add-to-cart', product);
-  }
-  </script>
-  
+}
+</script>
+
+<style scoped>
+.product-card {
+  background-color: #f5f5f5; /* Adjust the color to match your design */
+  border-radius: 10px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+</style>

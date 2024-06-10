@@ -1,19 +1,24 @@
 <template>
-    <v-tabs v-model="selectedCategory">
-      <v-tab v-for="category in categories" :key="category">
-        {{ category }}
+    <v-tabs v-model="selectedCategory" background-color="#f5f5f5">
+      <v-tab v-for="category in categoryStore.categories" :key="category.categoryId">
+        {{ category.categoryName }}
       </v-tab>
     </v-tabs>
   </template>
   
   <script lang="ts" setup>
-  import { ref, watch } from 'vue';
+  import { useCategoryStore } from '@/stores/category.store';
+import { useProductStore } from '@/stores/product.store';
+import { ref, watch } from 'vue';
   
-  const selectedCategory = ref<string | null>(null);
-  const categories = ref(['Coffee', 'Tea', 'Soda', 'Snacks']);
+  const productStore = useProductStore();
+  const categoryStore = useCategoryStore();
+  const selectedCategory = ref('');
   
   watch(selectedCategory, (newCategory) => {
-    emit('category-changed', newCategory);
+    productStore.selectedCategory = newCategory;
+    productStore.getProductPaginate();
   });
+  
   </script>
   

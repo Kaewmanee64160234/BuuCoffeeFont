@@ -1,4 +1,5 @@
 import type { Customer } from "./customer.type";
+import type { Product } from "./product.type";
 import type { ProductTypeTopping } from "./productTypeTopping.type";
 import type { ReceiptPromotion } from "./receiptPromotion.type";
 import type { User } from "./user.type";
@@ -20,7 +21,6 @@ export interface ReceiptItem {
     receiptItemId: number;
     quantity: number;
     receiptSubTotal: number;
-    reciept: Reciept;
-    user: User;
+    product: Product;
     productTypeToppings: ProductTypeTopping[];
   }

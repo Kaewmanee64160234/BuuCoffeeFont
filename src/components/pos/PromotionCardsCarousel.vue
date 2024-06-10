@@ -1,40 +1,91 @@
 <template>
-    <v-carousel>
-      <v-carousel-item v-for="(promotion, i) in promotions" :key="i">
-        <v-card>
-          <v-card-title>{{ promotion.title }}</v-card-title>
-          <v-card-actions>
-            <v-btn color="orange" @click="applyPromotion(promotion)">{{ promotion.buttonText }}</v-btn>
-          </v-card-actions>
-        </v-card>
+    <v-carousel hide-delimiter-background height="250px">
+      <v-carousel-item v-for="(chunk, index) in promotionChunks" :key="index">
+        <div class="promotion-container">
+          <v-card
+            v-for="promotion in chunk"
+            :key="promotion.promotionId"
+            class="promotion-card"
+          >
+            <v-card-title class="text-center">{{ promotion.promotionName }}</v-card-title>
+            <v-card-actions class="justify-center">
+              <v-btn color="primary" @click="applyPromotion(promotion)">
+                Apply
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </div>
       </v-carousel-item>
     </v-carousel>
   </template>
   
   <script lang="ts" setup>
-  import { ref } from 'vue';
+  import { usePosStore } from '@/stores/pos.store';
+import { useProductStore } from '@/stores/product.store';
+import { usePromotionStore } from '@/stores/promotion.store';
+import type { ReceiptPromotion } from '@/types/receiptPromotion.type';
+import { ref, computed, onMounted } from 'vue';
+
+  
+  const posStore = usePosStore();
+  const promotionStore = usePromotionStore();
+  onMounted(() => {
+    promotionStore.getAllPromotions();
+  });
   
   interface Promotion {
+    id: number;
     title: string;
     buttonText: string;
   }
   
-  const promotions = ref<Promotion[]>([
-    { title: 'Buy 1 Get 1 Free', buttonText: 'Apply Promotion' },
-    { title: 'Use Reward Points', buttonText: 'Apply Promotion' },
-    { title: 'Discount on Bring Your Own Cup', buttonText: 'Apply Promotion' },
-    { title: '50% Off', buttonText: 'Apply Promotion' },
-  ]);
+
+  
+  const promotionChunks = computed(() => {
+    const chunkSize = 4;
+    const chunks = [];
+    for (let i = 0; i < promotionStore.promotions.length; i += chunkSize) {
+      chunks.push(promotionStore.promotions.slice(i, i + chunkSize));
+    }
+    return chunks;
+  });
   
   function applyPromotion(promotion: Promotion) {
-    // Handle promotion application logic
-    console.log('Promotion applied:', promotion);
+    const receiptPromotion: ReceiptPromotion = {
+      receiptPromId: Date.now(),
+      receipt: {} as any,
+      promotion: {} as any,
+      discount: 10,
+      date: new Date(),
+    };
+    posStore.applyPromotion(receiptPromotion);
   }
   </script>
   
   <style scoped>
-  .v-carousel-item {
-    height: 200px;
+  .promotion-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .promotion-card {
+    width: 200px;
+    height: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #f5f5f5; /* Adjust the color to match your design */
+    border-radius: 10px;
+  }
+  
+  .text-center {
+    text-align: center;
+  }
+  
+  .justify-center {
+    justify-content: center;
   }
   </style>
   
