@@ -24,9 +24,9 @@ const router = createRouter({
       component: () => import('../views/product/ProductManagementView.vue')
     },
     {
-      path: '/categoryManagement',
-      name: 'categoryManagement',
-      component: () => import('../views/category/CategoryManagement.vue')
+      path: '/historyReceipt',
+      name: 'historyReceipt',
+      component: () => import('../views/receipt/HistoryReceipt.vue')
     },
     {
       path: '/ingredientList',

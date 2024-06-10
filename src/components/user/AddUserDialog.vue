@@ -72,6 +72,7 @@ function closeDialog() {
                         :items="[
                           'พนักงานขายกาแฟ',
                           'พนักงานขายข้าว',
+                          'ผู้จัดการร้าน'
                         ]"
                         required
                       ></v-select>
