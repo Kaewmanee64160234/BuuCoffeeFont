@@ -4,6 +4,10 @@ import type { Product } from "@/types/product.type";
 import type { ProductTypeTopping } from "@/types/productTypeTopping.type";
 import type { ReceiptPromotion } from "@/types/receiptPromotion.type";
 import type { ReceiptItem } from "@/types/recipt.type";
+import type { Receipt } from "@/types/receipt.type";
+import type { ProductType } from "@/types/productType.type";
+import type { Topping } from "@/types/topping.type";
+import { useProductStore } from "./product.store";
 
 export const usePosStore = defineStore("pos", () => {
   const selectedItems = ref<ReceiptItem[]>([]);
@@ -13,100 +17,65 @@ export const usePosStore = defineStore("pos", () => {
   const totalDiscount = ref<number>(0);
   const totalPrice = ref<number>(0);
   const netPrice = ref<number>(0);
+  const receipt = ref<Receipt>({
+    totalPrice: 0,
+    receiptType: "",
+    totalDiscount: 0,
+    netPrice: 0,
+    receiptStatus: "",
+    createdReceipt: new Date(),
+    receiptItems: [],
+  });
 
-  const addToCart = (product: Product, productTypeTopping: ProductTypeTopping | null) => {
-    const quantity = productTypeTopping ? productTypeTopping.quantity : 1;
+  const toppingDialog = ref(false);
+  const selectedProduct = ref<Product | null>(null);
+  const productStore = useProductStore();
 
-    const index = selectedItems.value.findIndex((item) => {
-      if (item.product.productId === product.productId) {
-        if (productTypeTopping) {
-          return item.productTypeToppings.some(t =>
-            t.topping?.toppingId === productTypeTopping.topping?.toppingId &&
-            t.productType?.productTypeId === productTypeTopping.productType?.productTypeId
-          );
-        }
-        return true;
-      }
-      return false;
-    });
-
-    if (index === -1) {
-      selectedItems.value.push({
-        product: product,
-        productTypeToppings: productTypeTopping ? [productTypeTopping] : [],
-        quantity: quantity,
-        receiptSubTotal: calculateSubTotal(product, productTypeTopping ? [productTypeTopping] : [], quantity),
-      });
+  const addToReceipt = (
+    productType: ProductType,
+    toppings: Topping[],
+    quantity: number,
+    price: number
+  ) => {
+    
+    const existingItem = receipt.value.receiptItems.find(
+      (item) =>
+        item.productTypeToppings[0].productType.productTypeId ===
+          productType.productTypeId &&
+        item.topping === toppings.map((t) => t.toppingName).join(", ") &&
+        item.quantity === quantity &&
+        item.price === price
+    );
+    if (existingItem) {
+      existingItem.quantity += quantity;
+      existingItem.price += price;
+      
     } else {
-      const item = selectedItems.value[index];
-      console.log('productTypeToppings', item.productTypeToppings);
-
-      if (productTypeTopping) {
-        const toppingIndex = item.productTypeToppings.findIndex(t =>
-          t.topping && t.topping.toppingId === productTypeTopping.topping.toppingId &&
-          t.productType && t.productType.productTypeId === productTypeTopping.productType.productTypeId
-        );
-
-        if (toppingIndex === -1) {
-          item.productTypeToppings.push(productTypeTopping);
-        } else {
-          item.productTypeToppings[toppingIndex].quantity += productTypeTopping.quantity;
-        }
-      }
-
-      item.quantity += quantity;
-      item.receiptSubTotal = calculateSubTotal(item.product, item.productTypeToppings, item.quantity);
+      receipt.value.receiptItems.push({
+        productTypeToppings: [
+          { productType, topping: toppings[0], quantity, sweetness: 0 },
+        ],
+        topping: toppings.map((t) => t.toppingName).join(", "),
+        type: productType.productTypeName,
+        quantity,
+        price,
+        product:productStore.selectedProduct
+      });
     }
-
     calculateTotalPrice();
-  };
-
-  const calculateSubTotal = (product: Product, productTypeToppings: ProductTypeTopping[], quantity: number) => {
-    let subTotalTopping = 0;
-    if (Array.isArray(productTypeToppings)) {
-      for (let j = 0; j < productTypeToppings.length; j++) {
-        if (productTypeToppings[j] && productTypeToppings[j].topping) {
-          subTotalTopping += parseFloat(productTypeToppings[j].topping.toppingPrice + '') * productTypeToppings[j].quantity;
-        }
-      }
-    }
-
-    const productTypePrice = productTypeToppings.length > 0 ? parseFloat(productTypeToppings[0].productType.productTypePrice + '') : 0;
-    const productPrice = parseFloat(product.productPrice + '');
-    const productSubTotal = (productPrice + productTypePrice + subTotalTopping) * quantity;
-
-    console.log(`Product Price: ${productPrice}, Product Type Price: ${productTypePrice}, Topping SubTotal: ${subTotalTopping}, Quantity: ${quantity}, SubTotal: ${productSubTotal}`);
-
-    return productSubTotal;
+    console.log( JSON.stringify(receipt.value.receiptItems));
   };
 
   const calculateTotalPrice = () => {
-    totalPrice.value = 0;
-    netPrice.value = 0;
-    
-    let total = 0;
-    let totalDiscountValue = 0;
+    receipt.value.totalPrice = receipt.value.receiptItems.reduce(
+      (acc, item) => acc + item.price,
+      0
+    );
+  };
 
-    for (let i = 0; i < selectedItems.value.length; i++) {
-      const item = selectedItems.value[i];
-      total += item.receiptSubTotal;
-    }
-
-    // Assuming totalDiscount is a fixed value or percentage
-    if (typeof totalDiscount.value === "number") {
-      totalDiscountValue = totalDiscount.value;
-    } else {
-      // If the discount is a percentage (e.g., '10%' -> 0.10)
-      const discountPercentage = parseFloat(totalDiscount.value) / 100;
-      totalDiscountValue = total * discountPercentage;
-    }
-
-    netPrice.value = total - totalDiscountValue;
-    totalPrice.value = total;
-
-    console.log("Total Price:", totalPrice.value);
-    console.log("Total Discount:", totalDiscountValue);
-    console.log("Net Price:", netPrice.value);
+  const selectProduct = (product: Product) => {
+    selectedProduct.value = product;
+    toppingDialog.value = true;
   };
 
   const removeItem = (index: number) => {
@@ -124,10 +93,17 @@ export const usePosStore = defineStore("pos", () => {
     receiptPromotions,
     customerPhone,
     customerPoints,
-    addToCart,
+    addToReceipt,
     removeItem,
     totalPrice,
     netPrice,
     applyPromotion,
+    selectProduct,
+    toppingDialog,
+    totalDiscount,
+    selectedProduct,
+    receipt,
+    calculateTotalPrice
+
   };
 });

@@ -3,10 +3,8 @@ import type { Topping } from "./topping.type";
 
 export interface ProductTypeTopping {
     productTypeToppingId?: number;
-    productType:ProductType;
+    productType: ProductType;
     topping: Topping;
     quantity: number;
     sweetness: number;
-    
-    
-}
+  }

@@ -1,6 +1,8 @@
 // receipt.type.ts
 import type { Customer } from './customer.type';
+import type { Product } from './product.type';
 import type { ProductTypeTopping } from './productTypeTopping.type';
+import type { Promotion } from './promotion.type';
 import type { User } from './user.type';
 
 export interface ReceiptItem {
@@ -9,6 +11,7 @@ export interface ReceiptItem {
   type: string;
   quantity: number;
   price: number;
+  product?:Product;
 }
 
 export interface Receipt {
@@ -19,8 +22,8 @@ export interface Receipt {
   netPrice: number;
   receiptStatus: string;
   createdReceipt: Date;
-  customerId: Customer;
-  userId: User;
-  items: ReceiptItem[];
-  promotion: string;
+  customer?: Customer;
+  user?: User;
+  receiptItems: ReceiptItem[];
+  promotion?: Promotion;
 }

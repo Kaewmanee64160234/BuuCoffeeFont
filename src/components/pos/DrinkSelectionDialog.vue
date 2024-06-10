@@ -1,146 +1,31 @@
-<script lang="ts" setup>
-import { ref, computed, watch } from 'vue';
-import { usePosStore } from '@/stores/pos.store';
-import type { Topping } from '@/types/topping.type';
-import type { ProductType } from '@/types/productType.type';
-import { useProductStore } from '@/stores/product.store';
-import { useToppingStore } from '@/stores/topping.store';
-import type { ProductTypeTopping } from '@/types/productTypeTopping.type';
-
-const posStore = usePosStore();
-const productStore = useProductStore();
-const toppingStore = useToppingStore();
-
-const showDialog = ref(false);
-
-const quantity = ref(1);
-const selectedType = ref<ProductType | null>(null);
-const selectedSweetness = ref<number | null>(null);
-const selectedToppings = ref<Topping[]>([]);
-const currentToppingIndex = ref(0);
-
-const sweetnessLevels = ref([0, 25, 50, 100, 125]);
-
-const displayedToppings = computed(() => {
-  return toppingStore.toppings.slice(currentToppingIndex.value, currentToppingIndex.value + 3);
-});
-
-function closeDialog() {
-  showDialog.value = false;
-  productStore.setSelectedProduct(null);
-  productStore.toppingDailog = false;
-  // clear data
-  selectedType.value = null;
-  selectedSweetness.value = null;
-  selectedToppings.value = [];
-  currentToppingIndex.value = 0;
-  quantity.value = 1;
-}
-
-function selectType(type: ProductType) {
-  selectedType.value = type;
-}
-
-function selectSweetness(level: number) {
-  selectedSweetness.value = level;
-}
-
-
-
-function increaseToppingQuantity(topping: Topping) {
-  const selectedTopping = selectedToppings.value.find(t => t.toppingId === topping.toppingId);
-  if (selectedTopping) {
-    selectedTopping.quantity += 1;
-  }
-}
-
-function decreaseToppingQuantity(topping: Topping) {
-  const selectedTopping = selectedToppings.value.find(t => t.toppingId === topping.toppingId);
-  if (selectedTopping && selectedTopping.quantity > 1) {
-    selectedTopping.quantity -= 1;
-  }
-}
-
-function prevTopping() {
-  if (currentToppingIndex.value > 0) {
-    currentToppingIndex.value -= 1;
-  }
-}
-
-function nextTopping() {
-  if (currentToppingIndex.value < toppingStore.toppings.length - 3) {
-    currentToppingIndex.value += 1;
-  }
-}
-
-function increaseQuantity() {
-  quantity.value += 1;
-}
-
-function decreaseQuantity() {
-  if (quantity.value > 1) {
-    quantity.value -= 1;
-  }
-}
-
-function confirmSelection() {
-  const productTypeTopping: ProductTypeTopping | null = selectedType.value ? {
-    productType: selectedType.value,
-    topping: selectedToppings.value.length > 0 ? selectedToppings.value[0] : null,
-    quantity: quantity.value,
-    sweetness: selectedSweetness.value,
-    
-
-  } : null;
-  posStore.addToCart(productStore.selectedProduct, productTypeTopping);
-  closeDialog();
-}
-function toggleTopping(topping: Topping) {
-  const existingToppingIndex = selectedToppings.value.findIndex(t => t.toppingId === topping.toppingId);
-  if (existingToppingIndex !== -1) {
-    selectedToppings.value.splice(existingToppingIndex, 1);
-  } else {
-    selectedToppings.value.push({ ...topping, quantity: 1 });
-  }
-}
-
-watch(() => productStore.selectedProduct, (newVal) => {
-  if (newVal && newVal.category.haveTopping) {
-    showDialog.value = true;
-  } else {
-    showDialog.value = false;
-  }
-});
-</script>
-
 <template>
-  <v-dialog v-model="productStore.toppingDailog" max-width="600">
+  <v-dialog v-model="posStore.toppingDialog" max-width="600">
     <v-card>
       <v-card-title class="d-flex justify-space-between align-center">
         <div>
-          <span>{{ productStore.selectedProduct?.productName }}</span>
+          <span>{{ posStore.selectedProduct?.productName }}</span>
         </div>
         <v-btn icon @click="closeDialog">
           <v-icon color="red">mdi-close</v-icon>
         </v-btn>
       </v-card-title>
       <v-card-subtitle class="d-flex justify-space-between align-center">
-        <div>{{ productStore.selectedProduct?.productName }}</div>
-        <div>{{ productStore.selectedProduct?.productPrice }} $</div>
+        <div>{{ posStore.selectedProduct?.productName }}</div>
+        <div>{{ posStore.selectedProduct?.productPrice }} $</div>
       </v-card-subtitle>
       <v-card-text>
-        <v-img :src="productStore.selectedProduct?.productImage" class="mb-4"></v-img>
+        <v-img :src="posStore.selectedProduct?.productImage" class="mb-4"></v-img>
         <div class="d-flex flex-column">
           <span>ตัวเลือก</span>
           <div class="d-flex justify-space-between">
             <v-chip
-              v-for="type in productStore.selectedProduct?.productTypes"
-              :key="type.productTypeId"
+              v-for="type in posStore.selectedProduct?.productTypes"
+              :key="type?.productTypeId"
               variant="outlined"
               :color="selectedType === type ? '#f5a623' : 'gray'"
               @click="selectType(type)"
             >
-              {{ type.productTypeName }} {{ type.productTypePrice }}
+              {{ type?.productTypeName }} {{ type?.productTypePrice }}
             </v-chip>
           </div>
         </div>
@@ -165,19 +50,19 @@ watch(() => productStore.selectedProduct, (newVal) => {
               <v-icon>mdi-chevron-left</v-icon>
             </v-btn>
             <div class="d-flex justify-space-between flex-grow-1">
-              <div v-for="topping in displayedToppings" :key="topping.toppingId" class="topping-item d-flex flex-column align-center">
+              <div v-for="topping in displayedToppings" :key="topping?.toppingId" class="topping-item d-flex flex-column align-center">
                 <v-chip
                   variant="outlined"
-                  :color="selectedToppings.some(t => t.toppingId === topping.toppingId) ? '#f5a623' : 'gray'"
+                  :color="selectedToppings.some(t => t.topping.toppingId === topping?.toppingId) ? '#f5a623' : 'gray'"
                   @click="toggleTopping(topping)"
                 >
-                  {{ topping.toppingName }} {{ topping.toppingPrice }}
+                  {{ topping?.toppingName }} {{ topping?.toppingPrice }}
                 </v-chip>
-                <div v-if="selectedToppings.some(t => t.toppingId === topping.toppingId)" class="quantity-controls d-flex align-center mt-2">
+                <div v-if="selectedToppings.some(t => t.topping.toppingId === topping?.toppingId)" class="quantity-controls d-flex align-center mt-2">
                   <v-btn icon @click="decreaseToppingQuantity(topping)">
                     <v-icon>mdi-minus</v-icon>
                   </v-btn>
-                  <span>{{ selectedToppings.find(t => t.toppingId === topping.toppingId)?.quantity }}</span>
+                  <span>{{ selectedToppings.find(t => t.topping.toppingId === topping?.toppingId)?.quantity }}</span>
                   <v-btn icon @click="increaseToppingQuantity(topping)">
                     <v-icon>mdi-plus</v-icon>
                   </v-btn>
@@ -201,6 +86,109 @@ watch(() => productStore.selectedProduct, (newVal) => {
     </v-card>
   </v-dialog>
 </template>
+
+<script setup lang="ts">
+import { usePosStore } from '@/stores/pos.store';
+import { useToppingStore } from '@/stores/topping.store';
+import type { ProductType } from '@/types/productType.type';
+import type { Topping } from '@/types/topping.type';
+import {  ref, computed } from 'vue';
+
+
+    const posStore = usePosStore();
+    const toppingStore = useToppingStore();
+    const selectedType = ref<ProductType | null>(null);
+    const selectedSweetness = ref<number>(100);
+    const selectedToppings = ref<Array<{ topping: Topping; quantity: number }>>([]);
+    const quantity = ref<number>(1);
+    const toppingIndex = ref<number>(0);
+
+    const sweetnessLevels = [0, 25, 50, 75, 100];
+    const displayedToppings = computed(() => {
+      return toppingStore.toppings.slice(toppingIndex.value, toppingIndex.value + 5);
+    });
+
+    function selectType(type: ProductType) {
+      selectedType.value = type;
+    }
+
+    function selectSweetness(level: number) {
+      selectedSweetness.value = level;
+    }
+
+    function toggleTopping(topping: Topping) {
+      const index = selectedToppings.value.findIndex((t) => t.topping.toppingId === topping.toppingId);
+      if (index === -1) {
+        selectedToppings.value.push({ topping, quantity: 1 });
+      } else {
+        selectedToppings.value.splice(index, 1);
+      }
+    }
+
+    function increaseToppingQuantity(topping: Topping) {
+      const toppingItem = selectedToppings.value.find((t) => t.topping.toppingId === topping.toppingId);
+      if (toppingItem) {
+        toppingItem.quantity++;
+      }
+    }
+
+    function decreaseToppingQuantity(topping: Topping) {
+      const toppingItem = selectedToppings.value.find((t) => t.topping.toppingId === topping.toppingId);
+      if (toppingItem && toppingItem.quantity > 1) {
+        toppingItem.quantity--;
+      }
+    }
+
+    function prevTopping() {
+      if (toppingIndex.value > 0) {
+        toppingIndex.value--;
+      }
+    }
+
+    function nextTopping() {
+      if (toppingIndex.value < toppingStore.toppings.length - 5) {
+        toppingIndex.value++;
+      }
+    }
+
+    function decreaseQuantity() {
+      if (quantity.value > 1) {
+        quantity.value--;
+      }
+    }
+
+    function increaseQuantity() {
+      quantity.value++;
+    }
+
+    function closeDialog() {
+      clearData();
+      posStore.toppingDialog = false;
+    }
+
+    function confirmSelection() {
+      if (selectedType.value) {
+        posStore.addToReceipt(
+          selectedType.value,
+          selectedToppings.value.map((t) => t.topping),
+          quantity.value,
+          selectedType.value.productTypePrice
+        );
+      }
+      closeDialog();
+    }
+
+    // clear data
+    function clearData() {
+      selectedType.value = null;
+      selectedSweetness.value = null;
+      selectedToppings.value = [];
+      quantity.value = 1;
+      toppingIndex.value = 0;
+
+    }
+
+</script>
 
 <style scoped>
 .promotion-container {
