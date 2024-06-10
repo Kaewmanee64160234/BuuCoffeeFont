@@ -1,22 +1,13 @@
-import { ref, watch} from "vue";
-import { defineStore } from "pinia";
-import type { User } from "@/types/user.type";
-import userService from "@/service/user.service";
+import { ref } from 'vue';
+import { defineStore } from 'pinia';
+import type { User } from '@/types/user.type';
+import userService from '@/service/user.service';
 
-export const useUserStore = defineStore("user", () => {
+export const useUserStore = defineStore('user', () => {
   const users = ref<User[]>([]);
   const user = ref<User | null>(null);
-  const searchQuery = ref<string>("");
+  const searchQuery = ref<string>('');
   const updateUserDialog = ref(false);
-
-  watch(searchQuery, (value) => {
-    console.log(value);
-    if (value === "") {
-      getAllUsers();
-    } else {
-      searchUser();
-    }
-  });
 
   const getAllUsers = async () => {
     try {
@@ -45,10 +36,10 @@ export const useUserStore = defineStore("user", () => {
       const response = await userService.createUser(newUser);
       if (response.status === 201) {
         users.value.push(response.data);
-        await getAllUsers();
+        await getAllUsers(); // Ensure that all users are fetched again
       }
     } catch (error) {
-      console.error("Error creating user:", error);
+      console.error('Error creating user:', error);
     }
   };
 
@@ -56,15 +47,20 @@ export const useUserStore = defineStore("user", () => {
     try {
       const response = await userService.updateUser(id, updatedUser);
       if (response.status === 200) {
+        const updatedUser = response.data;
         const index = users.value.findIndex(user => user.userId === id);
         if (index !== -1) {
-          users.value[index] = response.data;
+          users.value[index] = updatedUser;
         }
+        return updatedUser;
       }
     } catch (error) {
-      console.error(error);
+      console.error('Failed to update user:', error);
+      throw error;
     }
   };
+  
+  
 
   const deleteUser = async (id: number) => {
     try {
@@ -77,20 +73,10 @@ export const useUserStore = defineStore("user", () => {
     }
   };
 
-
-  const setUserForEdit = (selectedUser: User) => {
-    user.value = selectedUser;
+  const setUserForEdit = (userToEdit: User) => {
+    user.value = userToEdit;
   };
 
-  const searchUser = async () => {
-    try {
-      const response = await userService.searchUsers(searchQuery.value);
-      users.value = response.data;
-      console.log(response.data);
-    } catch (error) {
-      console.error('Error searching users:', error);
-    }
-  };
   return {
     users,
     user,
@@ -102,6 +88,5 @@ export const useUserStore = defineStore("user", () => {
     searchQuery,
     updateUserDialog,
     setUserForEdit,
-    searchUser
   };
 });
