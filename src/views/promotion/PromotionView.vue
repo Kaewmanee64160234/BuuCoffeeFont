@@ -14,6 +14,7 @@
               hide-details 
               dense 
               variant="solo"
+              @input="getPromotionsPaginate"
             ></v-text-field>
           </v-col>
           <v-spacer></v-spacer>
@@ -57,6 +58,12 @@
             </tr>
           </tbody>
         </v-table>
+      
+        <v-pagination
+          v-model="promotionStore.currentPage"
+          :length="Math.ceil(promotionStore.totalItems / promotionStore.itemsPerPage)"
+          @input="promotionStore.getPromotionsPaginate"
+        ></v-pagination>
       </v-card-text>
     </v-card>
   </v-container>
@@ -69,7 +76,7 @@
   import Swal from 'sweetalert2';
   import CreatePromotionDialog from '@/components/promotions/CreatePromotionDialog.vue';
   import UpdatePromotionDialog from '@/components/promotions/UpdatePromotionDialog.vue';
-import type { Promotion } from '@/types/promotion.type';
+  import type { Promotion } from '@/types/promotion.type';
   
   const promotionStore = usePromotionStore();
   
@@ -82,7 +89,7 @@ import type { Promotion } from '@/types/promotion.type';
   ]);
   
   onMounted(async () => {
-    await promotionStore.getAllPromotions();
+    await promotionStore.getPromotionsPaginate();
   });
   
   const openCreateDialog = () => {

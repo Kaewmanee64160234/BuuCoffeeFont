@@ -30,6 +30,13 @@ function getAllPromotions() {
       },
     });
   }
+
+  // getPromotionsPaginate
+  function getPromotionsPaginate(params: { search: string; page: number; limit: number }) {
+    return http.get(`/promotions/paginate`, {
+      params,
+    });
+  }
   
   export default {
     getAllPromotions,
@@ -38,4 +45,5 @@ function getAllPromotions() {
     updatePromotion,
     deletePromotion,
     searchPromotions,
+    getPromotionsPaginate
   };
