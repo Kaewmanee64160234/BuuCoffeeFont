@@ -11,6 +11,7 @@
             <div v-if="item.productTypeToppings.length > 0">
               ท็อปปิ้ง:
               <ul>
+                {{  item.productTypeToppings}}
                 <li v-for="topping in item.productTypeToppings.map(
                   productTypeTopping => productTypeTopping.topping
                 

@@ -1,9 +1,10 @@
 // receipt.type.ts
 import type { Customer } from './customer.type';
+import type { ProductTypeTopping } from './productTypeTopping.type';
 import type { User } from './user.type';
 
 export interface ReceiptItem {
-  productName: string;
+  productTypeToppings:ProductTypeTopping[];
   topping: string;
   type: string;
   quantity: number;
