@@ -3,23 +3,23 @@
     <v-card>
       <v-card-title class="d-flex justify-space-between align-center">
         <div>
-          <span>{{ posStore.selectedProduct?.productName }}</span>
+          <span>{{ productStore.selectedProduct?.productName }}</span>
         </div>
         <v-btn icon @click="closeDialog">
           <v-icon color="red">mdi-close</v-icon>
         </v-btn>
       </v-card-title>
       <v-card-subtitle class="d-flex justify-space-between align-center">
-        <div>{{ posStore.selectedProduct?.productName }}</div>
-        <div>{{ posStore.selectedProduct?.productPrice }} $</div>
+        <div>{{ productStore.selectedProduct?.productName }}</div>
+        <div>{{ productStore.selectedProduct?.productPrice }} $</div>
       </v-card-subtitle>
       <v-card-text>
-        <v-img :src="posStore.selectedProduct?.productImage" class="mb-4"></v-img>
+        <v-img :src="productStore.selectedProduct?.productImage" class="mb-4"></v-img>
         <div class="d-flex flex-column">
           <span>ตัวเลือก</span>
           <div class="d-flex justify-space-between">
             <v-chip
-              v-for="type in posStore.selectedProduct?.productTypes"
+              v-for="type in productStore.selectedProduct?.productTypes"
               :key="type?.productTypeId"
               variant="outlined"
               :color="selectedType === type ? '#f5a623' : 'gray'"
@@ -89,19 +89,23 @@
 
 <script setup lang="ts">
 import { usePosStore } from '@/stores/pos.store';
+import { useProductStore } from '@/stores/product.store';
 import { useToppingStore } from '@/stores/topping.store';
 import type { ProductType } from '@/types/productType.type';
 import type { Topping } from '@/types/topping.type';
+import type { ProductTypeTopping } from '@/types/productTypeTopping.type';
 import {  ref, computed } from 'vue';
 
 
     const posStore = usePosStore();
+    const productStore = useProductStore();
     const toppingStore = useToppingStore();
     const selectedType = ref<ProductType | null>(null);
     const selectedSweetness = ref<number>(100);
     const selectedToppings = ref<Array<{ topping: Topping; quantity: number }>>([]);
     const quantity = ref<number>(1);
     const toppingIndex = ref<number>(0);
+    const productTypeToppings = ref<ProductTypeTopping[]>([]);
 
     const sweetnessLevels = [0, 25, 50, 75, 100];
     const displayedToppings = computed(() => {
@@ -168,11 +172,25 @@ import {  ref, computed } from 'vue';
 
     function confirmSelection() {
       if (selectedType.value) {
-        posStore.addToReceipt(
+        // selectedToppings.value map to productTypeTopping
+
+        for(var i = 0; i < selectedToppings.value.length; i++) {
+          productTypeToppings.value.push({
+            productTypeToppingId: 0,
+            productType: selectedType.value,
+            topping: selectedToppings.value[i].topping,
+            quantity: selectedToppings.value[i].quantity,
+          });
+        }
+          
+          
+
+        posStore.addToReceipt( 
+          productStore.selectedProduct!,
           selectedType.value,
-          selectedToppings.value.map((t) => t.topping),
+          productTypeToppings.value,
           quantity.value,
-          selectedType.value.productTypePrice
+          selectedSweetness.value
         );
       }
       closeDialog();
@@ -185,6 +203,8 @@ import {  ref, computed } from 'vue';
       selectedToppings.value = [];
       quantity.value = 1;
       toppingIndex.value = 0;
+      productStore.selectedProduct= null;
+      productTypeToppings.value = [];
 
     }
 

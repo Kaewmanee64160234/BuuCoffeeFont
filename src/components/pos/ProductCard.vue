@@ -21,17 +21,18 @@ const props = defineProps<{ product: Product }>();
 const productStore = useProductStore();
 const posStore = usePosStore();
 onMounted(() => {
-  posStore.selectProduct(props.product);
+  productStore.setSelectedProduct(props.product);
 });
 
 function handleAddToCart() {
   productStore.setSelectedProduct(props.product);
-
   if (props.product.category.haveTopping) {
     openToppingDialog();
   } else {
-    posStore.addToReceipt(props.product.productTypes[0], [], 1, props.product.productPrice);
+    posStore.addToReceipt(props.product, null, [], 1,0);
   }
+  console.log(props.product);
+
 }
 
 // open toppingDialog

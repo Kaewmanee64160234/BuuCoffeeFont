@@ -6,5 +6,4 @@ export interface ProductTypeTopping {
     productType: ProductType;
     topping: Topping;
     quantity: number;
-    sweetness: number;
   }

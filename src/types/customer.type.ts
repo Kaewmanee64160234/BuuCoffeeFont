@@ -1,5 +1,4 @@
 
-import type { Reciept } from "./recipt.type";
 
 export interface Customer {
     customerId: number;
