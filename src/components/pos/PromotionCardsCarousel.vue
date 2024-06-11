@@ -1,5 +1,5 @@
 <template>
-    <v-carousel hide-delimiter-background height="250px">
+    <v-carousel hide-delimiter-background height="160">
       <v-carousel-item v-for="(chunk, index) in promotionChunks" :key="index">
         <div class="promotion-container">
           <v-card

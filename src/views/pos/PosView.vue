@@ -4,9 +4,24 @@
       <v-col>
         <v-sheet class="pa-2 ma-2">
           <v-container>
-            <promotion-cards-carousel></promotion-cards-carousel>
-            <search-bar></search-bar>
-            <category-tabs></category-tabs>
+            <v-row>
+              <v-col cols="12" md="12">
+                <promotion-cards-carousel></promotion-cards-carousel>
+
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="12" md="6">
+                <search-bar></search-bar>
+
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="12" md="6">
+                <category-tabs></category-tabs>
+
+              </v-col>
+            </v-row>
             <v-row>
               <v-col v-for="product in filteredProducts" :key="product.productId" cols="12" md="4">
                 <product-card :product="product"></product-card>
