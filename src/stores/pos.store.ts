@@ -128,9 +128,10 @@ export const usePosStore = defineStore("pos", () => {
       }
     }
     console.log("last", selectedItems.value[selectedItems.value.length - 1]);
-    productStore.totalProducts = calculateTotal(selectedItems.value);
+    receipt.value.receiptTotalPrice = calculateTotal(selectedItems.value);
   };
   const calculateTotal = (selectedItems: ReceiptItem[]) => {
+    receipt.value.receiptTotalPrice = 0;
     return selectedItems.reduce((acc, item) => {
       return acc + parseFloat(item.receiptSubTotal.toString());
     }, 0);
@@ -138,8 +139,8 @@ export const usePosStore = defineStore("pos", () => {
 
   const removeItem = (index: number) => {
     selectedItems.value.splice(index, 1);
-    productStore.totalProducts = 0;
-    productStore.totalProducts = calculateTotal(selectedItems.value);
+        receipt.value.receiptTotalPrice = calculateTotal(selectedItems.value);
+
   };
 
 
@@ -151,14 +152,13 @@ export const usePosStore = defineStore("pos", () => {
     if (selectedItems.value[index].quantity === 0) {
       selectedItems.value.splice(index, 1);
     }
-    productStore.totalProducts = 0;
-    productStore.totalProducts = calculateTotal(selectedItems.value);
+    receipt.value.receiptTotalPrice = calculateTotal(selectedItems.value);
+
   };
 
   // create function create recipt
   const createReceipt = async () => {
     receipt.value.receiptItems = selectedItems.value;
-    receipt.value.receiptTotalPrice = productStore.totalProducts;
     receipt.value.receiptTotalDiscount = totalDiscount.value;
     receipt.value.receiptNetPrice = netPrice.value;
     receipt.value.receiptType = "coffee";

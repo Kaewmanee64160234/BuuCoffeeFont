@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-row no-gutters>
-      <v-col>
+      <v-col  cols="8">
         <v-sheet class="pa-2 ma-2">
           <v-container>
             <v-row>

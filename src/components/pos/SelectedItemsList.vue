@@ -37,7 +37,9 @@
       </v-list-item>
     </v-list>
     <v-divider></v-divider>
-    <v-card-subtitle>รวมทั้งหมด: {{ productStore.totalProducts.toFixed(2) }}</v-card-subtitle>
+    <v-card-subtitle>รวมทั้งหมด: {{ posStore.receipt.receiptTotalPrice }}</v-card-subtitle>
+    <v-card-subtitle>ราคาลด: {{ posStore.receipt.receiptTotalDiscount }}</v-card-subtitle>
+    <v-card-subtitle>รวมสุทธิ: {{posStore.receipt.receiptNetPrice }}</v-card-subtitle>
     <v-divider></v-divider>
     <v-card-actions>
       <v-btn @click="selectPaymentMethod('cash')" color="success">ชำระเงินสด</v-btn>
