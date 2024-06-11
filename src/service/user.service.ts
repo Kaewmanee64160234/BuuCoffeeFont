@@ -11,7 +11,7 @@ function createUser(user: User) {
   return http.post("/users", user);
 }
 function updateUser(id: number, user: User) {
-  return http.put(`/users/${id}`, user);
+  return http.patch(`/users/${id}`, user);
 }
 function deleteUser(id: number) {
   return http.delete(`/users/${id}`);

@@ -21,11 +21,14 @@
               <v-col cols="12" md="6">
                 <v-text-field v-model="userStatus" label="สถานะผู้ใช้งาน" required></v-text-field>
               </v-col>
-              <v-col cols="12">
+              <v-col>
                 <v-select
                   v-model="userRole"
                   label="ตำแหน่งงาน"
-                  :items="['พนักงานขายกาแฟ', 'พนักงานขายข้าว', 'ผู้จัดการร้าน']"
+                  :items="[
+                    'พนักงานขายกาแฟ',
+                    'พนักงานขายข้าว',
+                  ]"
                   required
                 ></v-select>
               </v-col>
@@ -43,20 +46,14 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, defineEmits, ref, watch } from 'vue';
+import { defineProps, ref, watch } from 'vue';
 import { useUserStore } from '@/stores/user.store';
 import type { VForm } from 'vuetify/components';
 import type { User } from '@/types/user.type';
 
 const props = defineProps<{ dialog: boolean, user: User | null }>();
-const emit = defineEmits<{ (e: 'update:dialog', value: boolean): void }>();
 const form = ref<VForm | null>(null);
 const dialog = ref(props.dialog);
-
-watch(() => props.dialog, (newVal) => {
-  dialog.value = newVal;
-});
-
 const userStore = useUserStore();
 
 const userName = ref(props.user?.userName || '');
@@ -64,6 +61,10 @@ const userPassword = ref(props.user?.userPassword || '');
 const userEmail = ref(props.user?.userEmail || '');
 const userRole = ref(props.user?.userRole || '');
 const userStatus = ref(props.user?.userStatus || '');
+
+watch(() => props.dialog, (newVal) => {
+  dialog.value = newVal;
+});
 
 watch(() => props.user, (newVal) => {
   userName.value = newVal?.userName || '';
@@ -76,7 +77,7 @@ watch(() => props.user, (newVal) => {
 async function saveUser() {
   const { valid } = await form.value!.validate();
   if (valid) {
-    const updatedUser: User = {
+    const updatedUser = {
       userId: props.user?.userId || 0,
       userName: userName.value,
       userPassword: userPassword.value,
@@ -85,17 +86,26 @@ async function saveUser() {
       userStatus: userStatus.value,
     };
 
-    await userStore.updateUser(updatedUser.userId, updatedUser);
-    emit('update:dialog', false);
-    await userStore.getAllUsers();
+    try {
+      const response = await userStore.updateUser(updatedUser.userId, updatedUser);
+      if (response) {
+        dialog.value = false;
+        userStore.updateUserDialog = false;
+        await userStore.getAllUsers();
+      }
+    } catch (error) {
+      console.error('Failed to update user:', error);
+    }
   }
+  dialog.value = false;
 }
 
 function closeDialog() {
-  emit('update:dialog', false);
+  dialog.value = false;
+  userStore.updateUserDialog = false;
 }
-
 </script>
+
 
 <style scoped>
 </style>
