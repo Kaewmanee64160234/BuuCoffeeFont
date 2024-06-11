@@ -3,29 +3,33 @@ import type { Customer } from './customer.type';
 import type { Product } from './product.type';
 import type { ProductTypeTopping } from './productTypeTopping.type';
 import type { Promotion } from './promotion.type';
+import type { ReceiptPromotion } from './receiptPromotion.type';
 import type { Topping } from './topping.type';
 import type { User } from './user.type';
 
 export interface ReceiptItem {
   productTypeToppings:ProductTypeTopping[];
   quantity: number;
-  subTotal: number;
+  receiptSubTotal: number;
   product?:Product;
-  sweetness?: number;
+  sweetnessLevel?: number;
+  receiptItemId?: number;
 
 
 }
 
 export interface Receipt {
   receiptId?: number;
-  totalPrice: number;
+  receiptTotalPrice: number;
   receiptType: string;
-  totalDiscount: number;
-  netPrice: number;
+  receiptTotalDiscount: number;
+  receiptNetPrice: number;
   receiptStatus: string;
   createdReceipt: Date;
   customer?: Customer;
   user?: User;
   receiptItems: ReceiptItem[];
   promotion?: Promotion;
+  paymentMethod?: string;
+  receiptPromotions:ReceiptPromotion[];
 }

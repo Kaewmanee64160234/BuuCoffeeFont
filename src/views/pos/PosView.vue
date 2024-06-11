@@ -31,8 +31,8 @@
           </v-container>
         </v-sheet>
       </v-col>
-      <v-col cols="3">
-        <v-sheet class="pa-2 ma-2">
+      <v-col cols="4">
+        <v-sheet class="pa-2 ma-2" style="height: 100%;">
           <selected-items-list></selected-items-list>
 
         </v-sheet>

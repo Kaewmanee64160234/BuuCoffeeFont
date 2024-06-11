@@ -8,7 +8,9 @@ function getReceiptById(id: number) {
   return http.get(`/receipts/${id}`);
 }
 function createReceipt(receipt : Receipt) {
-  return http.post("/receipts", receipt);
+
+console.log("receipt", JSON.stringify(receipt));
+  return http.post("/reciept", receipt);
 }
 function updateReceipt(id: number, receipt: Receipt) {
   return http.put(`/receipts/${id}`, receipt);
