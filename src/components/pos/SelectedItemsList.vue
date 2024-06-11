@@ -42,7 +42,7 @@
     <v-card-actions>
       <v-btn @click="selectPaymentMethod('cash')" color="success">ชำระเงินสด</v-btn>
       <v-btn @click="selectPaymentMethod('qrcode')" color="primary">ชำระด้วย QR Code</v-btn>
-   
+
     </v-card-actions>
 
   </v-card>
@@ -63,14 +63,33 @@ function removeItem(index: number) {
 }
 
 function increaseQuantity(index: number) {
-  const item = selectedItems.value[index];
-  posStore.addToReceipt(item.product, item.productType, item.productTypeToppings, item.quantity + 1, item.sweetness);
+
+  if(  selectedItems.value[index].product?.category.haveTopping){
+    posStore.addToReceipt(
+      selectedItems.value[index].product,
+      selectedItems.value[index].productTypeToppings[0].productType,
+      selectedItems.value[index].productTypeToppings,
+      1,
+      selectedItems.value[index].sweetnessLevel,
+    )
+  }else{
+    posStore.addToReceipt(
+      selectedItems.value[index].product,
+      null,
+      [],
+      1,
+      null,
+    )
+  
+  }
 }
 
 function decreaseQuantity(index: number) {
   const item = selectedItems.value[index];
-  if (item.quantity > 1) {
-    posStore.addToReceipt(item.product, item.productType, item.productTypeToppings, item.quantity - 1, item.sweetness);
+  if (item.quantity === 1) {
+    removeItem(index);
+  } else {
+    posStore.spliceData(index)
   }
 }
 
@@ -89,10 +108,12 @@ function save() {
   background-color: #f5f5f5;
   border-radius: 10px;
 }
+
 .selected-item {
   display: flex;
   align-items: center;
 }
+
 .quantity-controls {
   display: flex;
   align-items: center;

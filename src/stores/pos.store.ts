@@ -31,108 +31,131 @@ export const usePosStore = defineStore("pos", () => {
   const selectedProduct = ref<Product | null>(null);
   const productStore = useProductStore();
 
+  const addToReceipt = (
+    product: Product,
+    productType: ProductType,
+    productTypeToppings: ProductTypeTopping[],
+    quantity: number,
+    sweetness: number
+  ) => {
+    // console.log("productType topping", productTypeToppings);
+    const parsedQuantity = parseInt(quantity.toString(), 10);
+    const productPrice = parseInt(product.productPrice + "");
 
-const addToReceipt = (
-  product: Product,
-  productType: ProductType,
-  productTypeToppings: ProductTypeTopping[],
-  quantity: number,
-  sweetness: number
-) => {
-  // console.log("productType topping", productTypeToppings);
-  const parsedQuantity = parseInt(quantity.toString(), 10);
-  const productPrice =parseInt( product.productPrice+'');
-
-  let existingItem;
-  if (product.category.haveTopping) {
-    existingItem = selectedItems.value.find(
-      (item) =>
-        JSON.stringify(item.productTypeToppings) ===
-          JSON.stringify(productTypeToppings) &&
-        item.product?.productId === product.productId &&
-        item.sweetnessLevel === sweetness
-    );
-  } else {
-    existingItem = selectedItems.value.find(
-      (item) => item.product?.productId === product.productId
-    );
-  }
-
-  if (existingItem) {
+    let existingItem;
     if (product.category.haveTopping) {
-      if (productTypeToppings.length > 0) {
-        const toppingsTotal = productTypeToppings.reduce(
-          (toppingAcc, toppingItem) =>
-            toppingAcc +
-            parseFloat(toppingItem.topping.toppingPrice.toString()) * parsedQuantity,
-          0
-        );
-        const itemTotal = (productPrice * parsedQuantity )+ toppingsTotal;
-        existingItem.receiptSubTotal += itemTotal + parseFloat(productType.productTypePrice.toString());
+      existingItem = selectedItems.value.find(
+        (item) =>
+          JSON.stringify(item.productTypeToppings) ===
+            JSON.stringify(productTypeToppings) &&
+          item.product?.productId === product.productId &&
+          item.sweetnessLevel === sweetness
+      );
+    } else {
+      existingItem = selectedItems.value.find(
+        (item) => item.product?.productId === product.productId
+      );
+    }
+
+    if (existingItem) {
+      if (product.category.haveTopping) {
+        if (productTypeToppings.length > 0) {
+          const toppingsTotal = productTypeToppings.reduce(
+            (toppingAcc, toppingItem) =>
+              toppingAcc +
+              parseFloat(toppingItem.topping.toppingPrice.toString()) *
+                parsedQuantity,
+            0
+          );
+          const itemTotal = productPrice * parsedQuantity + toppingsTotal;
+          existingItem.receiptSubTotal +=
+            itemTotal + parseFloat(productType.productTypePrice.toString());
+          existingItem.quantity += parsedQuantity;
+        } else {
+          existingItem.receiptSubTotal +=
+            (productPrice +
+              parseFloat(productType.productTypePrice.toString())) *
+            parsedQuantity;
+          existingItem.quantity += parsedQuantity;
+        }
       } else {
-        existingItem.receiptSubTotal +=
-         ( (productPrice+ parseFloat(productType.productTypePrice.toString())) * parsedQuantity) ;
+        existingItem.receiptSubTotal += productPrice * parsedQuantity;
+        existingItem.quantity += parsedQuantity;
       }
     } else {
-      existingItem.receiptSubTotal += productPrice * parsedQuantity;
-    }
-  } else {
-    if (product.category.haveTopping) {
-      if(productTypeToppings.length > 0) {
-        const toppingsTotal = productTypeToppings.reduce(
-          (toppingAcc, toppingItem) =>
-            toppingAcc +
-            (parseFloat(toppingItem.topping.toppingPrice.toString())*parseFloat(toppingItem.quantity+'')) * parsedQuantity,
-          0
-        );
-      const itemTotal =( (productPrice+ parseFloat(productType.productTypePrice.toString())) * parsedQuantity) + toppingsTotal;
-      selectedItems.value.push({
-        productTypeToppings,
-        quantity: parsedQuantity,
-        receiptSubTotal: itemTotal ,
-        product,
-        sweetnessLevel:sweetness,
-      });
-      }else{
+      if (product.category.haveTopping) {
+        if (productTypeToppings.length > 0) {
+          const toppingsTotal = productTypeToppings.reduce(
+            (toppingAcc, toppingItem) =>
+              toppingAcc +
+              parseFloat(toppingItem.topping.toppingPrice.toString()) *
+                parseFloat(toppingItem.quantity + "") *
+                parsedQuantity,
+            0
+          );
+          const itemTotal =
+            (productPrice +
+              parseFloat(productType.productTypePrice.toString())) *
+              parsedQuantity +
+            toppingsTotal;
+          selectedItems.value.push({
+            productTypeToppings,
+            quantity: parsedQuantity,
+            receiptSubTotal: itemTotal,
+            product,
+            sweetnessLevel: sweetness,
+          });
+        } else {
+          selectedItems.value.push({
+            productTypeToppings: [],
+            quantity: parsedQuantity,
+            receiptSubTotal:
+              (productPrice +
+                parseFloat(productType.productTypePrice.toString())) *
+              parsedQuantity,
+            product,
+            sweetnessLevel: sweetness,
+          });
+        }
+      } else {
         selectedItems.value.push({
           productTypeToppings: [],
           quantity: parsedQuantity,
-          receiptSubTotal:( (productPrice+ parseFloat(productType.productTypePrice.toString())) * parsedQuantity ),
+          receiptSubTotal: productPrice * parsedQuantity,
           product,
-          sweetnessLevel:sweetness,
+          sweetnessLevel: sweetness,
         });
       }
-     
-    
-    } else {
-      selectedItems.value.push({
-        productTypeToppings: [],
-        quantity: parsedQuantity,
-        receiptSubTotal: productPrice * parsedQuantity,
-        product,
-        sweetnessLevel:sweetness,
-      });
     }
-  }
-  console.log('last',selectedItems.value[selectedItems.value.length - 1]);
-  productStore.totalProducts = calculateTotal(selectedItems.value);
-};
-
-// calculate total
-const calculateTotal = (selectedItems: ReceiptItem[]) => {
-  return selectedItems.reduce((acc, item) => {
-    return acc + parseFloat(item.receiptSubTotal.toString());
-  }, 0);
-}
-
-
+    console.log("last", selectedItems.value[selectedItems.value.length - 1]);
+    productStore.totalProducts = calculateTotal(selectedItems.value);
+  };
+  const calculateTotal = (selectedItems: ReceiptItem[]) => {
+    return selectedItems.reduce((acc, item) => {
+      return acc + parseFloat(item.receiptSubTotal.toString());
+    }, 0);
+  };
 
   const removeItem = (index: number) => {
     selectedItems.value.splice(index, 1);
-    // productStore.totalProducts = calculateSubtotal(selectedItems.value);
+    productStore.totalProducts = 0;
+    productStore.totalProducts = calculateTotal(selectedItems.value);
   };
 
-  // create function create recipt 
+
+  const spliceData = (index: number) => {
+   
+    selectedItems.value[index].receiptSubTotal -= parseInt((selectedItems.value[index].receiptSubTotal/selectedItems.value[index].quantity)+'');
+    selectedItems.value[index].quantity -= 1;
+    
+    if (selectedItems.value[index].quantity === 0) {
+      selectedItems.value.splice(index, 1);
+    }
+    productStore.totalProducts = 0;
+    productStore.totalProducts = calculateTotal(selectedItems.value);
+  };
+
+  // create function create recipt
   const createReceipt = async () => {
     receipt.value.receiptItems = selectedItems.value;
     receipt.value.receiptTotalPrice = productStore.totalProducts;
@@ -141,20 +164,13 @@ const calculateTotal = (selectedItems: ReceiptItem[]) => {
     receipt.value.receiptType = "coffee";
     receipt.value.receiptStatus = "pending";
     receipt.value.createdReceipt = new Date();
-    
 
     await receiptService.createReceipt(receipt.value);
   };
 
-
   const applyPromotion = (promotion: ReceiptPromotion) => {
     receiptPromotions.value.push(promotion);
     // productStore.totalProducts = calculateSubtotal(selectedItems.value);
-  };
-
-  const selectProduct = (product: Product) => {
-    selectedProduct.value = product;
-    toppingDialog.value = true;
   };
 
   return {
@@ -167,11 +183,11 @@ const calculateTotal = (selectedItems: ReceiptItem[]) => {
     totalPrice,
     netPrice,
     // applyPromotion,
-    selectProduct,
     toppingDialog,
     totalDiscount,
     selectedProduct,
     receipt,
-    createReceipt
+    createReceipt,
+    spliceData,
   };
 });
