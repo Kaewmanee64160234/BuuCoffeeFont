@@ -67,11 +67,11 @@ const addToReceipt = (
             parseFloat(toppingItem.topping.toppingPrice.toString()) * parsedQuantity,
           0
         );
-        const itemTotal = productPrice * parsedQuantity + toppingsTotal;
+        const itemTotal = (productPrice * parsedQuantity )+ toppingsTotal;
         existingItem.receiptSubTotal += itemTotal + parseFloat(productType.productTypePrice.toString());
       } else {
         existingItem.receiptSubTotal +=
-          productPrice * parsedQuantity + parseFloat(productType.productTypePrice.toString());
+         ( (productPrice+ parseFloat(productType.productTypePrice.toString())) * parsedQuantity) ;
       }
     } else {
       existingItem.receiptSubTotal += productPrice * parsedQuantity;
@@ -85,11 +85,11 @@ const addToReceipt = (
             (parseFloat(toppingItem.topping.toppingPrice.toString())*parseFloat(toppingItem.quantity+'')) * parsedQuantity,
           0
         );
-      const itemTotal = productPrice * parsedQuantity + toppingsTotal;
+      const itemTotal =( (productPrice+ parseFloat(productType.productTypePrice.toString())) * parsedQuantity) + toppingsTotal;
       selectedItems.value.push({
         productTypeToppings,
         quantity: parsedQuantity,
-        receiptSubTotal: itemTotal + parseFloat(productType.productTypePrice.toString()),
+        receiptSubTotal: itemTotal ,
         product,
         sweetnessLevel:sweetness,
       });
@@ -97,7 +97,7 @@ const addToReceipt = (
         selectedItems.value.push({
           productTypeToppings: [],
           quantity: parsedQuantity,
-          receiptSubTotal: productPrice * parsedQuantity + parseFloat(productType.productTypePrice.toString()),
+          receiptSubTotal:( (productPrice+ parseFloat(productType.productTypePrice.toString())) * parsedQuantity ),
           product,
           sweetnessLevel:sweetness,
         });
