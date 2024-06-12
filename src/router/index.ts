@@ -24,6 +24,11 @@ const router = createRouter({
       component: () => import('../views/product/ProductManagementView.vue')
     },
     {
+      path: '/customersManagement',
+      name: 'customers',
+      component: () => import('../views/customer/customerManagement.vue')
+    },
+    {
       path: '/historyReceipt',
       name: 'historyReceipt',
       component: () => import('../views/receipt/HistoryReceipt.vue')
