@@ -2,6 +2,11 @@
   <v-card class="selected-items-list">
     <v-card-title>รายการที่เลือก</v-card-title>
     <v-divider></v-divider>
+    <v-btn color="success">find customer</v-btn>
+    <v-btn color="success" @click="openCreateCustomerDialog()">register customer</v-btn>
+
+    <v-divider></v-divider>
+
     <v-list>
       <v-list-item v-for="(item, index) in selectedItems" :key="index" class="selected-item">
         <v-list-item-avatar>
@@ -40,7 +45,8 @@
     <v-card-subtitle>รวมทั้งหมด: {{ posStore.receipt.receiptTotalPrice }}</v-card-subtitle>
     <v-card-subtitle>ราคาลด: {{ posStore.receipt.receiptTotalDiscount }}</v-card-subtitle>
     <v-card-subtitle>promotion: {{ posStore.receipt.receiptPromotions }}</v-card-subtitle>
-    <v-card-subtitle>รวมสุทธิ: {{posStore.receipt.receiptNetPrice }}</v-card-subtitle>
+    <v-card-subtitle>รวมสุทธิ: {{ posStore.receipt.receiptNetPrice }}</v-card-subtitle>
+    <v-card-subtitle>ลูกค้า: {{ posStore.receipt.customer?.customerName }}</v-card-subtitle>
     <v-divider></v-divider>
     <v-card-actions>
       <v-btn @click="selectPaymentMethod('cash')" color="success">ชำระเงินสด</v-btn>
@@ -48,6 +54,7 @@
     </v-card-actions>
   </v-card>
   <v-btn color="warning" @click="save">Finish</v-btn>
+  <AddCustomerDialog v-model:dialog="customerStore.openCreateCustomerDialog" />
 </template>
 
 <script lang="ts" setup>
@@ -55,11 +62,13 @@ import { usePosStore } from '@/stores/pos.store';
 import { useProductStore } from '@/stores/product.store';
 import { computed } from 'vue';
 import Swal from 'sweetalert2';
+import { useCustomerStore } from '@/stores/customer.store';
+import AddCustomerDialog from '../customer/AddCustomerDialog.vue';
 
 const posStore = usePosStore();
 const selectedItems = computed(() => posStore.selectedItems);
 const productStore = useProductStore();
-
+const customerStore = useCustomerStore();
 function removeItem(index: number) {
   posStore.removeItem(index);
 }
@@ -108,7 +117,7 @@ function save() {
     });
     return;
   }
-  if(posStore.receipt.paymentMethod === ''){
+  if (posStore.receipt.paymentMethod === '') {
     Swal.fire({
       icon: 'error',
       title: 'Incomplete Data',
@@ -116,6 +125,8 @@ function save() {
     });
     return;
   }
+
+
 
   posStore.createReceipt();
   // Clear data
@@ -132,6 +143,11 @@ function save() {
   });
   posStore.receiptDialog = true;
 }
+
+function openCreateCustomerDialog() {
+  customerStore.openCreateCustomerDialog = true;
+}
+
 </script>
 
 <style scoped>
