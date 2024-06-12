@@ -9,6 +9,9 @@
           <v-icon color="red">mdi-close</v-icon>
         </v-btn>
       </v-card-title>
+      <v-alert v-if="showAlert" type="error" dismissible @input="showAlert = false">
+        Please select a product type before confirming.
+      </v-alert>
       <v-card-subtitle class="d-flex justify-space-between align-center">
         <div>{{ productStore.selectedProduct?.productName }}</div>
         <div>{{ productStore.selectedProduct?.productPrice }} $</div>
@@ -95,119 +98,118 @@ import type { ProductType } from '@/types/productType.type';
 import type { Topping } from '@/types/topping.type';
 import type { ProductTypeTopping } from '@/types/productTypeTopping.type';
 import {  ref, computed } from 'vue';
+import Swal from 'sweetalert2';
 
+const posStore = usePosStore();
+const productStore = useProductStore();
+const toppingStore = useToppingStore();
+const selectedType = ref<ProductType | null>(null);
+const selectedSweetness = ref<number>(100);
+const selectedToppings = ref<Array<{ topping: Topping; quantity: number }>>([]);
+const quantity = ref<number>(1);
+const toppingIndex = ref<number>(0);
+const productTypeToppings = ref<ProductTypeTopping[]>([]);
+const showAlert = ref<boolean>(false);
 
-    const posStore = usePosStore();
-    const productStore = useProductStore();
-    const toppingStore = useToppingStore();
-    const selectedType = ref<ProductType | null>(null);
-    const selectedSweetness = ref<number>(100);
-    const selectedToppings = ref<Array<{ topping: Topping; quantity: number }>>([]);
-    const quantity = ref<number>(1);
-    const toppingIndex = ref<number>(0);
-    const productTypeToppings = ref<ProductTypeTopping[]>([]);
+const sweetnessLevels = [0, 25, 50, 75, 100];
+const displayedToppings = computed(() => {
+  return toppingStore.toppings.slice(toppingIndex.value, toppingIndex.value + 5);
+});
 
-    const sweetnessLevels = [0, 25, 50, 75, 100];
-    const displayedToppings = computed(() => {
-      return toppingStore.toppings.slice(toppingIndex.value, toppingIndex.value + 5);
+function selectType(type: ProductType) {
+  selectedType.value = type;
+  showAlert.value = false;
+}
+
+function selectSweetness(level: number) {
+  selectedSweetness.value = level;
+}
+
+function toggleTopping(topping: Topping) {
+  const index = selectedToppings.value.findIndex((t) => t.topping.toppingId === topping.toppingId);
+  if (index === -1) {
+    selectedToppings.value.push({ topping, quantity: 1 });
+  } else {
+    selectedToppings.value.splice(index, 1);
+  }
+}
+
+function increaseToppingQuantity(topping: Topping) {
+  const toppingItem = selectedToppings.value.find((t) => t.topping.toppingId === topping.toppingId);
+  if (toppingItem) {
+    toppingItem.quantity++;
+  }
+}
+
+function decreaseToppingQuantity(topping: Topping) {
+  const toppingItem = selectedToppings.value.find((t) => t.topping.toppingId === topping.toppingId);
+  if (toppingItem && toppingItem.quantity > 1) {
+    toppingItem.quantity--;
+  }
+}
+
+function prevTopping() {
+  if (toppingIndex.value > 0) {
+    toppingIndex.value--;
+  }
+}
+
+function nextTopping() {
+  if (toppingIndex.value < toppingStore.toppings.length - 5) {
+    toppingIndex.value++;
+  }
+}
+
+function decreaseQuantity() {
+  if (quantity.value > 1) {
+    quantity.value--;
+  }
+}
+
+function increaseQuantity() {
+  quantity.value++;
+}
+
+function closeDialog() {
+  clearData();
+  posStore.toppingDialog = false;
+}
+
+function confirmSelection() {
+  if (!selectedType.value) {
+    showAlert.value = true;
+    return;
+  }
+
+  for (var i = 0; i < selectedToppings.value.length; i++) {
+    productTypeToppings.value.push({
+      productTypeToppingId: 0,
+      productType: selectedType.value,
+      topping: selectedToppings.value[i].topping,
+      quantity: selectedToppings.value[i].quantity,
     });
+  }
 
-    function selectType(type: ProductType) {
-      selectedType.value = type;
-    }
+  posStore.addToReceipt(
+    productStore.selectedProduct!,
+    selectedType.value,
+    productTypeToppings.value,
+    quantity.value,
+    selectedSweetness.value
+  );
+  closeDialog();
+}
 
-    function selectSweetness(level: number) {
-      selectedSweetness.value = level;
-    }
-
-    function toggleTopping(topping: Topping) {
-      const index = selectedToppings.value.findIndex((t) => t.topping.toppingId === topping.toppingId);
-      if (index === -1) {
-        selectedToppings.value.push({ topping, quantity: 1 });
-      } else {
-        selectedToppings.value.splice(index, 1);
-      }
-    }
-
-    function increaseToppingQuantity(topping: Topping) {
-      const toppingItem = selectedToppings.value.find((t) => t.topping.toppingId === topping.toppingId);
-      if (toppingItem) {
-        toppingItem.quantity++;
-      }
-    }
-
-    function decreaseToppingQuantity(topping: Topping) {
-      const toppingItem = selectedToppings.value.find((t) => t.topping.toppingId === topping.toppingId);
-      if (toppingItem && toppingItem.quantity > 1) {
-        toppingItem.quantity--;
-      }
-    }
-
-    function prevTopping() {
-      if (toppingIndex.value > 0) {
-        toppingIndex.value--;
-      }
-    }
-
-    function nextTopping() {
-      if (toppingIndex.value < toppingStore.toppings.length - 5) {
-        toppingIndex.value++;
-      }
-    }
-
-    function decreaseQuantity() {
-      if (quantity.value > 1) {
-        quantity.value--;
-      }
-    }
-
-    function increaseQuantity() {
-      quantity.value++;
-    }
-
-    function closeDialog() {
-      clearData();
-      posStore.toppingDialog = false;
-    }
-
-    function confirmSelection() {
-      if (selectedType.value) {
-        // selectedToppings.value map to productTypeTopping
-
-        for(var i = 0; i < selectedToppings.value.length; i++) {
-          productTypeToppings.value.push({
-            productTypeToppingId: 0,
-            productType: selectedType.value,
-            topping: selectedToppings.value[i].topping,
-            quantity: selectedToppings.value[i].quantity,
-          });
-        }
-          
-          
-
-        posStore.addToReceipt( 
-          productStore.selectedProduct!,
-          selectedType.value,
-          productTypeToppings.value,
-          quantity.value,
-          selectedSweetness.value
-        );
-      }
-      closeDialog();
-    }
-
-    // clear data
-    function clearData() {
-      selectedType.value = null;
-      selectedSweetness.value = null;
-      selectedToppings.value = [];
-      quantity.value = 1;
-      toppingIndex.value = 0;
-      productStore.selectedProduct= null;
-      productTypeToppings.value = [];
-
-    }
-
+// clear data
+function clearData() {
+  selectedType.value = null;
+  selectedSweetness.value = null;
+  selectedToppings.value = [];
+  quantity.value = 1;
+  toppingIndex.value = 0;
+  productStore.selectedProduct= null;
+  productTypeToppings.value = [];
+}
 </script>
 
 <style scoped>
