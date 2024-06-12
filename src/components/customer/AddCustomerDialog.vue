@@ -56,7 +56,7 @@ async function saveCustomer() {
         customerId: 0,
         customerName: customerName.value,
         customerPhone: customerPhone.value,
-        customerNumberOfStamp: 1, // New customer starts with 1 point
+        customerNumberOfStamp: 0, // New customer starts with 1 point
       });
       dialog.value = false; // Close the dialog
       await customerStore.getAllCustomers(); // Refresh customer list
