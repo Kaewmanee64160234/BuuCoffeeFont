@@ -53,12 +53,6 @@ watch(paginate, async (newPage, oldPage) => {
         </v-row>
         <v-row>
           <v-col>
-            <v-btn color="success" class="button-full-width">
-              <v-icon left>mdi-filter</v-icon>
-              กรอง
-            </v-btn>
-          </v-col>
-          <v-col>
             <v-menu v-model="menu1" offset-y>
               <template v-slot:activator="{ props }">
                 <v-btn color="success" class="button-full-width" v-bind="props">

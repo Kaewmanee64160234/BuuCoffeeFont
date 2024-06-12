@@ -35,12 +35,6 @@ const formatDate = (date: any) => {
                 </v-row>
                 <v-row>
                     <v-col>
-                        <v-btn color="success" class="button-full-width">
-                            <v-icon left>mdi-filter</v-icon>
-                            กรอง
-                        </v-btn>
-                    </v-col>
-                    <v-col>
 
 
                         <v-btn color="success" class="button-full-width" :to="{ name: 'importingredients' }">

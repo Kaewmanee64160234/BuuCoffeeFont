@@ -47,90 +47,132 @@ const deleteCashier = async (id: number) => {
         console.error(error);
     }
 };
-</script>
+const lineChartOptions = ref({
+  chart: {
+    height: 350,
+    type: 'line',
+    zoom: {
+      enabled: false
+    }
+  },
+  dataLabels: {
+    enabled: false
+  },
+  stroke: {
+    curve: 'straight'
+  },
+  title: {
+    text: 'ยอดขายรายวัน',
+    align: 'left'
+  },
+  xaxis: {
+    categories: ['1 มิ.ย.', '2 มิ.ย.', '3 มิ.ย.', '4 มิ.ย.', '5 มิ.ย.', '6 มิ.ย.', '7 มิ.ย.']
+  },
+  tooltip: {
+    x: {
+      format: 'dd/MM/yy HH:mm'
+    }
+  }
+});
 
+const lineChartSeries = ref([
+  {
+    name: 'ยอดขาย',
+    data: [30, 40, 35, 50, 49, 60, 70]
+  }
+]);
+</script>
 <template>
-    <CreateDialogAddCashier/>
-    <CreateHistoryDialogCashier/>
-    <v-container>
-      <v-row>
-        <v-col cols="12" md="4">
-          <v-card>
+  <CreateDialogAddCashier/>
+  <CreateHistoryDialogCashier/>
+  <v-container>
+    <v-row>
+      <v-col cols="12" md="4">
+        <v-card>
           <apexchart type="donut" :options="chartOptions" :series="chartSeries"></apexchart>
-        </v-card>
-        </v-col>
-        <v-col cols="12" md="8">
-          <v-row>
-            <v-col cols="12" md="6">
-              <v-card>
-                <v-card-title class="d-flex justify-space-between align-center">
-                  เงินในลิ้นชัก
-                  <v-btn icon>
-                    <v-icon @click="openHistoryDialog">mdi-eye</v-icon>
-                  </v-btn>
-                </v-card-title>
-                <template v-if="ReportFinnceStore.cashiers !== null && Object.keys(ReportFinnceStore.cashiers).length !== 0">
-    <v-card-subtitle>
-        เงินต้น : {{ ReportFinnceStore.cashiers.cashierAmount }} 
-        <span @click="deleteCashier(ReportFinnceStore.cashiers.cashierId)">
-            <v-icon>mdi-delete</v-icon>
-        </span>
-    </v-card-subtitle>
+      </v-card>
+      </v-col>
+      <v-col cols="12" md="8">
+        <v-row>
+          <v-col cols="12" md="6">
+            <v-card>
+              <v-card-title class="d-flex justify-space-between align-center">
+                เงินในลิ้นชัก
+                <v-btn icon>
+                  <v-icon @click="openHistoryDialog">mdi-eye</v-icon>
+                </v-btn>
+              </v-card-title>
+              <template v-if="ReportFinnceStore.cashiers !== null && Object.keys(ReportFinnceStore.cashiers).length !== 0">
+  <v-card-subtitle>
+      เงินต้น : {{ ReportFinnceStore.cashiers.cashierAmount }} 
+      <span @click="deleteCashier(ReportFinnceStore.cashiers.cashierId)">
+          <v-icon>mdi-delete</v-icon>
+      </span>
+  </v-card-subtitle>
 </template>
 
 <template v-else>
-    <v-btn @click="openCreateDialog">กรอกจำนวนเงินวันนี้</v-btn>
+  <v-btn @click="openCreateDialog">กรอกจำนวนเงินวันนี้</v-btn>
 </template>
 
-                <v-card-subtitle>ปัจจุบัน : 1,400</v-card-subtitle>
-              </v-card>
-            </v-col>
-            <v-col cols="12" md="6">
-              <v-card>
-                <v-card-title class="d-flex justify-space-between align-center">
-                  รายได้
-                  <v-btn icon>
-                    <v-icon>mdi-eye</v-icon>
-                  </v-btn>
-                </v-card-title>
-                <v-card-subtitle class="text-h4">3,000.00</v-card-subtitle>
-                <v-card-actions>
-                  <v-btn block>กรอกจำนวนเงินวันนี้</v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-col>
-            <v-col cols="12" md="6">
-              <v-card>
-                <v-card-title class="d-flex justify-space-between align-center">
-                  จำนวนรายการ
-                  <v-btn icon>
-                    <v-icon>mdi-eye</v-icon>
-                  </v-btn>
-                </v-card-title>
-                <v-card-subtitle class="text-h4">45</v-card-subtitle>
-                <v-card-actions>
-                  <v-btn block>กรอกจำนวนเงินวันนี้</v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-col>
-            <v-col cols="12" md="6">
-              <v-card>
-                <v-card-title class="d-flex justify-space-between align-center">
-                  ส่วนลด
-                  <v-btn icon>
-                    <v-icon>mdi-eye</v-icon>
-                  </v-btn>
-                </v-card-title>
-                <v-card-subtitle class="text-h4">300</v-card-subtitle>
-                <v-card-actions>
-                  <v-btn block>กรอกจำนวนเงินวันนี้</v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-col>
-          </v-row>
-        </v-col>
-      </v-row>
-    </v-container>
+              <v-card-subtitle>ปัจจุบัน : 1,400</v-card-subtitle>
+            </v-card>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-card>
+              <v-card-title class="d-flex justify-space-between align-center">
+                รายได้
+                <v-btn icon>
+                  <v-icon>mdi-eye</v-icon>
+                </v-btn>
+              </v-card-title>
+              <v-card-subtitle class="text-h4">3,000.00</v-card-subtitle>
+              <v-card-actions>
+                <v-btn block>กรอกจำนวนเงินวันนี้</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-card>
+              <v-card-title class="d-flex justify-space-between align-center">
+                จำนวนรายการ
+                <v-btn icon>
+                  <v-icon>mdi-eye</v-icon>
+                </v-btn>
+              </v-card-title>
+              <v-card-subtitle class="text-h4">45</v-card-subtitle>
+              <v-card-actions>
+                <v-btn block>กรอกจำนวนเงินวันนี้</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-card>
+              <v-card-title class="d-flex justify-space-between align-center">
+                ส่วนลด
+                <v-btn icon>
+                  <v-icon>mdi-eye</v-icon>
+                </v-btn>
+              </v-card-title>
+              <v-card-subtitle class="text-h4">300</v-card-subtitle>
+              <v-card-actions>
+                <v-btn block>กรอกจำนวนเงินวันนี้</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-col>
+    </v-row>
+  <v-row>
+  <v-col cols="12">
+    <div>
+    <apexchart type="line" :options="lineChartOptions" :series="lineChartSeries"></apexchart>
+  </div>
+  </v-col>
+</v-row>
+</v-container>
+
+
   </template>
 
 <style scoped>
