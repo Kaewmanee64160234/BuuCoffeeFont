@@ -16,6 +16,8 @@
                 <v-text-field v-if="!noEndDate" v-model="endDate" label="วันที่สิ้นสุด" type="date"></v-text-field>
                 <v-select v-model="promotionType" :items="promotionStore.promotionTypes.map(promotionType => promotionType.value)"
                   item-text="text" item-value="value" label="ประเภทโปรโมชั่น" required></v-select>
+                  <v-select v-model="promotionStore_" :items="store"
+                    item-text="text" item-value="value" label="ร้านที่ใช้promotion" required></v-select>
                 <v-textarea v-model="description" label="คำอธิบาย" required></v-textarea>
               </v-form>
             </template>
@@ -78,6 +80,9 @@ const startDate = ref<string | null>(null);
 const endDate = ref<string | null>(null);
 const description = ref('');
 const noEndDate = ref(false);
+const promotionStore_ = ref('');
+
+const store = ['ร้านกาแฟ','ร้านกับข้าว']
 
 
 
@@ -132,6 +137,7 @@ const createPromotion = async () => {
         conditionValue2: promotionType.value === 'discountPercentage' ? minimumPrice.value : null,
         promotionDescription: description.value,
         noEndDate: noEndDate.value,
+        promotionForStore:promotionStore_.value
     };
 
     await promotionStore.createPromotion(newPromotion);

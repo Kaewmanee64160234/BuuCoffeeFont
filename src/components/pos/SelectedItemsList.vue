@@ -130,6 +130,7 @@ function save() {
     title: 'Receipt Created',
     text: 'The receipt has been successfully created.',
   });
+  posStore.receiptDialog = true;
 }
 </script>
 

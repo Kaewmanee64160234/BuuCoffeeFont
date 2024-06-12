@@ -30,9 +30,12 @@ export const usePosStore = defineStore("pos", () => {
     paymentMethod: "",
   });
 
+  const currentReceipt = ref<Receipt>();
+
   const toppingDialog = ref(false);
   const selectedProduct = ref<Product | null>(null);
   const productStore = useProductStore();
+  const receiptDialog = ref(false);
 
   const addToReceipt = (
     product: Product,
@@ -162,21 +165,18 @@ export const usePosStore = defineStore("pos", () => {
   // create function create recipt
   const createReceipt = async () => {
     receipt.value.receiptItems = selectedItems.value;
-    receipt.value.receiptTotalDiscount = totalDiscount.value;
-    receipt.value.receiptNetPrice = netPrice.value;
     receipt.value.receiptType = "coffee";
     receipt.value.receiptStatus = "pending";
     receipt.value.createdReceipt = new Date();
 
-    await receiptService.createReceipt(receipt.value);
+   const res =  await receiptService.createReceipt(receipt.value);
+   if(res.status === 201){
+    console.log("Receipt created successfully",res.data);
+    currentReceipt.value = res.data;
+   }
     
   };
-  const promotionTypes = [
-    { text: "Discount by Price", value: "discountPrice" },
-    { text: "Buy 1 Get 1", value: "buy1get1" },
-    { text: "Use Points for Discount", value: "usePoints" },
-    { text: "Discount by Percentage", value: "discountPercentage" },
-  ];
+
   const applyPromotion = (promotion: Promotion) => {
     // check promotion type
     if (
@@ -263,5 +263,7 @@ export const usePosStore = defineStore("pos", () => {
     createReceipt,
     spliceData,
     applyPromotion,
+    currentReceipt,
+    receiptDialog
   };
 });
