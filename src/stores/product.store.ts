@@ -45,7 +45,6 @@ export const useProductStore = defineStore("product", () => {
   const isCold = ref<boolean>(false);
   const isBlend = ref<boolean>(false);
   const selectedProduct = ref<Product>();
-  const toppingDailog = ref(false);
 
   const totalProducts = ref(0);
   const currentPage = ref(1);
@@ -232,6 +231,5 @@ export const useProductStore = defineStore("product", () => {
     itemsPerPage,
     selectedProduct,
     setSelectedProduct,
-    toppingDailog
   };
 });

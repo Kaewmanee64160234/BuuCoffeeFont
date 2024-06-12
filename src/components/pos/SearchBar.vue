@@ -3,7 +3,7 @@
       v-model="searchQuery"
       append-icon="mdi-magnify"
       label="ค้นหา"
-      solo
+      variant="solo"
       single-line
       hide-details
     ></v-text-field>
