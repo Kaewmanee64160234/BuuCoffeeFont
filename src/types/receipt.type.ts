@@ -25,11 +25,12 @@ export interface Receipt {
   receiptTotalDiscount: number;
   receiptNetPrice: number;
   receiptStatus: string;
-  createdReceipt: Date;
   customer?: Customer;
   user?: User;
   receiptItems: ReceiptItem[];
   promotion?: Promotion;
   paymentMethod?: string;
   receiptPromotions:ReceiptPromotion[];
+  createdDate: Date;
+  updatedDate: Date;
 }

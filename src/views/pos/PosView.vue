@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-row no-gutters>
-      <v-col>
+      <v-col  cols="8">
         <v-sheet class="pa-2 ma-2">
           <v-container>
             <v-row>
@@ -39,8 +39,9 @@
       </v-col>
 
     </v-row>
-
+<ReceiptDialog/>
   </v-app>
+
 </template>
 
 <script lang="ts" setup>
@@ -51,6 +52,7 @@ import CategoryTabs from '@/components/pos/CategoryTabs.vue';
 import ProductCard from '@/components/pos/ProductCard.vue';
 import SelectedItemsList from '@/components/pos/SelectedItemsList.vue';
 import DrinkSelectionDialog from '@/components/pos/DrinkSelectionDialog.vue';
+import ReceiptDialog from '@/components/pos/ReceiptDialog.vue';
 import { useProductStore } from '@/stores/product.store';
 import { useCategoryStore } from '@/stores/category.store';
 import { usePromotionStore } from '@/stores/promotion.store';

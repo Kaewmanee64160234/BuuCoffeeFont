@@ -14,7 +14,9 @@
               <v-text-field v-model="startDate" label="วันที่เริ่มต้น" type="date" required></v-text-field>
               <v-checkbox v-model="noEndDate" label="ไม่มีวันสิ้นสุด"></v-checkbox>
               <v-text-field v-if="!noEndDate" v-model="endDate" label="วันที่สิ้นสุด" type="date"></v-text-field>
-              <v-select v-model="promotionType" :items="promotionTypes.map(promotionType => promotionType.value)" item-text="text" item-value="value" label="ประเภทโปรโมชั่น" required></v-select>
+              <v-select v-model="promotionType" :items="promotionStore.promotionTypes.map(promotionType => promotionType.value)" item-text="text" item-value="value" label="ประเภทโปรโมชั่น" required></v-select>
+              <v-select v-model="promotionStore_" :items="store"
+                    item-text="text" item-value="value" label="ร้านที่ใช้promotion" required></v-select>
               <v-textarea v-model="description" label="คำอธิบาย" required></v-textarea>
             </v-form>
           </template>
@@ -35,7 +37,7 @@
                 <v-text-field v-model="discountValue" label="มูลค่าส่วนลด" type="number" required></v-text-field>
               </template>
               <template v-if="promotionType === 'discountPercentage'">
-                <v-text-field v-model="discountPercentage" label="เปอร์เซ็นต์ส่วนลด" type="number" required></v-text-field>
+                <v-text-field v-model="discountValue" label="เปอร์เซ็นต์ส่วนลด" type="number" required></v-text-field>
                 <v-text-field v-model="minimumPrice" label="ราคาขั้นต่ำสำหรับส่วนลด" type="number" required></v-text-field>
               </template>
             </v-form>
@@ -76,17 +78,15 @@ const startDate = ref<string | null>(null);
 const endDate = ref<string | null>(null);
 const description = ref('');
 const noEndDate = ref(false);
+const promotionStore_ = ref('');
 
-const promotionTypes = [
-  { text: 'Discount by Price', value: 'discountPrice' },
-  { text: 'Buy 1 Get 1', value: 'buy1get1' },
-  { text: 'Use Points for Discount', value: 'usePoints' },
-  { text: 'Discount by Percentage', value: 'discountPercentage' },
-];
+const store = ['ร้านกาแฟ','ร้านกับข้าว']
+
+
 
 const items = [
-  { title: 'Promotion Details', complete: false },
-  { title: 'Promotion Type Details', complete: false },
+    { title: 'Promotion Details', complete: false },
+    { title: 'Promotion Type Details', complete: false },
 ];
 
 onMounted(async () => {
@@ -105,13 +105,15 @@ function loadPromotionData() {
     discountValue.value = promotion.discountValue;
     buyProductId.value = promotion.buyProductId;
     freeProductId.value = promotion.freeProductId;
-    pointsRequired.value = promotion.pointsRequired;
-    discountPercentage.value = promotion.discountPercentage;
-    minimumPrice.value = promotion.minimumPrice;
+    pointsRequired.value = promotion.conditionValue1;
+    discountPercentage.value = promotion.discountValue;
+    minimumPrice.value = promotion.conditionValue1;
     startDate.value = promotion.startDate ? new Date(promotion.startDate).toISOString().substr(0, 10) : '';
     endDate.value = promotion.endDate ? new Date(promotion.endDate).toISOString().substr(0, 10) : '';
     description.value = promotion.promotionDescription || '';
     noEndDate.value = promotion.noEndDate;
+    promotionStore_.value = promotion.promotionForStore
+  
   }
 }
 
@@ -151,19 +153,19 @@ const updatePromotion = async () => {
   }
 
   const updatedPromotion: Promotion = {
-    promotionId: promotionId.value!,
-    promotionName: promotionName.value,
-    promotionType: promotionType.value,
-    startDate: startDate.value ? new Date(startDate.value) : null,
-    endDate: noEndDate.value ? null : (endDate.value ? new Date(endDate.value) : null),
-    discountValue: promotionType.value === 'discountPrice' || promotionType.value === 'usePoints' ? discountValue.value : null,
-    conditionQuantity: promotionType.value === 'discountPrice' || promotionType.value === 'usePoints' ? 1 : null,
-    buyProductId: promotionType.value === 'buy1get1' ? productStore.products.find(product => product.productName === buyProductId.value)?.productId : null, // Find the product id from the product store (assuming the product store has the products loaded
-    freeProductId: promotionType.value === 'buy1get1' ? productStore.products.find(product => product.productName === freeProductId.value)?.productId : null,
-    conditionValue1: promotionType.value === 'discountPercentage' ? discountPercentage.value : null,
-    conditionValue2: promotionType.value === 'discountPercentage' ? minimumPrice.value : null,
-    promotionDescription: description.value,
-    noEndDate: noEndDate.value,
+        promotionName: promotionName.value,
+        promotionType: promotionType.value,
+        startDate: new Date(startDate.value),
+        endDate: noEndDate.value ? null : new Date(endDate.value),
+        discountValue: promotionType.value === 'discountPrice' || promotionType.value === 'usePoints' || promotionType.value === 'discountPercentage' ? discountValue.value : null,
+        conditionQuantity: promotionType.value === 'discountPrice' || promotionType.value === 'usePoints' ? pointsRequired.value : null,
+        buyProductId: promotionType.value === 'buy1get1' ? productStore.products.find(product => product.productName === buyProductId.value)?.productId : null, // Find the product id from the product store (assuming the product store has the products loaded
+        freeProductId: promotionType.value === 'buy1get1' ? productStore.products.find(product => product.productName === freeProductId.value)?.productId : null,
+        conditionValue1: promotionType.value === 'discountPercentage' ? minimumPrice.value : null,
+        conditionValue2: promotionType.value === 'discountPercentage' ? minimumPrice.value : null,
+        promotionDescription: description.value,
+        noEndDate: noEndDate.value,
+        promotionForStore: promotionStore_.value
   };
 
   await promotionStore.updatePromotion(promotionId.value!, updatedPromotion);

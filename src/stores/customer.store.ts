@@ -2,12 +2,16 @@ import { ref } from 'vue';
 import { defineStore } from 'pinia';
 import type { Customer } from '@/types/customer.type';
 import customerService from '@/service/customer.service';
+import { usePosStore } from './pos.store';
 
 export const useCustomerStore = defineStore('customer', () => {
   const customers = ref<Customer[]>([]);
   const customer = ref<Customer | null>(null);
   const searchQuery = ref<string>('');
   const updateCustomerDialog = ref(false);
+  const openCreateCustomerDialog = ref(false);
+  const openDialogFindCustomer = ref(false);
+  const posStore = usePosStore();
 
   const getAllCustomers = async () => {
     try {
@@ -36,6 +40,8 @@ export const useCustomerStore = defineStore('customer', () => {
       const response = await customerService.createCustomer(newCustomer);
       if (response.status === 201) {
         customers.value.push(response.data);
+        posStore.receipt.customer = response.data;
+        console.log('Customer created:', response.data);
         await getAllCustomers(); // Ensure that all customers are fetched again
       }
     } catch (error) {
@@ -76,6 +82,12 @@ export const useCustomerStore = defineStore('customer', () => {
     customer.value = customerToEdit;
   };
 
+  // setCustomerInRecipt
+  const setCustomerInReceipt = (customer: Customer) => {
+    posStore.receipt.customer = customer;
+    openDialogFindCustomer.value = false;
+  };
+
   return {
     customers,
     customer,
@@ -87,5 +99,8 @@ export const useCustomerStore = defineStore('customer', () => {
     setCustomerForEdit,
     updateCustomerDialog,
     searchQuery,
+    openCreateCustomerDialog,
+    openDialogFindCustomer,
+    setCustomerInReceipt
   };
 });
