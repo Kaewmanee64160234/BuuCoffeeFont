@@ -2,7 +2,7 @@
   <v-card class="selected-items-list">
     <v-card-title>รายการที่เลือก</v-card-title>
     <v-divider></v-divider>
-    <v-btn color="success">find customer</v-btn>
+    <v-btn color="success"  @click="openFindCustomerDialog()"  >find customer</v-btn>
     <v-btn color="success" @click="openCreateCustomerDialog()">register customer</v-btn>
 
     <v-divider></v-divider>
@@ -55,6 +55,7 @@
   </v-card>
   <v-btn color="warning" @click="save">Finish</v-btn>
   <AddCustomerDialog v-model:dialog="customerStore.openCreateCustomerDialog" />
+  <FindCustomerDialog v-model:dialog="customerStore.openDialogFindCustomer" />
 </template>
 
 <script lang="ts" setup>
@@ -64,6 +65,7 @@ import { computed } from 'vue';
 import Swal from 'sweetalert2';
 import { useCustomerStore } from '@/stores/customer.store';
 import AddCustomerDialog from '../customer/AddCustomerDialog.vue';
+import FindCustomerDialog from '../pos/FindCustomerDialog.vue';
 
 const posStore = usePosStore();
 const selectedItems = computed(() => posStore.selectedItems);
@@ -136,16 +138,17 @@ function save() {
   posStore.receipt.receiptNetPrice = 0;
   posStore.receipt.receiptPromotions = [];
 
-  Swal.fire({
-    icon: 'success',
-    title: 'Receipt Created',
-    text: 'The receipt has been successfully created.',
-  });
+ 
   posStore.receiptDialog = true;
 }
 
 function openCreateCustomerDialog() {
   customerStore.openCreateCustomerDialog = true;
+}
+
+// open find customer dialog
+function openFindCustomerDialog() {
+  customerStore.openDialogFindCustomer = true;
 }
 
 </script>

@@ -9,6 +9,7 @@ import type { Topping } from "@/types/topping.type";
 import { useProductStore } from "./product.store";
 import receiptService from "@/service/receipt.service";
 import type { Promotion } from "@/types/promotion.type";
+import { useCustomerStore } from "./customer.store";
 
 export const usePosStore = defineStore("pos", () => {
   const selectedItems = ref<ReceiptItem[]>([]);
@@ -36,6 +37,7 @@ export const usePosStore = defineStore("pos", () => {
   const selectedProduct = ref<Product | null>(null);
   const productStore = useProductStore();
   const receiptDialog = ref(false);
+  const customerStore = useCustomerStore();
 
   const addToReceipt = (
     product: Product,
@@ -167,12 +169,14 @@ export const usePosStore = defineStore("pos", () => {
     receipt.value.receiptItems = selectedItems.value;
     receipt.value.receiptType = "coffee";
     receipt.value.receiptStatus = "pending";
-    receipt.value.createdReceipt = new Date();
+    receipt.value.createdDate = new Date();
 
    const res =  await receiptService.createReceipt(receipt.value);
    if(res.status === 201){
     console.log("Receipt created successfully",res.data);
     currentReceipt.value = res.data;
+    await customerStore.getAllCustomers();
+    
    }
     
   };

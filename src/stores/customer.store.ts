@@ -10,6 +10,7 @@ export const useCustomerStore = defineStore('customer', () => {
   const searchQuery = ref<string>('');
   const updateCustomerDialog = ref(false);
   const openCreateCustomerDialog = ref(false);
+  const openDialogFindCustomer = ref(false);
   const posStore = usePosStore();
 
   const getAllCustomers = async () => {
@@ -81,6 +82,12 @@ export const useCustomerStore = defineStore('customer', () => {
     customer.value = customerToEdit;
   };
 
+  // setCustomerInRecipt
+  const setCustomerInReceipt = (customer: Customer) => {
+    posStore.receipt.customer = customer;
+    openDialogFindCustomer.value = false;
+  };
+
   return {
     customers,
     customer,
@@ -92,6 +99,8 @@ export const useCustomerStore = defineStore('customer', () => {
     setCustomerForEdit,
     updateCustomerDialog,
     searchQuery,
-    openCreateCustomerDialog
+    openCreateCustomerDialog,
+    openDialogFindCustomer,
+    setCustomerInReceipt
   };
 });
