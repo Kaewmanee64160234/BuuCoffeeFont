@@ -12,7 +12,19 @@ async function getfindToday() {
     }
   }
 }
+function getAll() {
+  return http.get("/cashiers");
+}
+function getSumType() {
+  return http.get("/receipts/sum");
+}
+function deleteCashier(id: number) {
+  return http.delete(`/cashiers/${id}`);
+}
 
 export default {
   getfindToday,
+  deleteCashier,
+  getAll,
+  getSumType,
 };

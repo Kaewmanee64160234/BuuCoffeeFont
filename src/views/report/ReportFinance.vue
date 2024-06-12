@@ -9,6 +9,9 @@ const activeComponent = ref<string | null>(null);
 function showComponent(component: string) {
   activeComponent.value = component;
 }
+function reloadData() {
+  emit('reloadData');
+}
 </script>
 
 <template>
@@ -55,9 +58,7 @@ function showComponent(component: string) {
       <v-card-text>
         <v-row>
           <v-col>
-            <component
-              :is="activeComponent === 'finance' ? ReportFinanceComponant : null"
-            />
+            <component :is="activeComponent === 'finance' ? ReportFinanceComponant : null" @reloadData="reloadData" />
             <component
               :is="activeComponent === 'ingredient' ? ReportIngredientComponant : null"
             />
