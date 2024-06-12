@@ -8,6 +8,7 @@ import type { ProductType } from "@/types/productType.type";
 import type { Topping } from "@/types/topping.type";
 import { useProductStore } from "./product.store";
 import receiptService from "@/service/receipt.service";
+import type { Promotion } from "@/types/promotion.type";
 
 export const usePosStore = defineStore("pos", () => {
   const selectedItems = ref<ReceiptItem[]>([]);
@@ -18,13 +19,15 @@ export const usePosStore = defineStore("pos", () => {
   const totalPrice = ref<number>(0);
   const netPrice = ref<number>(0);
   const receipt = ref<Receipt>({
-    totalPrice: 0,
     receiptType: "",
-    totalDiscount: 0,
-    netPrice: 0,
+    receiptTotalDiscount: 0,
+    receiptNetPrice: 0,
     receiptStatus: "",
     createdReceipt: new Date(),
     receiptItems: [],
+    receiptPromotions: [],
+    receiptTotalPrice: 0,
+    paymentMethod: "",
   });
 
   const toppingDialog = ref(false);
@@ -139,21 +142,21 @@ export const usePosStore = defineStore("pos", () => {
 
   const removeItem = (index: number) => {
     selectedItems.value.splice(index, 1);
-        receipt.value.receiptTotalPrice = calculateTotal(selectedItems.value);
-
+    receipt.value.receiptTotalPrice = calculateTotal(selectedItems.value);
   };
 
-
   const spliceData = (index: number) => {
-   
-    selectedItems.value[index].receiptSubTotal -= parseInt((selectedItems.value[index].receiptSubTotal/selectedItems.value[index].quantity)+'');
+    selectedItems.value[index].receiptSubTotal -= parseInt(
+      selectedItems.value[index].receiptSubTotal /
+        selectedItems.value[index].quantity +
+        ""
+    );
     selectedItems.value[index].quantity -= 1;
-    
+
     if (selectedItems.value[index].quantity === 0) {
       selectedItems.value.splice(index, 1);
     }
     receipt.value.receiptTotalPrice = calculateTotal(selectedItems.value);
-
   };
 
   // create function create recipt
@@ -166,11 +169,81 @@ export const usePosStore = defineStore("pos", () => {
     receipt.value.createdReceipt = new Date();
 
     await receiptService.createReceipt(receipt.value);
+    
   };
-
-  const applyPromotion = (promotion: ReceiptPromotion) => {
-    receiptPromotions.value.push(promotion);
-    // productStore.totalProducts = calculateSubtotal(selectedItems.value);
+  const promotionTypes = [
+    { text: "Discount by Price", value: "discountPrice" },
+    { text: "Buy 1 Get 1", value: "buy1get1" },
+    { text: "Use Points for Discount", value: "usePoints" },
+    { text: "Discount by Percentage", value: "discountPercentage" },
+  ];
+  const applyPromotion = (promotion: Promotion) => {
+    // check promotion type
+    if (
+      promotion.promotionType === "discountPrice" ||
+      promotion.promotionType === "usePoints"
+    ) {
+      receipt.value.receiptPromotions.push({
+        date: new Date(),
+        discount: promotion.discountValue,
+        promotion: promotion,
+      });
+    } else if (promotion.promotionType === "discountPercentage") {
+      // calculate percentage discoutn with totak recipt
+      if (promotion.conditionValue1! <= receipt.value.receiptTotalPrice) {
+        const discount =
+          parseInt(receipt.value.receiptTotalPrice + "") *
+          parseFloat(promotion.discountValue! / 100 + "");
+        receipt.value.receiptPromotions.push({
+          date: new Date(),
+          discount: discount,
+          promotion: promotion,
+        });
+      }
+    } else {
+      // buy 1 get 1
+      // find in selectedItem have that prodyct?
+      const product = selectedItems.value.find(
+        (item) => item.product?.productId === promotion.buyProductId
+      );
+      const product2 = selectedItems.value.find(
+        (item) => item.product?.productId === promotion.freeProductId
+      );
+      if (product2 && product) {
+        if (promotion.freeProductId === promotion.buyProductId) {
+          // check qumtity
+          if (product.quantity>=2) {
+            const discount = selectedItems.value.find(
+              (item) => item.product?.productId === promotion.freeProductId
+            )?.product?.productPrice;
+            receipt.value.receiptPromotions.push({
+              date: new Date(),
+              discount: discount,
+              promotion: promotion,
+            });
+          }
+        } else {
+          const discount = productStore.products.find(
+            (product) => product.productId === promotion.freeProductId
+          )?.productPrice!;
+          receipt.value.receiptPromotions.push({
+            date: new Date(),
+            discount: discount,
+            promotion: promotion,
+          });
+        }
+      }
+    }
+    // calculate total discount
+    receipt.value.receiptTotalDiscount = receipt.value.receiptPromotions.reduce(
+      (acc, item) => {
+        return acc + parseInt(item.discount! + "");
+      },
+      0
+    );
+    receipt.value.receiptNetPrice =
+      parseInt(receipt.value.receiptTotalPrice + "") -
+      parseFloat(receipt.value.receiptTotalDiscount + "");
   };
 
   return {
@@ -189,5 +262,6 @@ export const usePosStore = defineStore("pos", () => {
     receipt,
     createReceipt,
     spliceData,
+    applyPromotion,
   };
 });

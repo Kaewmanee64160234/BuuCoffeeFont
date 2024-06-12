@@ -14,7 +14,7 @@
                 <v-text-field v-model="startDate" label="วันที่เริ่มต้น" type="date" required></v-text-field>
                 <v-checkbox v-model="noEndDate" label="ไม่มีวันสิ้นสุด"></v-checkbox>
                 <v-text-field v-if="!noEndDate" v-model="endDate" label="วันที่สิ้นสุด" type="date"></v-text-field>
-                <v-select v-model="promotionType" :items="promotionTypes.map(promotionType => promotionType.value)"
+                <v-select v-model="promotionType" :items="promotionStore.promotionTypes.map(promotionType => promotionType.value)"
                   item-text="text" item-value="value" label="ประเภทโปรโมชั่น" required></v-select>
                 <v-textarea v-model="description" label="คำอธิบาย" required></v-textarea>
               </v-form>
@@ -47,9 +47,9 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn v-if="step > 1" @click="previousStep">ย้อนกลับ</v-btn>
-          <v-btn v-if="step < items.length" @click="nextStep">ถัดไป</v-btn>
-          <v-btn v-if="step === items.length" @click="createPromotion">สร้าง</v-btn>
+          <!-- <v-btn v-if="step > 1" @click="previousStep">ย้อนกลับ</v-btn>
+          <v-btn v-if="step < items.length" @click="nextStep">ถัดไป</v-btn> -->
+          <v-btn v-if="step === items.length" @click="createPromotion()">สร้าง</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -79,12 +79,7 @@ const endDate = ref<string | null>(null);
 const description = ref('');
 const noEndDate = ref(false);
 
-const promotionTypes = [
-    { text: 'Discount by Price', value: 'discountPrice' },
-    { text: 'Buy 1 Get 1', value: 'buy1get1' },
-    { text: 'Use Points for Discount', value: 'usePoints' },
-    { text: 'Discount by Percentage', value: 'discountPercentage' },
-];
+
 
 const items = [
     { title: 'Promotion Details', complete: false },
@@ -107,6 +102,13 @@ const closeDialog = () => {
     buyProductId.value = null;
     freeProductId.value = null;
     pointsRequired.value = null;
+    discountPercentage.value = null;
+    minimumPrice.value = null;
+    startDate.value = null;
+    endDate.value = null;
+    description.value = '';
+    noEndDate.value = false;
+
     step.value = 1;
     promotionStore.createPromotionDialog = false;
 };
@@ -122,11 +124,11 @@ const createPromotion = async () => {
         promotionType: promotionType.value,
         startDate: new Date(startDate.value),
         endDate: noEndDate.value ? null : new Date(endDate.value),
-        discountValue: promotionType.value === 'discountPrice' || promotionType.value === 'usePoints' ? discountValue.value : null,
-        conditionQuantity: promotionType.value === 'discountPrice' || promotionType.value === 'usePoints' ? 1 : null,
+        discountValue: promotionType.value === 'discountPrice' || promotionType.value === 'usePoints' || promotionType.value === 'discountPercentage' ? discountValue.value : null,
+        conditionQuantity: promotionType.value === 'discountPrice' || promotionType.value === 'usePoints' ? pointsRequired.value : null,
         buyProductId: promotionType.value === 'buy1get1' ? productStore.products.find(product => product.productName === buyProductId.value)?.productId : null, // Find the product id from the product store (assuming the product store has the products loaded
         freeProductId: promotionType.value === 'buy1get1' ? productStore.products.find(product => product.productName === freeProductId.value)?.productId : null,
-        conditionValue1: promotionType.value === 'discountPercentage' ? discountPercentage.value : null,
+        conditionValue1: promotionType.value === 'discountPercentage' ? minimumPrice.value : null,
         conditionValue2: promotionType.value === 'discountPercentage' ? minimumPrice.value : null,
         promotionDescription: description.value,
         noEndDate: noEndDate.value,

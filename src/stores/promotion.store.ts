@@ -12,6 +12,12 @@ export const usePromotionStore = defineStore("promotion", () => {
   const currentPage = ref(1);
   const itemsPerPage = ref(5);
   const totalItems = ref(0);
+  const promotionTypes = [
+    { text: 'Discount by Price', value: 'discountPrice' },
+    { text: 'Buy 1 Get 1', value: 'buy1get1' },
+    { text: 'Use Points for Discount', value: 'usePoints' },
+    { text: 'Discount by Percentage', value: 'discountPercentage' },
+];
 
   // Watch for searchQuery
   watch(searchQuery, (value) => {
@@ -65,6 +71,7 @@ export const usePromotionStore = defineStore("promotion", () => {
       const res = await promotionService.createPromotion(promotion);
       if (res.data) {
         promotions.value.push(res.data);
+        getPromotionsPaginate();
       }
     } catch (error) {
       console.error(error);
@@ -78,6 +85,8 @@ export const usePromotionStore = defineStore("promotion", () => {
       if (res.data) {
         const index = promotions.value.findIndex((p) => p.promotionId === id);
         promotions.value[index] = res.data;
+      getPromotionsPaginate();
+
       }
     } catch (error) {
       console.error(error);
@@ -134,6 +143,7 @@ export const usePromotionStore = defineStore("promotion", () => {
     currentPage,
     itemsPerPage,
     getPromotionsPaginate,
-    totalItems
+    totalItems,
+    promotionTypes
   };
 });

@@ -39,14 +39,13 @@
     <v-divider></v-divider>
     <v-card-subtitle>รวมทั้งหมด: {{ posStore.receipt.receiptTotalPrice }}</v-card-subtitle>
     <v-card-subtitle>ราคาลด: {{ posStore.receipt.receiptTotalDiscount }}</v-card-subtitle>
+    <v-card-subtitle>promotion: {{ posStore.receipt.receiptPromotions }}</v-card-subtitle>
     <v-card-subtitle>รวมสุทธิ: {{posStore.receipt.receiptNetPrice }}</v-card-subtitle>
     <v-divider></v-divider>
     <v-card-actions>
       <v-btn @click="selectPaymentMethod('cash')" color="success">ชำระเงินสด</v-btn>
       <v-btn @click="selectPaymentMethod('qrcode')" color="primary">ชำระด้วย QR Code</v-btn>
-
     </v-card-actions>
-
   </v-card>
   <v-btn color="warning" @click="save">Finish</v-btn>
 </template>
@@ -55,6 +54,7 @@
 import { usePosStore } from '@/stores/pos.store';
 import { useProductStore } from '@/stores/product.store';
 import { computed } from 'vue';
+import Swal from 'sweetalert2';
 
 const posStore = usePosStore();
 const selectedItems = computed(() => posStore.selectedItems);
@@ -65,24 +65,22 @@ function removeItem(index: number) {
 }
 
 function increaseQuantity(index: number) {
-
-  if(  selectedItems.value[index].product?.category.haveTopping){
+  if (selectedItems.value[index].product?.category.haveTopping) {
     posStore.addToReceipt(
       selectedItems.value[index].product,
       selectedItems.value[index].productTypeToppings[0].productType,
       selectedItems.value[index].productTypeToppings,
       1,
       selectedItems.value[index].sweetnessLevel,
-    )
-  }else{
+    );
+  } else {
     posStore.addToReceipt(
       selectedItems.value[index].product,
       null,
       [],
       1,
       null,
-    )
-  
+    );
   }
 }
 
@@ -91,7 +89,7 @@ function decreaseQuantity(index: number) {
   if (item.quantity === 1) {
     removeItem(index);
   } else {
-    posStore.spliceData(index)
+    posStore.spliceData(index);
   }
 }
 
@@ -99,9 +97,39 @@ function selectPaymentMethod(method: string) {
   console.log(`Selected payment method: ${method}`);
   posStore.receipt.paymentMethod = method;
 }
-// save
+
 function save() {
-  posStore.createReceipt()
+  // Perform validation
+  if (selectedItems.value.length === 0) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Incomplete Data',
+      text: 'Please add at least one item to the receipt.',
+    });
+    return;
+  }
+  if(posStore.receipt.paymentMethod === ''){
+    Swal.fire({
+      icon: 'error',
+      title: 'Incomplete Data',
+      text: 'Please select payment method.',
+    });
+    return;
+  }
+
+  posStore.createReceipt();
+  // Clear data
+  posStore.selectedItems = [];
+  posStore.receipt.receiptTotalPrice = 0;
+  posStore.receipt.receiptTotalDiscount = 0;
+  posStore.receipt.receiptNetPrice = 0;
+  posStore.receipt.receiptPromotions = [];
+
+  Swal.fire({
+    icon: 'success',
+    title: 'Receipt Created',
+    text: 'The receipt has been successfully created.',
+  });
 }
 </script>
 

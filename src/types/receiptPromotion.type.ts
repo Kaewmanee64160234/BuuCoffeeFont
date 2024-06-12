@@ -4,9 +4,8 @@ import type { Promotion } from "./promotion.type";
 import type { Receipt } from "./receipt.type";
 
 export interface ReceiptPromotion {
-  receiptPromId: number;
-  receipt: Receipt;
+  receiptPromotionId?: number;
   promotion: Promotion;
-  discount: number;
+  discount?: number;
   date: Date;
 }
