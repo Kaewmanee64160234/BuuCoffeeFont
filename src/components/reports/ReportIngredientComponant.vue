@@ -1,3 +1,54 @@
+<script lang="ts" setup>
+import { onMounted } from 'vue';
+import ApexCharts from 'apexcharts';
+
+const pieChartOptions = {
+  series: [44, 55, 13, 43, 22],
+  chart: {
+    width: 380,
+    type: 'pie',
+  },
+  labels: ['หมวกแฟ่', 'นมผง', 'หมวกเขียว', 'น้ำเชื่อม', 'ไซรัป'],
+  responsive: [{
+    breakpoint: 480,
+    options: {
+      chart: {
+        width: 200
+      },
+      legend: {
+        position: 'bottom'
+      }
+    }
+  }]
+};
+
+const lineChartOptions = {
+  series: [{
+    name: 'ยอดเงินนำเข้าวัตถุดิบ',
+    data: [2540, 3000, 4000, 500]
+  }],
+  chart: {
+    type: 'line',
+    height: 350
+  },
+  xaxis: {
+    categories: ['05/04/2024', '21/03/2024', '10/03/2024', '1/02/2024']
+  },
+  yaxis: {
+    title: {
+      text: 'จำนวนเงิน (บาท)'
+    }
+  }
+};
+
+onMounted(() => {
+  const pieChart = new ApexCharts(document.querySelector("#pieChart"), pieChartOptions);
+  pieChart.render();
+
+  const lineChart = new ApexCharts(document.querySelector("#lineChart"), lineChartOptions);
+  lineChart.render();
+});
+</script>
 <template>
     <div class="container">
       <div class="section">
@@ -53,8 +104,11 @@
       <div class="section">
         <h2>นำเข้าวัตถุดิบ</h2>
         <div class="total-import">ยอดรวมนำเข้าวัตถุดิบ: 30,000</div>
-        <div id="lineChart"></div>
-        <table>
+        <v-row>
+        <v-col>
+          <div id="lineChart"></div>
+          </v-col>
+          <v-col>    <table>
           <thead>
             <tr>
               <th>วันที่</th>
@@ -96,7 +150,8 @@
               </td>
             </tr>
           </tbody>
-        </table>
+        </table></v-col>
+      </v-row>
       </div>
   
       <div class="section">
@@ -121,94 +176,10 @@
         </table>
       </div>
   
-      <div class="section">
-        <h2>ประวัติการเช็ควัตถุดิบ</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>วันที่</th>
-              <th>ผู้รับผิดชอบ</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>5/5/2024 16:30</td>
-              <td>กุลธิรา</td>
-              <td>
-                <button>View</button>
-                <button>Edit</button>
-              </td>
-            </tr>
-            <tr>
-              <td>25/4/2024 10:30</td>
-              <td>กุลธิรา</td>
-              <td>
-                <button>View</button>
-                <button>Edit</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
     </div>
   </template>
   
-  <script lang="ts" setup>
-import { onMounted } from 'vue';
-import ApexCharts from 'apexcharts';
-import 'vuetify/styles';
-import { createVuetify } from 'vuetify';
 
-const vuetify = createVuetify();
-
-const pieChartOptions = {
-  series: [44, 55, 13, 43, 22],
-  chart: {
-    width: 380,
-    type: 'pie',
-  },
-  labels: ['หมวกแฟ่', 'นมผง', 'หมวกเขียว', 'น้ำเชื่อม', 'ไซรัป'],
-  responsive: [{
-    breakpoint: 480,
-    options: {
-      chart: {
-        width: 200
-      },
-      legend: {
-        position: 'bottom'
-      }
-    }
-  }]
-};
-
-const lineChartOptions = {
-  series: [{
-    name: 'ยอดเงินนำเข้าวัตถุดิบ',
-    data: [2540, 3000, 4000, 500]
-  }],
-  chart: {
-    type: 'line',
-    height: 350
-  },
-  xaxis: {
-    categories: ['05/04/2024', '21/03/2024', '10/03/2024', '1/02/2024']
-  },
-  yaxis: {
-    title: {
-      text: 'จำนวนเงิน (บาท)'
-    }
-  }
-};
-
-onMounted(() => {
-  const pieChart = new ApexCharts(document.querySelector("#pieChart"), pieChartOptions);
-  pieChart.render();
-
-  const lineChart = new ApexCharts(document.querySelector("#lineChart"), lineChartOptions);
-  lineChart.render();
-});
-</script>
   
   <style>
 .container {

@@ -17,8 +17,8 @@ export interface ReceiptItem {
   receiptItemId?: number;
   productType?: ProductType;
 
-
 }
+
 
 export interface Receipt {
   receiptId?: number;

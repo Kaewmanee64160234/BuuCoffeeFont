@@ -8,7 +8,6 @@ function getReceiptById(id: number) {
   return http.get(`/receipts/${id}`);
 }
 function createReceipt(receipt : Receipt) {
-
 console.log("receipt", JSON.stringify(receipt));
   return http.post("/receipts", receipt);
 }
