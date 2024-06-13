@@ -10,7 +10,7 @@ function getReceiptById(id: number) {
 function createReceipt(receipt : Receipt) {
 
 console.log("receipt", JSON.stringify(receipt));
-  return http.post("/reciept", receipt);
+  return http.post("/receipts", receipt);
 }
 function updateReceipt(id: number, receipt: Receipt) {
   return http.put(`/receipts/${id}`, receipt);

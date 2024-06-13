@@ -9,6 +9,9 @@ const activeComponent = ref<string | null>(null);
 function showComponent(component: string) {
   activeComponent.value = component;
 }
+function reloadData() {
+  emit('reloadData');
+}
 </script>
 
 <template>
@@ -17,7 +20,7 @@ function showComponent(component: string) {
       <v-card-title>
         <v-row class="d-flex align-center justify-space-between">
           <v-col cols="auto">
-            รายการวัตถุดิบ
+            Dashboard
           </v-col>
           <v-col cols="auto">
             <v-btn
@@ -36,7 +39,7 @@ function showComponent(component: string) {
               @click="showComponent('ingredient')"
             >
               <v-icon left>mdi-filter</v-icon>
-              สินค้า
+              วัสถุดิบ
             </v-btn>
           </v-col>
           <v-col cols="auto">
@@ -46,7 +49,7 @@ function showComponent(component: string) {
               @click="showComponent('product')"
             >
               <v-icon left>mdi-filter</v-icon>
-              วัสถุดิบ
+              สินค้า
             </v-btn>
           </v-col>
         </v-row>
@@ -55,9 +58,7 @@ function showComponent(component: string) {
       <v-card-text>
         <v-row>
           <v-col>
-            <component
-              :is="activeComponent === 'finance' ? ReportFinanceComponant : null"
-            />
+            <component :is="activeComponent === 'finance' ? ReportFinanceComponant : null" @reloadData="reloadData" />
             <component
               :is="activeComponent === 'ingredient' ? ReportIngredientComponant : null"
             />

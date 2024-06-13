@@ -1,4 +1,4 @@
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { defineStore } from "pinia";
 import type { Receipt } from "@/types/receipt.type";
 import receiptService from "@/service/receipt.service";
@@ -20,7 +20,7 @@ export const useReceiptStore = defineStore("receipt", () => {
     }
   };
 
-  const getReceiptsById = async (id: number) => {
+  const getReceiptById = async (id: number) => {
     try {
       const response = await receiptService.getReceiptById(id);
       if (response.status === 200) {
@@ -43,14 +43,23 @@ export const useReceiptStore = defineStore("receipt", () => {
     }
   };
 
-  
+  const filteredReceipts = computed(() => {
+    if (!searchQuery.value) {
+      return receipts.value;
+    }
+    return receipts.value.filter(receipt =>
+      receipt.customer?.customerName?.toLowerCase().includes(searchQuery.value.toLowerCase())
+    );
+  });
+
   return {
     receipts,
     receipt,
     getAllReceipts,
-    getReceiptsById,
+    getReceiptById,
     createReceipt,
     searchQuery,
-    historyReceiptDialog
+    historyReceiptDialog,
+    filteredReceipts
   };
 });

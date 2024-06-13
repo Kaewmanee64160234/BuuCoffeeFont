@@ -4,9 +4,6 @@ import { useReportFinnceStore } from '@/stores/report/finance.store';
 const props = defineProps({
   dialogVisible: Boolean
 });
-
-
-
 const ReportFinnceStore = useReportFinnceStore();
 const clearData = () => {
     ReportFinnceStore.createCashierDialog = false;
