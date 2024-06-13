@@ -1,5 +1,4 @@
 <template>
-  <HistoryReceiptDialog v-model:dialog="historyReceiptDialog" :receipt="selectedReceipt" />
 
   <v-container>
     <v-card class="flex-container">
@@ -16,7 +15,6 @@
                 append-inner-icon="mdi-magnify"
                 hide-details
                 dense
-                @keydown="handleSearchKeydown"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -42,7 +40,7 @@
             <tbody>
               <tr v-for="receipt in filteredReceipts" :key="receipt.receiptId">
                 <td class="text-center">{{ receipt.receiptId }}</td>
-                <td class="text-center">{{ formatDateThai(receipt.createdDate) }}</td>
+                <td class="text-center">{{ formatDateThai(receipt.createdDate+'') }}</td>
                 <td class="text-center">{{ receipt.receiptTotalDiscount }}</td>
                 <td class="text-center">{{ receipt.customer?.customerName }}</td>
                 <td class="text-center">{{ receipt.promotion }}</td>
@@ -63,7 +61,8 @@
         </div>
       </v-card>
     </v-card>
-  </v-container>
+  <HistoryReceiptDialog />
+</v-container>
 </template>
 
 <script lang="ts" setup>
@@ -81,8 +80,9 @@ onMounted(async () => {
 });
 
 const openHistoryReceiptDialog = (receipt: Receipt) => {
-  selectedReceipt.value = receipt;
-  historyReceiptDialog.value = true;
+  // selectedReceipt.value = receipt;
+  receiptStore.receipt = receipt;
+ receiptStore.historyReceiptDialog = true;
 };
 
 const handleSearchKeydown = (event: KeyboardEvent) => {

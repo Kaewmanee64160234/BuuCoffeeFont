@@ -1,13 +1,15 @@
 <template>
-  <v-dialog v-model="dialog" max-width="900px">
+  <v-dialog v-model="reciptStore.historyReceiptDialog" max-width="900px">
     <v-card>
       <v-card-title>
         <span class="text-h5">
-          บันทึกการสั่งซื้อ วันที่ {{ formattedReceiptDate }}<br> ลูกค้า : {{ customerName }}
+          บันทึกการสั่งซื้อ วันที่ {{ formattedReceiptDate }}<br> ลูกค้า : {{ reciptStore.receipt?.customer?.customerName }}
         </span>
       </v-card-title>
       <v-card-text>
         <v-container>
+        <!-- {{ reciptStore.receipt }} -->
+
           <v-table dense>
             <thead>
               <tr>
@@ -18,17 +20,24 @@
                 <th class="text-center">ราคา</th>
               </tr>
             </thead>
+
             <tbody>
-              <tr v-for="(item, index) in receiptItems" :key="index">
+              <tr v-for="(item, index) in reciptStore.receipt?.receiptItems" :key="index">
                 <td class="text-center">{{ item.product?.productName || 'ไม่มีข้อมูล' }}</td>
                 <td class="text-center">
-                  <ul>
+                  <ul v-if="item.productTypeToppings.length > 0">
                     <li v-for="(topping, idx) in item.productTypeToppings" :key="idx">
                       {{ topping.topping?.toppingName || 'ไม่มีข้อมูล' }}
                     </li>
                   </ul>
+
+                  <span v-else>ไม่มีข้อมูล</span>
                 </td>
-                <td class="text-center">{{ item.productType?.productTypeName}}</td>
+                <td class="text-center">
+                  <span v-if="item.productTypeToppings.length > 0">{{ item.productTypeToppings[0].productType.productTypeName}}</span>
+                  <span v-else>ไม่มีข้อมูล</span>
+
+                </td>
                 <td class="text-center">{{ item.quantity }}</td>
                 <td class="text-center">{{ item.receiptSubTotal }}</td>
               </tr>
@@ -36,24 +45,23 @@
           </v-table>
           <div class="text-right" style="margin-top: 20px;">
             <strong>ราคารวมสุทธิ</strong>
-            <span>{{ receipt?.receiptTotalPrice ?? 0 }} บาท</span>
+            <span>{{ reciptStore.receipt?.receiptTotalPrice ?? 0 }} บาท</span>
           </div>
         </v-container>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="orange" @click="dialog = false">ตกลง</v-btn>
+        <v-btn color="orange" @click="closeDialog()">ตกลง</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, watch } from 'vue';
-import type { Receipt } from '@/types/receipt.type';
+import {  computed } from 'vue';
+import {useReceiptStore} from '@/stores/receipt.store';
 
-const props = defineProps<{ dialog: boolean, receipt: Receipt | null }>();
-const dialog = ref(props.dialog);
+const reciptStore = useReceiptStore()
 
 function formatDateThai(dateString: string): string {
   const date = new Date(dateString);
@@ -68,15 +76,19 @@ function formatDateThai(dateString: string): string {
 }
 
 const formattedReceiptDate = computed(() => {
-  return props.receipt ? formatDateThai(new Date(props.receipt.createdDate).toISOString()) : '';
+  return reciptStore.receipt ? formatDateThai(new Date(reciptStore.receipt.createdDate).toISOString()) : '';
 });
 
-const customerName = computed(() => props.receipt?.customer?.customerName || '');
-const receiptItems = computed(() => props.receipt?.receiptItems || []);
+// closeDialog
+function closeDialog() {
+  // cler data recipt store
+  reciptStore.receipt = null;
+  reciptStore.historyReceiptDialog = false;
+}
 
-watch(() => props.dialog, (newVal) => {
-  dialog.value = newVal;
-});
+
+
+
 </script>
 
 <style scoped>

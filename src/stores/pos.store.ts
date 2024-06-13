@@ -68,17 +68,21 @@ export const usePosStore = defineStore("pos", () => {
     if (existingItem) {
       if (product.category.haveTopping) {
         if (productTypeToppings.length > 0) {
+          existingItem.quantity += parsedQuantity;
           const toppingsTotal = productTypeToppings.reduce(
             (toppingAcc, toppingItem) =>
               toppingAcc +
               parseFloat(toppingItem.topping.toppingPrice.toString()) *
-                parsedQuantity,
+                parseFloat(toppingItem.quantity + "") *
+                existingItem.quantity,
             0
           );
-          const itemTotal = productPrice * parsedQuantity + toppingsTotal;
-          existingItem.receiptSubTotal +=
-            itemTotal + parseFloat(productType.productTypePrice.toString());
-          existingItem.quantity += parsedQuantity;
+          const itemTotal =
+            (productPrice +
+              parseFloat(productType.productTypePrice.toString())) *
+              existingItem.quantity +
+            toppingsTotal;
+          existingItem.receiptSubTotal = itemTotal;
         } else {
           existingItem.receiptSubTotal +=
             (productPrice +
@@ -112,6 +116,7 @@ export const usePosStore = defineStore("pos", () => {
             receiptSubTotal: itemTotal,
             product,
             sweetnessLevel: sweetness,
+            productType: productType
           });
         } else {
           selectedItems.value.push({
@@ -123,6 +128,8 @@ export const usePosStore = defineStore("pos", () => {
               parsedQuantity,
             product,
             sweetnessLevel: sweetness,
+            productType: productType
+
           });
         }
       } else {
@@ -144,6 +151,8 @@ export const usePosStore = defineStore("pos", () => {
       return acc + parseFloat(item.receiptSubTotal.toString());
     }, 0);
   };
+
+
 
   const removeItem = (index: number) => {
     selectedItems.value.splice(index, 1);
@@ -268,6 +277,6 @@ export const usePosStore = defineStore("pos", () => {
     spliceData,
     applyPromotion,
     currentReceipt,
-    receiptDialog
+    receiptDialog,
   };
 });

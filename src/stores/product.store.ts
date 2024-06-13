@@ -8,6 +8,7 @@ import type {
   IngredientQuantities,
   ProductType,
 } from "@/types/productType.type";
+import { useUserStore } from "./user.store";
 
 export const useProductStore = defineStore("product", () => {
   const products = ref<Product[]>([]);
@@ -28,7 +29,7 @@ export const useProductStore = defineStore("product", () => {
     file: new File([""], "filename"),
     productTypes: [],
   });
-
+  const userStore = useUserStore();
   const productName = ref<string>("");
   const productPrice = ref<number>(0);
   const selectedCategory = ref<string | null>(null);
@@ -52,17 +53,18 @@ export const useProductStore = defineStore("product", () => {
 
   const categoryStore = useCategoryStore();
 
-  // watch if selectedCategory 
+  // watch if selectedCategory
   watch(selectedCategory, (newCategory) => {
-    console.log("selectedCategory", newCategory);
+    console.log("selectedCategory", selectedCategory.value);
     if (newCategory) {
-      if(newCategory === 'All'){
-        getProductPaginate()
-      }else{
-        getProductsByCategory(newCategory);
-
+      if (newCategory === "All") {
+        console.log("selectedCategory====");
+        getProductPaginate();
       }
-
+      if (newCategory !== 1) {
+        console.log(" selectedCategory___", newCategory);
+        getProductsByCategory(newCategory);
+      }
     }
   });
 
@@ -75,8 +77,6 @@ export const useProductStore = defineStore("product", () => {
   const setSelectedProduct = (product: Product) => {
     selectedProduct.value = product;
   };
-
-
 
   const getAllProducts = async () => {
     try {
@@ -143,7 +143,6 @@ export const useProductStore = defineStore("product", () => {
       console.log("updateProduct", response.status);
       if (response.status === 200) {
         await getProductPaginate();
-
       }
     } catch (error) {
       console.error(error);
