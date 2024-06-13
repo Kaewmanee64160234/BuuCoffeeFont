@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted ,computed} from 'vue';
 import VueApexCharts from 'vue3-apexcharts';
 import { useReportFinnceStore } from '@/stores/report/finance.store';
 import CreateDialogAddCashier from '../../components/reports/cashier/DialogAddCashier.vue';
@@ -34,9 +34,13 @@ const updateChartData = () => {
 onMounted(async () => {
   await ReportFinnceStore.getfindToday();
   await ReportFinnceStore.getSumType();
+  await ReportFinnceStore.getDailyReport();
   updateChartData();
 });
-
+const cash = parseFloat(ReportFinnceStore.sumType.cash);
+const cashier = ReportFinnceStore.cashiers;
+const start = cashier ? parseFloat(cashier.cashierAmount) : undefined;
+const sum = (cash || 0) + (start || 0);
 const openCreateDialog = () => {
   ReportFinnceStore.createCashierDialog = true;
 };
@@ -53,7 +57,7 @@ const deleteCashier = async (id: number) => {
   }
 };
 
-const lineChartOptions = ref({
+const lineChartOptions = ref({ 
   chart: {
     height: 350,
     type: 'line',
@@ -114,55 +118,42 @@ const lineChartSeries = ref([
                   เงินต้น : {{ ReportFinnceStore.cashiers.cashierAmount }} 
                   <span @click="deleteCashier(ReportFinnceStore.cashiers.cashierId)">
                     <v-icon>mdi-delete</v-icon>
+                    <v-card-subtitle>ยอดรวมเงินสดวันนี้ :{{sum}}</v-card-subtitle>
                   </span>
                 </v-card-subtitle>
               </template>
               <template v-else>
                 <v-btn @click="openCreateDialog">กรอกจำนวนเงินวันนี้</v-btn>
               </template>
-              <v-card-subtitle>ปัจจุบัน : 1,400</v-card-subtitle>
+         
             </v-card>
           </v-col>
           <v-col cols="12" md="6">
             <v-card>
               <v-card-title class="d-flex justify-space-between align-center">
                 รายได้
-                <v-btn icon>
-                  <v-icon>mdi-eye</v-icon>
-                </v-btn>
+   
               </v-card-title>
-              <v-card-subtitle class="text-h4">3,000.00</v-card-subtitle>
-              <v-card-actions>
-                <v-btn block>กรอกจำนวนเงินวันนี้</v-btn>
-              </v-card-actions>
+              <v-card-subtitle class="text-h4">{{ ReportFinnceStore.dailyReport.totalSales }}</v-card-subtitle>
             </v-card>
           </v-col>
           <v-col cols="12" md="6">
             <v-card>
               <v-card-title class="d-flex justify-space-between align-center">
                 จำนวนรายการ
-                <v-btn icon>
-                  <v-icon>mdi-eye</v-icon>
-                </v-btn>
+   
               </v-card-title>
-              <v-card-subtitle class="text-h4">45</v-card-subtitle>
-              <v-card-actions>
-                <v-btn block>กรอกจำนวนเงินวันนี้</v-btn>
-              </v-card-actions>
+              <v-card-subtitle class="text-h4">{{ ReportFinnceStore.dailyReport.totalTransactions }}</v-card-subtitle>
             </v-card>
           </v-col>
           <v-col cols="12" md="6">
             <v-card>
               <v-card-title class="d-flex justify-space-between align-center">
                 ส่วนลด
-                <v-btn icon>
-                  <v-icon>mdi-eye</v-icon>
-                </v-btn>
+  
               </v-card-title>
-              <v-card-subtitle class="text-h4">300</v-card-subtitle>
-              <v-card-actions>
-                <v-btn block>กรอกจำนวนเงินวันนี้</v-btn>
-              </v-card-actions>
+              <v-card-subtitle class="text-h4">{{ ReportFinnceStore.dailyReport.totalDiscount }}</v-card-subtitle>
+   
             </v-card>
           </v-col>
         </v-row>

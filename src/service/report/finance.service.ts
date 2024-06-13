@@ -12,9 +12,17 @@ async function getfindToday() {
     }
   }
 }
+export function createCashier(cashier: Cashier) {
+  console.log(JSON.stringify(cashier));
+  return http.post("/cashiers", cashier);
+}
 function getAll() {
   return http.get("/cashiers");
 }
+function getDailyReport() {
+  return http.get("/receipts/daily-report");
+}
+
 function getSumType() {
   return http.get("/receipts/sum");
 }
@@ -27,4 +35,6 @@ export default {
   deleteCashier,
   getAll,
   getSumType,
+  getDailyReport,
+  createCashier,
 };
