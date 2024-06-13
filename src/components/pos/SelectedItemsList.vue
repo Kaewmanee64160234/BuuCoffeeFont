@@ -27,7 +27,7 @@
             <v-icon>mdi-minus</v-icon>
           </v-btn>
           <span>{{ item.quantity }}</span>
-          <v-btn icon @click="increaseQuantity(index)">
+          <v-btn icon @click="increaseQuantity(item)">
             <v-icon>mdi-plus</v-icon>
           </v-btn>
         </v-list-item-content>
@@ -66,6 +66,7 @@ import Swal from 'sweetalert2';
 import { useCustomerStore } from '@/stores/customer.store';
 import AddCustomerDialog from '../customer/AddCustomerDialog.vue';
 import FindCustomerDialog from '../pos/FindCustomerDialog.vue';
+import type {ReceiptItem} from '../../types/receipt.type';
 
 const posStore = usePosStore();
 const selectedItems = computed(() => posStore.selectedItems);
@@ -75,9 +76,18 @@ function removeItem(index: number) {
   posStore.removeItem(index);
 }
 
-function increaseQuantity(index: number) {
-  // add quantity for thai recipt item and new caluculate
-  posStore.increaseQuantity(index);
+function increaseQuantity(item:ReceiptItem) {
+  console.log('increase quantity', item);
+  if(item.product?.category.haveTopping){
+    if(item.productTypeToppings.length > 0){
+      posStore.addToReceipt(item.product,item.productType,item.productTypeToppings,1,item.sweetnessLevel)
+    }else{
+      posStore.addToReceipt(item.product,item.productType,[],1,item.sweetnessLevel)
+    }
+  }else{
+    posStore.addToReceipt(item.product,{},[],1,null)
+  }
+
   
 }
 
