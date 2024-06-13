@@ -1,6 +1,8 @@
 import type { Ingredient } from "@/types/ingredient.type";
 import http from "./axios";
-
+function getIngredientlow() {
+  return http.get("/ingredients/low-stock");
+}
 function getAllIngredients(params: any) {
   return http.get("/ingredients", { params: params });
 }
@@ -67,6 +69,7 @@ function searchIngredientsByName(name: string) {
   return http.get("/ingredients/search", { params: { name } });
 }
 
+
 export default {
   getAllIngredients,
   createImportIngredients,
@@ -74,5 +77,6 @@ export default {
   saveIngredient,
   updateIngredient,
   deleteIngredient,
-  searchIngredientsByName
+  searchIngredientsByName,
+  getIngredientlow
 };
