@@ -1,71 +1,3 @@
-<template>
-  <HistoryReceiptDialog v-model:dialog="historyReceiptDialog" :receipt="selectedReceipt" />
-
-  <v-container>
-    <v-card class="flex-container">
-      <v-card-title>
-        <v-row>
-          <v-col cols="12" style="font-size: 35px;">
-            จัดการผู้ใช้งาน
-          </v-col>
-          <v-row style="margin-left: 6%;">
-            <v-col class="pa-2 ma-2" cols="3">
-              <v-text-field
-                v-model="receiptStore.searchQuery"
-                label="ค้นหาคำสั่งซื้อ"
-                append-inner-icon="mdi-magnify"
-                hide-details
-                dense
-                @keydown="handleSearchKeydown"
-              ></v-text-field>
-            </v-col>
-          </v-row>
-        </v-row>
-        <v-spacer></v-spacer>
-      </v-card-title>
-      <v-card width="90%" style="margin-left: 5%; margin-top: 3%;">
-        <div class="table-wrapper">
-          <v-table class="text-center">
-            <thead>
-              <tr>
-                <th class="text-center"></th>
-                <th class="text-center">วันที่</th>
-                <th class="text-center">ส่วนลด</th>
-                <th class="text-center">สมาชิก</th>
-                <th class="text-center">โปรโมชั่น</th>
-                <th class="text-center">ราคารวมสุทธิ</th>
-                <th class="text-center">รูปแบบการจ่ายเงิน</th>
-                <th class="text-center">สถานะการจ่ายเงิน</th>
-                <th class="text-center">Operations</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="receipt in filteredReceipts" :key="receipt.receiptId">
-                <td class="text-center">{{ receipt.receiptId }}</td>
-                <td class="text-center">{{ formatDateThai(receipt.createdDate) }}</td>
-                <td class="text-center">{{ receipt.receiptTotalDiscount }}</td>
-                <td class="text-center">{{ receipt.customer?.customerName }}</td>
-                <td class="text-center">{{ receipt.promotion }}</td>
-                <td class="text-center">{{ receipt.receiptTotalPrice }}</td>
-                <td class="text-center">{{ receipt.paymentMethod }}</td>
-                <td class="text-center">{{ receipt.receiptStatus }}</td>
-                <td class="text-center">
-                  <v-btn color="#FFDD83" icon="mdi-eye" @click="openHistoryReceiptDialog(receipt)"></v-btn>
-                </td>
-              </tr>
-            </tbody>
-            <tbody v-if="!filteredReceipts.length">
-              <tr>
-                <td colspan="12" class="text-center">No data</td>
-              </tr>
-            </tbody>
-          </v-table>
-        </div>
-      </v-card>
-    </v-card>
-  </v-container>
-</template>
-
 <script lang="ts" setup>
 import { useReceiptStore } from '@/stores/receipt.store';
 import { computed, onMounted, ref } from 'vue';
@@ -93,12 +25,14 @@ const handleSearchKeydown = (event: KeyboardEvent) => {
 
 const filteredReceipts = computed(() => {
   if (!receiptStore.searchQuery) {
-    return receiptStore.receipts;
+    return receiptStore.receipts.slice().sort((a, b) => a.receiptId - b.receiptId);
   }
-  return receiptStore.receipts.filter(receipt =>
-    receipt.customer?.customerName?.toLowerCase().includes(receiptStore.searchQuery.toLowerCase()) ||
-    receipt.receiptId?.toString().includes(receiptStore.searchQuery)
-  );
+  return receiptStore.receipts
+    .filter(receipt =>
+      receipt.customer?.customerName?.toLowerCase().includes(receiptStore.searchQuery.toLowerCase()) ||
+      receipt.receiptId?.toString().includes(receiptStore.searchQuery)
+    )
+    .sort((a, b) => a.receiptId - b.receiptId);
 });
 
 function formatDateThai(dateString: string): string {
@@ -114,14 +48,80 @@ function formatDateThai(dateString: string): string {
 }
 </script>
 
-<style scoped>
+<template>
+  <HistoryReceiptDialog v-model:dialog="historyReceiptDialog" :receipt="selectedReceipt" />
+
+  <v-container>
+    <v-card class="flex-container">
+      <v-card-title>
+        <v-row>
+          <v-col cols="12" style="font-size: 35px;">
+            จัดการผู้ใช้งาน
+          </v-col>
+          <v-row style="margin-left: 6%;">
+            <v-col class="pa-2 ma-2" cols="3">
+              <v-text-field
+                v-model="receiptStore.searchQuery"
+                label="ค้นหาคำสั่งซื้อ"
+                append-inner-icon="mdi-magnify"
+                hide-details
+                dense
+                @keydown="handleSearchKeydown"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+        </v-row>
+        <v-spacer></v-spacer>
+      </v-card-title>
+      <v-card width="90%" style="margin-left: 5%; margin-top: 3%;">
+        <v-table class="text-center" style="max-height: 400px; overflow-y: auto;">
+          <thead>
+            <tr>
+              <th class="text-center">ID</th>
+              <th class="text-center">วันที่</th>
+              <th class="text-center">ส่วนลด</th>
+              <th class="text-center">สมาชิก</th>
+              <th class="text-center">โปรโมชั่น</th>
+              <th class="text-center">ราคารวมสุทธิ</th>
+              <th class="text-center">รูปแบบการจ่ายเงิน</th>
+              <th class="text-center">สถานะการจ่ายเงิน</th>
+              <th class="text-center">Operations</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="receipt in filteredReceipts" :key="receipt.receiptId">
+              <td class="text-center">{{ receipt.receiptId }}</td>
+              <td class="text-center">{{ formatDateThai(receipt.createdDate) }}</td>
+              <td class="text-center">{{ receipt.receiptTotalDiscount }}</td>
+              <td class="text-center">{{ receipt.customer?.customerName }}</td>
+              <td class="text-center">
+                <span v-for="promo in receipt.receiptPromotions" :key="promo.promotion.promotionId">
+                  {{ promo.promotion.promotionName || 'ไม่มีข้อมูล' }}
+                </span>
+              </td>
+              <td class="text-center">{{ receipt.receiptTotalPrice }}</td>
+              <td class="text-center">{{ receipt.paymentMethod }}</td>
+              <td class="text-center">{{ receipt.receiptStatus }}</td>
+              <td class="text-center">
+                <v-btn color="#FFDD83" icon="mdi-eye" @click="openHistoryReceiptDialog(receipt)"></v-btn>
+              </td>
+            </tr>
+          </tbody>
+          <tbody v-if="!filteredReceipts.length">
+            <tr>
+              <td colspan="12" class="text-center">No data</td>
+            </tr>
+          </tbody>
+        </v-table>
+      </v-card>
+    </v-card>
+  </v-container>
+</template>
+
+<style>
 .flex-container {
   display: flex;
   flex-direction: column;
   height: 95vh;
-}
-.table-wrapper {
-  max-height: 400px; /* Adjust the max-height as needed */
-  overflow-y: auto;
 }
 </style>
