@@ -8,7 +8,9 @@
           <button>+</button>
         </div>
         <div class="charts">
-          <div id="pieChart"></div>
+            <v-col>
+            <div id="pieChart"></div>
+          </v-col>
           <table>
             <thead>
               <tr>
@@ -153,119 +155,122 @@
   </template>
   
   <script lang="ts" setup>
-  import { onMounted } from 'vue';
-  import ApexCharts from 'apexcharts';
-  
-  const pieChartOptions = {
-    series: [44, 55, 13, 43, 22],
-    chart: {
-      width: 380,
-      type: 'pie',
-    },
-    labels: ['หมวกแฟ่', 'นมผง', 'หมวกเขียว', 'น้ำเชื่อม', 'ไซรัป'],
-    responsive: [{
-      breakpoint: 480,
-      options: {
-        chart: {
-          width: 200
-        },
-        legend: {
-          position: 'bottom'
-        }
-      }
-    }]
-  };
-  
-  const lineChartOptions = {
-    series: [{
-      name: 'ยอดเงินนำเข้าวัตถุดิบ',
-      data: [2540, 3000, 4000, 500]
-    }],
-    chart: {
-      type: 'line',
-      height: 350
-    },
-    xaxis: {
-      categories: ['05/04/2024', '21/03/2024', '10/03/2024', '1/02/2024']
-    },
-    yaxis: {
-      title: {
-        text: 'จำนวนเงิน (บาท)'
+import { onMounted } from 'vue';
+import ApexCharts from 'apexcharts';
+import 'vuetify/styles';
+import { createVuetify } from 'vuetify';
+
+const vuetify = createVuetify();
+
+const pieChartOptions = {
+  series: [44, 55, 13, 43, 22],
+  chart: {
+    width: 380,
+    type: 'pie',
+  },
+  labels: ['หมวกแฟ่', 'นมผง', 'หมวกเขียว', 'น้ำเชื่อม', 'ไซรัป'],
+  responsive: [{
+    breakpoint: 480,
+    options: {
+      chart: {
+        width: 200
+      },
+      legend: {
+        position: 'bottom'
       }
     }
-  };
-  
-  onMounted(() => {
-    const pieChart = new ApexCharts(document.querySelector("#pieChart"), pieChartOptions);
-    pieChart.render();
-  
-    const lineChart = new ApexCharts(document.querySelector("#lineChart"), lineChartOptions);
-    lineChart.render();
-  });
-  </script>
+  }]
+};
+
+const lineChartOptions = {
+  series: [{
+    name: 'ยอดเงินนำเข้าวัตถุดิบ',
+    data: [2540, 3000, 4000, 500]
+  }],
+  chart: {
+    type: 'line',
+    height: 350
+  },
+  xaxis: {
+    categories: ['05/04/2024', '21/03/2024', '10/03/2024', '1/02/2024']
+  },
+  yaxis: {
+    title: {
+      text: 'จำนวนเงิน (บาท)'
+    }
+  }
+};
+
+onMounted(() => {
+  const pieChart = new ApexCharts(document.querySelector("#pieChart"), pieChartOptions);
+  pieChart.render();
+
+  const lineChart = new ApexCharts(document.querySelector("#lineChart"), lineChartOptions);
+  lineChart.render();
+});
+</script>
   
   <style>
-  .container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-  }
-  
-  .section {
-    width: 100%;
-    background-color: #f5f5f5;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-  }
-  
-  .date-picker {
-    display: flex;
-    gap: 10px;
-  }
-  
-  .charts {
-    display: flex;
-    gap: 20px;
-  }
-  
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-  }
-  
-  table, th, td {
-    border: 1px solid #ddd;
-  }
-  
-  th, td {
-    padding: 8px;
-    text-align: left;
-  }
-  
-  th {
-    background-color: #f2f2f2;
-  }
-  
-  button {
-    padding: 5px 10px;
-    border: none;
-    border-radius: 5px;
-    background-color: #4CAF50;
-    color: white;
-    cursor: pointer;
-  }
-  
-  button:hover {
-    background-color: #45a049;
-  }
-  
-  #pieChart, #lineChart {
-    width: 100%;
-    max-width: 500px;
-    margin-top: 20px;
-  }
-  </style>
-  
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.section {
+  width: 100%;
+  background-color: #f5f5f5;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.date-picker {
+  display: flex;
+  gap: 10px;
+}
+
+.charts {
+  display: flex;
+  gap: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+table, th, td {
+  border: 1px solid #ddd;
+}
+
+th, td {
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #4CAF50;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+#pieChart, #lineChart {
+  width: 100%;
+  max-width: 500px;
+  margin-top: 20px;
+}
+</style>

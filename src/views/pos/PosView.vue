@@ -18,7 +18,7 @@
             </v-row>
             <v-row>
               <v-col cols="12" md="6">
-                <category-tabs></category-tabs>
+                <category-tabs :user-role="userRole"></category-tabs>
 
               </v-col>
             </v-row>
@@ -45,7 +45,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import PromotionCardsCarousel from '@/components/pos/PromotionCardsCarousel.vue';
 import SearchBar from '@/components/pos/SearchBar.vue';
 import CategoryTabs from '@/components/pos/CategoryTabs.vue';
@@ -62,7 +62,7 @@ const productStore = useProductStore();
 const categoryStore = useCategoryStore();
 const promotionStore = usePromotionStore();
 const toppingStore = useToppingStore();
-
+const userRole = ref("พนักงานขายข้าว");
 const filteredProducts = computed(() => {
   return productStore.products.filter(product => {
     const matchesCategory = productStore.selectedCategory ? product.category.categoryName === productStore.selectedCategory : true;
@@ -77,6 +77,7 @@ onMounted(async () => {
   await promotionStore.getAllPromotions();
   await toppingStore.getAllToppings();
 });
+
 </script>
 
 <style scoped>
