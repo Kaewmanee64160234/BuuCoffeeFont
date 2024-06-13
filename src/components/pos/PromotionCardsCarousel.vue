@@ -24,9 +24,7 @@ import Swal from 'sweetalert2';
 
 const posStore = usePosStore();
 const promotionStore = usePromotionStore();
-onMounted(() => {
-  promotionStore.getAllPromotions();
-});
+
 
 interface Promotion {
   id: number;

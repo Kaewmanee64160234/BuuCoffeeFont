@@ -128,6 +128,18 @@ export const usePromotionStore = defineStore("promotion", () => {
     }
   };
 
+  // get promotion by type
+  const getPromotionByType = async (type: string) => {
+    try {
+      const res = await promotionService.getPromotionByType(type);
+      if (res.data) {
+        promotions.value = res.data;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return {
     promotion,
     promotions,
@@ -144,6 +156,8 @@ export const usePromotionStore = defineStore("promotion", () => {
     itemsPerPage,
     getPromotionsPaginate,
     totalItems,
-    promotionTypes
+    promotionTypes,
+    getPromotionByType,
+    getPromotionByType
   };
 });

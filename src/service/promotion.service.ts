@@ -36,6 +36,11 @@ function getAllPromotions() {
     return http.get(`/promotions/paginate`, {
       params,
     });
+    
+  }
+  // get promotion by type
+  function getPromotionByType(type: string) {
+    return http.get(`/promotions/type/${type}`);
   }
   
   export default {
@@ -45,5 +50,6 @@ function getAllPromotions() {
     updatePromotion,
     deletePromotion,
     searchPromotions,
-    getPromotionsPaginate
+    getPromotionsPaginate,
+    getPromotionByType
   };

@@ -1,3 +1,46 @@
+<script lang="ts" setup>
+import { computed, onMounted, ref } from 'vue';
+import PromotionCardsCarousel from '@/components/pos/PromotionCardsCarousel.vue';
+import SearchBar from '@/components/pos/SearchBar.vue';
+import CategoryTabs from '@/components/pos/CategoryTabs.vue';
+import ProductCard from '@/components/pos/ProductCard.vue';
+import SelectedItemsList from '@/components/pos/SelectedItemsList.vue';
+import DrinkSelectionDialog from '@/components/pos/DrinkSelectionDialog.vue';
+import ReceiptDialog from '@/components/pos/ReceiptDialog.vue';
+import { useProductStore } from '@/stores/product.store';
+import { useCategoryStore } from '@/stores/category.store';
+import { usePromotionStore } from '@/stores/promotion.store';
+import { useToppingStore } from '@/stores/topping.store';
+
+const productStore = useProductStore();
+const categoryStore = useCategoryStore();
+const promotionStore = usePromotionStore();
+const toppingStore = useToppingStore();
+const userRole = ref("พนักงานขายข้าว");
+const filteredProducts = computed(() => {
+  return productStore.products.filter(product => {
+    const matchesCategory = productStore.selectedCategory ? product.category.categoryName === productStore.selectedCategory : true;
+    const matchesSearch = productStore.searchQuery ? product.productName.toLowerCase().includes(productStore.searchQuery.toLowerCase()) : true;
+    return matchesCategory && matchesSearch;
+  });
+});
+
+onMounted(async () => {
+  await productStore.getAllProducts();
+  await categoryStore.getAllCategories();
+  // await promotionStore.getAllPromotions();
+  await toppingStore.getAllToppings();
+  if(userRole.value === "พนักงานขายข้าว"){
+    promotionStore.getPromotionByType("ร้านกับข้าว");
+  }else{
+    promotionStore.getPromotionByType("ร้านกาแฟ");
+  
+  }
+
+});
+
+</script>
+
 <template>
   <v-app>
     <v-row no-gutters>
@@ -44,41 +87,7 @@
 
 </template>
 
-<script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue';
-import PromotionCardsCarousel from '@/components/pos/PromotionCardsCarousel.vue';
-import SearchBar from '@/components/pos/SearchBar.vue';
-import CategoryTabs from '@/components/pos/CategoryTabs.vue';
-import ProductCard from '@/components/pos/ProductCard.vue';
-import SelectedItemsList from '@/components/pos/SelectedItemsList.vue';
-import DrinkSelectionDialog from '@/components/pos/DrinkSelectionDialog.vue';
-import ReceiptDialog from '@/components/pos/ReceiptDialog.vue';
-import { useProductStore } from '@/stores/product.store';
-import { useCategoryStore } from '@/stores/category.store';
-import { usePromotionStore } from '@/stores/promotion.store';
-import { useToppingStore } from '@/stores/topping.store';
 
-const productStore = useProductStore();
-const categoryStore = useCategoryStore();
-const promotionStore = usePromotionStore();
-const toppingStore = useToppingStore();
-const userRole = ref("พนักงานขายข้าว");
-const filteredProducts = computed(() => {
-  return productStore.products.filter(product => {
-    const matchesCategory = productStore.selectedCategory ? product.category.categoryName === productStore.selectedCategory : true;
-    const matchesSearch = productStore.searchQuery ? product.productName.toLowerCase().includes(productStore.searchQuery.toLowerCase()) : true;
-    return matchesCategory && matchesSearch;
-  });
-});
-
-onMounted(async () => {
-  await productStore.getAllProducts();
-  await categoryStore.getAllCategories();
-  await promotionStore.getAllPromotions();
-  await toppingStore.getAllToppings();
-});
-
-</script>
 
 <style scoped>
 .v-container {
