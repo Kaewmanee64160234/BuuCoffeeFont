@@ -18,7 +18,7 @@
 <script lang="ts" setup>
 import { usePosStore } from '@/stores/pos.store';
 import { usePromotionStore } from '@/stores/promotion.store';
-import { computed, onMounted } from 'vue';
+import { computed } from 'vue';
 import Swal from 'sweetalert2';
 
 

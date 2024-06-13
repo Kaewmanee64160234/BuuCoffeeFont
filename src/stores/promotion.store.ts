@@ -158,6 +158,6 @@ export const usePromotionStore = defineStore("promotion", () => {
     totalItems,
     promotionTypes,
     getPromotionByType,
-    getPromotionByType
+    
   };
 });

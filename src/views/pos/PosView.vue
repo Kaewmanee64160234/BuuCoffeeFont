@@ -11,12 +11,13 @@ import { useProductStore } from '@/stores/product.store';
 import { useCategoryStore } from '@/stores/category.store';
 import { usePromotionStore } from '@/stores/promotion.store';
 import { useToppingStore } from '@/stores/topping.store';
+import {useUserStore } from '@/stores/user.store';
 
 const productStore = useProductStore();
 const categoryStore = useCategoryStore();
 const promotionStore = usePromotionStore();
 const toppingStore = useToppingStore();
-const userRole = ref("พนักงานขายข้าว");
+const userStore = useUserStore();
 const filteredProducts = computed(() => {
   return productStore.products.filter(product => {
     const matchesCategory = productStore.selectedCategory ? product.category.categoryName === productStore.selectedCategory : true;
@@ -28,13 +29,20 @@ const filteredProducts = computed(() => {
 onMounted(async () => {
   await productStore.getAllProducts();
   await categoryStore.getAllCategories();
-  // await promotionStore.getAllPromotions();
   await toppingStore.getAllToppings();
-  if(userRole.value === "พนักงานขายข้าว"){
+  if(userStore.userRole === "พนักงานขายข้าว"){
     promotionStore.getPromotionByType("ร้านกับข้าว");
+    productStore.selectedCategory = "กับข้าว";
+    const cate = categoryStore.categoriesForCreate.find(category => category.categoryName === "กับข้าว")
+    categoryStore.categoriesForCreate = [];
+    categoryStore.categoriesForCreate.push(cate!);
   }else{
     promotionStore.getPromotionByType("ร้านกาแฟ");
-  
+    productStore.selectedCategory = "coffee";
+    // find the category กับข้าว and slice
+    const cate = categoryStore.categoriesForCreate.findIndex(category => category.categoryName === "กาแฟ")
+    categoryStore.categoriesForCreate.splice(cate, 1);
+
   }
 
 });
@@ -61,7 +69,7 @@ onMounted(async () => {
             </v-row>
             <v-row>
               <v-col cols="12" md="6">
-                <category-tabs :user-role="userRole"></category-tabs>
+                <category-tabs ></category-tabs>
 
               </v-col>
             </v-row>

@@ -70,7 +70,6 @@ import type {ReceiptItem} from '../../types/receipt.type';
 
 const posStore = usePosStore();
 const selectedItems = computed(() => posStore.selectedItems);
-const productStore = useProductStore();
 const customerStore = useCustomerStore();
 function removeItem(index: number) {
   posStore.removeItem(index);
