@@ -203,7 +203,7 @@ function confirmSelection() {
 // clear data
 function clearData() {
   selectedType.value = null;
-  selectedSweetness.value = null;
+  selectedSweetness.value = 0;
   selectedToppings.value = [];
   quantity.value = 1;
   toppingIndex.value = 0;

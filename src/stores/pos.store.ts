@@ -145,6 +145,12 @@ export const usePosStore = defineStore("pos", () => {
     }, 0);
   };
 
+  // increaseQuantity
+  const increaseQuantity = (index: number) => {
+    selectedItems.value[index].quantity += 1;
+   
+  };
+
   const removeItem = (index: number) => {
     selectedItems.value.splice(index, 1);
     receipt.value.receiptTotalPrice = calculateTotal(selectedItems.value);
@@ -268,6 +274,7 @@ export const usePosStore = defineStore("pos", () => {
     spliceData,
     applyPromotion,
     currentReceipt,
-    receiptDialog
+    receiptDialog,
+    increaseQuantity
   };
 });

@@ -17,10 +17,8 @@
 
 <script lang="ts" setup>
 import { usePosStore } from '@/stores/pos.store';
-import { useProductStore } from '@/stores/product.store';
 import { usePromotionStore } from '@/stores/promotion.store';
-import type { ReceiptPromotion } from '@/types/receiptPromotion.type';
-import { ref, computed, onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
 import Swal from 'sweetalert2';
 
 

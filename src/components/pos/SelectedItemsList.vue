@@ -76,23 +76,9 @@ function removeItem(index: number) {
 }
 
 function increaseQuantity(index: number) {
-  if (selectedItems.value[index].product?.category.haveTopping) {
-    posStore.addToReceipt(
-      selectedItems.value[index].product,
-      selectedItems.value[index].productTypeToppings[0].productType,
-      selectedItems.value[index].productTypeToppings,
-      1,
-      selectedItems.value[index].sweetnessLevel,
-    );
-  } else {
-    posStore.addToReceipt(
-      selectedItems.value[index].product,
-      null,
-      [],
-      1,
-      null,
-    );
-  }
+  // add quantity for thai recipt item and new caluculate
+  posStore.increaseQuantity(index);
+  
 }
 
 function decreaseQuantity(index: number) {
@@ -103,6 +89,7 @@ function decreaseQuantity(index: number) {
     posStore.spliceData(index);
   }
 }
+
 
 function selectPaymentMethod(method: string) {
   console.log(`Selected payment method: ${method}`);
