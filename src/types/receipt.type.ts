@@ -1,6 +1,7 @@
 // receipt.type.ts
 import type { Customer } from './customer.type';
 import type { Product } from './product.type';
+import type { ProductType } from './productType.type';
 import type { ProductTypeTopping } from './productTypeTopping.type';
 import type { Promotion } from './promotion.type';
 import type { ReceiptPromotion } from './receiptPromotion.type';
@@ -14,9 +15,9 @@ export interface ReceiptItem {
   product?:Product;
   sweetnessLevel?: number;
   receiptItemId?: number;
-
-
+  productType?: ProductType;
 }
+
 
 export interface Receipt {
   receiptId?: number;
