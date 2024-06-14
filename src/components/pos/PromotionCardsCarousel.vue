@@ -11,8 +11,11 @@
         >
           <v-card-title class="text-center">{{ promotion.promotionName }}</v-card-title>
           <v-card-actions class="justify-center">
-            <v-btn color="primary" @click.stop="togglePromotion(promotion)">
+            <v-btn v-if="promotion.promotionForStore === 'กับข้าว' || promotion.promotionType === 'discountPercentage' " color="primary" @click.stop="togglePromotion(promotion)">
               {{ isPromotionApplied(promotion) ? 'Unselect' : 'Apply' }}
+            </v-btn>
+            <v-btn v-else color="primary" @click.stop="applyPromotion(promotion)">
+            Apply
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -25,15 +28,12 @@
 import { usePosStore } from '@/stores/pos.store';
 import { usePromotionStore } from '@/stores/promotion.store';
 import { computed } from 'vue';
+import type {Promotion} from '@/types/promotion.type';
 import Swal from 'sweetalert2';
 
 const posStore = usePosStore();
 const promotionStore = usePromotionStore();
 
-interface Promotion {
-  promotionId: number;
-  promotionName: string;
-}
 
 const promotionChunks = computed(() => {
   const chunkSize = 4;
@@ -54,6 +54,9 @@ function applyPromotion(promotion: Promotion) {
     return;
   }
 
+ 
+  
+
   posStore.applyPromotion(promotion);
 }
 
@@ -62,7 +65,6 @@ function removePromotion(promotion: Promotion) {
 }
 
 function togglePromotion(promotion: Promotion) {
-  console.log(isPromotionApplied(promotion));
   if (isPromotionApplied(promotion)) {
     removePromotion(promotion);
   } else {
