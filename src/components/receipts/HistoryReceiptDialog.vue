@@ -3,12 +3,13 @@
     <v-card>
       <v-card-title>
         <span class="text-h5">
-          บันทึกการสั่งซื้อ วันที่ {{ formattedReceiptDate }}<br> ลูกค้า : {{ reciptStore.receipt?.customer?.customerName }}
+          บันทึกการสั่งซื้อ วันที่ {{ formattedReceiptDate }}<br> ลูกค้า : {{
+            reciptStore.receipt?.customer?.customerName }}
         </span>
       </v-card-title>
       <v-card-text>
         <v-container>
-        <!-- {{ reciptStore.receipt }} -->
+          <!-- {{ reciptStore.receipt }} -->
 
           <v-table dense>
             <thead>
@@ -32,10 +33,30 @@
                     </li>
                   </ul>
                 </td>
-                <td class="text-center" v-if="item.productTypeToppings.length > 0">{{ item.productTypeToppings[0].productType.productTypeName}}</td>
-                <td class="text-center" v-else>{{ 'ไม่มีข้อมูล' }}</td>
+
+                <td>
+                  <ul>
+                    <li v-for="(topping, idx) in item.productTypeToppings" :key="idx">
+                      {{ topping.quantity || 'ไม่มีข้อมูล' }}
+                    </li>
+                  </ul>
+                </td>
+                <td class="text-center">
+
+                  <!-- {{ item.product }} -->
+
+                  <div v-if="item.product?.category.haveTopping">
+                    <span>
+                      {{ item.productType?.productTypeName }}
+                    </span>
+                  </div>
+                  <div v-else>
+                    ไม่มีข้อมูล
+                  </div>
+                </td>
 
                 <td class="text-center">{{ item.quantity }}</td>
+
                 <td class="text-center">{{ item.receiptSubTotal }}</td>
               </tr>
             </tbody>
@@ -55,8 +76,8 @@
 </template>
 
 <script lang="ts" setup>
-import {  computed } from 'vue';
-import {useReceiptStore} from '@/stores/receipt.store';
+import { computed } from 'vue';
+import { useReceiptStore } from '@/stores/receipt.store';
 
 const reciptStore = useReceiptStore()
 

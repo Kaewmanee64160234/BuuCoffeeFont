@@ -1,16 +1,17 @@
 <template>
-  <v-carousel hide-delimiter-background height="160">
+  <v-carousel hide-delimiters height="230" style="background-color: #80715E; border-radius: 30px;">
     <v-carousel-item v-for="(chunk, index) in promotionChunks" :key="index">
       <div class="promotion-container">
         <v-card v-for="promotion in chunk" :key="promotion.promotionId" class="promotion-card"
           :class="{ 'applied-promotion': isPromotionApplied(promotion) }" @click="togglePromotion(promotion)">
-          <v-card-title class="text-center">{{ promotion.promotionName }}</v-card-title>
+          <v-card-title class="text-center wrap-text">{{ promotion.promotionName }}</v-card-title>
           <v-card-actions class="justify-center">
-            <v-btn v-if="promotion.promotionCanUseManyTimes==false" color="primary" @click.stop="togglePromotion(promotion)">
-              {{ isPromotionApplied(promotion) ? 'Unselect' : 'Apply' }}
+            <v-btn v-if="promotion.promotionCanUseManyTimes == false" class="btn-apply-promotion"
+              @click.stop="togglePromotion(promotion)">
+              {{ isPromotionApplied(promotion) ? 'ยกเลิก' : 'ใช้โปรโมชั่นนี้' }}
             </v-btn>
-            <v-btn v-else color="primary" @click.stop="applyPromotion(promotion)">
-              Apply
+            <v-btn v-else class="btn-apply-promotion" @click.stop="applyPromotion(promotion)">
+              ใช้โปรโมชั่นนี้
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -28,7 +29,6 @@ import Swal from 'sweetalert2';
 
 const posStore = usePosStore();
 const promotionStore = usePromotionStore();
-
 
 const promotionChunks = computed(() => {
   const chunkSize = 4;
@@ -76,32 +76,73 @@ function isPromotionApplied(promotion: Promotion) {
 <style scoped>
 .promotion-container {
   display: flex;
-  justify-content: center;
-  gap: 10px;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 20px;
+  height: 100%;
+  padding-left: 10%;
 }
 
 .promotion-card {
-  width: 200px;
+  width: 150px;
   height: 150px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  background-color: #f5f5f5;
+  background-color: #ffffff;
+  border: 2px solid #ff9800;
   border-radius: 10px;
   cursor: pointer;
+  padding: 20px 0;
 }
 
 .promotion-card.applied-promotion {
   border: 2px solid #42a5f5;
-  /* Highlight color for applied promotion */
+}
+
+.v-card-title {
+  text-align: center;
+}
+
+.v-card-actions {
+  justify-content: center;
+  width: 100%;
 }
 
 .text-center {
   text-align: center;
+  font-size: 95%;
+  font-weight: bold;
 }
 
 .justify-center {
   justify-content: center;
+}
+
+.v-carousel-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.center-btn-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.btn-apply-promotion {
+  background-color: #ff9800;
+  color: black;
+  font-weight: bold;
+  padding: 5px 10px;
+  width: 100%;
+  border-radius: 20px;
+}
+
+.wrap-text {
+  word-wrap: break-word;
 }
 </style>

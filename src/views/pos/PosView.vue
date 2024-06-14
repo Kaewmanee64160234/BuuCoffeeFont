@@ -50,11 +50,11 @@ onMounted(async () => {
 </script>
 
 <template>
-  <v-app>
+  <v-app style="width: 100vw; ">
     <v-row no-gutters>
       <v-col  cols="8">
-        <v-sheet class="pa-2 ma-2">
-          <v-container>
+       
+          <v-container style="margin: 0; background-color: #907D66;">
             <v-row>
               <v-col cols="12" md="12">
                 <promotion-cards-carousel></promotion-cards-carousel>
@@ -80,7 +80,7 @@ onMounted(async () => {
             </v-row>
             <drink-selection-dialog></drink-selection-dialog>
           </v-container>
-        </v-sheet>
+    
       </v-col>
       <v-col cols="4">
         <v-sheet class="pa-2 ma-2" style="height: 100%;">
