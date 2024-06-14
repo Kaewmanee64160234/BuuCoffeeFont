@@ -15,6 +15,7 @@
               <tr>
                 <th class="text-center">รายการสินค้า</th>
                 <th class="text-center">ท็อปปิ้ง</th>
+                <th class="text-center">จำนวนท็อปปิ้ง</th>
                 <th class="text-center">ชนิด</th>
                 <th class="text-center">จำนวนต่อหน่วย</th>
                 <th class="text-center">ราคา</th>
@@ -32,7 +33,8 @@
                   </ul>
                 </td>
                 <td class="text-center" v-if="item.productTypeToppings.length > 0">{{ item.productTypeToppings[0].productType.productTypeName}}</td>
-                <td class="text-center" v-else></td>
+                <td class="text-center" v-else>{{ 'ไม่มีข้อมูล' }}</td>
+
                 <td class="text-center">{{ item.quantity }}</td>
                 <td class="text-center">{{ item.receiptSubTotal }}</td>
               </tr>

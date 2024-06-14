@@ -1,11 +1,8 @@
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
+import { ref} from 'vue';
 import { useReportFinnceStore } from '@/stores/report/finance.store';
 import { createCashier } from '@/service/report/finance.service';
 
-const props = defineProps({
-  dialogVisible: Boolean
-});
 
 const ReportFinnceStore = useReportFinnceStore();
 
@@ -16,6 +13,7 @@ const clearData = () => {
   ReportFinnceStore.createCashierDialog = false;
   cashierAmount.value = null;
 };
+
 
 const submitForm = async () => {
   if (cashierAmount.value !== null) {
@@ -28,9 +26,6 @@ const submitForm = async () => {
   }
 };
 
-watch(() => props.dialogVisible, (newValue) => {
-  ReportFinnceStore.createCashierDialog = newValue;
-});
 </script>
 
 <template>

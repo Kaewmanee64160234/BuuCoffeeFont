@@ -9,8 +9,8 @@ const activeComponent = ref<string | null>(null);
 function showComponent(component: string) {
   activeComponent.value = component;
 }
+activeComponent.value = 'finance'; 
 function reloadData() {
-  emit('reloadData');
 }
 </script>
 
