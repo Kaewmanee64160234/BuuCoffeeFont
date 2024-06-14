@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" max-width="800px">
+  <v-dialog v-model="customerStore.openDialogRegisterCustomer" max-width="800px">
     <v-card>
       <v-card-title>
         <span class="text-h5">สมัครสมาชิก</span>
@@ -20,7 +20,7 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn @click="closeDialog">ยกเลิก</v-btn>
+        <v-btn @click="close">ยกเลิก</v-btn>
         <v-btn color="orange" @click="saveCustomer">บันทึก</v-btn>
       </v-card-actions>
     </v-card>
@@ -32,21 +32,21 @@ import { defineProps, ref, watch } from 'vue';
 import { useCustomerStore } from '../../stores/customer.store';
 import type { VForm } from 'vuetify/components';
 
-const props = defineProps<{ dialog: boolean }>();
+
 const form = ref<VForm | null>(null);
-const dialog = ref(props.dialog);
+
 
 const customerName = ref('');
 const customerPhone = ref('');
 const customerStore = useCustomerStore();
 
-watch(() => props.dialog, (newVal) => {
-  dialog.value = newVal;
-  if (newVal) {
-    customerName.value = '';
-    customerPhone.value = '';
-  }
-});
+// close Dialog 
+function close() {
+  customerStore.openDialogRegisterCustomer = false;
+  // clear data
+  customerName.value = '';
+  customerPhone.value = '';
+}
 
 async function saveCustomer() {
   const { valid } = await form.value!.validate();
@@ -59,17 +59,16 @@ async function saveCustomer() {
         customerNumberOfStamp: 0, // New customer starts with 1 point
         createMemberDate: new Date(),
       });
-      dialog.value = false; // Close the dialog
       await customerStore.getAllCustomers(); // Refresh customer list
+      close();
+
     } catch (error) {
       console.error('Error saving customer:', error);
     }
   }
 }
 
-function closeDialog() {
-  dialog.value = false; // Close the dialog
-}
+
 </script>
 
 <style scoped>

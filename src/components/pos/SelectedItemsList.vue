@@ -54,7 +54,7 @@
     </v-card-actions>
   </v-card>
   <v-btn color="warning" @click="save">Finish</v-btn>
-  <AddCustomerDialog v-model:dialog="customerStore.openCreateCustomerDialog" />
+  <AddCustomerDialog  />
   <FindCustomerDialog v-model:dialog="customerStore.openDialogFindCustomer" />
 </template>
 
@@ -139,7 +139,7 @@ function save() {
 }
 
 function openCreateCustomerDialog() {
-  customerStore.openCreateCustomerDialog = true;
+  customerStore.openDialogRegisterCustomer = true;
 }
 
 // open find customer dialog
