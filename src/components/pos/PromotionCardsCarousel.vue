@@ -2,11 +2,17 @@
   <v-carousel hide-delimiter-background height="160">
     <v-carousel-item v-for="(chunk, index) in promotionChunks" :key="index">
       <div class="promotion-container">
-        <v-card v-for="promotion in chunk" :key="promotion.promotionId" class="promotion-card">
+        <v-card 
+          v-for="promotion in chunk" 
+          :key="promotion.promotionId" 
+          class="promotion-card"
+          :class="{'applied-promotion': isPromotionApplied(promotion)}"
+          @click="togglePromotion(promotion)"
+        >
           <v-card-title class="text-center">{{ promotion.promotionName }}</v-card-title>
           <v-card-actions class="justify-center">
-            <v-btn color="primary" @click="applyPromotion(promotion)">
-              Apply
+            <v-btn color="primary" @click.stop="togglePromotion(promotion)">
+              {{ isPromotionApplied(promotion) ? 'Unselect' : 'Apply' }}
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -21,18 +27,13 @@ import { usePromotionStore } from '@/stores/promotion.store';
 import { computed } from 'vue';
 import Swal from 'sweetalert2';
 
-
 const posStore = usePosStore();
 const promotionStore = usePromotionStore();
 
-
 interface Promotion {
-  id: number;
-  title: string;
-  buttonText: string;
+  promotionId: number;
+  promotionName: string;
 }
-
-
 
 const promotionChunks = computed(() => {
   const chunkSize = 4;
@@ -44,7 +45,6 @@ const promotionChunks = computed(() => {
 });
 
 function applyPromotion(promotion: Promotion) {
-  // Check if there are any receipt items
   if (posStore.selectedItems.length === 0) {
     Swal.fire({
       icon: 'error',
@@ -55,6 +55,26 @@ function applyPromotion(promotion: Promotion) {
   }
 
   posStore.applyPromotion(promotion);
+}
+
+function removePromotion(promotion: Promotion) {
+  posStore.removePromotion(promotion);
+}
+
+function togglePromotion(promotion: Promotion) {
+  console.log(isPromotionApplied(promotion));
+  
+  if (isPromotionApplied(promotion)) {
+    removePromotion(promotion);
+  } else {
+    applyPromotion(promotion);
+  }
+}
+
+function isPromotionApplied(promotion: Promotion) {
+  return posStore.receiptPromotions.some(
+    (receiptPromotion) => receiptPromotion.promotion.promotionId === promotion.promotionId
+  );
 }
 </script>
 
@@ -73,8 +93,12 @@ function applyPromotion(promotion: Promotion) {
   justify-content: center;
   align-items: center;
   background-color: #f5f5f5;
-  /* Adjust the color to match your design */
   border-radius: 10px;
+  cursor: pointer;
+}
+
+.promotion-card.applied-promotion {
+  border: 2px solid #42a5f5; /* Highlight color for applied promotion */
 }
 
 .text-center {

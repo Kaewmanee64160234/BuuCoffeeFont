@@ -116,7 +116,7 @@ export const usePosStore = defineStore("pos", () => {
             receiptSubTotal: itemTotal,
             product,
             sweetnessLevel: sweetness,
-            productType: productType
+            productType: productType,
           });
         } else {
           selectedItems.value.push({
@@ -128,8 +128,7 @@ export const usePosStore = defineStore("pos", () => {
               parsedQuantity,
             product,
             sweetnessLevel: sweetness,
-            productType: productType
-
+            productType: productType,
           });
         }
       } else {
@@ -152,11 +151,18 @@ export const usePosStore = defineStore("pos", () => {
     }, 0);
   };
 
-
-
   const removeItem = (index: number) => {
     selectedItems.value.splice(index, 1);
     receipt.value.receiptTotalPrice = calculateTotal(selectedItems.value);
+    if (selectedItems.value.length === 0) {
+      receipt.value.receiptTotalPrice = 0;
+      receipt.value.receiptTotalDiscount = 0;
+      receipt.value.receiptNetPrice = 0;
+      receipt.value.receiptItems = [];
+      receipt.value.receiptPromotions = [];
+      receipt.value.receiptStatus = "";
+      receipt.value.paymentMethod = "";
+    }
   };
 
   const spliceData = (index: number) => {
@@ -171,6 +177,16 @@ export const usePosStore = defineStore("pos", () => {
       selectedItems.value.splice(index, 1);
     }
     receipt.value.receiptTotalPrice = calculateTotal(selectedItems.value);
+    if (selectedItems.value.length === 0) {
+      // clear all data
+      receipt.value.receiptTotalPrice = 0;
+      receipt.value.receiptTotalDiscount = 0;
+      receipt.value.receiptNetPrice = 0;
+      receipt.value.receiptItems = [];
+      receipt.value.receiptPromotions = [];
+      receipt.value.receiptStatus = "";
+      receipt.value.paymentMethod = "";
+    }
   };
 
   // create function create recipt
@@ -179,15 +195,16 @@ export const usePosStore = defineStore("pos", () => {
     receipt.value.receiptType = "coffee";
     receipt.value.receiptStatus = "pending";
     receipt.value.createdDate = new Date();
+    if(receipt.value.receiptTotalDiscount===0){
+      receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice;
+    }
 
-   const res =  await receiptService.createReceipt(receipt.value);
-   if(res.status === 201){
-    console.log("Receipt created successfully",res.data);
-    currentReceipt.value = res.data;
-    await customerStore.getAllCustomers();
-    
-   }
-    
+    const res = await receiptService.createReceipt(receipt.value);
+    if (res.status === 201) {
+      console.log("Receipt created successfully", res.data);
+      currentReceipt.value = res.data;
+      await customerStore.getAllCustomers();
+    }
   };
 
   const applyPromotion = (promotion: Promotion) => {
@@ -225,7 +242,7 @@ export const usePosStore = defineStore("pos", () => {
       if (product2 && product) {
         if (promotion.freeProductId === promotion.buyProductId) {
           // check qumtity
-          if (product.quantity>=2) {
+          if (product.quantity >= 2) {
             const discount = selectedItems.value.find(
               (item) => item.product?.productId === promotion.freeProductId
             )?.product?.productPrice;
@@ -259,6 +276,27 @@ export const usePosStore = defineStore("pos", () => {
       parseFloat(receipt.value.receiptTotalDiscount + "");
   };
 
+  // removePromotion
+  const removePromotion = (promotion:Promotion) => {
+    const index = receipt.value.receiptPromotions.findIndex(
+      (item) => item.promotion.promotionId === promotion.promotionId
+    );
+    if (index !== -1) {
+      receipt.value.receiptPromotions.splice(index, 1);
+    }
+    // calculate total discount
+    receipt.value.receiptTotalDiscount = receipt.value.receiptPromotions.reduce(
+      (acc, item) => {
+        return acc + parseInt(item.discount! + "");
+      },
+      0
+    );
+    receipt.value.receiptNetPrice =
+      parseInt(receipt.value.receiptTotalPrice + "") -
+      parseFloat(receipt.value.receiptTotalDiscount + "");
+  };
+
+
   return {
     selectedItems,
     receiptPromotions,
@@ -278,5 +316,6 @@ export const usePosStore = defineStore("pos", () => {
     applyPromotion,
     currentReceipt,
     receiptDialog,
+    removePromotion
   };
 });

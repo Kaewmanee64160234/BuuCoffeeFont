@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { ref, onMounted ,computed} from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import VueApexCharts from 'vue3-apexcharts';
 import { useReportFinnceStore } from '@/stores/report/finance.store';
 import CreateDialogAddCashier from '../../components/reports/cashier/DialogAddCashier.vue';
 import CreateHistoryDialogCashier from '../../components/reports/cashier/HistoryCashier.vue';
-
+import Swal from 'sweetalert2';
 const ReportFinnceStore = useReportFinnceStore();
 
 const chartSeries = ref([0, 0]);
@@ -30,17 +30,71 @@ const updateChartData = () => {
   const qrCodeAmount = parseInt(ReportFinnceStore.sumType.qrcode) || 0;
   chartSeries.value = [cashAmount, qrCodeAmount];
 };
+const getMondayOfCurrentWeek = () => {
+  const today = new Date();
+  const day = today.getDay();
+  const diff = today.getDate() - day + (day === 0 ? -6 : 1); 
+  return new Date(today.setDate(diff));
+};
+const getFridayOfCurrentWeek = () => {
+  const monday = getMondayOfCurrentWeek();
+  const friday = new Date(monday);
+  friday.setDate(friday.getDate() + 4);
+  return friday;
+};
+const startDate = getMondayOfCurrentWeek();
+const endDate = getFridayOfCurrentWeek();
+const dateRange = ref({
+  startDate: startDate.toISOString().split('T')[0],
+  endDate: endDate.toISOString().split('T')[0],
+});
+const groupBy = ref<'day' | 'month' | 'year'>('day');
+const updateLineChartData = () => {
+  let groupedData;
+  switch (groupBy.value) {
+    case 'day':
+      groupedData = ReportFinnceStore.state.groupedByDay;
+      break;
+    case 'month':
+      groupedData = ReportFinnceStore.state.groupedByMonth;
+      break;
+    case 'year':
+      groupedData = ReportFinnceStore.state.groupedByYear;
+      break;
+  }
+  const categories = Object.keys(groupedData);
+  const data = Object.values(groupedData);
 
+  lineChartOptions.value = {
+    ...lineChartOptions.value,
+    xaxis: {
+      categories: categories
+    }
+  };
+
+  lineChartSeries.value = [
+    {
+      name: 'ยอดขาย',
+      data: data
+    }
+  ];
+};
 onMounted(async () => {
   await ReportFinnceStore.getfindToday();
   await ReportFinnceStore.getSumType();
   await ReportFinnceStore.getDailyReport();
+  await fetchGroupedFinance();
   updateChartData();
 });
-const cash = parseFloat(ReportFinnceStore.sumType.cash);
-const cashier = ReportFinnceStore.cashiers;
-const start = cashier ? parseFloat(cashier.cashierAmount) : undefined;
-const sum = (cash || 0) + (start || 0);
+const fetchGroupedFinance = async () => {
+  await ReportFinnceStore.fetchGroupedFinance(dateRange.value.startDate, dateRange.value.endDate);
+  updateLineChartData();
+};
+const sum = computed(() => {
+  const cash = parseFloat(ReportFinnceStore.sumType.cash) || 0;
+  const cashierAmount = ReportFinnceStore.cashiers ? parseFloat(ReportFinnceStore.cashiers.cashierAmount) || 0 : 0;
+  return cash + cashierAmount;
+});
 const openCreateDialog = () => {
   ReportFinnceStore.createCashierDialog = true;
 };
@@ -49,13 +103,34 @@ const openHistoryDialog = () => {
 };
 const deleteCashier = async (id: number) => {
   try {
-    await ReportFinnceStore.deleteCashier(id);
-    await ReportFinnceStore.getfindToday();
-    updateChartData();
+    // แสดง SweetAlert เพื่อยืนยันการลบ
+    const result = await Swal.fire({
+      title: 'คุณแน่ใจหรือไม่?',
+      text: 'คุณต้องการแก้ไขเงินในลิ้นชัก?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'ใช่, ลบเลย',
+      cancelButtonText: 'ยกเลิก'
+    });
+    if (result.isConfirmed) {
+      await ReportFinnceStore.deleteCashier(id);
+      await ReportFinnceStore.getfindToday();
+      Swal.fire({
+        icon: 'success',
+        title: 'ยกเลิกเรียบร้อย',
+        showConfirmButton: false,
+        timer: 1500 // 1.5 วินาที
+      });
+    }
   } catch (error) {
-    console.error(error);
+    Swal.fire({
+      icon: 'error',
+      title: 'เกิดข้อผิดพลาด',
+      text: 'ไม่สามารถลบผู้ใช้ได้ กรุณาลองใหม่ภายหลัง'
+    });
   }
 };
+
 
 const lineChartOptions = ref({ 
   chart: {
@@ -72,11 +147,11 @@ const lineChartOptions = ref({
     curve: 'straight'
   },
   title: {
-    text: 'ยอดขายรายวัน',
-    align: 'left'
+    text: 'ยอดขาย',
+    align: 'center'
   },
   xaxis: {
-    categories: ['1 มิ.ย.', '2 มิ.ย.', '3 มิ.ย.', '4 มิ.ย.', '5 มิ.ย.', '6 มิ.ย.', '7 มิ.ย.']
+    categories: []
   },
   tooltip: {
     x: {
@@ -88,7 +163,7 @@ const lineChartOptions = ref({
 const lineChartSeries = ref([
   {
     name: 'ยอดขาย',
-    data: [3000, 3500, 4000, 4500, 5000, 5500, 6000]
+    data: []
   }
 ]);
 </script>
@@ -160,15 +235,34 @@ const lineChartSeries = ref([
       </v-col>
     </v-row>
     <v-row>
-      <v-col cols="6">
-        <div>
-          <apexchart type="line" :options="lineChartOptions" :series="lineChartSeries"></apexchart>
-        </div>
+      <v-col cols="12" md="4">
+        <v-text-field
+          label="เริ่มวันที่"
+          v-model="dateRange.startDate"
+          type="date"
+        ></v-text-field>
       </v-col>
-      <v-col cols="6">
-        <div>
-          <apexchart type="line" :options="lineChartOptions" :series="lineChartSeries"></apexchart>
-        </div>
+      <v-col cols="12" md="4">
+        <v-text-field
+          label="ถึงวันที่"
+          v-model="dateRange.endDate"
+          type="date"
+        ></v-text-field>
+      </v-col>
+      <v-col cols="12" md="4">
+        <v-select
+          label="กรองตาม"
+          :items="['day', 'month', 'year']"
+          v-model="groupBy"
+        ></v-select>
+      </v-col>
+      <v-col cols="12">
+        <v-btn @click="fetchGroupedFinance">อัปเดตกราฟ</v-btn>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="12" md="6">
+        <apexchart type="line" :options="lineChartOptions" :series="lineChartSeries"></apexchart>
       </v-col>
     </v-row>
   </v-container>

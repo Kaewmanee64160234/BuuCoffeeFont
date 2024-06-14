@@ -1,4 +1,4 @@
-import { ref } from "vue";
+import { ref ,reactive} from "vue";
 import { defineStore } from "pinia";
 import financeService from "@/service/report/finance.service";
 import type { Cashier } from "@/types/report/cashier.type";
@@ -9,6 +9,11 @@ export const useReportFinnceStore = defineStore("cashier", () => {
   const historycashiers = ref<Cashier[]>([]);
   const sumType = ref<{ cash: string; qrcode: string }>({ cash: "", qrcode: "" });
   const dailyReport = ref<{ totalSales: number; totalDiscount: number ; totalTransactions: number}>({ totalSales: 0, totalDiscount: 0, totalTransactions:0});
+  const state = reactive({
+    groupedByDay: {},
+    groupedByMonth: {},
+    groupedByYear: {},
+  });
   const createCashier = async (cashier: Cashier) => {
     try {
       const res = await financeService.createCashier(cashier);
@@ -69,6 +74,18 @@ export const useReportFinnceStore = defineStore("cashier", () => {
       console.error(error);
     }
   };
+  const fetchGroupedFinance = async (startDate: string, endDate: string) => {
+    try {
+      const response = await financeService.getGroupedFinance(startDate, endDate);
+      if (response.data) {
+        state.groupedByDay = response.data.groupedByDay;
+        state.groupedByMonth = response.data.groupedByMonth;
+        state.groupedByYear = response.data.groupedByYear;
+      }
+    } catch (error) {
+      console.error("Error fetching grouped finance:", error);
+    }
+  };
   return {
     cashiers,
     createCashierDialog,
@@ -76,12 +93,14 @@ export const useReportFinnceStore = defineStore("cashier", () => {
     historycashiers,
     sumType,
     dailyReport,
+    state,
+    createCashier,
     getfindToday,
-    deleteCashier,
     getAll,
+    deleteCashier,
     getSumType,
     getDailyReport,
-    createCashier,
+    fetchGroupedFinance,
     
   };
 });
