@@ -4,13 +4,11 @@
       <v-card-title>
         <span class="text-h5">
           บันทึกการสั่งซื้อ วันที่ {{ formattedReceiptDate }}<br> ลูกค้า : {{
-            reciptStore.receipt?.customer?.customerName }}
+            reciptStore.receipt?.customer?.customerName || 'ไม่มีข้อมูล' }}
         </span>
       </v-card-title>
       <v-card-text>
         <v-container>
-          <!-- {{ reciptStore.receipt }} -->
-
           <v-table dense>
             <thead>
               <tr>
@@ -25,51 +23,48 @@
 
             <tbody>
               <tr v-for="(item, index) in reciptStore.receipt?.receiptItems" :key="index">
-                <td class="text-center">{{ item.product?.productName || 'ไม่มีข้อมูล' }}</td>
+                <td class="text-center">{{ item.product?.productName}}</td>
                 <td class="text-center">
                   <ul>
                     <li v-for="(topping, idx) in item.productTypeToppings" :key="idx">
-                      {{ topping.topping?.toppingName || 'ไม่มีข้อมูล' }}
+                      {{ topping.topping?.toppingName}}
                     </li>
                   </ul>
                 </td>
 
-                <td>
+                <td class="text-center">
                   <ul>
                     <li v-for="(topping, idx) in item.productTypeToppings" :key="idx">
-                      {{ topping.quantity || 'ไม่มีข้อมูล' }}
+                      {{ topping.quantity}}
                     </li>
                   </ul>
                 </td>
                 <td class="text-center">
-
-                  <!-- {{ item.product }} -->
-
-                  <div v-if="item.product?.category.haveTopping">
+                  <!-- <div v-if="item.product?.category?.haveTopping"> -->
                     <span>
-                      {{ item.productType?.productTypeName }}
+                      {{ item.productType }}
                     </span>
-                  </div>
-                  <div v-else>
+                  <!-- </div> -->
+                  <!-- <div v-else>
                     ไม่มีข้อมูล
-                  </div>
+                  </div> -->
                 </td>
 
-                <td class="text-center">{{ item.quantity }}</td>
+                <td class="text-center">{{ item.quantity}}</td>
 
-                <td class="text-center">{{ item.receiptSubTotal }}</td>
+                <td class="text-center">{{ item.receiptSubTotal}}</td>
               </tr>
             </tbody>
           </v-table>
           <div class="text-right" style="margin-top: 20px;">
             <strong>ราคารวมสุทธิ</strong>
-            <span>{{ reciptStore.receipt?.receiptTotalPrice ?? 0 }} บาท</span>
+            <span>{{ reciptStore.receipt?.receiptTotalPrice || 0 }} บาท</span>
           </div>
         </v-container>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="orange" @click="closeDialog()">ตกลง</v-btn>
+        <v-btn color="orange" @click="closeDialog">ตกลง</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -97,16 +92,10 @@ const formattedReceiptDate = computed(() => {
   return reciptStore.receipt ? formatDateThai(new Date(reciptStore.receipt.createdDate).toISOString()) : '';
 });
 
-// closeDialog
 function closeDialog() {
-  // cler data recipt store
   reciptStore.receipt = null;
   reciptStore.historyReceiptDialog = false;
 }
-
-
-
-
 </script>
 
 <style scoped>
