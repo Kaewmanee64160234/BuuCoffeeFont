@@ -30,6 +30,7 @@ export const usePosStore = defineStore("pos", () => {
     receiptPromotions: [],
     receiptTotalPrice: 0,
     paymentMethod: "",
+    customer: null,
   });
 
   const currentReceipt = ref<Receipt>();
@@ -248,10 +249,47 @@ export const usePosStore = defineStore("pos", () => {
       promotion.promotionType === "usePoints"
     ) {
       newDiscount = promotion.discountValue!;
+      if (promotion.promotionType === "usePoints") {
+        if (receipt.value.customer !== null) {
+          if (
+            receipt.value.customer!.customerNumberOfStamp <
+            promotion.discountValue!
+          ) {
+            Swal.fire({
+              icon: "error",
+              title: "Invalid Discount",
+              text: "The customer does not have enough points to redeem.",
+            });
+            return;
+          }
+          receipt.value.customer!.customerNumberOfStamp -=
+            promotion.discountValue!;
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Invalid Discount",
+            text: "The customer does not have enough points to redeem.",
+          });
+          return;
+        }
+      }
+      if (promotion.promotionType === "discountPrice") {
+        if (promotion.conditionValue1! <= receipt.value.receiptTotalPrice) {
+          newDiscount = promotion.discountValue!;
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Invalid Discount Not in Condition",
+            text: "The total price must be greater than or equal to the condition value to apply a discount.",
+          });
+          return;
+        }
+      }
     } else if (promotion.promotionType === "discountPercentage") {
       if (promotion.conditionValue1! <= receipt.value.receiptTotalPrice) {
         newDiscount =
-         parseInt( receipt.value.receiptTotalPrice+'') * (parseInt(promotion.discountValue!+'') / 100);
+          parseInt(receipt.value.receiptTotalPrice + "") *
+          (parseInt(promotion.discountValue! + "") / 100);
       } else {
         Swal.fire({
           icon: "error",
@@ -269,20 +307,100 @@ export const usePosStore = defineStore("pos", () => {
       );
       if (product2 && product) {
         if (promotion.freeProductId === promotion.buyProductId) {
-          if (product.quantity >= 2) {
-            newDiscount = product.product?.productPrice!;
+          const numberOfUsedPromotions = receipt.value.receiptPromotions.filter(
+            (item) => item.promotion.promotionId === promotion.promotionId
+          ).length;
+          console.log(
+            "numberOfUsedPromotions",
+            product.quantity - numberOfUsedPromotions * 2
+          );
+
+          if (product.quantity - numberOfUsedPromotions * 2 >= 2) {
+            if (product.quantity >= 2) {
+              newDiscount = product.product?.productPrice!;
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Product Not enough",
+                text: "The buy product quantity is not enough to apply the promotion.",
+              });
+              return;
+            }
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Invalid Discount Overused",
+              text: "The promotion is not valid for this product.",
+            });
+            return;
           }
         } else {
-          newDiscount = productStore.products.find(
-            (prod) => prod.productId === promotion.freeProductId
-          )?.productPrice!;
+          // check if the product is in the receipt
+          if (product && product2) {
+            // check if the product quantity is more than the promotion condition
+            if (product.quantity >= promotion.conditionValue1!) {
+              // check if the product2 quantity is more than the promotion condition
+              if (product2.quantity >= promotion.conditionValue2!) {
+                // check if the promotion is not used before
+                const numberOfUsedPromotions =
+                  receipt.value.receiptPromotions.filter(
+                    (item) =>
+                      item.promotion.promotionId === promotion.promotionId
+                  ).length;
+                if (numberOfUsedPromotions < product.quantity) {
+                  newDiscount = productStore.products.find(
+                    (prod) => prod.productId === promotion.freeProductId
+                  )?.productPrice!;
+                } else {
+                  Swal.fire({
+                    icon: "error",
+                    title: "Invalid Discount Overused",
+                    text: "The promotion is not valid for this product.",
+                  });
+                  return;
+                }
+              } else {
+                Swal.fire({
+                  icon: "error",
+                  title: "Invalid Discount",
+                  text: "The free product quantity is not enough to apply the promotion.",
+                });
+                return;
+              }
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Invalid Discount",
+                text: "The buy product quantity is not enough to apply the promotion.",
+              });
+              return;
+            }
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Invalid Discount",
+              text: "The promotion is not valid for this product.",
+            });
+            return;
+          }
         }
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Not in receipt",
+          text: "The promotion is not valid for this product.",
+        });
+        return;
       }
     }
 
     // Check if the new discount would result in a negative or zero net price
-    const newTotalDiscount = parseFloat(receipt.value.receiptTotalDiscount+'') + parseFloat(newDiscount+'');
-    const newNetPrice = parseFloat(receipt.value.receiptTotalPrice+'') - parseFloat(newTotalDiscount+'');
+    const newTotalDiscount =
+      parseFloat(receipt.value.receiptTotalDiscount + "") +
+      parseFloat(newDiscount + "");
+    const newNetPrice =
+      parseFloat(receipt.value.receiptTotalPrice + "") -
+      parseFloat(newTotalDiscount + "");
 
     if (newNetPrice <= 0) {
       Swal.fire({
