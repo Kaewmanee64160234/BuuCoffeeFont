@@ -44,7 +44,11 @@
     <v-divider></v-divider>
     <v-card-subtitle>รวมทั้งหมด: {{ posStore.receipt.receiptTotalPrice }}</v-card-subtitle>
     <v-card-subtitle>ราคาลด: {{ posStore.receipt.receiptTotalDiscount }}</v-card-subtitle>
-    <v-card-subtitle>promotion: {{ posStore.receipt.receiptPromotions }}</v-card-subtitle>
+    <v-card-subtitle>promotion: 
+      <li v-for="promotion in posStore.receipt.receiptPromotions" :key="promotion.receiptPromotionId">
+        {{ promotion.promotion.promotionType }}: {{ promotion.discount }}
+      </li>
+    </v-card-subtitle>
     <v-card-subtitle>รวมสุทธิ: {{ posStore.receipt.receiptNetPrice }}</v-card-subtitle>
     <v-card-subtitle>ลูกค้า: {{ posStore.receipt.customer?.customerName }}</v-card-subtitle>
     <v-divider></v-divider>

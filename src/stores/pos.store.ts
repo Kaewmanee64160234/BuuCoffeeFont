@@ -195,6 +195,9 @@ export const usePosStore = defineStore("pos", () => {
     receipt.value.receiptType = "coffee";
     receipt.value.receiptStatus = "pending";
     receipt.value.createdDate = new Date();
+    if(receipt.value.receiptTotalDiscount===0){
+      receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice;
+    }
 
     const res = await receiptService.createReceipt(receipt.value);
     if (res.status === 201) {
@@ -273,6 +276,27 @@ export const usePosStore = defineStore("pos", () => {
       parseFloat(receipt.value.receiptTotalDiscount + "");
   };
 
+  // removePromotion
+  const removePromotion = (promotion:Promotion) => {
+    const index = receipt.value.receiptPromotions.findIndex(
+      (item) => item.promotion.promotionId === promotion.promotionId
+    );
+    if (index !== -1) {
+      receipt.value.receiptPromotions.splice(index, 1);
+    }
+    // calculate total discount
+    receipt.value.receiptTotalDiscount = receipt.value.receiptPromotions.reduce(
+      (acc, item) => {
+        return acc + parseInt(item.discount! + "");
+      },
+      0
+    );
+    receipt.value.receiptNetPrice =
+      parseInt(receipt.value.receiptTotalPrice + "") -
+      parseFloat(receipt.value.receiptTotalDiscount + "");
+  };
+
+
   return {
     selectedItems,
     receiptPromotions,
@@ -292,5 +316,6 @@ export const usePosStore = defineStore("pos", () => {
     applyPromotion,
     currentReceipt,
     receiptDialog,
+    removePromotion
   };
 });
