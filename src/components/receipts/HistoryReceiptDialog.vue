@@ -34,8 +34,6 @@
                   </ul>
                 </td>
                 <td class="text-center">
-                <!-- {{ item.product }} -->
-
                   <div v-if="item.product?.category.haveTopping">
                     <span>
                       {{ item.productType?.productTypeName }}
@@ -45,8 +43,6 @@
                     ไม่มีข้อมูล
                   </div>
                 </td>
-
-
                 <td class="text-center">{{ item.quantity }}</td>
                 <td class="text-center">{{ item.receiptSubTotal }}</td>
                 <td class="text-center">{{ item.receiptSubTotal }}</td>
