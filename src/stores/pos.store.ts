@@ -140,6 +140,7 @@ export const usePosStore = defineStore("pos", () => {
           receiptSubTotal: productPrice * parsedQuantity,
           product,
           sweetnessLevel: sweetness,
+          productType:productType,
         });
       }
     }
