@@ -31,6 +31,12 @@ function deleteCashier(id: number) {
 function getGroupedFinance(startDate: string, endDate: string) {
   return http.get(`/receipts/grouped?startDate=${startDate}&endDate=${endDate}`);
 }
+function getRevenue() {
+  return http.get("/importingredients/revenue");
+}
+function getExpenditure() {
+  return http.get("/importingredients/expenditure");
+}
 export default {
   getfindToday,
   createCashier,
@@ -39,5 +45,7 @@ export default {
   getGroupedFinance,
   getSumType,
   deleteCashier,
+  getRevenue,
+  getExpenditure,
 
 };
