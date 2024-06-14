@@ -328,7 +328,7 @@ const submitForm = async () => {
     if (selectedIngredientsHot.value.length > 0) {
       productData.productTypes.push({
         productTypeName: 'ร้อน',
-        productTypePrice: 0,
+        productTypePrice:  getProductType('ร้อน').productTypePrice,
         recipes: selectedIngredientsHot.value.map((ingredientId) => {
           return {
             ingredient: ingredientStore.ingredients.find(i => i.ingredientId === ingredientId)!,
@@ -340,7 +340,7 @@ const submitForm = async () => {
     if (selectedIngredientsCold.value.length > 0) {
       productData.productTypes.push({
         productTypeName: 'เย็น',
-        productTypePrice: 0,
+        productTypePrice: getProductType('เย็น').productTypePrice,
         recipes: selectedIngredientsCold.value.map((ingredientId) => {
           return {
             ingredient: ingredientStore.ingredients.find(i => i.ingredientId === ingredientId)!,
@@ -352,7 +352,7 @@ const submitForm = async () => {
     if (selectedIngredientsBlend.value.length > 0) {
       productData.productTypes.push({
         productTypeName: 'ปั่น',
-        productTypePrice: 0,
+        productTypePrice: getProductType('ปั่น').productTypePrice,
         recipes: selectedIngredientsBlend.value.map((ingredientId) => {
           return {
             ingredient: ingredientStore.ingredients.find(i => i.ingredientId === ingredientId)!,

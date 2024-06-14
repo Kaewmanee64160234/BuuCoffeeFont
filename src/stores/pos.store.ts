@@ -10,7 +10,7 @@ import { useProductStore } from "./product.store";
 import receiptService from "@/service/receipt.service";
 import type { Promotion } from "@/types/promotion.type";
 import { useCustomerStore } from "./customer.store";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 
 export const usePosStore = defineStore("pos", () => {
   const selectedItems = ref<ReceiptItem[]>([]);
@@ -196,7 +196,7 @@ export const usePosStore = defineStore("pos", () => {
     receipt.value.receiptType = "coffee";
     receipt.value.receiptStatus = "pending";
     receipt.value.createdDate = new Date();
-    if(receipt.value.receiptTotalDiscount===0){
+    if (receipt.value.receiptTotalDiscount === 0) {
       receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice;
     }
 
@@ -209,73 +209,104 @@ export const usePosStore = defineStore("pos", () => {
   };
 
   const applyPromotion = (promotion: Promotion) => {
-    // Initial validation: check if receipt total price is valid
-    if (receipt.value.receiptTotalPrice <= 0) {
+    const currentDate = new Date();
+
+    // Check if the promotion is within the valid date range
+    if (currentDate < new Date(promotion.startDate)) {
       Swal.fire({
-        icon: 'error',
-        title: 'Invalid Operation',
-        text: 'The total price must be greater than zero to apply a promotion.',
+        icon: "error",
+        title: "Promotion Expired",
+        text: "The promotion is not valid at this time.",
       });
       return;
     }
-  
-    let newDiscount = 0;
-  
-    if (promotion.promotionType === 'discountPrice' || promotion.promotionType === 'usePoints') {
-      newDiscount = promotion.discountValue!;
-    } else if (promotion.promotionType === 'discountPercentage') {
-      if (promotion.conditionValue1! <= receipt.value.receiptTotalPrice) {
-        newDiscount = receipt.value.receiptTotalPrice * (promotion.discountValue! / 100);
-      }else{
+    if (promotion.noEndDate == false) {
+      if (currentDate > new Date(promotion.endDate!)) {
         Swal.fire({
-          icon: 'error',
-          title: 'Invalid Discount Not in Condition',
-          text: 'The total price must be greater than or equal to the condition value to apply a percentage discount.',
+          icon: "error",
+          title: "Promotion Expired",
+          text: "The promotion is not valid at this time.",
+        });
+        return;
+      }
+    }
+
+    // Initial validation: check if receipt total price is valid
+    if (receipt.value.receiptTotalPrice <= 0) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Operation",
+        text: "The total price must be greater than zero to apply a promotion.",
+      });
+      return;
+    }
+
+    let newDiscount = 0;
+
+    if (
+      promotion.promotionType === "discountPrice" ||
+      promotion.promotionType === "usePoints"
+    ) {
+      newDiscount = promotion.discountValue!;
+    } else if (promotion.promotionType === "discountPercentage") {
+      if (promotion.conditionValue1! <= receipt.value.receiptTotalPrice) {
+        newDiscount =
+          receipt.value.receiptTotalPrice * (promotion.discountValue! / 100);
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Invalid Discount Not in Condition",
+          text: "The total price must be greater than or equal to the condition value to apply a percentage discount.",
         });
         return;
       }
     } else {
-      const product = selectedItems.value.find((item) => item.product?.productId === promotion.buyProductId);
-      const product2 = selectedItems.value.find((item) => item.product?.productId === promotion.freeProductId);
+      const product = selectedItems.value.find(
+        (item) => item.product?.productId === promotion.buyProductId
+      );
+      const product2 = selectedItems.value.find(
+        (item) => item.product?.productId === promotion.freeProductId
+      );
       if (product2 && product) {
         if (promotion.freeProductId === promotion.buyProductId) {
           if (product.quantity >= 2) {
             newDiscount = product.product?.productPrice!;
           }
         } else {
-          newDiscount = productStore.products.find((prod) => prod.productId === promotion.freeProductId)?.productPrice!;
+          newDiscount = productStore.products.find(
+            (prod) => prod.productId === promotion.freeProductId
+          )?.productPrice!;
         }
       }
     }
-  
+
     // Check if the new discount would result in a negative or zero net price
     const newTotalDiscount = receipt.value.receiptTotalDiscount + newDiscount;
     const newNetPrice = receipt.value.receiptTotalPrice - newTotalDiscount;
-  
+
     if (newNetPrice <= 0) {
       Swal.fire({
-        icon: 'error',
-        title: 'Invalid Discount',
-        text: 'The discount is too high and would result in a zero or negative total price.',
+        icon: "error",
+        title: "Invalid Discount",
+        text: "The discount is too high and would result in a zero or negative total price.",
       });
       return;
     }
-  
+
     // Apply the promotion
     receipt.value.receiptPromotions.push({
       date: new Date(),
       discount: newDiscount,
       promotion: promotion,
     });
-  
+
     // Update receipt totals
     receipt.value.receiptTotalDiscount = newTotalDiscount;
     receipt.value.receiptNetPrice = newNetPrice;
   };
-  
 
   // removePromotion
-  const removePromotion = (promotion:Promotion) => {
+  const removePromotion = (promotion: Promotion) => {
     const index = receipt.value.receiptPromotions.findIndex(
       (item) => item.promotion.promotionId === promotion.promotionId
     );
@@ -293,7 +324,6 @@ export const usePosStore = defineStore("pos", () => {
       parseInt(receipt.value.receiptTotalPrice + "") -
       parseFloat(receipt.value.receiptTotalDiscount + "");
   };
-
 
   return {
     selectedItems,
@@ -314,6 +344,6 @@ export const usePosStore = defineStore("pos", () => {
     applyPromotion,
     currentReceipt,
     receiptDialog,
-    removePromotion
+    removePromotion,
   };
 });

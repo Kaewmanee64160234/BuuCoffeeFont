@@ -45,6 +45,8 @@ const promotionChunks = computed(() => {
 });
 
 function applyPromotion(promotion: Promotion) {
+  console.log('promtoken', promotion);
+  
   if (posStore.selectedItems.length === 0) {
     Swal.fire({
       icon: 'error',
@@ -53,9 +55,6 @@ function applyPromotion(promotion: Promotion) {
     });
     return;
   }
-
- 
-  
 
   posStore.applyPromotion(promotion);
 }
