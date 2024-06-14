@@ -16,6 +16,7 @@ export interface ReceiptItem {
   sweetnessLevel?: number;
   receiptItemId?: number;
   productType?: ProductType;
+
 }
 
 

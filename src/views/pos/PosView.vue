@@ -1,3 +1,54 @@
+<script lang="ts" setup>
+import { computed, onMounted, ref } from 'vue';
+import PromotionCardsCarousel from '@/components/pos/PromotionCardsCarousel.vue';
+import SearchBar from '@/components/pos/SearchBar.vue';
+import CategoryTabs from '@/components/pos/CategoryTabs.vue';
+import ProductCard from '@/components/pos/ProductCard.vue';
+import SelectedItemsList from '@/components/pos/SelectedItemsList.vue';
+import DrinkSelectionDialog from '@/components/pos/DrinkSelectionDialog.vue';
+import ReceiptDialog from '@/components/pos/ReceiptDialog.vue';
+import { useProductStore } from '@/stores/product.store';
+import { useCategoryStore } from '@/stores/category.store';
+import { usePromotionStore } from '@/stores/promotion.store';
+import { useToppingStore } from '@/stores/topping.store';
+import {useUserStore } from '@/stores/user.store';
+
+const productStore = useProductStore();
+const categoryStore = useCategoryStore();
+const promotionStore = usePromotionStore();
+const toppingStore = useToppingStore();
+const userStore = useUserStore();
+const filteredProducts = computed(() => {
+  return productStore.products.filter(product => {
+    const matchesCategory = productStore.selectedCategory ? product.category.categoryName === productStore.selectedCategory : true;
+    const matchesSearch = productStore.searchQuery ? product.productName.toLowerCase().includes(productStore.searchQuery.toLowerCase()) : true;
+    return matchesCategory && matchesSearch;
+  });
+});
+
+onMounted(async () => {
+  await productStore.getAllProducts();
+  await categoryStore.getAllCategories();
+  await toppingStore.getAllToppings();
+  if(userStore.userRole === "พนักงานขายข้าว"){
+    promotionStore.getPromotionByType("ร้านกับข้าว");
+    productStore.selectedCategory = "กับข้าว";
+    const cate = categoryStore.categoriesForCreate.find(category => category.categoryName === "กับข้าว")
+    categoryStore.categoriesForCreate = [];
+    categoryStore.categoriesForCreate.push(cate!);
+  }else{
+    promotionStore.getPromotionByType("ร้านกาแฟ");
+    productStore.selectedCategory = "coffee";
+    // find the category กับข้าว and slice
+    const cate = categoryStore.categoriesForCreate.findIndex(category => category.categoryName === "กาแฟ")
+    categoryStore.categoriesForCreate.splice(cate, 1);
+
+  }
+
+});
+
+</script>
+
 <template>
   <v-app>
     <v-row no-gutters>
@@ -18,7 +69,7 @@
             </v-row>
             <v-row>
               <v-col cols="12" md="6">
-                <category-tabs :user-role="userRole"></category-tabs>
+                <category-tabs ></category-tabs>
 
               </v-col>
             </v-row>
@@ -44,41 +95,7 @@
 
 </template>
 
-<script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue';
-import PromotionCardsCarousel from '@/components/pos/PromotionCardsCarousel.vue';
-import SearchBar from '@/components/pos/SearchBar.vue';
-import CategoryTabs from '@/components/pos/CategoryTabs.vue';
-import ProductCard from '@/components/pos/ProductCard.vue';
-import SelectedItemsList from '@/components/pos/SelectedItemsList.vue';
-import DrinkSelectionDialog from '@/components/pos/DrinkSelectionDialog.vue';
-import ReceiptDialog from '@/components/pos/ReceiptDialog.vue';
-import { useProductStore } from '@/stores/product.store';
-import { useCategoryStore } from '@/stores/category.store';
-import { usePromotionStore } from '@/stores/promotion.store';
-import { useToppingStore } from '@/stores/topping.store';
 
-const productStore = useProductStore();
-const categoryStore = useCategoryStore();
-const promotionStore = usePromotionStore();
-const toppingStore = useToppingStore();
-const userRole = ref("พนักงานขายข้าว");
-const filteredProducts = computed(() => {
-  return productStore.products.filter(product => {
-    const matchesCategory = productStore.selectedCategory ? product.category.categoryName === productStore.selectedCategory : true;
-    const matchesSearch = productStore.searchQuery ? product.productName.toLowerCase().includes(productStore.searchQuery.toLowerCase()) : true;
-    return matchesCategory && matchesSearch;
-  });
-});
-
-onMounted(async () => {
-  await productStore.getAllProducts();
-  await categoryStore.getAllCategories();
-  await promotionStore.getAllPromotions();
-  await toppingStore.getAllToppings();
-});
-
-</script>
 
 <style scoped>
 .v-container {
