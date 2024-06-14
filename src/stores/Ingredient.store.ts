@@ -9,10 +9,9 @@ import { useMessageStore } from "./message";
 export const useIngredientStore = defineStore("ingredient", () => {
   const loadingStore = useLoadingStore();
   const messageStore = useMessageStore();
-  const loaded = ref(false);
-  const loading = ref(false);
   const ingredient = ref<Ingredient | null>(null);
   const ingredients = ref<Ingredient[]>([]);
+  const ingredientlow = ref<Ingredient[]>([]);
   const importingredients = ref<Importingredient[]>([]);
   const search = ref<string>("");
   const dialog = ref(false); // สถานะของ Dialog
@@ -24,7 +23,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
     ingredientQuantityInStock: 0,
     ingredientQuantityPerUnit: 0,
     ingredientQuantityPerSubUnit: "",
-    ingredientRemining:0,
+    ingredientRemining: 0,
     ingredientImage: "no_image.jpg",
     files: [],
   });
@@ -33,14 +32,14 @@ export const useIngredientStore = defineStore("ingredient", () => {
       editedIngredient.value = {
         ingredientName: "",
         ingredientSupplier: "",
-    ingredientMinimun: 0,
-    ingredientUnit: "",
-    ingredientQuantityInStock: 0,
-    ingredientQuantityPerUnit: 0,
-    ingredientQuantityPerSubUnit: "",
-    ingredientRemining:0,
-    ingredientImage: "no_image.jpg",
-    files: [],
+        ingredientMinimun: 0,
+        ingredientUnit: "",
+        ingredientQuantityInStock: 0,
+        ingredientQuantityPerUnit: 0,
+        ingredientQuantityPerSubUnit: "",
+        ingredientRemining: 0,
+        ingredientImage: "no_image.jpg",
+        files: [],
       };
     }
   });
@@ -85,6 +84,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
       messageStore.showError("Oops!, cannot get ingredients.");
     }
   }
+
   async function searchIngredients(name: string) {
     try {
       const res = await ingredientService.searchIngredientsByName(name);
@@ -94,7 +94,6 @@ export const useIngredientStore = defineStore("ingredient", () => {
       messageStore.showError("Oops!, cannot search ingredients.");
     }
   }
-
 
   const ingredientList = ref<
     { ingredient: Ingredient; count: number; totalunit: number }[]
@@ -127,19 +126,16 @@ export const useIngredientStore = defineStore("ingredient", () => {
   function removeIngredient(index: number) {
     ingredientList.value.splice(index, 1);
   }
-
-
-  // const getAllIngredients = async () => {
-  //   try {
-  //     const response = await ingredientService.getAllIngredients();
-  //     if (response.status === 200) {
-  //       ingredients.value = response.data.data;
-  //       console.log(response.data);
-  //     }
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
+  async function getIngredientlow() {
+    try {
+      const response = await ingredientService.getIngredientlow();
+      if (response.status === 200) {
+        ingredientlow.value = response.data;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   const getAllHistoryImportIngredients = async () => {
     try {
@@ -189,10 +185,11 @@ export const useIngredientStore = defineStore("ingredient", () => {
         const res = await ingredientService.updateIngredient(
           editedIngredient.value.ingredientId,
           editedIngredient.value
-          
         );
       } else {
-        const res = await ingredientService.saveIngredient(editedIngredient.value);
+        const res = await ingredientService.saveIngredient(
+          editedIngredient.value
+        );
       }
       dialog.value = false;
     } catch (e) {
@@ -203,10 +200,10 @@ export const useIngredientStore = defineStore("ingredient", () => {
   }
   async function setEditedIngredient(ingredient: Ingredient) {
     editedIngredient.value = JSON.parse(JSON.stringify(ingredient));
-    await getAllIngredients(); 
+    await getAllIngredients();
     dialog.value = true;
   }
-  
+
   const deleteIngredient = async (id: number) => {
     try {
       await ingredientService.deleteIngredient(id);
@@ -235,6 +232,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
     total,
     importingredients,
     ingredientCheckList,
+    ingredientlow,
     getAllIngredients,
     Addingredient,
     saveImportData,
@@ -243,7 +241,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
     Addingredienttotable,
     saveIngredient,
     deleteIngredient,
-    searchIngredients
-    
+    searchIngredients,
+    getIngredientlow,
   };
 });

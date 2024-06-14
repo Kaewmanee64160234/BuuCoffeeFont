@@ -25,19 +25,13 @@
               <tr v-for="(item, index) in reciptStore.receipt?.receiptItems" :key="index">
                 <td class="text-center">{{ item.product?.productName || 'ไม่มีข้อมูล' }}</td>
                 <td class="text-center">
-                  <ul v-if="item.productTypeToppings.length > 0">
+                  <ul>
                     <li v-for="(topping, idx) in item.productTypeToppings" :key="idx">
                       {{ topping.topping?.toppingName || 'ไม่มีข้อมูล' }}
                     </li>
                   </ul>
-
-                  <span v-else>ไม่มีข้อมูล</span>
                 </td>
-                <td class="text-center">
-                  <span v-if="item.productTypeToppings.length > 0">{{ item.productTypeToppings[0].productType.productTypeName}}</span>
-                  <span v-else>ไม่มีข้อมูล</span>
-
-                </td>
+                <td class="text-center">{{ item.productType?.productTypeName || 'ไม่มีข้อมูล' }}</td>
                 <td class="text-center">{{ item.quantity }}</td>
                 <td class="text-center">{{ item.receiptSubTotal }}</td>
               </tr>

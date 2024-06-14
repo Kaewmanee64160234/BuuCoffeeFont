@@ -1,7 +1,10 @@
 <script lang="ts" setup>
 import { onMounted } from 'vue';
 import ApexCharts from 'apexcharts';
+import { useIngredientStore } from '@/stores/Ingredient.store';
+import { useRouter } from 'vue-router'; 
 
+const ingredientStore = useIngredientStore();
 const pieChartOptions = {
   series: [44, 55, 13, 43, 22],
   chart: {
@@ -41,7 +44,9 @@ const lineChartOptions = {
   }
 };
 
-onMounted(() => {
+onMounted(async () => {
+  await ingredientStore.getIngredientlow();
+  console.log('test',ingredientStore.ingredientlow)
   const pieChart = new ApexCharts(document.querySelector("#pieChart"), pieChartOptions);
   pieChart.render();
 
@@ -166,16 +171,21 @@ onMounted(() => {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>1</td>
-              <td>ฮีพี-เมจ นมพาสเจอร์ไรส์</td>
-              <td>เมจ</td>
-              <td>2</td>
-            </tr>
-          </tbody>
+          <tr v-for="(item, index) in ingredientStore.ingredientlow" :key="index">
+            <td>{{ index + 1 }}</td>
+            <td>{{ item.ingredientName }}</td>
+            <td>{{ item.ingredientSupplier }}</td>
+         <td>{{ item.ingredientQuantityInStock }}</td>
+          </tr>
+        </tbody>
+        <tbody v-if="!ingredientStore.ingredientlow.length">
+          <tr>
+            <td colspan="9" class="text-center">No data</td>
+          </tr>
+        </tbody>
         </table>
       </div>
-  
+      <pagination :total="totalItems" :per-page="pageSize" v-model="currentPage"></pagination>
     </div>
   </template>
   
