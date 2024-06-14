@@ -1,9 +1,9 @@
 <template>
   <v-dialog v-model="posStore.toppingDialog" max-width="600">
-    <v-card>
+    <v-card v-if="productStore.selectedProduct">
       <v-card-title class="d-flex justify-space-between align-center">
         <div>
-          <span>{{ productStore.selectedProduct?.productName }}</span>
+          <span>{{ productStore.selectedProduct.productName }}</span>
         </div>
         <v-btn icon @click="closeDialog">
           <v-icon color="red">mdi-close</v-icon>
@@ -13,74 +13,78 @@
         Please select a product type before confirming.
       </v-alert>
       <v-card-subtitle class="d-flex justify-space-between align-center">
-        <div>{{ productStore.selectedProduct?.productName }}</div>
-        <div>{{ productStore.selectedProduct?.productPrice }} $</div>
+        <div>{{ productStore.selectedProduct.productName }}</div>
+        <div>{{ productStore.selectedProduct.productPrice }} $</div>
       </v-card-subtitle>
       <v-card-text>
-        <v-img :src="productStore.selectedProduct?.productImage" class="mb-4"></v-img>
-        <div class="d-flex flex-column">
-          <span>ตัวเลือก</span>
-          <div class="d-flex justify-space-between">
-            <v-chip
-              v-for="type in productStore.selectedProduct?.productTypes"
-              :key="type?.productTypeId"
-              variant="outlined"
-              :color="selectedType === type ? '#f5a623' : 'gray'"
-              @click="selectType(type)"
-            >
-              {{ type?.productTypeName }} {{ type?.productTypePrice }}
-            </v-chip>
-          </div>
-        </div>
-        <div class="d-flex flex-column">
-          <span>ระดับความหวาน</span>
-          <div class="d-flex justify-space-between">
-            <v-chip
-              v-for="level in sweetnessLevels"
-              :key="level"
-              variant="outlined"
-              :color="selectedSweetness === level ? '#f5a623' : 'gray'"
-              @click="selectSweetness(level)"
-            >
-              {{ level }}%
-            </v-chip>
-          </div>
-        </div>
-        <div class="d-flex flex-column">
-          <span>ท็อปปิ้ง</span>
-          <div class="topping-container d-flex align-center">
-            <v-btn icon @click="prevTopping">
-              <v-icon>mdi-chevron-left</v-icon>
-            </v-btn>
-            <div class="d-flex justify-space-between flex-grow-1">
-              <div v-for="topping in displayedToppings" :key="topping?.toppingId" class="topping-item d-flex flex-column align-center">
+        <div class="product-info-container d-flex">
+          <v-img :src="`http://localhost:3000/products/${productStore.selectedProduct.productId}/image`" class="product-image"></v-img>
+          <div class="product-options-container">
+            <div class="d-flex flex-column">
+              <span>ตัวเลือก</span>
+              <div class="d-flex justify-space-between">
                 <v-chip
+                  v-for="type in productStore.selectedProduct.productTypes"
+                  :key="type.productTypeId"
                   variant="outlined"
-                  :color="selectedToppings.some(t => t.topping.toppingId === topping?.toppingId) ? '#f5a623' : 'gray'"
-                  @click="toggleTopping(topping)"
+                  :color="selectedType === type ? '#f5a623' : 'gray'"
+                  @click="selectType(type)"
                 >
-                  {{ topping?.toppingName }} {{ topping?.toppingPrice }}
+                  {{ type.productTypeName }} {{ type.productTypePrice }}
                 </v-chip>
-                <div v-if="selectedToppings.some(t => t.topping.toppingId === topping?.toppingId)" class="quantity-controls d-flex align-center mt-2">
-                  <v-btn icon @click="decreaseToppingQuantity(topping)">
-                    <v-icon>mdi-minus</v-icon>
-                  </v-btn>
-                  <span>{{ selectedToppings.find(t => t.topping.toppingId === topping?.toppingId)?.quantity }}</span>
-                  <v-btn icon @click="increaseToppingQuantity(topping)">
-                    <v-icon>mdi-plus</v-icon>
-                  </v-btn>
-                </div>
               </div>
             </div>
-            <v-btn icon @click="nextTopping">
-              <v-icon>mdi-chevron-right</v-icon>
-            </v-btn>
+            <div class="d-flex flex-column">
+              <span>ระดับความหวาน</span>
+              <div class="d-flex justify-space-between">
+                <v-chip
+                  v-for="level in sweetnessLevels"
+                  :key="level"
+                  variant="outlined"
+                  :color="selectedSweetness === level ? '#f5a623' : 'gray'"
+                  @click="selectSweetness(level)"
+                >
+                  {{ level }}%
+                </v-chip>
+              </div>
+            </div>
+            <div class="d-flex flex-column">
+              <span>ท็อปปิ้ง</span>
+              <div class="topping-container d-flex align-center">
+                <v-btn icon @click="prevTopping">
+                  <v-icon>mdi-chevron-left</v-icon>
+                </v-btn>
+                <div class="d-flex justify-space-between flex-grow-1">
+                  <div v-for="topping in displayedToppings" :key="topping.toppingId" class="topping-item d-flex flex-column align-center">
+                    <v-chip
+                      variant="outlined"
+                      :color="selectedToppings.some(t => t.topping.toppingId === topping.toppingId) ? '#f5a623' : 'gray'"
+                      @click="toggleTopping(topping)"
+                    >
+                      {{ topping.toppingName }} {{ topping.toppingPrice }}
+                    </v-chip>
+                    <div v-if="selectedToppings.some(t => t.topping.toppingId === topping.toppingId)" class="quantity-controls d-flex align-center mt-2">
+                      <v-btn icon @click="decreaseToppingQuantity(topping)">
+                        <v-icon>mdi-minus</v-icon>
+                      </v-btn>
+                      <span>{{ selectedToppings.find(t => t.topping.toppingId === topping.toppingId)?.quantity }}</span>
+                      <v-btn icon @click="increaseToppingQuantity(topping)">
+                        <v-icon>mdi-plus</v-icon>
+                      </v-btn>
+                    </div>
+                  </div>
+                </div>
+                <v-btn icon @click="nextTopping">
+                  <v-icon>mdi-chevron-right</v-icon>
+                </v-btn>
+              </div>
+            </div>
+            <div class="quantity-container d-flex justify-space-between align-center mt-4">
+              <v-btn @click="decreaseQuantity" icon="mdi-minus"></v-btn>
+              <span>{{ quantity }}</span>
+              <v-btn @click="increaseQuantity" icon="mdi-plus"></v-btn>
+            </div>
           </div>
-        </div>
-        <div class="quantity-container d-flex justify-space-between align-center mt-4">
-          <v-btn @click="decreaseQuantity" icon="mdi-minus"></v-btn>
-          <span>{{ quantity }}</span>
-          <v-btn @click="increaseQuantity" icon="mdi-plus"></v-btn>
         </div>
       </v-card-text>
       <v-card-actions class="justify-center">
@@ -90,6 +94,8 @@
   </v-dialog>
 </template>
 
+
+
 <script setup lang="ts">
 import { usePosStore } from '@/stores/pos.store';
 import { useProductStore } from '@/stores/product.store';
@@ -97,7 +103,7 @@ import { useToppingStore } from '@/stores/topping.store';
 import type { ProductType } from '@/types/productType.type';
 import type { Topping } from '@/types/topping.type';
 import type { ProductTypeTopping } from '@/types/productTypeTopping.type';
-import {  ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import Swal from 'sweetalert2';
 
 const posStore = usePosStore();
@@ -171,8 +177,9 @@ function increaseQuantity() {
 }
 
 function closeDialog() {
-  clearData();
   posStore.toppingDialog = false;
+
+  clearData();
 }
 
 function confirmSelection() {
@@ -207,12 +214,41 @@ function clearData() {
   selectedToppings.value = [];
   quantity.value = 1;
   toppingIndex.value = 0;
-  productStore.selectedProduct= null;
+  productStore.selectedProduct = null;
   productTypeToppings.value = [];
 }
+
+// Watch for changes in posStore.toppingDialog and ensure selectedProduct is set
+watch(
+  () => posStore.toppingDialog,
+  (newVal) => {
+    if (newVal && !productStore.selectedProduct) {
+      console.warn("Topping dialog opened without selected product.");
+      posStore.toppingDialog = false; // Close the dialog if no product is selected
+    }
+  }
+);
 </script>
 
+
 <style scoped>
+.product-info-container {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
+
+.product-image {
+  width: 150px;
+  height: auto;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.product-options-container {
+  flex-grow: 1;
+}
+
 .promotion-container {
   display: flex;
   justify-content: space-around;
@@ -272,3 +308,4 @@ function clearData() {
   margin: 0 10px;
 }
 </style>
+

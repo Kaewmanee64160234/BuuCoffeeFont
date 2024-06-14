@@ -15,9 +15,7 @@ const printReceipt = () => {
   const originalContents = document.body.innerHTML;
 
   document.body.innerHTML = printContents;
-
   window.print();
-
   document.body.innerHTML = originalContents;
   window.location.reload();
 };
@@ -30,7 +28,6 @@ const formattedTime = computed(() => {
   return dayjs(posStore.currentReceipt?.createdDate).format('HH:mm:ss');
 });
 </script>
-
 
 <template>
   <v-dialog v-model="posStore.receiptDialog" max-width="400">
@@ -114,6 +111,7 @@ const formattedTime = computed(() => {
     </v-card>
   </v-dialog>
 </template>
+
 
 <style scoped>
 .receipt-content {
@@ -201,5 +199,20 @@ const formattedTime = computed(() => {
 
 .v-btn {
   width: 45%;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printableArea, #printableArea * {
+    visibility: visible;
+  }
+  #printableArea {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
 }
 </style>
