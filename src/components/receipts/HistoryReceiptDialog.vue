@@ -31,7 +31,8 @@
                     </li>
                   </ul>
                 </td>
-                <td class="text-center">{{ item.productType?.productTypeName || 'ไม่มีข้อมูล' }}</td>
+                <td class="text-center" v-if="item.productTypeToppings.length > 0">{{ item.productTypeToppings[0].productType.productTypeName}}</td>
+                <td class="text-center" v-else></td>
                 <td class="text-center">{{ item.quantity }}</td>
                 <td class="text-center">{{ item.receiptSubTotal }}</td>
               </tr>
