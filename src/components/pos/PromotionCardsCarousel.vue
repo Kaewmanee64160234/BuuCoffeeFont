@@ -2,20 +2,15 @@
   <v-carousel hide-delimiter-background height="160">
     <v-carousel-item v-for="(chunk, index) in promotionChunks" :key="index">
       <div class="promotion-container">
-        <v-card 
-          v-for="promotion in chunk" 
-          :key="promotion.promotionId" 
-          class="promotion-card"
-          :class="{'applied-promotion': isPromotionApplied(promotion)}"
-          @click="togglePromotion(promotion)"
-        >
+        <v-card v-for="promotion in chunk" :key="promotion.promotionId" class="promotion-card"
+          :class="{ 'applied-promotion': isPromotionApplied(promotion) }" @click="togglePromotion(promotion)">
           <v-card-title class="text-center">{{ promotion.promotionName }}</v-card-title>
           <v-card-actions class="justify-center">
-            <v-btn v-if="promotion.promotionForStore === 'กับข้าว' || promotion.promotionType === 'discountPercentage' " color="primary" @click.stop="togglePromotion(promotion)">
+            <v-btn v-if="promotion.promotionCanUseManyTimes==false" color="primary" @click.stop="togglePromotion(promotion)">
               {{ isPromotionApplied(promotion) ? 'Unselect' : 'Apply' }}
             </v-btn>
             <v-btn v-else color="primary" @click.stop="applyPromotion(promotion)">
-            Apply
+              Apply
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -28,7 +23,7 @@
 import { usePosStore } from '@/stores/pos.store';
 import { usePromotionStore } from '@/stores/promotion.store';
 import { computed } from 'vue';
-import type {Promotion} from '@/types/promotion.type';
+import type { Promotion } from '@/types/promotion.type';
 import Swal from 'sweetalert2';
 
 const posStore = usePosStore();
@@ -46,7 +41,7 @@ const promotionChunks = computed(() => {
 
 function applyPromotion(promotion: Promotion) {
   console.log('promtoken', promotion);
-  
+
   if (posStore.selectedItems.length === 0) {
     Swal.fire({
       icon: 'error',
@@ -98,7 +93,8 @@ function isPromotionApplied(promotion: Promotion) {
 }
 
 .promotion-card.applied-promotion {
-  border: 2px solid #42a5f5; /* Highlight color for applied promotion */
+  border: 2px solid #42a5f5;
+  /* Highlight color for applied promotion */
 }
 
 .text-center {

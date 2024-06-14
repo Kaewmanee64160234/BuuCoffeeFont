@@ -248,7 +248,6 @@ export const usePosStore = defineStore("pos", () => {
       promotion.promotionType === "discountPrice" ||
       promotion.promotionType === "usePoints"
     ) {
-      newDiscount = promotion.discountValue!;
       if (promotion.promotionType === "usePoints") {
         if (receipt.value.customer !== null) {
           if (
@@ -273,19 +272,9 @@ export const usePosStore = defineStore("pos", () => {
           return;
         }
       }
-      if (promotion.promotionType === "discountPrice") {
-        if (promotion.conditionValue1! <= receipt.value.receiptTotalPrice) {
-          newDiscount = promotion.discountValue!;
-        } else {
-          Swal.fire({
-            icon: "error",
-            title: "Invalid Discount Not in Condition",
-            text: "The total price must be greater than or equal to the condition value to apply a discount.",
-          });
-          return;
-        }
-      }
-    } else if (promotion.promotionType === "discountPercentage") {
+      newDiscount = promotion.discountValue!;
+    }
+    if (promotion.promotionType === "discountPercentage") {
       if (promotion.conditionValue1! <= receipt.value.receiptTotalPrice) {
         newDiscount =
           parseInt(receipt.value.receiptTotalPrice + "") *
@@ -298,7 +287,8 @@ export const usePosStore = defineStore("pos", () => {
         });
         return;
       }
-    } else {
+    }
+    if (promotion.promotionType === "buy1get1") {
       const product = selectedItems.value.find(
         (item) => item.product?.productId === promotion.buyProductId
       );

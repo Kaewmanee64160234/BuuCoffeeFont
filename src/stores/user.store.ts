@@ -8,7 +8,7 @@ export const useUserStore = defineStore("user", () => {
   const user = ref<User | null>(null);
   const searchQuery = ref<string>("");
   const updateUserDialog = ref(false);
-  const userRole = ref("พนักงานร้านฟาแฟ");
+  const userRole = ref("พนักงานขายข้าว");
 
   const getAllUsers = async () => {
     try {

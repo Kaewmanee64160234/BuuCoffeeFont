@@ -17,7 +17,12 @@
               <v-select v-model="promotionType" :items="promotionStore.promotionTypes.map(promotionType => promotionType.value)" item-text="text" item-value="value" label="ประเภทโปรโมชั่น" required></v-select>
               <v-select v-model="promotionStore_" :items="store"
                     item-text="text" item-value="value" label="ร้านที่ใช้promotion" required></v-select>
-              <v-textarea v-model="description" label="คำอธิบาย" required></v-textarea>
+             
+              <!-- add check box promotionCanUseManyTimes -->
+
+              <v-checkbox v-model="promotionCanUseManyTimes" label="โปรโมชั่นนี้สามารถใช้ได้หลายครั้ง"></v-checkbox>
+
+                    <v-textarea v-model="description" label="คำอธิบาย" required></v-textarea>
             </v-form>
           </template>
 
@@ -75,6 +80,7 @@ const pointsRequired = ref<number | null>(null);
 const discountPercentage = ref<number | null>(null);
 const minimumPrice = ref<number | null>(null);
 const startDate = ref<string | null>(null);
+const promotionCanUseManyTimes = ref(false)
 const endDate = ref<string | null>(null);
 const description = ref('');
 const noEndDate = ref(false);
@@ -112,7 +118,8 @@ function loadPromotionData() {
     endDate.value = promotion.endDate ? new Date(promotion.endDate).toISOString().substr(0, 10) : '';
     description.value = promotion.promotionDescription || '';
     noEndDate.value = promotion.noEndDate;
-    promotionStore_.value = promotion.promotionForStore
+    promotionStore_.value = promotion.promotionForStore,
+    promotionCanUseManyTimes.value = promotion.promotionCanUseManyTimes
   
   }
 }
@@ -145,6 +152,8 @@ const closeDialog = () => {
   promotionStore.promotion = null;
 
   promotionStore.updatePromotionDialog = false;
+  promotionCanUseManyTimes.value = false;
+  
 };
 
 const updatePromotion = async () => {
@@ -165,7 +174,8 @@ const updatePromotion = async () => {
         conditionValue2: promotionType.value === 'discountPercentage' ? minimumPrice.value : null,
         promotionDescription: description.value,
         noEndDate: noEndDate.value,
-        promotionForStore: promotionStore_.value
+        promotionForStore: promotionStore_.value,
+        promotionCanUseManyTimes:promotionCanUseManyTimes.value
   };
 
   await promotionStore.updatePromotion(promotionId.value!, updatedPromotion);
