@@ -77,38 +77,12 @@
   
           <v-list-item to="/ingredientList">
             <template v-slot:prepend>
-              <img src="../../src/components/img/recipe.png" alt="Ingredient List" class="nav-icon"/>
+              <img src="../../src/components/img/groceries.png" alt="Ingredient List" class="nav-icon"/>
             </template>
             Ingredient List
           </v-list-item>
   
-          <v-list-item to="/importingredient">
-            <template v-slot:prepend>
-              <img src="../../src/components/img/groceries.png" alt="Import Ingredient" class="nav-icon"/>
-            </template>
-            Import Ingredient
-          </v-list-item>
-  
-          <v-list-item to="/importingredient-history">
-            <template v-slot:prepend>
-              <img src="../../src/components/img/shopping-list.png" alt="Import Ingredient History" class="nav-icon"/>
-            </template>
-            Import Ingredient History
-          </v-list-item>
-  
-          <v-list-item to="/checkingredient">
-            <template v-slot:prepend>
-              <img src="../../src/components/img/order.png" alt="Check Ingredient" class="nav-icon"/>
-            </template>
-            Check Ingredient
-          </v-list-item>
-  
-          <v-list-item to="/checkingredient-history">
-            <template v-slot:prepend>
-              <img src="../../src/components/img/checklist.png" alt="Check Ingredient History" class="nav-icon"/>
-            </template>
-            Check Ingredient History
-          </v-list-item>
+          
         </v-list>
       </v-navigation-drawer>
   
