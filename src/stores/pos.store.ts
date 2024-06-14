@@ -224,7 +224,7 @@ export const usePosStore = defineStore("pos", () => {
       if (currentDate > new Date(promotion.endDate!)) {
         Swal.fire({
           icon: "error",
-          title: "Promotion Expired",
+          title: "Promotion Expired noEndDate",
           text: "The promotion is not valid at this time.",
         });
         return;
@@ -251,7 +251,7 @@ export const usePosStore = defineStore("pos", () => {
     } else if (promotion.promotionType === "discountPercentage") {
       if (promotion.conditionValue1! <= receipt.value.receiptTotalPrice) {
         newDiscount =
-          receipt.value.receiptTotalPrice * (promotion.discountValue! / 100);
+         parseInt( receipt.value.receiptTotalPrice+'') * (parseInt(promotion.discountValue!+'') / 100);
       } else {
         Swal.fire({
           icon: "error",
@@ -281,8 +281,8 @@ export const usePosStore = defineStore("pos", () => {
     }
 
     // Check if the new discount would result in a negative or zero net price
-    const newTotalDiscount = receipt.value.receiptTotalDiscount + newDiscount;
-    const newNetPrice = receipt.value.receiptTotalPrice - newTotalDiscount;
+    const newTotalDiscount = parseFloat(receipt.value.receiptTotalDiscount+'') + parseFloat(newDiscount+'');
+    const newNetPrice = parseFloat(receipt.value.receiptTotalPrice+'') - parseFloat(newTotalDiscount+'');
 
     if (newNetPrice <= 0) {
       Swal.fire({
