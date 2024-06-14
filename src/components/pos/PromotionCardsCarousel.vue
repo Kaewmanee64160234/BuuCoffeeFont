@@ -72,7 +72,7 @@ function togglePromotion(promotion: Promotion) {
 }
 
 function isPromotionApplied(promotion: Promotion) {
-  return posStore.receiptPromotions.some(
+  return posStore.receipt.receiptPromotions.some(
     (receiptPromotion) => receiptPromotion.promotion.promotionId === promotion.promotionId
   );
 }
