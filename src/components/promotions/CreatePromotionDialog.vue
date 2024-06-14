@@ -40,7 +40,7 @@
                   <v-text-field v-model="discountValue" label="มูลค่าส่วนลด" type="number" required></v-text-field>
                 </template>
                 <template v-if="promotionType === 'discountPercentage'">
-                  <v-text-field v-model="discountPercentage" label="เปอร์เซ็นต์ส่วนลด" type="number" required></v-text-field>
+                  <v-text-field v-model="discountValue" label="เปอร์เซ็นต์ส่วนลด" type="number" required></v-text-field>
                   <v-text-field v-model="minimumPrice" label="ราคาขั้นต่ำสำหรับส่วนลด" type="number" required></v-text-field>
                 </template>
               </v-form>
@@ -124,8 +124,7 @@ const createPromotion = async () => {
     }
 
     const newPromotion: Promotion = {
-        promotionId: 0, // This will be set by the backend
-        promotionName: promotionName.value,
+      promotionName: promotionName.value,
         promotionType: promotionType.value,
         startDate: new Date(startDate.value),
         endDate: noEndDate.value ? null : new Date(endDate.value),
@@ -137,7 +136,7 @@ const createPromotion = async () => {
         conditionValue2: promotionType.value === 'discountPercentage' ? minimumPrice.value : null,
         promotionDescription: description.value,
         noEndDate: noEndDate.value,
-        promotionForStore:promotionStore_.value
+        promotionForStore: promotionStore_.value
     };
 
     await promotionStore.createPromotion(newPromotion);

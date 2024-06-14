@@ -10,6 +10,7 @@ import { useProductStore } from "./product.store";
 import receiptService from "@/service/receipt.service";
 import type { Promotion } from "@/types/promotion.type";
 import { useCustomerStore } from "./customer.store";
+import Swal from 'sweetalert2';
 
 export const usePosStore = defineStore("pos", () => {
   const selectedItems = ref<ReceiptItem[]>([]);
@@ -208,73 +209,70 @@ export const usePosStore = defineStore("pos", () => {
   };
 
   const applyPromotion = (promotion: Promotion) => {
-    // check promotion type
-    if (
-      promotion.promotionType === "discountPrice" ||
-      promotion.promotionType === "usePoints"
-    ) {
-      receipt.value.receiptPromotions.push({
-        date: new Date(),
-        discount: promotion.discountValue,
-        promotion: promotion,
+    // Initial validation: check if receipt total price is valid
+    if (receipt.value.receiptTotalPrice <= 0) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid Operation',
+        text: 'The total price must be greater than zero to apply a promotion.',
       });
-    } else if (promotion.promotionType === "discountPercentage") {
-      // calculate percentage discoutn with totak recipt
+      return;
+    }
+  
+    let newDiscount = 0;
+  
+    if (promotion.promotionType === 'discountPrice' || promotion.promotionType === 'usePoints') {
+      newDiscount = promotion.discountValue!;
+    } else if (promotion.promotionType === 'discountPercentage') {
       if (promotion.conditionValue1! <= receipt.value.receiptTotalPrice) {
-        const discount =
-          parseInt(receipt.value.receiptTotalPrice + "") *
-          parseFloat(promotion.discountValue! / 100 + "");
-        receipt.value.receiptPromotions.push({
-          date: new Date(),
-          discount: discount,
-          promotion: promotion,
+        newDiscount = receipt.value.receiptTotalPrice * (promotion.discountValue! / 100);
+      }else{
+        Swal.fire({
+          icon: 'error',
+          title: 'Invalid Discount Not in Condition',
+          text: 'The total price must be greater than or equal to the condition value to apply a percentage discount.',
         });
+        return;
       }
     } else {
-      // buy 1 get 1
-      // find in selectedItem have that prodyct?
-      const product = selectedItems.value.find(
-        (item) => item.product?.productId === promotion.buyProductId
-      );
-      const product2 = selectedItems.value.find(
-        (item) => item.product?.productId === promotion.freeProductId
-      );
+      const product = selectedItems.value.find((item) => item.product?.productId === promotion.buyProductId);
+      const product2 = selectedItems.value.find((item) => item.product?.productId === promotion.freeProductId);
       if (product2 && product) {
         if (promotion.freeProductId === promotion.buyProductId) {
-          // check qumtity
           if (product.quantity >= 2) {
-            const discount = selectedItems.value.find(
-              (item) => item.product?.productId === promotion.freeProductId
-            )?.product?.productPrice;
-            receipt.value.receiptPromotions.push({
-              date: new Date(),
-              discount: discount,
-              promotion: promotion,
-            });
+            newDiscount = product.product?.productPrice!;
           }
         } else {
-          const discount = productStore.products.find(
-            (product) => product.productId === promotion.freeProductId
-          )?.productPrice!;
-          receipt.value.receiptPromotions.push({
-            date: new Date(),
-            discount: discount,
-            promotion: promotion,
-          });
+          newDiscount = productStore.products.find((prod) => prod.productId === promotion.freeProductId)?.productPrice!;
         }
       }
     }
-    // calculate total discount
-    receipt.value.receiptTotalDiscount = receipt.value.receiptPromotions.reduce(
-      (acc, item) => {
-        return acc + parseInt(item.discount! + "");
-      },
-      0
-    );
-    receipt.value.receiptNetPrice =
-      parseInt(receipt.value.receiptTotalPrice + "") -
-      parseFloat(receipt.value.receiptTotalDiscount + "");
+  
+    // Check if the new discount would result in a negative or zero net price
+    const newTotalDiscount = receipt.value.receiptTotalDiscount + newDiscount;
+    const newNetPrice = receipt.value.receiptTotalPrice - newTotalDiscount;
+  
+    if (newNetPrice <= 0) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid Discount',
+        text: 'The discount is too high and would result in a zero or negative total price.',
+      });
+      return;
+    }
+  
+    // Apply the promotion
+    receipt.value.receiptPromotions.push({
+      date: new Date(),
+      discount: newDiscount,
+      promotion: promotion,
+    });
+  
+    // Update receipt totals
+    receipt.value.receiptTotalDiscount = newTotalDiscount;
+    receipt.value.receiptNetPrice = newNetPrice;
   };
+  
 
   // removePromotion
   const removePromotion = (promotion:Promotion) => {

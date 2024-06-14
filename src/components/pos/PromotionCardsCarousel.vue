@@ -63,7 +63,6 @@ function removePromotion(promotion: Promotion) {
 
 function togglePromotion(promotion: Promotion) {
   console.log(isPromotionApplied(promotion));
-  
   if (isPromotionApplied(promotion)) {
     removePromotion(promotion);
   } else {
