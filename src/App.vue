@@ -1,11 +1,10 @@
-<script setup lang="ts">
-import { RouterView } from 'vue-router'
-</script>
-
 <template>
-
-  <RouterView />
+  <MainMenu />
 </template>
+
+<script setup lang="ts">
+import MainMenu from '@/components/MainLayout.vue';
+</script>
 
 <style >
 /* font kanit */
@@ -59,5 +58,4 @@ import { RouterView } from 'vue-router'
 *::-ms-scrollbar-thumb:hover {
   background: #555; 
 }
-
 </style>

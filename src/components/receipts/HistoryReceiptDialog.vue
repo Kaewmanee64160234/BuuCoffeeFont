@@ -15,6 +15,7 @@
               <tr>
                 <th class="text-center">รายการสินค้า</th>
                 <th class="text-center">ท็อปปิ้ง</th>
+                <th class="text-center">จำนวนท็อปปิ้ง</th>
                 <th class="text-center">ชนิด</th>
                 <th class="text-center">จำนวนต่อหน่วย</th>
                 <th class="text-center">ราคา</th>
@@ -31,7 +32,16 @@
                     </li>
                   </ul>
                 </td>
-                <td class="text-center">{{ item.productType?.productTypeName || 'ไม่มีข้อมูล' }}</td>
+                <td class="text-center">
+                  <ul>
+                    <li v-for="(topping, idx) in item.productTypeToppings" :key="idx">
+                      {{ topping.quantity || 'ไม่มีข้อมูล' }}
+                    </li>
+                  </ul>
+                </td>
+                <td class="text-center">
+                  {{ item.productType?.productTypeName || 'ไม่มีข้อมูล' }}
+                </td>
                 <td class="text-center">{{ item.quantity }}</td>
                 <td class="text-center">{{ item.receiptSubTotal }}</td>
               </tr>
