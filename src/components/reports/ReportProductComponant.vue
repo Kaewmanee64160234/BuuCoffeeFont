@@ -91,7 +91,7 @@
   });
   </script>
   
-  <style>
+  <style scoped>
   #barChart, #pieChart {
     margin: 20px 0;
   }

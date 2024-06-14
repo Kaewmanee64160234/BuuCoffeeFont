@@ -129,7 +129,7 @@ const deleteCustomer = async (customerId: number) => {
   </v-container>
 </template>
 
-<style>
+<style scoped>
 .flex-container {
   display: flex;
   flex-direction: column;

@@ -191,7 +191,7 @@ onMounted(async () => {
   
 
   
-  <style>
+  <style scoped>
 .container {
   display: flex;
   flex-wrap: wrap;
