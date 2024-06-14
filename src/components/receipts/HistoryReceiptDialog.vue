@@ -32,9 +32,21 @@
                     </li>
                   </ul>
                 </td>
-                <td class="text-center" v-if="item.productTypeToppings.length > 0">{{ item.productTypeToppings[0].productType.productTypeName}}</td>
-                <td class="text-center" v-else>{{ 'ไม่มีข้อมูล' }}</td>
-
+                <td class="text-center">
+                  <ul>
+                    <li v-for="(topping, idx) in item.productTypeToppings" :key="idx">
+                      {{ topping.quantity || 'ไม่มีข้อมูล' }}
+                    </li>
+                  </ul>
+                </td>
+                <td class="text-center">
+                  <span v-if="item.productTypeToppings.length > 0">
+                    {{ item.productTypeToppings[0].productType.productTypeName }}
+                  </span>
+                  <span v-else>
+                    ไม่มีข้อมูล
+                  </span>
+                </td>
                 <td class="text-center">{{ item.quantity }}</td>
                 <td class="text-center">{{ item.receiptSubTotal }}</td>
               </tr>
