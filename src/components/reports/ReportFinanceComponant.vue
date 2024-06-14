@@ -4,7 +4,7 @@ import VueApexCharts from 'vue3-apexcharts';
 import { useReportFinnceStore } from '@/stores/report/finance.store';
 import CreateDialogAddCashier from '../../components/reports/cashier/DialogAddCashier.vue';
 import CreateHistoryDialogCashier from '../../components/reports/cashier/HistoryCashier.vue';
-
+import Swal from 'sweetalert2';
 const ReportFinnceStore = useReportFinnceStore();
 
 const chartSeries = ref([0, 0]);
@@ -92,9 +92,8 @@ const fetchGroupedFinance = async () => {
 };
 const sum = computed(() => {
   const cash = parseFloat(ReportFinnceStore.sumType.cash) || 0;
-  const cashier = ReportFinnceStore.cashiers;
-  const start = cashier ? parseFloat(cashier.cashierAmount) : 0;
-  return cash + start;
+  const cashierAmount = ReportFinnceStore.cashiers ? parseFloat(ReportFinnceStore.cashiers.cashierAmount) || 0 : 0;
+  return cash + cashierAmount;
 });
 const openCreateDialog = () => {
   ReportFinnceStore.createCashierDialog = true;
@@ -104,13 +103,34 @@ const openHistoryDialog = () => {
 };
 const deleteCashier = async (id: number) => {
   try {
-    await ReportFinnceStore.deleteCashier(id);
-    await ReportFinnceStore.getfindToday();
-    updateChartData();
+    // แสดง SweetAlert เพื่อยืนยันการลบ
+    const result = await Swal.fire({
+      title: 'คุณแน่ใจหรือไม่?',
+      text: 'คุณต้องการแก้ไขเงินในลิ้นชัก?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'ใช่, ลบเลย',
+      cancelButtonText: 'ยกเลิก'
+    });
+    if (result.isConfirmed) {
+      await ReportFinnceStore.deleteCashier(id);
+      await ReportFinnceStore.getfindToday();
+      Swal.fire({
+        icon: 'success',
+        title: 'ยกเลิกเรียบร้อย',
+        showConfirmButton: false,
+        timer: 1500 // 1.5 วินาที
+      });
+    }
   } catch (error) {
-    console.error(error);
+    Swal.fire({
+      icon: 'error',
+      title: 'เกิดข้อผิดพลาด',
+      text: 'ไม่สามารถลบผู้ใช้ได้ กรุณาลองใหม่ภายหลัง'
+    });
   }
 };
+
 
 const lineChartOptions = ref({ 
   chart: {
