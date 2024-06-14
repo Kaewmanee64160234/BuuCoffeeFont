@@ -2,7 +2,7 @@
   <v-card class="selected-items-list">
     <v-card-title>รายการที่เลือก</v-card-title>
     <v-divider></v-divider>
-    <v-btn color="success"  @click="openFindCustomerDialog()"  >find customer</v-btn>
+    <v-btn color="success" @click="openFindCustomerDialog()">find customer</v-btn>
     <v-btn color="success" @click="openCreateCustomerDialog()">register customer</v-btn>
 
     <v-divider></v-divider>
@@ -44,7 +44,7 @@
     <v-divider></v-divider>
     <v-card-subtitle>รวมทั้งหมด: {{ posStore.receipt.receiptTotalPrice }}</v-card-subtitle>
     <v-card-subtitle>ราคาลด: {{ posStore.receipt.receiptTotalDiscount }}</v-card-subtitle>
-    <v-card-subtitle>promotion: 
+    <v-card-subtitle>promotion:
       <li v-for="promotion in posStore.receipt.receiptPromotions" :key="promotion.receiptPromotionId">
         {{ promotion.promotion.promotionType }}: {{ promotion.discount }}
       </li>
@@ -58,7 +58,7 @@
     </v-card-actions>
   </v-card>
   <v-btn color="warning" @click="save">Finish</v-btn>
-  <AddCustomerDialog  />
+  <AddCustomerDialog />
   <FindCustomerDialog v-model:dialog="customerStore.openDialogFindCustomer" />
 </template>
 
@@ -70,7 +70,7 @@ import Swal from 'sweetalert2';
 import { useCustomerStore } from '@/stores/customer.store';
 import AddCustomerDialog from '../customer/AddCustomerDialog.vue';
 import FindCustomerDialog from '../pos/FindCustomerDialog.vue';
-import type {ReceiptItem} from '../../types/receipt.type';
+import type { ReceiptItem } from '../../types/receipt.type';
 
 const posStore = usePosStore();
 const selectedItems = computed(() => posStore.selectedItems);
@@ -79,19 +79,19 @@ function removeItem(index: number) {
   posStore.removeItem(index);
 }
 
-function increaseQuantity(item:ReceiptItem) {
+function increaseQuantity(item: ReceiptItem) {
   console.log('increase quantity', item);
-  if(item.product?.category.haveTopping){
-    if(item.productTypeToppings.length > 0){
-      posStore.addToReceipt(item.product,item.productType,item.productTypeToppings,1,item.sweetnessLevel)
-    }else{
-      posStore.addToReceipt(item.product,item.productType,[],1,item.sweetnessLevel)
+  if (item.product?.category.haveTopping) {
+    if (item.productTypeToppings.length > 0) {
+      posStore.addToReceipt(item.product, item.productType, item.productTypeToppings, 1, item.sweetnessLevel)
+    } else {
+      posStore.addToReceipt(item.product, item.productType, [], 1, item.sweetnessLevel)
     }
-  }else{
-    posStore.addToReceipt(item.product,{},[],1,null)
+  } else {
+    posStore.addToReceipt(item.product, {}, [], 1, null)
   }
 
-  
+
 }
 
 function decreaseQuantity(index: number) {
@@ -138,7 +138,7 @@ function save() {
   posStore.receipt.receiptNetPrice = 0;
   posStore.receipt.receiptPromotions = [];
 
- 
+
   posStore.receiptDialog = true;
 }
 
