@@ -21,30 +21,34 @@
 </template>
 
 <script lang="ts" setup>
+import { ref, watch, onMounted } from 'vue';
 import { usePosStore } from '@/stores/pos.store';
 import { usePromotionStore } from '@/stores/promotion.store';
-import { computed, onMounted } from 'vue';
 import type { Promotion } from '@/types/promotion.type';
 import Swal from 'sweetalert2';
 
 const posStore = usePosStore();
 const promotionStore = usePromotionStore();
 
-onMounted(() => {
- 
-});
-const promotionChunks = computed(() => {
+const promotionChunks = ref<Promotion[][]>([]);
+
+function chunkPromotions() {
   const chunkSize = 4;
-  const chunks = [];
+  const chunks: Promotion[][] = [];
   for (let i = 0; i < promotionStore.promotions.length; i += chunkSize) {
     chunks.push(promotionStore.promotions.slice(i, i + chunkSize));
   }
-  return chunks;
+  promotionChunks.value = chunks;
+}
+
+onMounted(async () => {
+  await promotionStore.getAllPromotions(); // Assuming there's a method to fetch all promotions
+  chunkPromotions();
 });
 
-function applyPromotion(promotion: Promotion) {
-  console.log('promtoken', promotion);
+watch(() => promotionStore.promotions, chunkPromotions, { immediate: true });
 
+function applyPromotion(promotion: Promotion) {
   if (posStore.selectedItems.length === 0) {
     Swal.fire({
       icon: 'error',
@@ -75,6 +79,7 @@ function isPromotionApplied(promotion: Promotion) {
   );
 }
 </script>
+
 
 <style scoped>
 .promotion-container {
