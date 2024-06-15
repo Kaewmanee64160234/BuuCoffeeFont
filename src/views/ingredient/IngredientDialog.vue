@@ -1,10 +1,9 @@
 <script lang="ts" setup>
 import { useIngredientStore } from '@/stores/Ingredient.store';
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 import type { VForm } from "vuetify/components";
 
 const form = ref<VForm | null>(null);
-const url = import.meta.env.VITE_BACKEND_URL;
 
 const IngredientStore = useIngredientStore();
 async function save() {
@@ -15,9 +14,10 @@ async function save() {
 }
 </script>
 
+
+
 <template>
   <v-dialog v-model="IngredientStore.dialog" persistent width="1024">
- 
     <transition name="fade">
       <v-card class="rounded-card white-background">
         <v-card-title class="text-center">
@@ -55,7 +55,6 @@ async function save() {
               <v-row>
                 <v-col cols="12" sm="6" md="4">
                   <v-text-field
-            
                     label="กรุณากรอกชื่อวัตถุดิบ"
                     required
                     v-model="IngredientStore.editedIngredient.ingredientName"
@@ -67,7 +66,6 @@ async function save() {
                 </v-col>
                 <v-col cols="12" sm="6" md="4">
                   <v-text-field
-          
                     label="กรุณากรอกชื่อแบรนด์"
                     required
                     v-model="IngredientStore.editedIngredient.ingredientSupplier"
@@ -76,23 +74,26 @@ async function save() {
                 </v-col>
                 <v-col cols="12" sm="6" md="4">
                   <v-text-field
-         
                     label="กรุณากรอกปริมาณต่อหน่วย"
                     v-model.number="IngredientStore.editedIngredient.ingredientQuantityPerUnit"
+                    :rules="[
+                      (v) => !!v || 'กรุณากรอกปริมาณต่อหน่วย',
+                      (v) => v > 0 || 'ปริมาณต้องมากกว่า 0',
+                      (v) => /^[0-9]+$/.test(v) || 'กรุณากรอกเฉพาะตัวเลข'
+                    ]"
                   ></v-text-field>
                 </v-col>
               </v-row>
               <v-row>
                 <v-col cols="12" sm="6" md="4">
                   <v-text-field
-     
                     label="กรุณากรอกหน่วย"
                     v-model="IngredientStore.editedIngredient.ingredientUnit"
+                    :rules="[(v) => /^[A-Za-zก-ฮะ-ูเ-์\s]+$/.test(v) || 'กรุณากรอกเฉพาะตัวอักษร']"
                   ></v-text-field>
                 </v-col>
                 <v-col cols="12" sm="6" md="4">
                   <v-text-field
-          
                     label="กรุณากรอกขั้นต่ำ"
                     v-model.number="IngredientStore.editedIngredient.ingredientMinimun"
                     :rules="[
@@ -129,11 +130,13 @@ async function save() {
   </v-dialog>
 </template>
 
+
+
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
 * {
   font-family: 'Kanit', sans-serif;
 }
-
 </style>
+

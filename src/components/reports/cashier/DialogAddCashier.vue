@@ -1,45 +1,49 @@
 <script lang="ts" setup>
-import { ref} from 'vue';
+import { ref } from 'vue';
 import { useReportFinnceStore } from '@/stores/report/finance.store';
 import { createCashier } from '@/service/report/finance.service';
-
 
 const ReportFinnceStore = useReportFinnceStore();
 
 const cashierAmount = ref<number | null>(null);
 const userId = 1; // mock up id
 
+const form = ref<HTMLFormElement | null>(null); // Reference to the form
+
 const clearData = () => {
   ReportFinnceStore.createCashierDialog = false;
   cashierAmount.value = null;
 };
 
-
 const submitForm = async () => {
-  if (cashierAmount.value !== null) {
-    const cashier = {
-      cashierAmount: cashierAmount.value,
-      user: userId
-    };
-    await createCashier(cashier);
-    clearData();
+  if (form.value && form.value.validate()) {
+    if (cashierAmount.value !== null) {
+      const cashier = {
+        cashierAmount: cashierAmount.value,
+        user: userId,
+      };
+      await createCashier(cashier);
+      clearData();
+    }
   }
 };
 
+const rules = {
+  required: (value: any) => !!value || 'กรุณากรอกข้อมูลเป็นตัวเลข.',
+};
 </script>
 
 <template>
   <v-dialog v-model="ReportFinnceStore.createCashierDialog" max-width="500px">
     <v-card>
-      <v-card-title>
-        Create Cashier
-      </v-card-title>
+      <v-card-title>Create Cashier</v-card-title>
       <v-card-text>
-        <v-form @submit.prevent="submitForm">
+        <v-form ref="form" @submit.prevent="submitForm">
           <v-text-field
             v-model="cashierAmount"
             label="Cashier Amount"
             type="number"
+            :rules="[rules.required, rules.min]"
             required
           ></v-text-field>
         </v-form>
@@ -52,3 +56,6 @@ const submitForm = async () => {
   </v-dialog>
 </template>
 
+<style scoped>
+/* Add any scoped styles here */
+</style>
