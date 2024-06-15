@@ -1,93 +1,8 @@
-<script lang="ts" setup>
-import { computed, onMounted, ref, watch } from 'vue';
-import PromotionCardsCarousel from '@/components/pos/PromotionCardsCarousel.vue';
-import SearchBar from '@/components/pos/SearchBar.vue';
-import ProductCard from '@/components/pos/ProductCard.vue';
-import SelectedItemsList from '@/components/pos/SelectedItemsList.vue';
-import DrinkSelectionDialog from '@/components/pos/DrinkSelectionDialog.vue';
-import ReceiptDialog from '@/components/pos/ReceiptDialog.vue';
-import { useProductStore } from '@/stores/product.store';
-import { useCategoryStore } from '@/stores/category.store';
-import { usePromotionStore } from '@/stores/promotion.store';
-import { useToppingStore } from '@/stores/topping.store';
-import { useUserStore } from '@/stores/user.store';
-import type { Product } from '@/types/product.type';
-
-const productStore = useProductStore();
-const categoryStore = useCategoryStore();
-const promotionStore = usePromotionStore();
-const toppingStore = useToppingStore();
-const userStore = useUserStore();
-const selectedCategory = ref('');
-const productFilters = ref<Product[]>();
-const searchQuery = ref('');
-
-
-watch(selectedCategory, async (newCategory) => {
-  if (newCategory) {
-    productFilters.value = [];
-    productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === newCategory.toLocaleLowerCase());
-
-
-  }
-});
-
-watch(searchQuery, async (newQuery) => {
-  if (newQuery === '') {
-    productFilters.value = [];
-    if (userStore.userRole === "พนักงานขายข้าว") {
-      productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === selectedCategory.value.toLocaleLowerCase() && product.category.categoryName.toLocaleLowerCase() === 'กับข้าว'.toLocaleLowerCase());
-    } else {
-      productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === selectedCategory.value.toLocaleLowerCase() && product.category.categoryName.toLocaleLowerCase() !== 'กับข้าว'.toLocaleLowerCase());
-    }
-
-  } else {
-    productFilters.value = [];
-
-    if (
-      userStore.userRole === "พนักงานขายข้าว"
-    ) {
-      productFilters.value = productStore.products.filter(product => product.productName.toLocaleLowerCase().includes(newQuery.toLocaleLowerCase()) && product.category.categoryName.toLocaleLowerCase() === 'กับข้าว'.toLocaleLowerCase());
-    } else {
-      productFilters.value = productStore.products.filter(product => product.productName.toLocaleLowerCase().includes(newQuery.toLocaleLowerCase()) && product.category.categoryName.toLocaleLowerCase() !== 'กับข้าว'.toLocaleLowerCase());
-    }
-
-
-  }
-});
-
-onMounted(async () => {
-  await productStore.getAllProducts();
-  await categoryStore.getAllCategories();
-  await toppingStore.getAllToppings();
-  if (userStore.userRole === "พนักงานขายข้าว") {
-    promotionStore.getPromotionByType("ร้านกับข้าว");
-    // productStore.selectedCategory = "กับข้าว";
-    selectedCategory.value = "กับข้าว";
-    const cate = categoryStore.categoriesForCreate.find(category => category.categoryName === "กับข้าว")
-    categoryStore.categoriesForCreate = [];
-    categoryStore.categoriesForCreate.push(cate!);
-    // fiter product from category
-    productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === "กับข้าว".toLocaleLowerCase());
-
-  } else {
-    promotionStore.getPromotionByType("ร้านกาแฟ");
-    // productStore.selectedCategory = "coffee";
-    selectedCategory.value = "coffee";
-    const cate = categoryStore.categoriesForCreate.findIndex(category => category.categoryName === "กับข้าว")
-    categoryStore.categoriesForCreate.splice(cate, 1);
-    // filter
-    productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === "coffee".toLocaleLowerCase());
-  }
-
-});
-</script>
-
 <template>
-  <v-app style="width: 100vw;">
-    <v-row class="full-width-row">
-      <v-col cols="8" class="d-flex flex-column align-center" style="background-color: #C1B6A9;">
-        <v-container fluid class="full-width-container" >
+  <v-app style="width: 100vw; height: 100vh;">
+    <v-row class="full-width-row" style="height: 100%;">
+      <v-col cols="8" class="d-flex flex-column align-center" style="background-color: #C1B6A9; height: 100%;">
+        <v-container fluid class="full-width-container" style="height: 100%;">
 
           <v-row class="full-width-row">
             <v-col cols="12" class="d-flex justify-center align-center">
@@ -127,15 +42,85 @@ onMounted(async () => {
           <drink-selection-dialog></drink-selection-dialog>
         </v-container>
       </v-col>
-      <v-col cols="4">
-        <v-sheet class="pa-2 ma-2" style="height: 100%;">
-          <selected-items-list></selected-items-list>
+      <v-col cols="4" style="margin: 0; padding: 0; height: 100%; overflow: hidden;">
+        <v-sheet style="height: 100%;">
+          <selected-items-list style="height: 100%;"></selected-items-list>
         </v-sheet>
       </v-col>
     </v-row>
     <receipt-dialog />
   </v-app>
 </template>
+
+<script lang="ts" setup>
+import { computed, onMounted, ref, watch } from 'vue';
+import PromotionCardsCarousel from '@/components/pos/PromotionCardsCarousel.vue';
+import SearchBar from '@/components/pos/SearchBar.vue';
+import ProductCard from '@/components/pos/ProductCard.vue';
+import SelectedItemsList from '@/components/pos/SelectedItemsList.vue';
+import DrinkSelectionDialog from '@/components/pos/DrinkSelectionDialog.vue';
+import ReceiptDialog from '@/components/pos/ReceiptDialog.vue';
+import { useProductStore } from '@/stores/product.store';
+import { useCategoryStore } from '@/stores/category.store';
+import { usePromotionStore } from '@/stores/promotion.store';
+import { useToppingStore } from '@/stores/topping.store';
+import { useUserStore } from '@/stores/user.store';
+import type { Product } from '@/types/product.type';
+
+const productStore = useProductStore();
+const categoryStore = useCategoryStore();
+const promotionStore = usePromotionStore();
+const toppingStore = useToppingStore();
+const userStore = useUserStore();
+const selectedCategory = ref('');
+const productFilters = ref<Product[]>();
+const searchQuery = ref('');
+
+watch(selectedCategory, async (newCategory) => {
+  if (newCategory) {
+    productFilters.value = [];
+    productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === newCategory.toLocaleLowerCase());
+  }
+});
+
+watch(searchQuery, async (newQuery) => {
+  if (newQuery === '') {
+    productFilters.value = [];
+    if (userStore.userRole === "พนักงานขายข้าว") {
+      productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === selectedCategory.value.toLocaleLowerCase() && product.category.categoryName.toLocaleLowerCase() === 'กับข้าว'.toLocaleLowerCase());
+    } else {
+      productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === selectedCategory.value.toLocaleLowerCase() && product.category.categoryName.toLocaleLowerCase() !== 'กับข้าว'.toLocaleLowerCase());
+    }
+  } else {
+    productFilters.value = [];
+    if (userStore.userRole === "พนักงานขายข้าว") {
+      productFilters.value = productStore.products.filter(product => product.productName.toLocaleLowerCase().includes(newQuery.toLocaleLowerCase()) && product.category.categoryName.toLocaleLowerCase() === 'กับข้าว'.toLocaleLowerCase());
+    } else {
+      productFilters.value = productStore.products.filter(product => product.productName.toLocaleLowerCase().includes(newQuery.toLocaleLowerCase()) && product.category.categoryName.toLocaleLowerCase() !== 'กับข้าว'.toLocaleLowerCase());
+    }
+  }
+});
+
+onMounted(async () => {
+  await productStore.getAllProducts();
+  await categoryStore.getAllCategories();
+  await toppingStore.getAllToppings();
+  if (userStore.userRole === "พนักงานขายข้าว") {
+    promotionStore.getPromotionByType("ร้านกับข้าว");
+    selectedCategory.value = "กับข้าว";
+    const cate = categoryStore.categoriesForCreate.find(category => category.categoryName === "กับข้าว")
+    categoryStore.categoriesForCreate = [];
+    categoryStore.categoriesForCreate.push(cate!);
+    productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === "กับข้าว".toLocaleLowerCase());
+  } else {
+    promotionStore.getPromotionByType("ร้านกาแฟ");
+    selectedCategory.value = "coffee";
+    const cate = categoryStore.categoriesForCreate.findIndex(category => category.categoryName === "กับข้าว")
+    categoryStore.categoriesForCreate.splice(cate, 1);
+    productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === "coffee".toLocaleLowerCase());
+  }
+});
+</script>
 
 <style scoped>
 .full-width-container,
