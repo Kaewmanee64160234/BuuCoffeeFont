@@ -86,8 +86,8 @@ onMounted(async () => {
 <template>
   <v-app style="width: 100vw;">
     <v-row class="full-width-row">
-      <v-col cols="8" class="d-flex flex-column align-center">
-        <v-container fluid class="full-width-container" style="background-color: #C1B6A9;">
+      <v-col cols="8" class="d-flex flex-column align-center" style="background-color: #C1B6A9;">
+        <v-container fluid class="full-width-container" >
 
           <v-row class="full-width-row">
             <v-col cols="12" class="d-flex justify-center align-center">
@@ -102,7 +102,6 @@ onMounted(async () => {
           </v-row>
           <v-row class="full-width-row">
             <v-col cols="12" md="6">
-              {{ selectedCategory }}
               <v-tabs v-model="selectedCategory" align-tabs="start" color="brown">
                 <v-tab v-for="category in categoryStore.categoriesForCreate" :key="category.categoryId"
                   :value="category.categoryName">

@@ -85,7 +85,7 @@
         </v-list>
       </v-navigation-drawer>
   
-      <v-main :class="{ 'main-rail': rail }">
+      <v-main :class="{ 'main-rail': rail }" style="margin: 0;padding: 0;margin-left: 3%;">
         <router-view></router-view>
       </v-main>
     </v-app>

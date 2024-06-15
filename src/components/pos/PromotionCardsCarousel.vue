@@ -1,5 +1,5 @@
 <template>
-  <v-carousel height="230" style="background-color: #80715E; border-radius: 30px;">
+  <v-carousel hide-delimiter-background hide-delimiters height="230" style="background-color: #80715E; border-radius: 30px;">
     <v-carousel-item v-for="(chunk, index) in promotionChunks" :key="chunk[index].promotionId">
       <div class="promotion-container">
         <v-card v-for="promotion in chunk" :key="promotion.promotionId" class="promotion-card"

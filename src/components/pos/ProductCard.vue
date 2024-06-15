@@ -31,11 +31,11 @@ function openToppingDialog() {
 
 
 <template>
-  <v-card class="product-card" @click="handleAddToCart">
+  <v-card  class="product-card" @click="handleAddToCart">
     <v-img class="product-image" 
       :src="`http://localhost:3000/products/${product.productId}/image`"
       :lazy-src="`http://localhost:3000/products/${product.productId}/image`" />
-    <v-card-title class="text-center">{{ product.productName }} {{ product.productPrice }} BATH</v-card-title>
+    <v-card-title class="text-center">{{ product.productName }} {{ product.productPrice }} .-</v-card-title>
   </v-card>
 </template>
 
@@ -58,13 +58,16 @@ function openToppingDialog() {
 
 .product-image {
   width: 100%;
-  height: 200px;
+  height: 150px;
   object-fit: cover;
   border-radius: 10px;
 }
 
 .text-center {
   text-align: center;
+  width: 100%;
+  font-weight: bold;
+  color: black;
 }
 </style>
 

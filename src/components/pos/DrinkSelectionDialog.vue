@@ -2,9 +2,7 @@
   <v-dialog v-model="posStore.toppingDialog" max-width="600">
     <v-card v-if="productStore.selectedProduct">
       <v-card-title class="d-flex justify-space-between align-center">
-        <div>
-          <span>{{ productStore.selectedProduct.productName }}</span>
-        </div>
+        <div></div>
         <v-btn icon @click="closeDialog">
           <v-icon color="red">mdi-close</v-icon>
         </v-btn>
@@ -12,89 +10,99 @@
       <v-alert v-if="showAlert" type="error" dismissible @input="showAlert = false">
         Please select a product type before confirming.
       </v-alert>
-      <v-card-subtitle class="d-flex justify-space-between align-center">
-        <div>{{ productStore.selectedProduct.productName }}</div>
-        <div>{{ productStore.selectedProduct.productPrice }} $</div>
-      </v-card-subtitle>
       <v-card-text>
-        <div class="product-info-container d-flex">
-          <v-img :src="`http://localhost:3000/products/${productStore.selectedProduct.productId}/image`" class="product-image"></v-img>
-          <div class="product-options-container">
-            <div class="d-flex flex-column">
-              <span>ตัวเลือก</span>
-              <div class="d-flex justify-space-between">
-                <v-chip
-                  v-for="type in productStore.selectedProduct.productTypes"
-                  :key="type.productTypeId"
-                  variant="outlined"
-                  :color="selectedType === type ? '#f5a623' : 'gray'"
-                  @click="selectType(type)"
-                >
-                  {{ type.productTypeName }} {{ type.productTypePrice }}
-                </v-chip>
+        <v-row>
+          <v-col class="d-flex justify-center align-center" style="width: 200px; height: 200px;">
+            <v-img :src="`http://localhost:3000/products/${productStore.selectedProduct.productId}/image`"
+              class="product-image"></v-img>
+          </v-col>
+          <v-col>
+            <v-row>
+              <v-col>
+                <span class="product-name">{{ productStore.selectedProduct.productName }}</span>
+              </v-col>
+              <v-col>
+                <span class="product-price">{{ productStore.selectedProduct.productPrice }} ฿</span>
+              </v-col>
+            </v-row>
+            <v-row class="mt-3">
+              <div class="d-flex flex-column">
+                <span>ตัวเลือก</span>
+                <div class="d-flex flex-wrap">
+                  <v-chip v-for="type in productStore.selectedProduct.productTypes" :key="type.productTypeId"
+                    variant="outlined" :color="selectedType === type ? '#f5a623' : 'gray'" @click="selectType(type)"
+                    class="chip">
+                    {{ type.productTypeName }} {{ type.productTypePrice }}
+                  </v-chip>
+                </div>
               </div>
-            </div>
-            <div class="d-flex flex-column">
+            </v-row>
+          </v-col>
+        </v-row>
+        <div class="product-info-container d-flex">
+          <div class="product-options-container">
+            <div class="d-flex flex-column mt-4">
               <span>ระดับความหวาน</span>
-              <div class="d-flex justify-space-between">
-                <v-chip
-                  v-for="level in sweetnessLevels"
-                  :key="level"
-                  variant="outlined"
-                  :color="selectedSweetness === level ? '#f5a623' : 'gray'"
-                  @click="selectSweetness(level)"
-                >
+              <div class="d-flex justify-start">
+                <v-chip v-for="level in sweetnessLevels" :key="level" variant="outlined"
+                  :color="selectedSweetness === level ? '#f5a623' : 'gray'" @click="selectSweetness(level)"
+                  class="chip">
                   {{ level }}%
                 </v-chip>
               </div>
             </div>
-            <div class="d-flex flex-column">
+            <div class="d-flex flex-column mt-4">
               <span>ท็อปปิ้ง</span>
               <div class="topping-container d-flex align-center">
-                <v-btn icon @click="prevTopping">
+                <v-btn size="x-small" icon @click="prevTopping">
                   <v-icon>mdi-chevron-left</v-icon>
                 </v-btn>
-                <div class="d-flex justify-space-between flex-grow-1">
-                  <div v-for="topping in displayedToppings" :key="topping.toppingId" class="topping-item d-flex flex-column align-center">
-                    <v-chip
-                      variant="outlined"
+                <div class="d-flex justify-space-between flex-grow-1 ma-3">
+                  <div v-for="topping in displayedToppings" :key="topping.toppingId"
+                    class="topping-item d-flex flex-column align-center">
+                    <v-chip variant="outlined"
                       :color="selectedToppings.some(t => t.topping.toppingId === topping.toppingId) ? '#f5a623' : 'gray'"
-                      @click="toggleTopping(topping)"
-                    >
+                      @click="toggleTopping(topping)" class="chip">
                       {{ topping.toppingName }} {{ topping.toppingPrice }}
                     </v-chip>
-                    <div v-if="selectedToppings.some(t => t.topping.toppingId === topping.toppingId)" class="quantity-controls d-flex align-center mt-2">
-                      <v-btn icon @click="decreaseToppingQuantity(topping)">
+                    <div v-if="selectedToppings.some(t => t.topping.toppingId === topping.toppingId)"
+                      class="quantity-controls d-flex align-center mt-2">
+                      <v-btn size="small" icon @click="decreaseToppingQuantity(topping)">
                         <v-icon>mdi-minus</v-icon>
                       </v-btn>
                       <span>{{ selectedToppings.find(t => t.topping.toppingId === topping.toppingId)?.quantity }}</span>
-                      <v-btn icon @click="increaseToppingQuantity(topping)">
+                      <v-btn size="small" icon @click="increaseToppingQuantity(topping)">
                         <v-icon>mdi-plus</v-icon>
                       </v-btn>
                     </div>
                   </div>
                 </div>
-                <v-btn icon @click="nextTopping">
+                <v-btn size="x-small" icon @click="nextTopping">
                   <v-icon>mdi-chevron-right</v-icon>
                 </v-btn>
               </div>
             </div>
-            <div class="quantity-container d-flex justify-space-between align-center mt-4">
-              <v-btn @click="decreaseQuantity" icon="mdi-minus"></v-btn>
-              <span>{{ quantity }}</span>
-              <v-btn @click="increaseQuantity" icon="mdi-plus"></v-btn>
-            </div>
+
           </div>
         </div>
       </v-card-text>
-      <v-card-actions class="justify-center">
-        <v-btn color="primary" @click="confirmSelection">ยืนยันการทำรายการ</v-btn>
+      <v-card-actions>
+        <v-row class="justify-center align-center w-100">
+          <v-col class="d-flex justify-center align-center">
+            <div class="quantity-container d-flex justify-space-between align-center">
+              <v-btn variant="elevated" color="#C5C5C5" click="decreaseQuantity" icon="mdi-minus"></v-btn>
+              <span class="mx-2">{{ quantity }}</span>
+              <v-btn variant="elevated" color="#FF9642" @click="increaseQuantity" icon="mdi-plus"></v-btn>
+            </div>
+          </v-col>
+          <v-col class="d-flex justify-center align-center">
+            <v-btn variant="elevated" color="#FF9642" rounded="xl" style="width: 90%;" @click="confirmSelection">ยืนยันการทำรายการ</v-btn>
+          </v-col>
+        </v-row>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
-
-
 
 <script setup lang="ts">
 import { usePosStore } from '@/stores/pos.store';
@@ -230,7 +238,6 @@ watch(
 );
 </script>
 
-
 <style scoped>
 .product-info-container {
   display: flex;
@@ -247,6 +254,17 @@ watch(
 
 .product-options-container {
   flex-grow: 1;
+}
+
+.product-name {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.product-price {
+  font-size: 20px;
+  color: #f5a623;
+  font-weight: bold;
 }
 
 .promotion-container {
@@ -269,12 +287,14 @@ watch(
   text-align: center;
 }
 
-.justify-center {
-  justify-content: center;
-}
+
 
 .active {
   background-color: #f5a623;
+}
+
+.chip {
+  margin: 5px;
 }
 
 .topping-container {
@@ -291,6 +311,7 @@ watch(
 
 .quantity-container span {
   margin: 0 10px;
+  font-size: 20px;
 }
 
 .topping-item {
@@ -308,4 +329,3 @@ watch(
   margin: 0 10px;
 }
 </style>
-
