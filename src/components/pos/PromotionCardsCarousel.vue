@@ -1,12 +1,12 @@
 <template>
-  <v-carousel hide-delimiters height="230" style="background-color: #80715E; border-radius: 30px;">
-    <v-carousel-item v-for="(chunk, index) in promotionChunks" :key="index">
+  <v-carousel hide-delimiter-background hide-delimiters height="230" style="background-color: #80715E; border-radius: 30px;">
+    <v-carousel-item v-for="(chunk, index) in promotionChunks" :key="chunk[index].promotionId">
       <div class="promotion-container">
         <v-card v-for="promotion in chunk" :key="promotion.promotionId" class="promotion-card"
           :class="{ 'applied-promotion': isPromotionApplied(promotion) }" @click="togglePromotion(promotion)">
           <v-card-title class="text-center wrap-text">{{ promotion.promotionName }}</v-card-title>
           <v-card-actions class="justify-center">
-            <v-btn v-if="promotion.promotionCanUseManyTimes == false" class="btn-apply-promotion"
+            <v-btn v-if="!promotion.promotionCanUseManyTimes" class="btn-apply-promotion"
               @click.stop="togglePromotion(promotion)">
               {{ isPromotionApplied(promotion) ? 'ยกเลิก' : 'ใช้โปรโมชั่นนี้' }}
             </v-btn>
@@ -20,28 +20,48 @@
   </v-carousel>
 </template>
 
+
 <script lang="ts" setup>
+import { ref, watch, onMounted, nextTick } from 'vue';
 import { usePosStore } from '@/stores/pos.store';
 import { usePromotionStore } from '@/stores/promotion.store';
-import { computed } from 'vue';
 import type { Promotion } from '@/types/promotion.type';
 import Swal from 'sweetalert2';
 
 const posStore = usePosStore();
 const promotionStore = usePromotionStore();
 
-const promotionChunks = computed(() => {
+const promotionChunks = ref<Promotion[][]>([]);
+
+function chunkPromotions() {
   const chunkSize = 4;
-  const chunks = [];
+  const chunks: Promotion[][] = [];
+  if (promotionStore.promotions.length === 0) {
+    console.log("No promotions available");
+    return;
+  }
   for (let i = 0; i < promotionStore.promotions.length; i += chunkSize) {
     chunks.push(promotionStore.promotions.slice(i, i + chunkSize));
   }
-  return chunks;
+  promotionChunks.value = chunks;
+  console.log("Chunked Promotions:", promotionChunks.value);
+}
+
+onMounted(async () => {
+  console.log("Fetching promotions...");
+  await promotionStore.getAllPromotions(); // Fetch all promotions from the store
+  console.log("Fetched Promotions:", promotionStore.promotions); // Debugging log
+  chunkPromotions(); // Chunk promotions after fetching
+  await nextTick(); // Ensure DOM update
+  console.log("Carousel items rendered");
 });
 
-function applyPromotion(promotion: Promotion) {
-  console.log('promtoken', promotion);
+watch(() => promotionStore.promotions, () => {
+  console.log("Promotions updated:", promotionStore.promotions); // Debugging log
+  chunkPromotions();
+}, { immediate: true });
 
+function applyPromotion(promotion: Promotion) {
   if (posStore.selectedItems.length === 0) {
     Swal.fire({
       icon: 'error',
@@ -72,6 +92,10 @@ function isPromotionApplied(promotion: Promotion) {
   );
 }
 </script>
+
+
+
+
 
 <style scoped>
 .promotion-container {

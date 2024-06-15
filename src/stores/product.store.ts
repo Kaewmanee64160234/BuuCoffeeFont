@@ -15,6 +15,7 @@ export const useProductStore = defineStore("product", () => {
   const updateProductDialog = ref(false);
   const createProductDialog = ref(false);
   const searchQuery = ref<string>("");
+  const searchQueryPos = ref<string>("");
 
   const product = ref<Product & { file: File }>({
     productId: 0,
@@ -230,5 +231,6 @@ export const useProductStore = defineStore("product", () => {
     itemsPerPage,
     selectedProduct,
     setSelectedProduct,
+    searchQueryPos
   };
 });
