@@ -13,6 +13,7 @@ const userEmail = ref('');
 const userRole = ref('');
 const userStatus = ref('');
 const userStore = useUserStore();
+const show = ref(false);
 
 const rules = {
   required: (value: any) => !!value || 'กรุณากรอกข้อมูล',
@@ -70,9 +71,11 @@ function closeDialog() {
                 <v-text-field
                   v-model="userPassword"
                   label="รหัสผ่าน"
-                  type="password"
+                  :type="show ? 'text' : 'password'"
                   :rules="[rules.required, rules.password]"
                   required
+                  :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
+                  @click:append="show = !show"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" md="6">
