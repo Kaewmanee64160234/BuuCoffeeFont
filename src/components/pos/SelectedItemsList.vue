@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { usePosStore } from '@/stores/pos.store';
 import { useCustomerStore } from '@/stores/customer.store';
 import Swal from 'sweetalert2';
@@ -11,6 +11,7 @@ const step = ref(1);
 const posStore = usePosStore();
 const customerStore = useCustomerStore();
 const selectedItems = computed(() => posStore.selectedItems);
+const selectedCustomer = ref('');
 
 function nextStep() {
   step.value++;
@@ -84,27 +85,70 @@ function openCreateCustomerDialog() {
   customerStore.openDialogRegisterCustomer = true;
 }
 
-function openFindCustomerDialog() {
-  customerStore.openDialogFindCustomer = true;
+watch(() => selectedCustomer.value, () => {
+  if(selectedCustomer.value === '' || selectedCustomer.value === null) {
+    posStore.receipt.customer = null;
+    return;
+  }
+
+  findCustomer();
+}
+);
+
+function findCustomer() {
+  console.log('Selected customer:', selectedCustomer.value);
+  const customer = customerStore.customers.find(c => c.customerPhone === selectedCustomer.value);
+  console.log('Customer found:', customer);
+  
+  if (customer) {
+    posStore.receipt.customer = customer;
+  } else {
+    Swal.fire({
+      icon: 'error',
+      title: 'Customer Not Found',
+      text: 'No customer found with this phone number.',
+    });
+  }
 }
 </script>
 
 <template>
-  <v-app style="width: 100%; height: 100vh;">
+  <v-app style="width: 100%; padding: 20px;">
     <v-window v-model="step" transition="fade">
       <v-window-item :value="1">
         <div>
-          <h3 class="text-h6">เลือกสินค้าและลูกค้า</h3>
+          <h3>รายละเอียดการสั่งซื้อ</h3>
+          <h6>สมาชิก: <span>
+              {{ posStore.receipt.customer?.customerName }}
+          </span></h6>
+          <h6>แต้มสะสม</h6>
+          <h6>เบอร์โทรลูกค้า</h6>
+          <div>
+            <v-row class="d-flex justify-center align-center">
+              <v-col cols="12" md="6">
+                <v-autocomplete
+                  v-model="selectedCustomer"
+                  :items="customerStore.customers.map(c => c.customerPhone)"
+                  item-text="phone"
+                  item-value="phone"
+                  label="เบอร์โทรลูกค้า"
+                  variant="solo"
+                  append-inner-icon="mdi-magnify"
+                  
+                ></v-autocomplete>
+              </v-col>
+              <v-col cols="12" md="3">
+                <v-btn color="success" @click="openCreateCustomerDialog()">ลงทะเบียนลูกค้า</v-btn>
+              </v-col>
+              <v-col cols="12" md="3">
+                <v-btn color="success" @click="openCreateCustomerDialog()">ลงทะเบียนลูกค้า</v-btn>
+              </v-col>
+            </v-row>
+          </div>
           <br>
-          <v-card class="selected-items-list">
+          <div class="selected-items-list">
             <v-card-title>รายการที่เลือก</v-card-title>
             <v-divider></v-divider>
-    
-
-            <v-btn color="success" @click="openFindCustomerDialog()">ค้นหาลูกค้า</v-btn>
-            <v-btn color="success" @click="openCreateCustomerDialog()">ลงทะเบียนลูกค้า</v-btn>
-            <v-divider></v-divider>
-
             <v-list>
               <v-list-item v-for="(item, index) in selectedItems" :key="index" class="selected-item">
                 <v-list-item-avatar>
@@ -150,7 +194,7 @@ function openFindCustomerDialog() {
             <v-card-subtitle>รวมสุทธิ: {{ posStore.receipt.receiptNetPrice }}</v-card-subtitle>
             <v-card-subtitle>ลูกค้า: {{ posStore.receipt.customer?.customerName }}</v-card-subtitle>
             <v-divider></v-divider>
-          </v-card>
+          </div>
           <AddCustomerDialog />
           <FindCustomerDialog v-model:dialog="customerStore.openDialogFindCustomer" />
           <v-btn color="primary" @click="nextStep">ถัดไป</v-btn>
@@ -188,12 +232,8 @@ function openFindCustomerDialog() {
   </v-app>
 </template>
 
-<style scoped>
-.selected-items-list {
-  background-color: #f5f5f5;
-  border-radius: 10px;
-}
 
+<style scoped>
 .selected-item {
   display: flex;
   align-items: center;
@@ -204,11 +244,13 @@ function openFindCustomerDialog() {
   align-items: center;
 }
 
-.fade-enter-active, .fade-leave-active {
+.fade-enter-active,
+.fade-leave-active {
   transition: opacity 0.5s;
 }
 
-.fade-enter, .fade-leave-to {
+.fade-enter,
+.fade-leave-to {
   opacity: 0;
 }
 
