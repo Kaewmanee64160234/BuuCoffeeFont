@@ -153,9 +153,10 @@ function formatDateThai(dateString: string): string {
           <thead>
             <tr>
               <th class="text-center">ID</th>
-              <th class="text-center">วันที่</th>
+              <th class="text-center">วันที่ออกใบเสร็จ</th>
               <th class="text-center">ส่วนลด</th>
               <th class="text-center">สมาชิก</th>
+              <th class="text-center">แต้มสะสม</th>
               <th class="text-center">โปรโมชั่น</th>
               <th class="text-center">ราคารวมสุทธิ</th>
               <th class="text-center">รูปแบบการจ่ายเงิน</th>
@@ -168,14 +169,22 @@ function formatDateThai(dateString: string): string {
               <td class="text-center">{{ receipt.receiptId }}</td>
               <td class="text-center">{{ formatDateThai(receipt.createdDate+'') }}</td>
               <td class="text-center">{{ receipt.receiptTotalDiscount }}</td>
-              <td class="text-center">{{ receipt.customer?.customerName }}</td>
               <td class="text-center">
-                <span v-for="promo in receipt.receiptPromotions" :key="promo.promotion.promotionId">
-                  {{ promo.promotion.promotionName || 'ไม่มีข้อมูล' }}
+                {{ receipt.customer?.customerName || '-' }}
+              </td>
+              <td class="text-center">
+                {{ receipt.customer?.customerNumberOfStamp || 0 }}
+              </td>
+              <td class="text-center">
+                <span v-if="receipt.receiptPromotions && receipt.receiptPromotions.length > 0">
+                  มีการใช้โปรโมชั่น
+                </span>
+                <span v-else>
+                  -
                 </span>
               </td>
               <td class="text-center">{{ receipt.receiptTotalPrice }}</td>
-              <td class="text-center">{{ receipt.paymentMethod }}</td>
+              <td class="text-center">{{ receipt.paymentMethod || '-' }}</td>
               <td class="text-center">{{ receipt.receiptStatus }}</td>
               <td class="text-center">
                 <v-btn color="#FFDD83" icon="mdi-eye" @click="openHistoryReceiptDialog(receipt)"></v-btn>

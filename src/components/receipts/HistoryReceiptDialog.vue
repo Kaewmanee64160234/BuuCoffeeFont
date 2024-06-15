@@ -1,75 +1,96 @@
 <template>
-  <v-dialog v-model="reciptStore.historyReceiptDialog" max-width="900px">
+  <v-dialog v-model="reciptStore.historyReceiptDialog" max-width="1090px">
     <v-card>
       <v-card-title>
         <span class="text-h5">
-          บันทึกการสั่งซื้อ วันที่ {{ formattedReceiptDate }}<br> ลูกค้า : {{
-            reciptStore.receipt?.customer?.customerName }}
+          บันทึกการสั่งซื้อ วันที่ {{ formattedReceiptDate }} เวลา {{ formattedReceiptTime }}<br> ลูกค้า : {{
+            reciptStore.receipt?.customer?.customerName || 'ไม่มีข้อมูล' }}
         </span>
       </v-card-title>
       <v-card-text>
         <v-container>
-          <!-- {{ reciptStore.receipt }} -->
-
           <v-table dense>
             <thead>
               <tr>
                 <th class="text-center">รายการสินค้า</th>
+                <th class="text-center">ระดับความหวาน</th>
                 <th class="text-center">ท็อปปิ้ง</th>
                 <th class="text-center">จำนวนท็อปปิ้ง</th>
                 <th class="text-center">ชนิด</th>
                 <th class="text-center">จำนวนต่อหน่วย</th>
                 <th class="text-center">ราคา</th>
+                <th class="text-center">โปรโมชั่นที่ใช้</th>
+                <th class="text-center">พนักงานที่ออกใบเสร็จ</th>
               </tr>
             </thead>
 
             <tbody>
               <tr v-for="(item, index) in reciptStore.receipt?.receiptItems" :key="index">
-                <td class="text-center">{{ item.product?.productName || 'ไม่มีข้อมูล' }}</td>
+                <td class="text-center">{{ item.product?.productName }}</td>
+
+                <td class="text-center">
+                  {{ item.sweetnessLevel ? item.sweetnessLevel + '%' : '0%' }}
+                </td>
+                
                 <td class="text-center">
                   <ul>
                     <li v-for="(topping, idx) in item.productTypeToppings" :key="idx">
-                      {{ topping.topping?.toppingName || 'ไม่มีข้อมูล' }}
+                      <span v-if="topping.topping?.toppingName">{{ topping.topping.toppingName }}</span>
+                      <span v-else>-</span>
                     </li>
+                    <li v-if="item.productTypeToppings.length === 0">-</li>
                   </ul>
                 </td>
 
-                <td>
+                <td class="text-center">
                   <ul>
                     <li v-for="(topping, idx) in item.productTypeToppings" :key="idx">
-                      {{ topping.quantity || 'ไม่มีข้อมูล' }}
+                      {{ topping.quantity || '0' }}
                     </li>
+                    <li v-if="item.productTypeToppings.length === 0">0</li>
                   </ul>
                 </td>
+
                 <td class="text-center">
-
-                  <!-- {{ item.product }} -->
-
-                  <div v-if="item.product?.category.haveTopping">
-                    <span>
-                      {{ item.productType?.productTypeName }}
-                    </span>
-                  </div>
-                  <div v-else>
+                  <span v-if="item.productType?.productTypeName">
+                    {{ item.productType.productTypeName }}
+                  </span>
+                  <span v-else>
                     ไม่มีข้อมูล
-                  </div>
+                  </span>
                 </td>
 
                 <td class="text-center">{{ item.quantity }}</td>
 
                 <td class="text-center">{{ item.receiptSubTotal }}</td>
+
+
+                <td class="text-center">
+                  <span v-if="reciptStore.receipt?.receiptPromotions?.length">
+                    <span v-for="promo in reciptStore.receipt?.receiptPromotions" :key="promo.promotion.promotionId">
+                      {{ promo.promotion.promotionName }}
+                    </span>
+                  </span>
+                  <span v-else>
+                    -
+                  </span>
+                </td>
+
+                <td class="text-center">
+                  {{ reciptStore.receipt?.user?.userName || '-' }}
+                </td>
               </tr>
             </tbody>
           </v-table>
           <div class="text-right" style="margin-top: 20px;">
             <strong>ราคารวมสุทธิ</strong>
-            <span>{{ reciptStore.receipt?.receiptTotalPrice ?? 0 }} บาท</span>
+            <span>{{ reciptStore.receipt?.receiptTotalPrice || 0 }} บาท</span>
           </div>
         </v-container>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="orange" @click="closeDialog()">ตกลง</v-btn>
+        <v-btn color="orange" @click="closeDialog">ตกลง</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -93,20 +114,25 @@ function formatDateThai(dateString: string): string {
   return `${day} ${month} พ.ศ.${year}`;
 }
 
+function formatTime(dateString: string): string {
+  const date = new Date(dateString);
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  return `${hours}:${minutes}`;
+}
+
 const formattedReceiptDate = computed(() => {
   return reciptStore.receipt ? formatDateThai(new Date(reciptStore.receipt.createdDate).toISOString()) : '';
 });
 
-// closeDialog
+const formattedReceiptTime = computed(() => {
+  return reciptStore.receipt ? formatTime(new Date(reciptStore.receipt.createdDate).toISOString()) : '';
+});
+
 function closeDialog() {
-  // cler data recipt store
   reciptStore.receipt = null;
   reciptStore.historyReceiptDialog = false;
 }
-
-
-
-
 </script>
 
 <style scoped>
