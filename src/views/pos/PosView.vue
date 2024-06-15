@@ -75,7 +75,25 @@ const userStore = useUserStore();
 const selectedCategory = ref('');
 const productFilters = ref<Product[]>();
 const searchQuery = ref('');
-
+onMounted(async () => {
+  await productStore.getAllProducts();
+  await categoryStore.getAllCategories();
+  await toppingStore.getAllToppings();
+  if (userStore.userRole === "พนักงานขายข้าว") {
+    promotionStore.getPromotionByType("ร้านกับข้าว");
+    selectedCategory.value = "กับข้าว";
+    const cate = categoryStore.categoriesForCreate.find(category => category.categoryName === "กับข้าว")
+    categoryStore.categoriesForCreate = [];
+    categoryStore.categoriesForCreate.push(cate!);
+    productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === "กับข้าว".toLocaleLowerCase());
+  } else {
+    promotionStore.getPromotionByType("ร้านกาแฟ");
+    selectedCategory.value = "coffee";
+    const cate = categoryStore.categoriesForCreate.findIndex(category => category.categoryName === "กับข้าว")
+    categoryStore.categoriesForCreate.splice(cate, 1);
+    productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === "coffee".toLocaleLowerCase());
+  }
+});
 watch(selectedCategory, async (newCategory) => {
   if (newCategory) {
     productFilters.value = [];
@@ -101,25 +119,7 @@ watch(searchQuery, async (newQuery) => {
   }
 });
 
-onMounted(async () => {
-  await productStore.getAllProducts();
-  await categoryStore.getAllCategories();
-  await toppingStore.getAllToppings();
-  if (userStore.userRole === "พนักงานขายข้าว") {
-    promotionStore.getPromotionByType("ร้านกับข้าว");
-    selectedCategory.value = "กับข้าว";
-    const cate = categoryStore.categoriesForCreate.find(category => category.categoryName === "กับข้าว")
-    categoryStore.categoriesForCreate = [];
-    categoryStore.categoriesForCreate.push(cate!);
-    productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === "กับข้าว".toLocaleLowerCase());
-  } else {
-    promotionStore.getPromotionByType("ร้านกาแฟ");
-    selectedCategory.value = "coffee";
-    const cate = categoryStore.categoriesForCreate.findIndex(category => category.categoryName === "กับข้าว")
-    categoryStore.categoriesForCreate.splice(cate, 1);
-    productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === "coffee".toLocaleLowerCase());
-  }
-});
+
 </script>
 
 <style scoped>
