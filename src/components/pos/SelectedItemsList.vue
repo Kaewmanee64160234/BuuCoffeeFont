@@ -86,7 +86,7 @@ function openCreateCustomerDialog() {
 }
 
 watch(() => selectedCustomer.value, () => {
-  if(selectedCustomer.value === '' || selectedCustomer.value === null) {
+  if (selectedCustomer.value === '' || selectedCustomer.value === null) {
     posStore.receipt.customer = null;
     return;
   }
@@ -99,7 +99,7 @@ function findCustomer() {
   console.log('Selected customer:', selectedCustomer.value);
   const customer = customerStore.customers.find(c => c.customerPhone === selectedCustomer.value);
   console.log('Customer found:', customer);
-  
+
   if (customer) {
     posStore.receipt.customer = customer;
   } else {
@@ -118,71 +118,76 @@ function findCustomer() {
       <v-window-item :value="1">
         <div>
           <h3>รายละเอียดการสั่งซื้อ</h3>
-          <h6>สมาชิก: <span>
-              {{ posStore.receipt.customer?.customerName }}
-          </span></h6>
-          <h6>แต้มสะสม</h6>
+          <h6>สมาชิก: <span>{{ posStore.receipt.customer?.customerName == null ? 'ไม่มี' : posStore.receipt.customer?.customerName }}</span></h6>
+          <h6>แต้มสะสม: <span>{{ posStore.receipt.customer == null ? '0' : posStore.receipt.customer?.customerNumberOfStamp }}</span> Point</h6>
           <h6>เบอร์โทรลูกค้า</h6>
-          <div>
+          <div class="py-2">
             <v-row class="d-flex justify-center align-center">
               <v-col cols="12" md="6">
-                <v-autocomplete
-                  v-model="selectedCustomer"
-                  :items="customerStore.customers.map(c => c.customerPhone)"
-                  item-text="phone"
-                  item-value="phone"
-                  label="เบอร์โทรลูกค้า"
-                  variant="solo"
-                  append-inner-icon="mdi-magnify"
-                  
-                ></v-autocomplete>
+                <v-autocomplete v-model="selectedCustomer" :items="customerStore.customers.map(c => c.customerPhone)" item-text="phone" item-value="phone" label="เบอร์โทรลูกค้า" variant="solo" append-inner-icon="mdi-magnify"></v-autocomplete>
               </v-col>
-              <v-col cols="12" md="3">
-                <v-btn color="success" @click="openCreateCustomerDialog()">ลงทะเบียนลูกค้า</v-btn>
+              <v-col cols="12" md="2">
+                <v-btn icon="mdi-account-plus" color="#ff9800" @click="openCreateCustomerDialog()"></v-btn>
               </v-col>
-              <v-col cols="12" md="3">
-                <v-btn color="success" @click="openCreateCustomerDialog()">ลงทะเบียนลูกค้า</v-btn>
+              <v-col cols="12" md="4">
+                <v-btn color="#ff9800" @click="openCreateCustomerDialog()">ประวัติการสั่งซื้อ</v-btn>
               </v-col>
             </v-row>
           </div>
-          <br>
-          <div class="selected-items-list">
-            <v-card-title>รายการที่เลือก</v-card-title>
+          <v-divider></v-divider>
+          <div class="selected-items-list" style="width: 100%;">
             <v-divider></v-divider>
-            <v-list>
-              <v-list-item v-for="(item, index) in selectedItems" :key="index" class="selected-item">
-                <v-list-item-avatar>
-                  <v-img :src="item.product?.productImage" alt="product image"></v-img>
-                </v-list-item-avatar>
-                <v-list-item-content>
-                  <v-list-item-title>{{ item.product?.productName }}</v-list-item-title>
-                  <v-list-item-subtitle>{{ item.productType?.productTypeName }}</v-list-item-subtitle>
-                  <div v-if="item.productTypeToppings.length > 0">
-                    <v-list-item-subtitle>ท็อปปิ้ง:</v-list-item-subtitle>
-                    <v-list-item-subtitle v-for="topping in item.productTypeToppings" :key="topping.topping.toppingId">
-                      - {{ topping.topping.toppingName }}: {{ topping.topping.toppingPrice }}
-                    </v-list-item-subtitle>
-                  </div>
-                </v-list-item-content>
-                <v-list-item-content class="quantity-controls">
-                  <v-btn icon @click="decreaseQuantity(index)">
-                    <v-icon>mdi-minus</v-icon>
-                  </v-btn>
-                  <span>{{ item.quantity }}</span>
-                  <v-btn icon @click="increaseQuantity(item)">
-                    <v-icon>mdi-plus</v-icon>
-                  </v-btn>
-                </v-list-item-content>
-                <v-list-item-content>
-                  <v-list-item-subtitle>{{ item.receiptSubTotal.toFixed(2) }}</v-list-item-subtitle>
-                </v-list-item-content>
-                <v-list-item-action>
-                  <v-btn icon @click="removeItem(index)">
-                    <v-icon color="red">mdi-delete</v-icon>
-                  </v-btn>
-                </v-list-item-action>
-              </v-list-item>
-            </v-list>
+            <div style="width: 100%;">
+              <v-row style="width: 100%;">
+                <v-col cols="12" md="6"></v-col>
+                <v-col cols="12" md="6">
+                  <v-btn color="red" variant="text">ยกเลิกรายการ</v-btn>
+                </v-col>
+              </v-row>
+              <v-row style="width: 100%;">
+                <v-list class="full-width">
+                  <v-list-item-group>
+                    <div v-for="(item, index) in selectedItems" :key="index" class="selected-item full-width">
+                      <v-list-item :prepend-avatar="`http://localhost:3000/products/${item.product?.productId}/image`">
+                        <v-row>
+                          <v-col cols="8">
+                            <div>{{ item.product?.productName }}</div>
+                          </v-col>
+                          <v-col cols="4" class="text-right">
+                            <v-list-item-subtitle>{{ item.receiptSubTotal.toFixed(2) }}</v-list-item-subtitle>
+                          </v-col>
+                        </v-row>
+                        <v-row>
+                          <v-col cols="8">
+                            <div>{{ item.productType?.productTypeName }} - ความหวาน {{ item.sweetnessLevel }}%</div>
+                            <div v-if="item.productTypeToppings.length > 0">
+                              <span>ท็อปปิ้ง:</span>
+                              <ul>
+                                <li v-for="topping in item.productTypeToppings" :key="topping.topping.toppingId">
+                                  {{ topping.topping.toppingName }}: {{ topping.topping.toppingPrice }}
+                                </li>
+                              </ul>
+                            </div>
+                          </v-col>
+                          <v-col cols="4" class="text-right">
+                            <v-btn size="xs-small" icon @click="decreaseQuantity(index)">
+                              <v-icon>mdi-minus</v-icon>
+                            </v-btn>
+                            <span class="pa-2">{{ item.quantity }}</span>
+                            <v-btn size="xs-small" icon @click="increaseQuantity(item)">
+                              <v-icon>mdi-plus</v-icon>
+                            </v-btn>
+                            <v-btn icon variant="text" @click="removeItem(index)">
+                              <v-icon color="red">mdi-delete</v-icon>
+                            </v-btn>
+                          </v-col>
+                        </v-row>
+                      </v-list-item>
+                    </div>
+                  </v-list-item-group>
+                </v-list>
+              </v-row>
+            </div>
             <v-divider></v-divider>
             <v-card-subtitle>รวมทั้งหมด: {{ posStore.receipt.receiptTotalPrice }}</v-card-subtitle>
             <v-card-subtitle>ราคาลด: {{ posStore.receipt.receiptTotalDiscount }}</v-card-subtitle>
@@ -200,7 +205,6 @@ function findCustomer() {
           <v-btn color="primary" @click="nextStep">ถัดไป</v-btn>
         </div>
       </v-window-item>
-
       <v-window-item :value="2">
         <div>
           <h3 class="text-h6">เลือกวิธีชำระเงิน</h3>
@@ -232,16 +236,20 @@ function findCustomer() {
   </v-app>
 </template>
 
-
 <style scoped>
 .selected-item {
   display: flex;
   align-items: center;
+
 }
 
 .quantity-controls {
   display: flex;
   align-items: center;
+}
+
+.full-width {
+  width: 100%;
 }
 
 .fade-enter-active,
