@@ -13,7 +13,14 @@
                 <v-text-field v-model="userName" label="ชื่อผู้ใช้" required></v-text-field>
               </v-col>
               <v-col cols="12" md="6">
-                <v-text-field v-model="userPassword" label="รหัสผ่าน" type="password" required></v-text-field>
+                <v-text-field 
+                v-model="userPassword" 
+                label="รหัสผ่าน" 
+                :type="show ? 'text' : 'password'"
+                :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
+                  @click:append="show = !show"
+                required>
+                </v-text-field>
               </v-col>
               <v-col cols="12" md="6">
                 <v-text-field v-model="userEmail" label="อีเมล" required></v-text-field>
@@ -55,6 +62,7 @@ const props = defineProps<{ dialog: boolean, user: User | null }>();
 const form = ref<VForm | null>(null);
 const dialog = ref(props.dialog);
 const userStore = useUserStore();
+const show = ref(false);
 
 const userName = ref(props.user?.userName || '');
 const userPassword = ref(props.user?.userPassword || '');

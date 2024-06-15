@@ -9,10 +9,20 @@
           <v-form ref="form">
             <v-row>
               <v-col cols="12" md="12">
-                <v-text-field v-model="customerName" label="ชื่อลูกค้า" required></v-text-field>
+                <v-text-field 
+                  v-model="customerName" 
+                  label="ชื่อลูกค้า" 
+                  :rules="[rules.required, rules.alpha]" 
+                  required
+                ></v-text-field>
               </v-col>
               <v-col cols="12" md="12">
-                <v-text-field v-model="customerPhone" label="เบอร์โทรศัพท์" required></v-text-field>
+                <v-text-field 
+                  v-model="customerPhone" 
+                  label="เบอร์โทรศัพท์" 
+                  :rules="[rules.required, rules.phoneNumber]" 
+                  required
+                ></v-text-field>
               </v-col>
             </v-row>
           </v-form>
@@ -28,17 +38,24 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, ref, watch } from 'vue';
+import { ref } from 'vue';
 import { useCustomerStore } from '../../stores/customer.store';
 import type { VForm } from 'vuetify/components';
 
-
 const form = ref<VForm | null>(null);
-
 
 const customerName = ref('');
 const customerPhone = ref('');
 const customerStore = useCustomerStore();
+
+const rules = {
+  required: (value: string) => !!value || 'กรุณากรอกข้อมูล',
+  alpha: (value: string) => /^[a-zA-Zก-๙\s]+$/.test(value) || 'กรุณากรอกชื่อเป็นตัวอักษรเท่านั้น',
+  phoneNumber: (value: string) => {
+    const phoneRegex = /^0\d{9}$/;
+    return phoneRegex.test(value) || 'กรุณากรอกเบอร์โทรศัพท์ที่ถูกต้อง (ขึ้นต้นด้วย 0 และมี 10 หลัก)';
+  }
+};
 
 // close Dialog 
 function close() {
@@ -61,14 +78,11 @@ async function saveCustomer() {
       });
       await customerStore.getAllCustomers(); // Refresh customer list
       close();
-
     } catch (error) {
       console.error('Error saving customer:', error);
     }
   }
 }
-
-
 </script>
 
 <style scoped>
