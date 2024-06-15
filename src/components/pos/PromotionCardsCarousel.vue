@@ -108,8 +108,8 @@ function isPromotionApplied(promotion: Promotion) {
 }
 
 .promotion-card {
-  width: 130px;
-  height: 130px;
+  width: 150px;
+  height: 150px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
