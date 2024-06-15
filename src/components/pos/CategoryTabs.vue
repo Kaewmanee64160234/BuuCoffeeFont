@@ -9,8 +9,6 @@
         {{ category.categoryName }}
       </v-tab>
     </v-tabs>
-
-  
   </div>
 </template>
 
@@ -19,10 +17,13 @@ import { useCategoryStore } from '@/stores/category.store';
 import { useProductStore } from '@/stores/product.store';
 import { ref, watch } from 'vue';
 import type { Category } from '@/types/category.type';
+import type { Product } from '@/types/product.type';
+import {usePosStore} from '@/stores/pos.store';
 
 const productStore = useProductStore();
 const categoryStore = useCategoryStore();
 const selectedCategory = ref('');
+const posStore = usePosStore();
 
 watch(selectedCategory, (newCategory) => {
   if (newCategory) {
@@ -33,21 +34,11 @@ watch(selectedCategory, (newCategory) => {
 
 function fetchProducts(category: Category) {
   selectedCategory.value = category.categoryName;
+  productStore.searchQuery = ''; // Clear search query if needed
 }
 
-function handleAddToCart(product) {
-  productStore.setSelectedProduct(product);
-  if (product.category.haveTopping) {
-    openToppingDialog();
-  } else {
-    posStore.addToReceipt(product, null, [], 1, 0);
-  }
-  console.log(product);
-}
 
-function openToppingDialog() {
-  posStore.toppingDialog = true;
-}
+
 </script>
 
 <style scoped>
