@@ -146,6 +146,9 @@ export const usePosStore = defineStore("pos", () => {
     }
     console.log("last", selectedItems.value[selectedItems.value.length - 1]);
     receipt.value.receiptTotalPrice = calculateTotal(selectedItems.value);
+    if(receipt.value.receiptTotalDiscount === 0){
+      receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice;
+    }
   };
   const calculateTotal = (selectedItems: ReceiptItem[]) => {
     receipt.value.receiptTotalPrice = 0;

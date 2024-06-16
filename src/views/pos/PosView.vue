@@ -75,10 +75,10 @@ watch(searchQuery, async (newQuery) => {
 <template>
   <v-app style="width: 100vw; height: 100vh;">
     <v-row class="full-width-row" style="height: 100%;">
-      <v-col cols="8" class="d-flex flex-column align-center" style="background-color: #C1B6A9; height: 100%;">
+      <v-col cols="7" class="d-flex flex-column align-center" style="background-color: #C1B6A9; height: 100%;">
         <v-container fluid class="full-width-container" style="height: 100%;">
           <v-row class="full-width-row">
-            <v-col cols="12" class="d-flex justify-center align-center">
+            <v-col cols="12" class="d-flex justify-center align-center ">
               <promotion-cards-carousel></promotion-cards-carousel>
             </v-col>
           </v-row>
@@ -112,7 +112,7 @@ watch(searchQuery, async (newQuery) => {
           <drink-selection-dialog></drink-selection-dialog>
         </v-container>
       </v-col>
-      <v-col cols="4" class="d-flex flex-column" style="margin: 0; padding: 10px; height: 100%;">
+      <v-col cols="5" class="d-flex flex-column" style="margin: 0; padding: 10px; height: 100%;">
         <v-sheet style="height: 100%; display: flex; flex-direction: column;">
           <selected-items-list style="flex: 1;"></selected-items-list>
         </v-sheet>
