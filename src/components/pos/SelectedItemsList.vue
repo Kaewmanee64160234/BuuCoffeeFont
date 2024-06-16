@@ -13,6 +13,8 @@ const posStore = usePosStore();
 const customerStore = useCustomerStore();
 const selectedItems = computed(() => posStore.selectedItems);
 const selectedCustomer = ref('');
+const recive = ref(0);
+const change = ref(0);
 
 function nextStep() {
   if (selectedItems.value.length === 0) {
@@ -44,6 +46,27 @@ function removeItem(index: number) {
   posStore.removeItem(index);
 }
 
+function calculateChange() {
+  if (posStore.receipt.paymentMethod === 'cash') {
+    change.value = recive.value - posStore.receipt.receiptNetPrice;
+
+  }
+}
+
+function selectPaymentMethod(method: string) {
+  console.log(`Selected payment method: ${method}`);
+  posStore.receipt.paymentMethod = method;
+  if (method === 'cash') {
+    calculateChange();
+  } else {
+    change.value = 0;
+  }
+}
+
+watch(() => recive.value, () => {
+  calculateChange();
+});
+
 function increaseQuantity(item: ReceiptItem) {
   console.log('increase quantity', item);
   if (item.product?.category.haveTopping) {
@@ -66,11 +89,6 @@ function decreaseQuantity(index: number) {
   }
 }
 
-function selectPaymentMethod(method: string) {
-  console.log(`Selected payment method: ${method}`);
-  posStore.receipt.paymentMethod = method;
-}
-
 function save() {
   // Perform validation
   if (selectedItems.value.length === 0) {
@@ -89,6 +107,14 @@ function save() {
     });
     return;
   }
+  if (posStore.receipt.paymentMethod === 'cash' && recive.value < posStore.receipt.receiptNetPrice) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Incomplete Data',
+      text: 'Please enter the correct amount of cash received.',
+    });
+    return;
+  }
 
   posStore.createReceipt();
   // Clear data
@@ -98,7 +124,10 @@ function save() {
   posStore.receipt.receiptNetPrice = 0;
   posStore.receipt.receiptPromotions = [];
   posStore.receiptDialog = true;
+  recive.value = 0;
+  change.value = 0;
   step.value = 1; // Reset step to 1 after saving
+  posStore.receipt.paymentMethod = '';
 }
 
 function openCreateCustomerDialog() {
@@ -112,6 +141,12 @@ function cancelReceipt() {
   posStore.receipt.receiptNetPrice = 0;
   posStore.receipt.receiptPromotions = [];
   posStore.receiptDialog = false;
+  recive.value = 0;
+  change.value = 0;
+  step.value = 1; // Reset step to 1 after cancel
+  posStore.receipt.paymentMethod = '';
+
+
 }
 
 function removePromotion(promotion: Promotion) {
@@ -143,6 +178,7 @@ function findCustomer() {
   }
 }
 </script>
+
 
 <template>
   <v-app style="height: 100vh;">
@@ -177,7 +213,7 @@ function findCustomer() {
             <v-list class="full-width" style="max-height: 40vh;">
               <v-list-item-group style="overflow-y: auto;">
                 <div v-for="(item, index) in selectedItems" :key="index" class="selected-item full-width my-2">
-                  <v-card style="width: 100%" elevation="2">
+                  <!-- <v-card style="width: 100%" elevation="2"> -->
                     <v-list-item :prepend-avatar="`http://localhost:3000/products/${item.product?.productId}/image`"
                       class="full-width">
                       <v-row style="padding: 0;">
@@ -196,8 +232,10 @@ function findCustomer() {
                             {{ item.sweetnessLevel }}%
                           </div>
                           <div v-else>
-                            <div style="font-weight: lighter;color: gray;font-size: 11px;">
-                              {{ item.product?.productName }}
+                            <div style="font-weight: lighter;color: gray;font-size: 15px;">
+                              {{ item.product?.productName}}( {{ item.product?.category.categoryName }} ) {{ item.product?.productPrice }}.- 
+
+
                             </div>
                           </div>
                           <div v-if="item.productTypeToppings.length > 0">
@@ -205,7 +243,7 @@ function findCustomer() {
                               <li style="font-weight: lighter;color: gray;font-size: 11px;"
                                 v-for="topping in item.productTypeToppings" :key="topping.topping.toppingId">
                                 x{{ topping.quantity }} {{ topping.topping.toppingName }}: {{
-                                topping.topping.toppingPrice }}.-
+                                  topping.topping.toppingPrice }}.-
                               </li>
                             </ul>
                           </div>
@@ -224,7 +262,7 @@ function findCustomer() {
                         </v-col>
                       </v-row>
                     </v-list-item>
-                  </v-card>
+                  <!-- </v-card> -->
                 </div>
               </v-list-item-group>
             </v-list>
@@ -240,7 +278,7 @@ function findCustomer() {
                   <div style="width: 100%;">
                     <span class="pa-2">{{ promotion.promotion.promotionType }}:</span>
                     <span class="red--text">{{ promotion.discount }} $</span>
-                    <v-btn size="small" icon variant="text" @click="removePromotion(promotion)">
+                    <v-btn size="small" icon variant="text" @click="removePromotion(promotion.promotion)">
                       <v-icon color="red">mdi-delete</v-icon>
                     </v-btn>
                   </div>
@@ -316,26 +354,17 @@ function findCustomer() {
                 <div>
                   <p class="d-flex justify-space-between pr-6 my-2">
                     <span style="text-align: start;"> ทั้งหมด:</span>
-                    <span style="text-align: end;">{{ posStore.receipt.receiptNetPrice.toFixed(2) }}</span>
+                    <span style="text-align: end;">{{ posStore.receipt.receiptTotalPrice.toFixed(2) }}</span>
                   </p>
-                  <!-- promotion -->
-                  <div class="my-2" v-for="(promotion) in posStore.receipt.receiptPromotions"
-                    :key="promotion.receiptPromotionId" style="text-align: end; width: 100%; padding-right: 40px;">
-                    <div style="width: 100%;">
-                      <span class="pa-2">{{ promotion.promotion.promotionType }}:</span>
-                      <span class="red--text">{{ promotion.discount?.toFixed(2) }} $</span>
-                      <v-btn size="small" icon variant="text" @click="removePromotion(promotion)">
-                        <v-icon color="red">mdi-delete</v-icon>
-                      </v-btn>
-                    </div>
-                  </div>
+
                   <!-- รับมา -->
-                  <div>
+                  <div v-if="posStore.receipt.paymentMethod == 'cash'">
                     <p class="d-flex justify-space-between align-center pr-6 my-2">
                       <span style="text-align: start;"> รับมา:</span>
                       <span style="text-align: start;width: 50%; ">
                         <v-responsive class="mx-auto" style="height: 10;">
-                          <v-text-field variant="solo" name="name" label="label" id="id"></v-text-field>
+                          <v-text-field v-model="recive" variant="solo" name="จำนวนเงิน" label="จำนวนเงิน"
+                            id="id"></v-text-field>
                         </v-responsive>
                       </span>
                     </p>
@@ -344,7 +373,8 @@ function findCustomer() {
                   <div>
                     <p class="d-flex justify-space-between pr-6 my-2">
                       <span style="text-align: start;"> ทอน:</span>
-                      <span style="text-align: end;">{{ posStore.receipt.receiptNetPrice.toFixed(2) }}</span>
+                      <span style="text-align: end;" :class="recive < 0 || recive < posStore.receipt.receiptNetPrice  ? 'red--text' : 'black'
+                        ">{{ change.toFixed(2) }}</span>
                     </p>
                   </div>
                   <v-divider></v-divider>
