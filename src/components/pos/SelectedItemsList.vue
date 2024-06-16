@@ -214,12 +214,14 @@ function findCustomer() {
             </v-row>
           </div>
           <v-divider></v-divider>
-          <div class="selected-items-list">
-            <div class="d-flex justify-end pr-6">
+
+          <div class="d-flex justify-end pr-6">
               <v-btn color="red" variant="text" @click="cancelReceipt">ยกเลิกรายการ</v-btn>
             </div>
-            <v-list class="full-width" style="max-height: 40vh;">
-              <v-list-item-group style="overflow-y: auto;">
+          <div class="selected-items-list">
+           
+            <v-list class="full-width" style="overflow-y: auto;">
+              <v-list-item-group >
                 <div v-for="(item, index) in selectedItems" :key="index" class="selected-item full-width my-2">
                   <v-list-item :prepend-avatar="`http://localhost:3000/products/${item.product?.productId}/image`" class="full-width">
                     <v-row style="padding: 0;">
@@ -377,7 +379,7 @@ function findCustomer() {
                     </p>
                   </div>
                   <v-divider></v-divider>
-                  <v-row class="py-3 my-2">
+                  <v-row class="pt-1">
                     <v-col>
                       <h3>ราคาสุทธิ</h3>
                     </v-col>
@@ -385,7 +387,7 @@ function findCustomer() {
                       <h3>{{ posStore.receipt.receiptNetPrice.toFixed(2) }}</h3>
                     </v-col>
                   </v-row>
-                  <v-row style="width: 100%;">
+                  <v-row style="width: 100%; padding: 0;">
                     <div class="d-flex justify-center pr-6" style="width: 100%;">
                       <v-btn style="padding-right: 20px; width: 40%; margin-right: 10px;" color="secondary" rounded @click="prevStep">ย้อนกลับ</v-btn>
                       <v-btn style="padding-right: 20px; width: 40%; margin-right: 10px;" color="#FF9642" rounded @click="save">บันทึก</v-btn>
@@ -420,6 +422,7 @@ function findCustomer() {
 }
 
 .payment-method {
+  margin-top: 50px;
   height: 25%;
 }
 
@@ -454,13 +457,13 @@ function findCustomer() {
 
 .selected-items-list {
   max-height: 40%;
-  height: 200px;
+  height: 150px;
   overflow-y: auto;
 }
 
 .promotion {
-  max-height: 15%;
-  height: 60px;
+  max-height: 20%;
+  height: 70px;
   overflow-y: auto;
 }
 
