@@ -4,12 +4,33 @@ import type { User } from "@/types/user.type";
 import userService from "@/service/user.service";
 
 export const useUserStore = defineStore("user", () => {
+  const currentUser = ref<User>({
+    userId: -1,
+    userName: "",
+    userPassword: "",
+    userRole: "",
+    userEmail: "",
+    userStatus: "",
+  });
   const users = ref<User[]>([]);
   const user = ref<User | null>(null);
   const searchQuery = ref<string>("");
   const updateUserDialog = ref(false);
   // const userRole = ref("พนักงานขายข้าว");
-  const userRole = ref("พนักงานขายกาแฟ");
+  // const userRole = ref("พนักงานขายกาแฟ");
+  function setUser(user: User) {
+    currentUser.value = { ...user };
+    localStorage.setItem('user', JSON.stringify(user));
+  }
+
+  function getUser() {
+    const userString = localStorage.getItem('user');
+    if (userString) {
+      return JSON.parse(userString) as User;
+    }
+    return currentUser.value;
+  }
+
 
   const getAllUsers = async () => {
     try {
@@ -88,6 +109,8 @@ export const useUserStore = defineStore("user", () => {
     searchQuery,
     updateUserDialog,
     setUserForEdit,
-    userRole,
+    currentUser,
+    setUser, 
+    getUser
   };
 });
