@@ -111,20 +111,23 @@ function findCustomer() {
   }
 }
 </script>
-
 <template>
-  <v-app style="width: 100%; padding: 20px;">
+  <v-app class="pa-4" style="width: 100%;">
     <v-window v-model="step" transition="fade">
       <v-window-item :value="1">
         <div>
           <h3>รายละเอียดการสั่งซื้อ</h3>
-          <h6>สมาชิก: <span>{{ posStore.receipt.customer?.customerName == null ? 'ไม่มี' : posStore.receipt.customer?.customerName }}</span></h6>
-          <h6>แต้มสะสม: <span>{{ posStore.receipt.customer == null ? '0' : posStore.receipt.customer?.customerNumberOfStamp }}</span> Point</h6>
+          <h6>สมาชิก: <span>{{ posStore.receipt.customer?.customerName == null ? 'ไม่มี' :
+            posStore.receipt.customer?.customerName }}</span></h6>
+          <h6>แต้มสะสม: <span>{{ posStore.receipt.customer == null ? '0' :
+            posStore.receipt.customer?.customerNumberOfStamp }}</span> Point</h6>
           <h6>เบอร์โทรลูกค้า</h6>
           <div class="py-2">
             <v-row class="d-flex justify-center align-center">
               <v-col cols="12" md="6">
-                <v-autocomplete v-model="selectedCustomer" :items="customerStore.customers.map(c => c.customerPhone)" item-text="phone" item-value="phone" label="เบอร์โทรลูกค้า" variant="solo" append-inner-icon="mdi-magnify"></v-autocomplete>
+                <v-autocomplete v-model="selectedCustomer" :items="customerStore.customers.map(c => c.customerPhone)"
+                  item-text="phone" item-value="phone" label="เบอร์โทรลูกค้า" variant="solo"
+                  append-inner-icon="mdi-magnify"></v-autocomplete>
               </v-col>
               <v-col cols="12" md="2">
                 <v-btn icon="mdi-account-plus" color="#ff9800" @click="openCreateCustomerDialog()"></v-btn>
@@ -135,59 +138,64 @@ function findCustomer() {
             </v-row>
           </div>
           <v-divider></v-divider>
-          <div class="selected-items-list" style="width: 100%;">
-            <v-divider></v-divider>
-            <div style="width: 100%;">
-              <v-row style="width: 100%;">
-                <v-col cols="12" md="6"></v-col>
-                <v-col cols="12" md="6">
-                  <v-btn color="red" variant="text">ยกเลิกรายการ</v-btn>
-                </v-col>
-              </v-row>
-              <v-row style="width: 100%;">
-                <v-list class="full-width">
-                  <v-list-item-group>
-                    <div v-for="(item, index) in selectedItems" :key="index" class="selected-item full-width">
-                      <v-list-item :prepend-avatar="`http://localhost:3000/products/${item.product?.productId}/image`">
-                        <v-row>
-                          <v-col cols="8">
-                            <div>{{ item.product?.productName }}</div>
-                          </v-col>
-                          <v-col cols="4" class="text-right">
-                            <v-list-item-subtitle>{{ item.receiptSubTotal.toFixed(2) }}</v-list-item-subtitle>
-                          </v-col>
-                        </v-row>
-                        <v-row>
-                          <v-col cols="8">
-                            <div>{{ item.productType?.productTypeName }} - ความหวาน {{ item.sweetnessLevel }}%</div>
-                            <div v-if="item.productTypeToppings.length > 0">
-                              <span>ท็อปปิ้ง:</span>
-                              <ul>
-                                <li v-for="topping in item.productTypeToppings" :key="topping.topping.toppingId">
-                                  {{ topping.topping.toppingName }}: {{ topping.topping.toppingPrice }}
-                                </li>
-                              </ul>
-                            </div>
-                          </v-col>
-                          <v-col cols="4" class="text-right">
-                            <v-btn size="xs-small" icon @click="decreaseQuantity(index)">
-                              <v-icon>mdi-minus</v-icon>
-                            </v-btn>
-                            <span class="pa-2">{{ item.quantity }}</span>
-                            <v-btn size="xs-small" icon @click="increaseQuantity(item)">
-                              <v-icon>mdi-plus</v-icon>
-                            </v-btn>
-                            <v-btn icon variant="text" @click="removeItem(index)">
-                              <v-icon color="red">mdi-delete</v-icon>
-                            </v-btn>
-                          </v-col>
-                        </v-row>
-                      </v-list-item>
-                    </div>
-                  </v-list-item-group>
-                </v-list>
-              </v-row>
+          <div class="selected-items-list">
+            <div class="d-flex justify-end">
+              <v-btn color="red" variant="text">ยกเลิกรายการ</v-btn>
             </div>
+            <v-list class="full-width" style="max-height: 40vh; overflow-y: auto;">
+              <v-list-item-group>
+                <div v-for="(item, index) in selectedItems" :key="index" class="selected-item full-width my-2">
+                  <v-list-item :prepend-avatar="`http://localhost:3000/products/${item.product?.productId}/image`"
+                    class="full-width">
+                    <v-row style="padding: 0;">
+                      <v-col cols="6" style="color: black;font-size: 16px; ">
+                        <div class="product-name">{{ item.product?.productName }}</div>
+                      </v-col>
+                      <v-col cols="6" class="text-right pr-8" style="color: black;font-size: 16px; ">
+                        <p>{{ item.receiptSubTotal.toFixed(2) }}</p>
+                      </v-col>
+                    </v-row>
+                    <v-row style="padding: 0;">
+                      <v-col cols="7" style="color: gray;font-size: 12px; padding-top: 0;">
+                        <div v-if="item.product?.category.haveTopping"
+                          style="font-weight: lighter;color: gray;font-size: 10px;">{{
+                            item.productType?.productTypeName }} +{{
+                            item.productType?.productTypePrice }} |
+                          ความหวาน {{ item.sweetnessLevel }}%</div>
+                        <div v-else>
+                          <div style="font-weight: lighter;color: gray;font-size: 11px;">{{
+                            item.product?.productName }} </div>
+                        </div>
+                        <div v-if="item.productTypeToppings.length > 0">
+                          <ul>
+                            <li style="font-weight: lighter;color: gray;font-size: 11px;"
+                              v-for="topping in item.productTypeToppings" :key="topping.topping.toppingId">
+                              x{{ topping.quantity }} {{ topping.topping.toppingName }}: {{
+                                topping.topping.toppingPrice }}.-
+                            </li>
+                          </ul>
+                        </div>
+                      </v-col>
+                      <v-col cols="5" style="padding-top: 0;" >
+                        <v-btn size="xs-small" color="#C5C5C5" icon @click="decreaseQuantity(index)">
+                          <v-icon>mdi-minus</v-icon>
+                        </v-btn>
+                        <span class="pa-2">{{ item.quantity }}</span>
+                        <v-btn size="xs-small" color="#FF9642" icon @click="increaseQuantity(item)">
+                          <v-icon>mdi-plus</v-icon>
+                        </v-btn>
+                        <v-btn icon variant="text" @click="removeItem(index)">
+                          <v-icon color="red">mdi-delete</v-icon>
+                        </v-btn>
+                      </v-col>
+                    </v-row>
+                  </v-list-item>
+                  <v-divider></v-divider>
+                </div>
+              </v-list-item-group>
+            </v-list>
+          </div>
+          <div class="summary-section">
             <v-divider></v-divider>
             <v-card-subtitle>รวมทั้งหมด: {{ posStore.receipt.receiptTotalPrice }}</v-card-subtitle>
             <v-card-subtitle>ราคาลด: {{ posStore.receipt.receiptTotalDiscount }}</v-card-subtitle>
@@ -240,7 +248,12 @@ function findCustomer() {
 .selected-item {
   display: flex;
   align-items: center;
+}
 
+.product-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .quantity-controls {
@@ -266,5 +279,15 @@ function findCustomer() {
   height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+.selected-items-list {
+  max-height: 40vh;
+  overflow-y: auto;
+  margin-top: 10px;
+}
+
+.summary-section {
+  margin-top: 20px;
 }
 </style>
