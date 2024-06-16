@@ -5,6 +5,7 @@ import { useAuthStore } from '@/stores/auth';
 
 const authStore = useAuthStore();
 const router = useRouter();
+const show = ref(false);
 
 const valid = ref(false);
 const email = ref('');
@@ -48,9 +49,11 @@ const loginHandler = async () => {
           <v-text-field
             v-model="password"
             :rules="passwordRules"
+            :type="show ? 'text' : 'password'"
             label="รหัสผ่าน"
-            type="password"
             required
+            :append-inner-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
+            @click:append-inner="show = !show"
           ></v-text-field>
         </v-form>
       </v-card-text>
