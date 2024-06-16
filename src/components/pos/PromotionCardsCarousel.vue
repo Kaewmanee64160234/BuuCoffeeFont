@@ -1,26 +1,3 @@
-<template>
-  <v-carousel hide-delimiter-background hide-delimiters height="230" style="background-color: #80715E; border-radius: 30px;">
-    <v-carousel-item v-for="(chunk, index) in promotionChunks" :key="chunk[index].promotionId">
-      <div class="promotion-container">
-        <v-card v-for="promotion in chunk" :key="promotion.promotionId" class="promotion-card"
-          :class="{ 'applied-promotion': isPromotionApplied(promotion) }" @click="togglePromotion(promotion)">
-          <v-card-title class="text-center wrap-text">{{ promotion.promotionName }}</v-card-title>
-          <v-card-actions class="justify-center">
-            <v-btn v-if="!promotion.promotionCanUseManyTimes" class="btn-apply-promotion"
-              @click.stop="togglePromotion(promotion)">
-              {{ isPromotionApplied(promotion) ? 'ยกเลิก' : 'ใช้โปรโมชั่นนี้' }}
-            </v-btn>
-            <v-btn v-else class="btn-apply-promotion" @click.stop="applyPromotion(promotion)">
-              ใช้โปรโมชั่นนี้
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </div>
-    </v-carousel-item>
-  </v-carousel>
-</template>
-
-
 <script lang="ts" setup>
 import { ref, watch, onMounted, nextTick } from 'vue';
 import { usePosStore } from '@/stores/pos.store';
@@ -91,25 +68,58 @@ function isPromotionApplied(promotion: Promotion) {
     (receiptPromotion) => receiptPromotion.promotion.promotionId === promotion.promotionId
   );
 }
+
+function getButtonClass(promotion: Promotion) {
+  return isPromotionApplied(promotion) ? 'btn-applied-promotion' : 'btn-apply-promotion';
+}
 </script>
 
+<template>
+  <v-carousel hide-delimiter-background hide-delimiters height="180" style="background-color: #80715E; border-radius: 20px;">
+    <v-carousel-item v-for="(chunk, index) in promotionChunks" :key="chunk[index].promotionId">
+      <div class="promotion-group">
+        <div class="promotion-container">
+          <v-card v-for="promotion in chunk" :key="promotion.promotionId" class="promotion-card"
+            :class="{ 'applied-promotion': isPromotionApplied(promotion) }" @click="togglePromotion(promotion)">
+            <v-card-title class="text-center wrap-text">{{ promotion.promotionName }}</v-card-title>
+            <v-card-actions class="justify-center">
+              <v-btn
+                :class="getButtonClass(promotion)"
+                class="btn-apply-promotion"
+                @click.stop="togglePromotion(promotion)">
+                {{ isPromotionApplied(promotion) ? 'ยกเลิก' : 'ใช้โปรโมชั่นนี้' }}
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </div>
+      </div>
+    </v-carousel-item>
+  </v-carousel>
+</template>
 
 
 
 
 <style scoped>
+.promotion-group{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  height: 100%;
+}
 .promotion-container {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  gap: 20px;
+  gap: 10px;
   height: 100%;
-  padding-left: 10%;
+  padding-left: 5%;
 }
 
 .promotion-card {
-  width: 150px;
-  height: 150px;
+  width: 120px;
+  height: 120px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -118,15 +128,16 @@ function isPromotionApplied(promotion: Promotion) {
   border: 2px solid #ff9800;
   border-radius: 10px;
   cursor: pointer;
-  padding: 20px 0;
+  padding: 10px 0;
 }
 
 .promotion-card.applied-promotion {
-  border: 2px solid #42a5f5;
+  border: 2px solid #C5C5C5;
 }
 
 .v-card-title {
   text-align: center;
+  font-size: 80%; /* Adjusted font size */
 }
 
 .v-card-actions {
@@ -136,7 +147,7 @@ function isPromotionApplied(promotion: Promotion) {
 
 .text-center {
   text-align: center;
-  font-size: 95%;
+  font-size: 85%;
   font-weight: bold;
 }
 
@@ -154,14 +165,23 @@ function isPromotionApplied(promotion: Promotion) {
 .center-btn-container {
   display: flex;
   justify-content: center;
-  margin-top: 10px;
+  margin-top: 5px;
 }
 
 .btn-apply-promotion {
   background-color: #ff9800;
   color: black;
   font-weight: bold;
-  padding: 5px 10px;
+  padding: 3px 8px;
+  width: 100%;
+  border-radius: 20px;
+}
+
+.btn-applied-promotion {
+  background-color: #C5C5C5;
+  color: white;
+  font-weight: bold;
+  padding: 3px 8px;
   width: 100%;
   border-radius: 20px;
 }
@@ -170,3 +190,4 @@ function isPromotionApplied(promotion: Promotion) {
   word-wrap: break-word;
 }
 </style>
+

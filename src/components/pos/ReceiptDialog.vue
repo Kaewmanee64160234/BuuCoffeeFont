@@ -21,11 +21,11 @@ const printReceipt = () => {
 };
 
 const formattedDate = computed(() => {
-  return dayjs(posStore.currentReceipt?.createdDate).format('DD MMM YYYY');
+  return dayjs(posStore.currentReceipt?.createdDate).format('DD/MM/YYYY');
 });
 
 const formattedTime = computed(() => {
-  return dayjs(posStore.currentReceipt?.createdDate).format('HH:mm:ss');
+  return dayjs(posStore.currentReceipt?.createdDate).format('HH:mm');
 });
 </script>
 
@@ -35,40 +35,43 @@ const formattedTime = computed(() => {
       <v-card-text ref="receiptContent">
         <div class="receipt-content" id="printableArea">
           <div class="receipt-header text-center">
-            <h1>Buu Library</h1>
+            <h4 class="header-text">Buu Library</h4>
             <div class="dashed-line"></div>
-            <p>Queue: {{ posStore.currentReceipt?.receiptId }}</p>
-            <p>Staff: {{ posStore.currentReceipt?.user?.userName }}</p>
-            <p>
+            <div class="d-flex justify-space-between">
+              <p style="text-align: start">Queue: {{ posStore.currentReceipt?.receiptId }}</p>
+              <p style="text-align: start">#{{ posStore.currentReceipt?.receiptId }}</p>
+            </div>
+            <p style="text-align: start">Staff: {{ posStore.currentReceipt?.user?.userName }}</p>
+            <p style="text-align: start">
               Guests: {{
                 posStore.currentReceipt?.customer === null
                   ? "guest"
                   : posStore.currentReceipt?.customer?.customerName
               }}
             </p>
-            <p>Date: {{ formattedDate }}</p>
-            <p>Time: {{ formattedTime }}</p>
+            <div class="d-flex justify-space-between">
+              <p style="text-align: start">Date: {{ formattedDate }}</p>
+              <p style="text-align: start">Time: {{ formattedTime }}</p>
+            </div>
+
             <div class="dashed-line"></div>
           </div>
           <div class="receipt-body">
-            <h2 class="text-center">Receipt</h2>
-            <div
-              v-for="item in posStore.currentReceipt?.receiptItems"
-              :key="item.receiptItemId"
-              class="receipt-item"
-            >
+            <h4 class="text-center">Receipt</h4>
+            <div v-for="item in posStore.currentReceipt?.receiptItems" :key="item.receiptItemId" class="receipt-item">
               <div class="item-details">
-                <div class="item-info">
-                  <p class="product-name">{{ item.quantity }} x {{ item.product?.productName }}</p>
-                  <p class="product-price">{{ item.product?.productPrice }} ฿</p>
+                <div class="item-info d-flex justify-space-between ">
+                  <p class="product-name">{{ item.quantity }} x {{ item.product?.productName }} {{
+                    item.product?.category.haveTopping ? item.productType?.productTypeName : '' }}</p>
+                  <p class="product-price">{{ item.receiptSubTotal.toFixed(2) }} ฿</p>
                 </div>
               </div>
+              <p class="toppings" v-if="item.product?.category.haveTopping">
+                ความหวาน {{ item.sweetnessLevel }}%
+              </p>
               <p v-if="item.productTypeToppings.length > 0" class="toppings">
-                <span
-                  v-for="topping in item.productTypeToppings"
-                  :key="topping.productTypeToppingId"
-                >
-                  1x {{ topping.topping.toppingName }} ({{ topping.quantity }})
+                <span v-for="topping in item.productTypeToppings" :key="topping.productTypeToppingId">
+                  {{ topping.quantity }}x {{ topping.topping.toppingName }} <br>
                 </span>
               </p>
             </div>
@@ -76,14 +79,16 @@ const formattedTime = computed(() => {
           <div class="dashed-line"></div>
           <div class="receipt-summary">
             <p>Items: {{ posStore.currentReceipt?.receiptItems.length }}</p>
-            <p
-              v-for="promotion in posStore.currentReceipt?.receiptPromotions"
-              :key="promotion.promotion.promotionId"
-            >
-              Promotion: {{ promotion.promotion.promotionName }} - {{
-                promotion.discount
-              }} ฿
-            </p>
+            <p>Promotions:</p>
+            <div v-if="posStore.currentReceipt?.receiptNetPrice" class="promotion">
+              <div class="d-flex justify-space-between toppings"
+                v-for="promotion in posStore.currentReceipt?.receiptPromotions" :key="promotion.promotion.promotionId">
+                <p>{{ promotion.promotion.promotionName }}</p>
+                <p> {{ promotion.discount }} ฿</p>
+              </div>
+            </div>
+
+
 
             <p class="total">
               Total:
@@ -102,6 +107,8 @@ const formattedTime = computed(() => {
           <div class="receipt-footer text-center">
             <p>{{ posStore.currentReceipt?.paymentMethod?.toUpperCase() }}</p>
           </div>
+          <div class="dashed-line"></div>
+
         </div>
       </v-card-text>
       <v-card-actions class="justify-center">
@@ -112,16 +119,26 @@ const formattedTime = computed(() => {
   </v-dialog>
 </template>
 
-
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Playwrite+NL:wght@100..400&display=swap');
+
+.header-text {
+  font-family: 'Playwrite NL', sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  padding-bottom: 10px;
+
+}
+
 .receipt-content {
-  width: 100%;
-  max-width: 57mm;
+  width: 57mm;
   margin: 0 auto;
   padding: 20px;
-  background-color: #f9f9f9;
+  background-color: #fff;
+  border: 1px solid #ccc;
   border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
 }
 
 .receipt-header,
@@ -157,23 +174,9 @@ const formattedTime = computed(() => {
 }
 
 .item-details {
-  display: flex;
-  align-items: center;
+  /* display: flex;
+  align-items: center; */
   margin-bottom: 5px;
-}
-
-.product-image {
-  width: 50px;
-  height: 50px;
-  border-radius: 5px;
-  object-fit: cover;
-  margin-right: 10px;
-}
-
-.item-info {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
 }
 
 .product-name {
@@ -205,9 +208,12 @@ const formattedTime = computed(() => {
   body * {
     visibility: hidden;
   }
-  #printableArea, #printableArea * {
+
+  #printableArea,
+  #printableArea * {
     visibility: visible;
   }
+
   #printableArea {
     position: absolute;
     left: 0;

@@ -31,7 +31,7 @@ function openToppingDialog() {
 
 
 <template>
-  <v-card  class="product-card" @click="handleAddToCart">
+  <v-card class="product-card" @click="handleAddToCart">
     <v-img class="product-image" 
       :src="`http://localhost:3000/products/${product.productId}/image`"
       :lazy-src="`http://localhost:3000/products/${product.productId}/image`" />
@@ -39,13 +39,11 @@ function openToppingDialog() {
   </v-card>
 </template>
 
-
-
 <style scoped>
 .product-card {
   border-radius: 10px;
   width: 100%;
-  max-width: 200px; /* Max width for the card */
+  max-width: 150px; /* Smaller max width for the card */
   height: auto;
   padding: 10px;
   cursor: pointer;
@@ -58,7 +56,7 @@ function openToppingDialog() {
 
 .product-image {
   width: 100%;
-  height: 150px;
+  height: 100px; /* Smaller height for the image */
   object-fit: cover;
   border-radius: 10px;
 }
@@ -68,6 +66,6 @@ function openToppingDialog() {
   width: 100%;
   font-weight: bold;
   color: black;
+  font-size: 14px; /* Smaller font size */
 }
 </style>
-

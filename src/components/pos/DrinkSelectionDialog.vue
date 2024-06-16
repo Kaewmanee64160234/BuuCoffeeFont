@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="posStore.toppingDialog" max-width="600">
+  <v-dialog v-model="posStore.toppingDialog" max-width="650">
     <v-card v-if="productStore.selectedProduct">
       <v-card-title class="d-flex justify-space-between align-center">
         <div></div>
@@ -13,8 +13,8 @@
       <v-card-text>
         <v-row>
           <v-col class="d-flex justify-center align-center" style="width: 200px; height: 200px;">
-            <v-img :src="`http://localhost:3000/products/${productStore.selectedProduct.productId}/image`"
-              class="product-image"></v-img>
+            <img :src="`http://localhost:3000/products/${productStore.selectedProduct.productId}/image`"
+              class="product-image" />
           </v-col>
           <v-col>
             <v-row>
@@ -53,36 +53,31 @@
             </div>
             <div class="d-flex flex-column mt-4">
               <span>ท็อปปิ้ง</span>
-              <div class="topping-container d-flex align-center">
-                <v-btn size="x-small" icon @click="prevTopping">
-                  <v-icon>mdi-chevron-left</v-icon>
-                </v-btn>
-                <div class="d-flex justify-space-between flex-grow-1 ma-3">
-                  <div v-for="topping in displayedToppings" :key="topping.toppingId"
-                    class="topping-item d-flex flex-column align-center">
-                    <v-chip variant="outlined"
-                      :color="selectedToppings.some(t => t.topping.toppingId === topping.toppingId) ? '#f5a623' : 'gray'"
-                      @click="toggleTopping(topping)" class="chip">
-                      {{ topping.toppingName }} {{ topping.toppingPrice }}
-                    </v-chip>
-                    <div v-if="selectedToppings.some(t => t.topping.toppingId === topping.toppingId)"
-                      class="quantity-controls d-flex align-center mt-2">
-                      <v-btn size="small" icon @click="decreaseToppingQuantity(topping)">
-                        <v-icon>mdi-minus</v-icon>
-                      </v-btn>
-                      <span>{{ selectedToppings.find(t => t.topping.toppingId === topping.toppingId)?.quantity }}</span>
-                      <v-btn size="small" icon @click="increaseToppingQuantity(topping)">
-                        <v-icon>mdi-plus</v-icon>
-                      </v-btn>
+              <v-carousel hide-delimiters height="80">
+                <v-carousel-item v-for="(toppingGroup, index) in toppingGroups" :key="index">
+                  <div class="d-flex justify-center">
+                    <div v-for="topping in toppingGroup" :key="topping.toppingId"
+                      class="topping-item d-flex flex-column align-center mx-4">
+                      <v-chip variant="outlined"
+                        :color="selectedToppings.some(t => t.topping.toppingId === topping.toppingId) ? '#f5a623' : 'gray'"
+                        @click="toggleTopping(topping)" class="chip">
+                        {{ topping.toppingName }} {{ topping.toppingPrice }}
+                      </v-chip>
+                      <div v-if="selectedToppings.some(t => t.topping.toppingId === topping.toppingId)"
+                        class="quantity-controls d-flex align-center mt-2">
+                        <v-btn size="xs-small" icon @click="decreaseToppingQuantity(topping)">
+                          <v-icon  size="small">mdi-minus</v-icon>
+                        </v-btn>
+                        <span>{{ selectedToppings.find(t => t.topping.toppingId === topping.toppingId)?.quantity }}</span>
+                        <v-btn size="xs-small" icon @click="increaseToppingQuantity(topping)">
+                          <v-icon size="small">mdi-plus</v-icon>
+                        </v-btn>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <v-btn size="x-small" icon @click="nextTopping">
-                  <v-icon>mdi-chevron-right</v-icon>
-                </v-btn>
-              </div>
+                </v-carousel-item>
+              </v-carousel>
             </div>
-
           </div>
         </div>
       </v-card-text>
@@ -90,9 +85,10 @@
         <v-row class="justify-center align-center w-100">
           <v-col class="d-flex justify-center align-center">
             <div class="quantity-container d-flex justify-space-between align-center">
-              <v-btn variant="elevated" color="#C5C5C5" click="decreaseQuantity" icon="mdi-minus"></v-btn>
+              <p class="pa-2">จำนวนสินค้า</p>
+              <v-btn variant="elevated" color="#C5C5C5" @click="decreaseQuantity()" icon="mdi-minus"></v-btn>
               <span class="mx-2">{{ quantity }}</span>
-              <v-btn variant="elevated" color="#FF9642" @click="increaseQuantity" icon="mdi-plus"></v-btn>
+              <v-btn variant="elevated" color="#FF9642" @click="increaseQuantity()" icon="mdi-plus"></v-btn>
             </div>
           </v-col>
           <v-col class="d-flex justify-center align-center">
@@ -120,14 +116,19 @@ const toppingStore = useToppingStore();
 const selectedType = ref<ProductType | null>(null);
 const selectedSweetness = ref<number>(100);
 const selectedToppings = ref<Array<{ topping: Topping; quantity: number }>>([]);
+  const productTypeToppings = ref<ProductTypeTopping[]>([]);
+
 const quantity = ref<number>(1);
-const toppingIndex = ref<number>(0);
-const productTypeToppings = ref<ProductTypeTopping[]>([]);
 const showAlert = ref<boolean>(false);
 
 const sweetnessLevels = [0, 25, 50, 75, 100];
-const displayedToppings = computed(() => {
-  return toppingStore.toppings.slice(toppingIndex.value, toppingIndex.value + 5);
+
+const toppingGroups = computed(() => {
+  const groups = [];
+  for (let i = 0; i < toppingStore.toppings.length; i += 4) {
+    groups.push(toppingStore.toppings.slice(i, i + 4));
+  }
+  return groups;
 });
 
 function selectType(type: ProductType) {
@@ -148,6 +149,16 @@ function toggleTopping(topping: Topping) {
   }
 }
 
+function decreaseQuantity() {
+  if (quantity.value > 1) {
+    quantity.value--;
+  }
+}
+
+function increaseQuantity() {
+  quantity.value++;
+}
+
 function increaseToppingQuantity(topping: Topping) {
   const toppingItem = selectedToppings.value.find((t) => t.topping.toppingId === topping.toppingId);
   if (toppingItem) {
@@ -160,28 +171,10 @@ function decreaseToppingQuantity(topping: Topping) {
   if (toppingItem && toppingItem.quantity > 1) {
     toppingItem.quantity--;
   }
-}
-
-function prevTopping() {
-  if (toppingIndex.value > 0) {
-    toppingIndex.value--;
+  if (toppingItem && toppingItem.quantity === 1) {
+    const index = selectedToppings.value.findIndex((t) => t.topping.toppingId === topping.toppingId);
+    selectedToppings.value.splice(index, 1);
   }
-}
-
-function nextTopping() {
-  if (toppingIndex.value < toppingStore.toppings.length - 5) {
-    toppingIndex.value++;
-  }
-}
-
-function decreaseQuantity() {
-  if (quantity.value > 1) {
-    quantity.value--;
-  }
-}
-
-function increaseQuantity() {
-  quantity.value++;
 }
 
 function closeDialog() {
@@ -221,7 +214,6 @@ function clearData() {
   selectedSweetness.value = 0;
   selectedToppings.value = [];
   quantity.value = 1;
-  toppingIndex.value = 0;
   productStore.selectedProduct = null;
   productTypeToppings.value = [];
 }
@@ -246,9 +238,9 @@ watch(
 }
 
 .product-image {
-  width: 150px;
+  width: 130px;
   height: auto;
-  border-radius: 10px;
+  border-radius: 50%;
   object-fit: cover;
 }
 
@@ -286,8 +278,6 @@ watch(
 .text-center {
   text-align: center;
 }
-
-
 
 .active {
   background-color: #f5a623;

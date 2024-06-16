@@ -27,6 +27,7 @@ export interface Receipt {
   receiptTotalDiscount: number;
   receiptNetPrice: number;
   receiptStatus: string;
+  queueNumber: number;
   customer?: Customer;
   user?: User;
   receiptItems: ReceiptItem[];

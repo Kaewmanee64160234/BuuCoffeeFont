@@ -40,7 +40,7 @@ export const usePosStore = defineStore("pos", () => {
   const productStore = useProductStore();
   const receiptDialog = ref(false);
   const customerStore = useCustomerStore();
-
+  let queueNumber = 1;
   const addToReceipt = (
     product: Product,
     productType: ProductType,
@@ -140,12 +140,15 @@ export const usePosStore = defineStore("pos", () => {
           receiptSubTotal: productPrice * parsedQuantity,
           product,
           sweetnessLevel: sweetness,
-          productType:productType,
+          productType: productType,
         });
       }
     }
     console.log("last", selectedItems.value[selectedItems.value.length - 1]);
     receipt.value.receiptTotalPrice = calculateTotal(selectedItems.value);
+    if (receipt.value.receiptTotalDiscount === 0) {
+      receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice;
+    }
   };
   const calculateTotal = (selectedItems: ReceiptItem[]) => {
     receipt.value.receiptTotalPrice = 0;
@@ -198,6 +201,8 @@ export const usePosStore = defineStore("pos", () => {
     receipt.value.receiptType = "coffee";
     receipt.value.receiptStatus = "pending";
     receipt.value.createdDate = new Date();
+    receipt.value.queueNumber = queueNumber;
+    queueNumber++;
     if (receipt.value.receiptTotalDiscount === 0) {
       receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice;
     }
