@@ -31,6 +31,7 @@ const filteredUsers = computed(() => {
     user.userName.toLowerCase().includes(userStore.searchQuery.toLowerCase())
   );
 });
+
 </script>
 
 <template>
@@ -61,7 +62,7 @@ const filteredUsers = computed(() => {
             <v-col class="mt-4" cols="3" width="30%">
               <v-btn color="success" @click="addUserDialog = true">
                 <v-icon left>mdi-plus</v-icon>
-                Add New User
+                เพิ่มผู้ใช้งาน
               </v-btn>
             </v-col>
           </v-row>

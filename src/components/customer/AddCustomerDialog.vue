@@ -1,3 +1,64 @@
+<script lang="ts" setup>
+import { ref } from 'vue';
+import { useCustomerStore } from '../../stores/customer.store';
+import type { VForm } from 'vuetify/components';
+import Swal from 'sweetalert2';
+
+const form = ref<VForm | null>(null);
+
+const customerName = ref('');
+const customerPhone = ref('');
+const customerStore = useCustomerStore();
+
+const rules = {
+  required: (value: string) => !!value || 'กรุณากรอกข้อมูล',
+  alpha: (value: string) => /^[a-zA-Zก-๙\s]+$/.test(value) || 'กรุณากรอกชื่อเป็นตัวอักษรเท่านั้น',
+  phoneNumber: (value: string) => {
+    const phoneRegex = /^0\d{9}$/;
+    return phoneRegex.test(value) || 'กรุณากรอกเบอร์โทรศัพท์ที่ถูกต้อง (ขึ้นต้นด้วย 0 และมี 10 หลัก)';
+  }
+};
+
+// close Dialog 
+function close() {
+  customerStore.openDialogRegisterCustomer = false;
+  // clear data
+  customerName.value = '';
+  customerPhone.value = '';
+}
+
+async function saveCustomer() {
+  const { valid } = await form.value!.validate();
+  if (valid) {
+    try {
+      await customerStore.createCustomer({
+        customerId: 0,
+        customerName: customerName.value,
+        customerPhone: customerPhone.value,
+        customerNumberOfStamp: 0, // New customer starts with 1 point
+        createMemberDate: new Date(),
+      });
+      await customerStore.getAllCustomers(); // Refresh customer list
+      close();
+      Swal.fire({
+        title: 'สำเร็จ!',
+        text: 'ลูกค้าได้ถูกบันทึกแล้ว',
+        icon: 'success',
+        confirmButtonText: 'ตกลง'
+      });
+    } catch (error) {
+      console.error('Error saving customer:', error);
+      Swal.fire({
+        title: 'เกิดข้อผิดพลาด',
+        text: 'เกิดข้อผิดพลาดขณะบันทึกลูกค้า',
+        icon: 'error',
+        confirmButtonText: 'ตกลง'
+      });
+    }
+  }
+}
+</script>
+
 <template>
   <v-dialog v-model="customerStore.openDialogRegisterCustomer" max-width="800px">
     <v-card>
@@ -36,54 +97,6 @@
     </v-card>
   </v-dialog>
 </template>
-
-<script lang="ts" setup>
-import { ref } from 'vue';
-import { useCustomerStore } from '../../stores/customer.store';
-import type { VForm } from 'vuetify/components';
-
-const form = ref<VForm | null>(null);
-
-const customerName = ref('');
-const customerPhone = ref('');
-const customerStore = useCustomerStore();
-
-const rules = {
-  required: (value: string) => !!value || 'กรุณากรอกข้อมูล',
-  alpha: (value: string) => /^[a-zA-Zก-๙\s]+$/.test(value) || 'กรุณากรอกชื่อเป็นตัวอักษรเท่านั้น',
-  phoneNumber: (value: string) => {
-    const phoneRegex = /^0\d{9}$/;
-    return phoneRegex.test(value) || 'กรุณากรอกเบอร์โทรศัพท์ที่ถูกต้อง (ขึ้นต้นด้วย 0 และมี 10 หลัก)';
-  }
-};
-
-// close Dialog 
-function close() {
-  customerStore.openDialogRegisterCustomer = false;
-  // clear data
-  customerName.value = '';
-  customerPhone.value = '';
-}
-
-async function saveCustomer() {
-  const { valid } = await form.value!.validate();
-  if (valid) {
-    try {
-      await customerStore.createCustomer({
-        customerId: 0,
-        customerName: customerName.value,
-        customerPhone: customerPhone.value,
-        customerNumberOfStamp: 0, // New customer starts with 1 point
-        createMemberDate: new Date(),
-      });
-      await customerStore.getAllCustomers(); // Refresh customer list
-      close();
-    } catch (error) {
-      console.error('Error saving customer:', error);
-    }
-  }
-}
-</script>
 
 <style scoped>
 </style>

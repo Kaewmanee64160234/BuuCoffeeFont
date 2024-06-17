@@ -379,11 +379,11 @@ const submitForm = async () => {
     }
 
     closeDialog();
-    showSuccessDialog('Product updated successfully!');
+    showSuccessDialog('แก้ไขสินค้าเสร็จสิ้น!');
     // reload page
   } catch (error) {
     console.error('Error updating product:', error);
-    Swal.fire('Error', 'An error occurred while updating the product.', 'error');
+    Swal.fire('เกิดข้อผิดพลาด', 'เกิดข้อผิดพลาดขณะแก้ไขสินค้า');
   }
 };
 
@@ -417,10 +417,10 @@ const closeDialog = () => {
 
 const showSuccessDialog = (message: string) => {
   Swal.fire({
-    title: 'Success!',
+    title: 'สำเร็จ!',
     text: message,
     icon: 'success',
-    confirmButtonText: 'OK'
+    confirmButtonText: 'ตกลง'
   });
 };
 

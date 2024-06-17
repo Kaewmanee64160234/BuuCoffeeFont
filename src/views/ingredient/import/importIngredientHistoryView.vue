@@ -7,7 +7,8 @@ const router = useRouter();
 onMounted(async () => {
     await ingredientStore.getAllHistoryImportIngredients();
 });
-
+const showDetail = () => {
+};
 
 const navigateTo = (routeName: string) => {
     router.push({ name: routeName });
@@ -22,6 +23,7 @@ const formatDate = (date: any) => {
 </script>
 
 <template>
+
     <v-container>
         <v-card>
             <v-card-title>
@@ -69,7 +71,7 @@ const formatDate = (date: any) => {
         <td>{{ item.discount }}</td>
         <td>{{ item.user.userName }}</td>
         <td>
-            <v-btn color="#FFDD83" class="mr-2" icon="mdi-pencil">ดู</v-btn>
+            <v-btn color="#FFDD83" class="mr-2" icon="mdi-pencil"@click="showDetail(item.importingredientitem)">ดู</v-btn>
         </td>
     </tr>
 </tbody>
