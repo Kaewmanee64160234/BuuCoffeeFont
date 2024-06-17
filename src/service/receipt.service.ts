@@ -15,11 +15,11 @@ function updateReceipt(id: number, receipt: Receipt) {
   return http.put(`/receipts/${id}`, receipt);
 }
 function deleteReceipt(id: number) {
-  return http.delete(`/receipts/${id}`);
+  return http.delete(`/receipts/cancel/${id}`);
 }
 // cancelReceipt
 function cancelReceipt(id: number) {
-  return http.put(`/receipts/cancel/${id}`);
+  return http.delete(`/receipts/cancel/${id}`);
 }
 
 // in-30-min getRecieptIn30Min

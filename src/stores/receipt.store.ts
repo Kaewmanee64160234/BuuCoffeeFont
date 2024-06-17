@@ -62,8 +62,21 @@ export const useReceiptStore = defineStore("receipt", () => {
     } catch (error) {
       console.error(error);
     }
-  };
 
+
+  };
+// cancelReceipt
+  const cancelReceipt = async (id: number) => {
+    try {
+      const response = await receiptService.cancelReceipt(id);
+      if (response.status === 200) {
+        await getRecieptIn30Min();
+      }
+      return response;
+    } catch (error) {
+      console.error(error);
+    }
+  }
   return {
     receipts,
     receipt,
@@ -73,6 +86,7 @@ export const useReceiptStore = defineStore("receipt", () => {
     searchQuery,
     historyReceiptDialog,
     filteredReceipts,
-    getRecieptIn30Min
+    getRecieptIn30Min,
+    cancelReceipt
   };
 });

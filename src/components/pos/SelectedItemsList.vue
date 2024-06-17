@@ -1,6 +1,9 @@
 <template>
+  <ReceiptDetailsDialogPos/>
+
   <div class="h-screen app">
     <AddCustomerDialog />
+
     <v-window v-model="step" transition="fade" class="h-screen">
       <v-window-item :value="1" class="full-height">
         <div class="content-container">
@@ -231,7 +234,6 @@
       </v-window-item>
     </v-window>
   </div>
-  <ReceiptDetailsDialogPos/>
 </template>
 
 <script lang="ts" setup>
