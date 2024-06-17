@@ -26,6 +26,7 @@ function chunkPromotions() {
 
 onMounted(async () => {
   console.log("Fetching promotions...");
+  await promotionStore.getAllPromotions(); // Fetch all promotions from the store
   console.log("Fetched Promotions:", promotionStore.promotions); 
   chunkPromotions(); 
   await nextTick(); 
@@ -35,7 +36,7 @@ onMounted(async () => {
 watch(() => promotionStore.promotions, () => {
   console.log("Promotions updated:", promotionStore.promotions); // Debugging log
   chunkPromotions();
-}, { immediate: true });
+});
 
 function applyPromotion(promotion: Promotion) {
   if (posStore.selectedItems.length === 0) {

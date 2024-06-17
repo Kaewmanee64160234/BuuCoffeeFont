@@ -24,6 +24,7 @@ const productFilters = ref<Product[]>();
 const searchQuery = ref('');
 const customerStore = useCustomerStore();
 onMounted(async () => {
+  promotionStore.promotions = []
   await productStore.getAllProducts();
   await categoryStore.getAllCategories();
   await toppingStore.getAllToppings();

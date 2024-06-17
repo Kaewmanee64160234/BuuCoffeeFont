@@ -190,14 +190,16 @@ function findCustomer() {
           <div>
             <div class="d-flex justify-space-between" style="padding-right: 60px;">
               <h3>รายละเอียดการสั่งซื้อ</h3>
-              <h3>#{{ posStore.currentReceipt?.queueNumber=== null ?   posStore.currentReceipt?.queueNumber+1 : posStore.queueNumber }}</h3>
+              <h3>#{{ posStore.currentReceipt?.queueNumber === null ? posStore.currentReceipt?.queueNumber + 1 :
+                posStore.queueNumber }}</h3>
 
             </div>
             <div class="pa-3" v-if="userStore.userRole !== 'พนักงานขายข้าว'">
               <div>
                 <p class="d-flex justify-space-between pr-10 my-2">
                   <span style="text-align: start;"> สมาชิก</span>
-                  <span style="text-align: end;color: black;">{{ posStore.receipt.customer?.customerName == null ? 'ไม่มี'
+                  <span style="text-align: end;color: black;">{{ posStore.receipt.customer?.customerName == null ?
+                    'ไม่มี'
                     : posStore.receipt.customer?.customerName }}</span>
                 </p>
               </div>
@@ -218,7 +220,8 @@ function findCustomer() {
                     append-inner-icon="mdi-magnify"></v-autocomplete>
                 </v-col>
                 <v-col cols="12" md="5" class="d-flex align-center justify-start">
-                  <v-btn class="mr-3" icon="mdi-account-plus" color="#ff9800" @click="openCreateCustomerDialog()"></v-btn>
+                  <v-btn class="mr-3" icon="mdi-account-plus" color="#ff9800"
+                    @click="openCreateCustomerDialog()"></v-btn>
                   <v-btn color="#ff9800" @click="openCreateCustomerDialog()">ประวัติการสั่งซื้อ</v-btn>
                 </v-col>
               </v-row>
@@ -260,7 +263,8 @@ function findCustomer() {
                             <ul>
                               <li style="font-weight: lighter;color: gray;font-size: 11px;"
                                 v-for="topping in item.productTypeToppings" :key="topping.topping.toppingId">
-                                x{{ topping.quantity }} {{ topping.topping.toppingName }}: {{ topping.topping.toppingPrice
+                                x{{ topping.quantity }} {{ topping.topping.toppingName }}: {{
+                                  topping.topping.toppingPrice
                                 }}.-
                               </li>
                             </ul>
@@ -284,7 +288,8 @@ function findCustomer() {
                 </v-list-item-group>
               </v-list>
             </div>
-            <div :class="userStore.userRole === 'พนักงานขายข้าว' ? 'summary-section-30' : 'summary-section-25'" style="width: 100%;">
+            <div :class="userStore.userRole === 'พนักงานขายข้าว' ? 'summary-section-30' : 'summary-section-25'"
+              style="width: 100%;">
               <v-divider></v-divider>
               <h3>สรุปรายการ</h3>
               <v-card-subtitle>โปรโมชั่น:</v-card-subtitle>
@@ -315,9 +320,9 @@ function findCustomer() {
           </div>
           <div class="footer-buttons">
             <v-row class="d-flex justify-center pr-6" style="width: 100%;">
-              <v-btn style="padding-right: 20px; width: 40%; margin-right: 10px;" color="secondary" rounded
+              <v-btn style="padding-right: 20px; width: 80%; margin-right: 10px;" color="#FF9642" rounded
                 @click="nextStep">ชำระเงิน</v-btn>
-              
+
             </v-row>
           </div>
         </div>
@@ -325,10 +330,10 @@ function findCustomer() {
       <v-window-item :value="2" class="full-height">
         <div class="content-container">
           <div class="title-detail">
-            <div class="d-flex justify-space-between pr-6">
+            <div class="d-flex justify-space-between" style="padding-right: 60px;">
               <h3>รายละเอียดการสั่งซื้อ</h3>
-              <h3>#{{ posStore.currentReceipt?.queueNumber=== null ?   posStore.currentReceipt?.queueNumber+1 : posStore.queueNumber }}</h3>
-
+              <h3>#{{ posStore.currentReceipt?.queueNumber === null ? posStore.currentReceipt?.queueNumber + 1 :
+                posStore.queueNumber }}</h3>
             </div>
 
             <div class="pa-3" v-if="userStore.userRole !== 'พนักงานขายข้าว'">
@@ -365,17 +370,23 @@ function findCustomer() {
             <v-divider></v-divider>
           </div>
           <div class="payment-method">
-            <h3>เลือกวิธีชำระเงิน</h3>
-            <div class="d-flex align-center justify-center py-4">
-              <v-btn :class="{ 'selected': posStore.receipt.paymentMethod === 'cash' }" class="payment-button"
-                variant="outlined" style="color: black;" @click="selectPaymentMethod('cash')">
-                เงินสด
-              </v-btn>
-              <v-btn :class="{ 'selected': posStore.receipt.paymentMethod === 'qrcode' }" class="payment-button"
-                variant="outlined" style="color: black;" @click="selectPaymentMethod('qrcode')">
-                แสกนจ่าย
-              </v-btn>
-            </div>
+            <v-row class="pa-3">
+              <h3>เลือกวิธีชำระเงิน</h3>
+              <div class="mt-2" >
+
+                <v-btn :class="{ 'selected': posStore.receipt.paymentMethod === 'cash' }" class="payment-button"
+                  variant="outlined" style="color: black;" @click="selectPaymentMethod('cash')">
+                  เงินสด
+                </v-btn>
+                <v-btn :class="{ 'selected': posStore.receipt.paymentMethod === 'qrcode' }" class="payment-button"
+                  variant="outlined" style="color: black;" @click="selectPaymentMethod('qrcode')">
+                  แสกนจ่าย
+                </v-btn>
+
+              </div>
+            </v-row>
+
+
           </div>
           <v-divider></v-divider>
           <div class="summary-section-2" style="width: 100%;padding: 20px;">
@@ -417,7 +428,7 @@ function findCustomer() {
                     </p>
                   </div>
                   <v-divider></v-divider>
-                  <v-row class="pt-1">
+                  <v-row class="pt-4">
                     <v-col>
                       <h3>ราคาสุทธิ</h3>
                     </v-col>
@@ -425,7 +436,6 @@ function findCustomer() {
                       <h3>{{ posStore.receipt.receiptNetPrice.toFixed(2) }}</h3>
                     </v-col>
                   </v-row>
-                  
                 </div>
               </div>
             </div>
@@ -457,13 +467,15 @@ function findCustomer() {
 }
 
 .title-detail {
-  max-height: 30%;
-  height: 60px;
-
+  max-height: 40%;
 }
 
 .payment-method {
-  max-height: 25%;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  max-height: 30%;
+  /* height: 60px; */
+
 }
 
 .summary-section-2 {
@@ -563,7 +575,8 @@ function findCustomer() {
 .content-container {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 56px); /* Adjust the height based on your app bar or other elements */
+  height: calc(100vh - 56px);
+  /* Adjust the height based on your app bar or other elements */
 }
 
 .footer-buttons {
@@ -572,5 +585,3 @@ function findCustomer() {
   width: 100%;
 }
 </style>
-
-
