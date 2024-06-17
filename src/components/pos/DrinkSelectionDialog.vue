@@ -8,7 +8,7 @@
         </v-btn>
       </v-card-title>
       <v-alert v-if="showAlert" type="error" dismissible @input="showAlert = false">
-        Please select a product type before confirming.
+        กรุณาเลือกประเภทสินค้า
       </v-alert>
       <v-card-text>
         <v-row>
@@ -116,7 +116,7 @@ const toppingStore = useToppingStore();
 const selectedType = ref<ProductType | null>(null);
 const selectedSweetness = ref<number>(100);
 const selectedToppings = ref<Array<{ topping: Topping; quantity: number }>>([]);
-  const productTypeToppings = ref<ProductTypeTopping[]>([]);
+const productTypeToppings = ref<ProductTypeTopping[]>([]);
 
 const quantity = ref<number>(1);
 const showAlert = ref<boolean>(false);
@@ -179,7 +179,6 @@ function decreaseToppingQuantity(topping: Topping) {
 
 function closeDialog() {
   posStore.toppingDialog = false;
-
   clearData();
 }
 

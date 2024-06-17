@@ -16,8 +16,8 @@ export const useUserStore = defineStore("user", () => {
   const user = ref<User | null>(null);
   const searchQuery = ref<string>("");
   const updateUserDialog = ref(false);
-  const userRole = ref("พนักงานขายข้าว");
-  // const userRole = ref("พนักงานขายกาแฟ");
+  // const userRole = ref("พนักงานขายข้าว");
+  const userRole = ref("พนักงานขายกาแฟ");
   function setUser(user: User) {
     currentUser.value = { ...user };
     localStorage.setItem('user', JSON.stringify(user));

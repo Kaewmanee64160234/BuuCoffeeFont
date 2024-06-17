@@ -7,7 +7,6 @@ import { onMounted } from 'vue';
 const props = defineProps<{ product: Product }>();
 const productStore = useProductStore();
 const posStore = usePosStore();
-const url = import.meta.env.VITE_API_URL;
 
 onMounted(() => {
   productStore.setSelectedProduct(props.product);
@@ -23,12 +22,10 @@ function handleAddToCart() {
   console.log(props.product);
 }
 
-// Open topping dialog
 function openToppingDialog() {
   posStore.toppingDialog = true;
 }
 </script>
-
 
 <template>
   <v-card class="product-card" @click="handleAddToCart">
@@ -43,7 +40,7 @@ function openToppingDialog() {
 .product-card {
   border-radius: 10px;
   width: 100%;
-  max-width: 150px; /* Smaller max width for the card */
+  max-width: 150px;
   height: auto;
   padding: 10px;
   cursor: pointer;
@@ -51,12 +48,12 @@ function openToppingDialog() {
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  margin: 10px; /* Margin for spacing between cards */
+  margin: 10px;
 }
 
 .product-image {
   width: 100%;
-  height: 100px; /* Smaller height for the image */
+  height: 100px;
   object-fit: cover;
   border-radius: 10px;
 }
@@ -66,6 +63,6 @@ function openToppingDialog() {
   width: 100%;
   font-weight: bold;
   color: black;
-  font-size: 14px; /* Smaller font size */
+  font-size: 14px;
 }
 </style>
