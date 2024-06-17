@@ -77,6 +77,7 @@ export const useReceiptStore = defineStore("receipt", () => {
       console.error(error);
     }
   }
+  
   return {
     receipts,
     receipt,
