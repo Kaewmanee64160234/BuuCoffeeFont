@@ -10,6 +10,9 @@ function getAllIngredients(params: any) {
 function getAllHistoryImportIngredients() {
   return http.get("/importingredients");
 }
+function getAllHistoryCheckIngredients() {
+  return http.get("/checkingredients");
+}
 function createImportIngredients(ingredient: {
   importingredientitem: {
     ingredientId: number;
@@ -91,5 +94,6 @@ export default {
   updateIngredient,
   deleteIngredient,
   searchIngredientsByName,
-  getIngredientlow
+  getIngredientlow,
+  getAllHistoryCheckIngredients
 };
