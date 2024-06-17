@@ -72,7 +72,7 @@ export const useProductStore = defineStore("product", () => {
   watch(selectedCategory, (newCategory) => {
     console.log("selectedCategory", selectedCategory.value);
     if (newCategory) {
-      if (newCategory === "All") {
+      if (newCategory === "ทั้งหมด") {
         console.log("selectedCategory====");
         getProductPaginate();
       }

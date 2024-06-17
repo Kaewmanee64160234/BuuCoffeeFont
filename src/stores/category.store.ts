@@ -15,7 +15,7 @@ export const useCategoryStore = defineStore("category", () => {
   const updateCategoryDialog = ref(false);
 
   watch(selectedCategory, async (value) => {
-    if (value === "All") {
+    if (value === "ทั้งหมด") {
       await productStore.getProductPaginate();
     } else {
       productStore.getProductsByCategory(value);
@@ -43,7 +43,7 @@ export const useCategoryStore = defineStore("category", () => {
         // push category All
         categories.value.push({
           categoryId: 0,
-          categoryName: "All",
+          categoryName: "ทั้งหมด",
           haveTopping: false,
         });
         // pop last category out

@@ -76,7 +76,7 @@ function getButtonClass(promotion: Promotion) {
 
 <template>
   <v-carousel hide-delimiter-background hide-delimiters height="180" style="background-color: #80715E; border-radius: 20px;">
-    <v-carousel-item v-for="(chunk, index) in promotionChunks" :key="chunk[index].promotionId">
+    <v-carousel-item v-for="(chunk, index) in promotionChunks" :key="index">
       <div class="promotion-group">
         <div class="promotion-container">
           <v-card v-for="promotion in chunk" :key="promotion.promotionId" class="promotion-card"
