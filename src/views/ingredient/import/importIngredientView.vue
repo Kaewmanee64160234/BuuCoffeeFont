@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, watch, onMounted } from 'vue';
 import { useIngredientStore } from '@/stores/Ingredient.store';
-
+import Swal from 'sweetalert2';
 const ingredientStore = useIngredientStore();
 const searchQuery = ref('');
 
@@ -29,6 +29,42 @@ const rules = {
   required: (value: any) => !!value || 'กรุณากรอกข้อมูล',
   name: (value: string) => /^[A-Za-zก-ฮ\s]+$/.test(value) || 'ชื่อหมวดหมู่ต้องเป็นตัวอักษรเท่านั้น',
   number: (value: any) => /^[0-9]+$/.test(value) || 'กรุณากรอกข้อมูลเป็นตัวเลข'
+};
+const confirmSave = () => {
+  return Swal.fire({
+    title: 'คุณแน่ใจหรือไม่?',
+    text: 'คุณต้องการที่จะบันทึกข้อมูลนี้หรือไม่?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'ใช่, บันทึกข้อมูล',
+    cancelButtonText: 'ไม่, ยกเลิก',
+    reverseButtons: true
+  }).then((result) => {
+    if (result.isConfirmed) {
+      saveData(); 
+      return true; 
+    }
+    return false; 
+  });
+};
+
+const saveData = () => {
+  ingredientStore.saveImportData(); 
+  Swal.fire('บันทึกข้อมูลสำเร็จ!', '', 'success');
+};
+
+const saveAndClearForm = async () => {
+  const confirmed = await confirmSave();
+  if (confirmed) {
+    resetForm();
+  }
+};
+
+const resetForm = () => {
+  ingredientStore.ingredientList = []; 
+  ingredientStore.store = ""; 
+  ingredientStore.discount = 0; 
+  ingredientStore.total = 0;
 };
 </script>
 
@@ -149,10 +185,10 @@ const rules = {
             </v-row>
             <v-row>
               <v-col>
-                <v-btn @click="ingredientStore.saveImportData" color="orange">
-                  <v-icon left>mdi-plus</v-icon>
-                  บันทึกข้อมูล
-                </v-btn>
+                <v-btn @click="saveAndClearForm " color="orange">
+    <v-icon left>mdi-plus</v-icon>
+    บันทึกข้อมูล
+  </v-btn>
               </v-col>
             </v-row>
           </v-col>
