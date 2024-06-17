@@ -29,7 +29,7 @@ onMounted(async () => {
   await categoryStore.getAllCategories();
   await toppingStore.getAllToppings();
   await customerStore.getAllCustomers();
-  if (userStore.userRole === "พนักงานขายข้าว") {
+  if (userStore.user?.userRole === "พนักงานขายข้าว") {
     promotionStore.getPromotionByType("ร้านกับข้าว");
     selectedCategory.value = "กับข้าว";
     const cate = categoryStore.categoriesForCreate.find(category => category.categoryName === "กับข้าว")
@@ -41,7 +41,9 @@ onMounted(async () => {
     selectedCategory.value = "กาแฟ";
     const cate = categoryStore.categoriesForCreate.findIndex(category => category.categoryName === "กับข้าว")
     categoryStore.categoriesForCreate.splice(cate, 1);
-    productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === "coffee".toLocaleLowerCase());
+ 
+   productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === "กาแฟ".toLocaleLowerCase());
+console.log("Filter", productFilters.value)
   }
 });
 watch(selectedCategory, async (newCategory) => {
@@ -54,14 +56,14 @@ watch(selectedCategory, async (newCategory) => {
 watch(searchQuery, async (newQuery) => {
   if (newQuery === '') {
     productFilters.value = [];
-    if (userStore.userRole === "พนักงานขายข้าว") {
+    if (userStore.user?.userRole === "พนักงานขายข้าว") {
       productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === selectedCategory.value.toLocaleLowerCase() && product.category.categoryName.toLocaleLowerCase() === 'กับข้าว'.toLocaleLowerCase());
     } else {
       productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === selectedCategory.value.toLocaleLowerCase() && product.category.categoryName.toLocaleLowerCase() !== 'กับข้าว'.toLocaleLowerCase());
     }
   } else {
     productFilters.value = [];
-    if (userStore.userRole === "พนักงานขายข้าว") {
+    if (userStore.user?.userRole === "พนักงานขายข้าว") {
       productFilters.value = productStore.products.filter(product => product.productName.toLocaleLowerCase().includes(newQuery.toLocaleLowerCase()) && product.category.categoryName.toLocaleLowerCase() === 'กับข้าว'.toLocaleLowerCase());
     } else {
       productFilters.value = productStore.products.filter(product => product.productName.toLocaleLowerCase().includes(newQuery.toLocaleLowerCase()) && product.category.categoryName.toLocaleLowerCase() !== 'กับข้าว'.toLocaleLowerCase());

@@ -24,16 +24,17 @@ function createImportIngredients(ingredient: {
 }) {
   return http.post("/importingredients", ingredient);
 }
-async function saveIngredient(ingredient: Ingredient & { files: File[] }) {
+async function saveIngredient(ingredient: Ingredient & { imageFile: File[] }) {
   const formData = new FormData();
   formData.append('ingredientName', ingredient.ingredientName || '');
   formData.append('ingredientSupplier', ingredient.ingredientSupplier || '');
   formData.append('ingredientMinimun', `${ingredient.ingredientMinimun}`);
   formData.append('ingredientUnit', ingredient.ingredientUnit || '');
   formData.append('ingredientQuantityPerUnit', `${ingredient.ingredientQuantityPerUnit || 0}`);
-  
-  if (ingredient.files && ingredient.files.length > 0) {
-    formData.append('ingredientImages', ingredient.files[0]);
+  formData.append('ingredientQuantityPerSubUnit', ingredient.ingredientQuantityPerSubUnit || '');
+
+  if (ingredient.imageFile && ingredient.imageFile.length > 0) {
+    formData.append('ingredientImages', ingredient.imageFile[0]);
   }
 
   return http.post("/ingredients", formData, {
@@ -43,17 +44,17 @@ async function saveIngredient(ingredient: Ingredient & { files: File[] }) {
   });
 }
 
-async function updateIngredient(id: number, ingredient: Ingredient & { files: File[] }) {
+async function updateIngredient(id: number, ingredient: Ingredient & { imageFile: File[] }) {
   const formData = new FormData();
   formData.append("ingredientName", ingredient.ingredientName || '');
   formData.append("ingredientSupplier", ingredient.ingredientSupplier || '');
   formData.append("ingredientMinimun", `${ingredient.ingredientMinimun || 0}`);
   formData.append("ingredientUnit", ingredient.ingredientUnit || '');
-  formData.append("ingredientQuantityInStock", `${ingredient.ingredientQuantityInStock}`);
   formData.append("ingredientQuantityPerUnit", `${ingredient.ingredientQuantityPerUnit || 0}`);
-  
-  if (ingredient.files && ingredient.files.length > 0) {
-    formData.append("file", ingredient.files[0]);
+  formData.append('ingredientQuantityPerSubUnit', ingredient.ingredientQuantityPerSubUnit || '');
+
+  if (ingredient.imageFile && ingredient.imageFile.length > 0) {
+    formData.append("imageFile", ingredient.imageFile[0]);
   }
 
   return await http.patch(`/ingredients/${id}`, formData, {

@@ -15,31 +15,32 @@ export const useIngredientStore = defineStore("ingredient", () => {
   const importingredients = ref<Importingredient[]>([]);
   const search = ref<string>("");
   const dialog = ref(false); // สถานะของ Dialog
-  const editedIngredient = ref<Ingredient & { files: File[] }>({
-    ingredientName: "",
-    ingredientSupplier: "",
+  const editedIngredient = ref<Ingredient>({
+    ingredientName: '',
+    ingredientSupplier: '',
     ingredientMinimun: 0,
-    ingredientUnit: "",
+    ingredientUnit: '',
     ingredientQuantityInStock: 0,
     ingredientQuantityPerUnit: 0,
-    ingredientQuantityPerSubUnit: "",
+    ingredientQuantityPerSubUnit: '',
     ingredientRemining: 0,
-    ingredientImage: "no_image.jpg",
-    files: [],
+    ingredientImage: 'no_image.jpg',
+    imageFile: [], // เพิ่ม imageFile ตามที่ระบุใน interface
   });
+  
   watch(dialog, (newDialog, oldDialog) => {
     if (!newDialog) {
       editedIngredient.value = {
-        ingredientName: "",
-        ingredientSupplier: "",
+        ingredientName: '',
+        ingredientSupplier: '',
         ingredientMinimun: 0,
-        ingredientUnit: "",
+        ingredientUnit: '',
         ingredientQuantityInStock: 0,
         ingredientQuantityPerUnit: 0,
-        ingredientQuantityPerSubUnit: "",
+        ingredientQuantityPerSubUnit: '',
         ingredientRemining: 0,
-        ingredientImage: "no_image.jpg",
-        files: [],
+        ingredientImage: 'no_image.jpg',
+        imageFile: [], // เพิ่ม imageFile ตามที่ระบุใน interface
       };
     }
   });
@@ -181,26 +182,29 @@ export const useIngredientStore = defineStore("ingredient", () => {
   async function saveIngredient() {
     loadingStore.isLoading = true;
     try {
+      let res;
       if (editedIngredient.value.ingredientId) {
-        const res = await ingredientService.updateIngredient(
+        res = await ingredientService.updateIngredient(
           editedIngredient.value.ingredientId,
           editedIngredient.value
         );
       } else {
-        const res = await ingredientService.saveIngredient(
+        res = await ingredientService.saveIngredient(
           editedIngredient.value
         );
       }
-      dialog.value = false;
+      dialog.value = false; // ปิด dialog หลังจากบันทึกข้อมูลเสร็จสิ้น
+      await getAllIngredients(); // Refresh ingredient list after save
     } catch (e) {
       console.log(e);
       messageStore.showError("Cannot save product");
+    } finally {
+      loadingStore.isLoading = false; // ให้ isLoading เป็น false ทุกรอบ
     }
-    loadingStore.isLoading = false;
   }
+
   async function setEditedIngredient(ingredient: Ingredient) {
     editedIngredient.value = JSON.parse(JSON.stringify(ingredient));
-    await getAllIngredients();
     dialog.value = true;
   }
 
