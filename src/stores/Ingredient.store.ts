@@ -15,6 +15,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
   const importingredients = ref<Importingredient[]>([]);
   const search = ref<string>("");
   const dialog = ref(false); // สถานะของ Dialog
+  const dialogImportItem = ref(false);
   const editedIngredient = ref<Ingredient>({
     ingredientName: '',
     ingredientSupplier: '',
@@ -179,6 +180,27 @@ export const useIngredientStore = defineStore("ingredient", () => {
       console.error("Error saving import data:");
     }
   }
+  // async function saveCheckData() {
+  //   const ingredientList = ingredientCheckList.value.map((item) => ({
+  //     ingredientId: item.ingredientcheck.ingredientId!,
+  //     UsedQuantity: item.count,
+  //   }));
+
+  //   const checkIngredientsPayload = {
+  //     checkingredientitem: ingredientList, 
+  //     userId: 1,
+  //     date: new Date(),
+  //   };
+
+  //   console.log('Sending data to API:', checkIngredientsPayload);
+
+  //   try {
+  //     const response = await ingredientService.createCheckIngredients(checkIngredientsPayload);
+  //     console.log('API response:', response);
+  //   } catch (error) {
+  //     console.error('Error saving check data:', error);
+  //   }
+  // }
   async function saveIngredient() {
     loadingStore.isLoading = true;
     try {
@@ -219,9 +241,11 @@ export const useIngredientStore = defineStore("ingredient", () => {
   };
   return {
     ingredient,
+    // saveCheckData,
     ingredients,
     search,
     dialog,
+    dialogImportItem,
     page,
     keyword,
     take,

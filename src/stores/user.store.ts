@@ -6,11 +6,11 @@ import userService from "@/service/user.service";
 export const useUserStore = defineStore("user", () => {
   const currentUser = ref<User>({
     userId: -1,
-    userName: "",
-    userPassword: "",
-    userRole: "",
-    userEmail: "",
-    userStatus: "",
+    userName: '',
+    userPassword: '',
+    userRole: '',
+    userEmail: '',
+    userStatus: '',
   });
   const users = ref<User[]>([]);
   const user = ref<User | null>(null);
