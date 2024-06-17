@@ -16,6 +16,19 @@ export const useProductStore = defineStore("product", () => {
   const createProductDialog = ref(false);
   const searchQuery = ref<string>("");
   const searchQueryPos = ref<string>("");
+  const editedProduct = ref<Product & { file: File }>({
+    productId: 0,
+    productName: "",
+    productPrice: 0,
+    productImage: "",
+    category: {
+      categoryId: 0,
+      categoryName: "",
+      haveTopping: false,
+    },
+    file: new File([""], "filename"),
+    productTypes: [],
+  });
 
   const product = ref<Product & { file: File }>({
     productId: 0,
@@ -34,6 +47,7 @@ export const useProductStore = defineStore("product", () => {
   const productName = ref<string>("");
   const productPrice = ref<number>(0);
   const selectedCategory = ref<string | null>(null);
+  const selectedCategoryForUpdate = ref<string | null>(null);
   const imagePreview = ref<string | null>(null);
 
   const selectedIngredientsHot = ref<number[]>([]);
@@ -231,6 +245,8 @@ export const useProductStore = defineStore("product", () => {
     itemsPerPage,
     selectedProduct,
     setSelectedProduct,
-    searchQueryPos
+    searchQueryPos,
+    editedProduct,
+    selectedCategoryForUpdate
   };
 });
