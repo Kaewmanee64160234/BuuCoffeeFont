@@ -41,7 +41,9 @@ onMounted(async () => {
     selectedCategory.value = "กาแฟ";
     const cate = categoryStore.categoriesForCreate.findIndex(category => category.categoryName === "กับข้าว")
     categoryStore.categoriesForCreate.splice(cate, 1);
-    productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === "coffee".toLocaleLowerCase());
+ 
+   productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === "กาแฟ".toLocaleLowerCase());
+console.log("Filter", productFilters.value)
   }
 });
 watch(selectedCategory, async (newCategory) => {
