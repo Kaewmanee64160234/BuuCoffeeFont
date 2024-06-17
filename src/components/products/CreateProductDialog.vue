@@ -67,9 +67,9 @@
                         <v-text-field variant="solo" v-model="getProductType(step.label).productTypePrice" label="ราคาประเภทสินค้า" type="number" required />
                       </v-col>
                       <v-col cols="12">
-                        <v-btn icon @click="() => addRecipe(getProductType(step.label))">
+                        <!-- <v-btn icon @click="() => addRecipe(getProductType(step.label))">
                           <v-icon>mdi-plus</v-icon>
-                        </v-btn>
+                        </v-btn> -->
                       </v-col>
                       <v-col cols="12">
                         <v-table>
