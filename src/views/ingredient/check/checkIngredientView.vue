@@ -2,7 +2,7 @@
 import { useIngredientStore } from '@/stores/Ingredient.store';
 import { onMounted } from 'vue';
 import ingredientService from "@/service/ingredient.service";
-
+import Swal from 'sweetalert2';
 const ingredientStore = useIngredientStore();
 
 onMounted(async () => {
@@ -27,10 +27,48 @@ const saveCheckData = async () => {
   console.log("Sending data to API:", checkIngredientsPayload);
 
   try {
-    const response = await ingredientService.createCheckIngredients(checkIngredientsPayload);
-    console.log("API response:", response);
+    // ยืนยันก่อนส่งข้อมูล
+    const confirmation = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to save this data?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, save it!',
+      cancelButtonText: 'No, cancel!',
+    });
+
+    if (confirmation.isConfirmed) {
+      // แสดงการส่งข้อมูล
+      Swal.fire({
+        title: 'Saving data...',
+        text: 'Please wait while we save your data.',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      const response = await ingredientService.createCheckIngredients(checkIngredientsPayload);
+      console.log("API response:", response);
+
+      // แสดงผลลัพธ์เมื่อสำเร็จ
+      Swal.fire({
+        title: 'Success!',
+        text: 'Your data has been saved successfully.',
+        icon: 'success',
+      });
+    } else {
+      Swal.fire('Cancelled', 'Your data was not saved.', 'error');
+    }
   } catch (error) {
     console.error("Error saving check data:", error);
+
+    // แสดงผลลัพธ์เมื่อเกิดข้อผิดพลาด
+    Swal.fire({
+      title: 'Error!',
+      text: 'There was an error saving your data.',
+      icon: 'error',
+    });
   }
 };
 

@@ -56,7 +56,7 @@ async function save() {
               </v-col>
               <v-col cols="12" sm="6" md="4">
                 <v-text-field
-                  label="ปริมาณต่อหน่วย"
+                  label="ปริมาณต่อหน่วย/ย่อย"
                   v-model.number="IngredientStore.editedIngredient.ingredientQuantityPerUnit"
                   :rules="[
                     (v) => !!v || 'กรุณากรอกปริมาณต่อหน่วย',
@@ -84,7 +84,7 @@ async function save() {
               </v-col>
               <v-col cols="12" sm="6" md="4">
                 <v-text-field
-                  label="ปริมาณต่อหน่วย"
+                  label="หน่วย/ย่อย"
                   v-model.number="IngredientStore.editedIngredient.ingredientQuantityPerSubUnit"
                 ></v-text-field>
               </v-col>
