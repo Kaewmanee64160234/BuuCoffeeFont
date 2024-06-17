@@ -2,12 +2,14 @@ import { ref ,reactive} from "vue";
 import { defineStore } from "pinia";
 import financeService from "@/service/report/finance.service";
 import type { Cashier } from "@/types/report/cashier.type";
+import type { TopSellingProduct } from "@/types/report/top-selling-product.type";
 export const useReportFinnceStore = defineStore("cashier", () => {
   const cashiers = ref<Cashier[]>([]);
   const createCashierDialog = ref(false);
   const createHistoryCashierDialog = ref(false);
   const historycashiers = ref<Cashier[]>([]);
   const sumType = ref<{ cash: string; qrcode: string }>({ cash: "", qrcode: "" });
+  const topSellingProduct = ref<TopSellingProduct[]>([]);
   const dailyReport = ref<{ totalSales: number; totalDiscount: number ; totalTransactions: number}>({ totalSales: 0, totalDiscount: 0, totalTransactions:0});
   const state = reactive({
     groupedByDay: {},
@@ -85,6 +87,16 @@ export const useReportFinnceStore = defineStore("cashier", () => {
       console.error("Error fetching grouped finance:", error);
     }
   };
+  const getTopSellingProduct = async (date: string) => {
+    try {
+      const res = await financeService.getTopSellingProducts(date);
+      if (res.data) {
+        topSellingProduct.value = res.data;
+      }
+    } catch (error) {
+      console.error('Error fetching top selling product:', error);
+    }
+  };
   return {
     cashiers,
     createCashierDialog,
@@ -93,6 +105,7 @@ export const useReportFinnceStore = defineStore("cashier", () => {
     sumType,
     dailyReport,
     state,
+    topSellingProduct,
     createCashier,
     getfindToday,
     getAll,
@@ -100,6 +113,7 @@ export const useReportFinnceStore = defineStore("cashier", () => {
     getSumType,
     getDailyReport,
     fetchGroupedFinance,
+    getTopSellingProduct,
     
   };
 });

@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-navigation-drawer v-if="!isLoginPage" v-model="drawer" :rail="rail" permanent app>
+    <v-navigation-drawer v-if="isAuthenticated" v-model="drawer" :rail="rail" permanent app>
       <v-list-item class="drawer-header">
         <template v-slot:append>
           <v-btn
@@ -105,7 +105,6 @@ import { useAuthStore } from '@/stores/auth';
 const drawer = ref(true)
 const rail = ref(true)
 const route = useRoute()
-
 const authStore = useAuthStore();
 const isAuthenticated = computed(() => authStore.isLogin);
 

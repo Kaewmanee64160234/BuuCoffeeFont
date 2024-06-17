@@ -118,41 +118,25 @@ onMounted(async () => {
             <tr>
               <th>วันที่</th>
               <th>จำนวนเงิน</th>
-              <th>Action</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td>05/04/2024</td>
               <td>2,540</td>
-              <td>
-                <button>View</button>
-                <button>Edit</button>
-              </td>
+
             </tr>
             <tr>
               <td>21/03/2024</td>
               <td>3,000</td>
-              <td>
-                <button>View</button>
-                <button>Edit</button>
-              </td>
             </tr>
             <tr>
               <td>10/03/2024</td>
               <td>4,000</td>
-              <td>
-                <button>View</button>
-                <button>Edit</button>
-              </td>
             </tr>
             <tr>
               <td>1/02/2024</td>
               <td>500</td>
-              <td>
-                <button>View</button>
-                <button>Edit</button>
-              </td>
             </tr>
           </tbody>
         </table></v-col>
