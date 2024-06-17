@@ -11,6 +11,7 @@ import receiptService from "@/service/receipt.service";
 import type { Promotion } from "@/types/promotion.type";
 import { useCustomerStore } from "./customer.store";
 import Swal from "sweetalert2";
+import { useUserStore } from "./user.store";
 
 export const usePosStore = defineStore("pos", () => {
   const selectedItems = ref<ReceiptItem[]>([]);
@@ -40,7 +41,8 @@ export const usePosStore = defineStore("pos", () => {
   const productStore = useProductStore();
   const receiptDialog = ref(false);
   const customerStore = useCustomerStore();
-  let queueNumber = 1;
+  const userStore = useUserStore();
+  const queueNumber = ref(1);
   const addToReceipt = (
     product: Product,
     productType: ProductType,
@@ -197,12 +199,26 @@ export const usePosStore = defineStore("pos", () => {
 
   // create function create recipt
   const createReceipt = async () => {
-    receipt.value.receiptItems = selectedItems.value;
-    receipt.value.receiptType = "coffee";
-    receipt.value.receiptStatus = "pending";
-    receipt.value.createdDate = new Date();
-    receipt.value.queueNumber = queueNumber;
-    queueNumber++;
+    let receiptStatus = "";
+    if (userStore.userRole == " พนักงานขายกาแฟ") {
+      receiptStatus = "ร้านกาแฟ";
+    } else {
+      receiptStatus = "ร้านข้าว";
+    }
+    if (currentReceipt.value?.queueNumber !== undefined) {
+      receipt.value.receiptItems = selectedItems.value;
+      receipt.value.receiptStatus = receiptStatus;
+      receipt.value.receiptStatus = "paid";
+      receipt.value.createdDate = new Date();
+      receipt.value.queueNumber = currentReceipt.value?.queueNumber + 1;
+    } else {
+      receipt.value.receiptItems = selectedItems.value;
+      receipt.value.receiptType = receiptStatus;
+      receipt.value.receiptStatus = "paid";
+      receipt.value.createdDate = new Date();
+      receipt.value.queueNumber = queueNumber.value;
+    }
+    queueNumber.value++;
     if (receipt.value.receiptTotalDiscount === 0) {
       receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice;
     }
@@ -459,5 +475,6 @@ export const usePosStore = defineStore("pos", () => {
     currentReceipt,
     receiptDialog,
     removePromotion,
+    queueNumber,
   };
 });

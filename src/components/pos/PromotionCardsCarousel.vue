@@ -26,10 +26,9 @@ function chunkPromotions() {
 
 onMounted(async () => {
   console.log("Fetching promotions...");
-  await promotionStore.getAllPromotions(); // Fetch all promotions from the store
-  console.log("Fetched Promotions:", promotionStore.promotions); // Debugging log
-  chunkPromotions(); // Chunk promotions after fetching
-  await nextTick(); // Ensure DOM update
+  console.log("Fetched Promotions:", promotionStore.promotions); 
+  chunkPromotions(); 
+  await nextTick(); 
   console.log("Carousel items rendered");
 });
 

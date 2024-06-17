@@ -7,10 +7,12 @@ import AddCustomerDialog from '../customer/AddCustomerDialog.vue';
 import FindCustomerDialog from '../pos/FindCustomerDialog.vue';
 import type { ReceiptItem } from '../../types/receipt.type';
 import type { Promotion } from '../../types/promotion.type';
+import { useUserStore } from '@/stores/user.store';
 
 const step = ref(1);
 const posStore = usePosStore();
 const customerStore = useCustomerStore();
+const userStore = useUserStore();
 const selectedItems = computed(() => posStore.selectedItems);
 const selectedCustomer = ref('');
 const recive = ref(0);
@@ -186,26 +188,33 @@ function findCustomer() {
     <v-window v-model="step" transition="fade" style="height: 100%;">
       <v-window-item :value="1">
         <div>
-          <h3>รายละเอียดการสั่งซื้อ</h3>
-          <div class="pa-3">
+          <div class="d-flex justify-space-between" style="padding-right: 60px;">
+            <h3>รายละเอียดการสั่งซื้อ</h3>
+            <h3>#{{ posStore.currentReceipt?.queueNumber=== null ?   posStore.currentReceipt?.queueNumber+1 : posStore.queueNumber }}</h3>
+          </div>
+          <div class="pa-3" v-if="userStore.userRole !== 'พนักงานขายข้าว'">
             <div>
               <p class="d-flex justify-space-between pr-10 my-2">
                 <span style="text-align: start;"> สมาชิก</span>
-                <span style="text-align: end;color: black;">{{ posStore.receipt.customer?.customerName == null ? 'ไม่มี' : posStore.receipt.customer?.customerName }}</span>
+                <span style="text-align: end;color: black;">{{ posStore.receipt.customer?.customerName == null ? 'ไม่มี'
+                  : posStore.receipt.customer?.customerName }}</span>
               </p>
             </div>
             <div>
               <p class="d-flex justify-space-between pr-10 my-2">
                 <span style="text-align: start;"> แต้มสะสม</span>
-                <span style="text-align: end;">{{ posStore.receipt.customer == null ? '0' : posStore.receipt.customer?.customerNumberOfStamp }} Point</span>
+                <span style="text-align: end;">{{ posStore.receipt.customer == null ? '0' :
+                  posStore.receipt.customer?.customerNumberOfStamp }} Point</span>
               </p>
             </div>
             <p>เบอร์โทรลูกค้า</p>
           </div>
-          <div class="">
+          <div class="" v-if="userStore.userRole !== 'พนักงานขายข้าว'">
             <v-row class="d-flex align-center justify-start">
               <v-col cols="12" md="6" class="d-flex align-center justify-start">
-                <v-autocomplete v-model="selectedCustomer" :items="customerStore.customers.map(c => c.customerPhone)" item-text="phone" item-value="phone" label="เบอร์โทรลูกค้า" variant="solo" append-inner-icon="mdi-magnify"></v-autocomplete>
+                <v-autocomplete v-model="selectedCustomer" :items="customerStore.customers.map(c => c.customerPhone)"
+                  item-text="phone" item-value="phone" label="เบอร์โทรลูกค้า" variant="solo"
+                  append-inner-icon="mdi-magnify"></v-autocomplete>
               </v-col>
               <v-col cols="12" md="5" class="d-flex align-center justify-start">
                 <v-btn class="mr-3" icon="mdi-account-plus" color="#ff9800" @click="openCreateCustomerDialog()"></v-btn>
@@ -216,14 +225,15 @@ function findCustomer() {
           <v-divider></v-divider>
 
           <div class="d-flex justify-end pr-6">
-              <v-btn color="red" variant="text" @click="cancelReceipt">ยกเลิกรายการ</v-btn>
-            </div>
-          <div class="selected-items-list">
-           
+            <v-btn color="red" variant="text" @click="cancelReceipt">ยกเลิกรายการ</v-btn>
+          </div>
+          <div :class="userStore.userRole === 'พนักงานขายข้าว' ? 'selected-items-list-50' : 'selected-items-list-40'">
+
             <v-list class="full-width" style="overflow-y: auto;">
-              <v-list-item-group >
+              <v-list-item-group>
                 <div v-for="(item, index) in selectedItems" :key="index" class="selected-item full-width my-2">
-                  <v-list-item :prepend-avatar="`http://localhost:3000/products/${item.product?.productId}/image`" class="full-width">
+                  <v-list-item :prepend-avatar="`http://localhost:3000/products/${item.product?.productId}/image`"
+                    class="full-width">
                     <v-row style="padding: 0;">
                       <v-col cols="6" style="color: black;font-size: 16px;">
                         <div class="product-name">{{ item.product?.productName }}</div>
@@ -234,18 +244,23 @@ function findCustomer() {
                     </v-row>
                     <v-row style="padding: 0;">
                       <v-col cols="7" style="color: gray;font-size: 12px; padding-top: 0;">
-                        <div v-if="item.product?.category.haveTopping" style="font-weight: lighter;color: gray;font-size: 10px;">
-                          {{ item.productType?.productTypeName }} +{{ item.productType?.productTypePrice }} | ความหวาน {{ item.sweetnessLevel }}%
+                        <div v-if="item.product?.category.haveTopping"
+                          style="font-weight: lighter;color: gray;font-size: 10px;">
+                          {{ item.productType?.productTypeName }} +{{ item.productType?.productTypePrice }} | ความหวาน
+                          {{ item.sweetnessLevel }}%
                         </div>
                         <div v-else>
                           <div style="font-weight: lighter;color: gray;font-size: 15px;">
-                            {{ item.product?.productName }}( {{ item.product?.category.categoryName }} ) {{ item.product?.productPrice }}.-
+                            {{ item.product?.productName }}( {{ item.product?.category.categoryName }} ) {{
+                              item.product?.productPrice }}.-
                           </div>
                         </div>
                         <div v-if="item.productTypeToppings.length > 0">
                           <ul>
-                            <li style="font-weight: lighter;color: gray;font-size: 11px;" v-for="topping in item.productTypeToppings" :key="topping.topping.toppingId">
-                              x{{ topping.quantity }} {{ topping.topping.toppingName }}: {{ topping.topping.toppingPrice }}.-
+                            <li style="font-weight: lighter;color: gray;font-size: 11px;"
+                              v-for="topping in item.productTypeToppings" :key="topping.topping.toppingId">
+                              x{{ topping.quantity }} {{ topping.topping.toppingName }}: {{ topping.topping.toppingPrice
+                              }}.-
                             </li>
                           </ul>
                         </div>
@@ -268,13 +283,14 @@ function findCustomer() {
               </v-list-item-group>
             </v-list>
           </div>
-          <div class="summary-section" style="width: 100%;">
+          <div :class="userStore.userRole === 'พนักงานขายข้าว' ? 'summary-section-30' : 'summary-section-25'" style="width: 100%;">
             <v-divider></v-divider>
             <h3>สรุปรายการ</h3>
             <v-card-subtitle>โปรโมชั่น:</v-card-subtitle>
-            <div class="promotion">
+            <div :class="userStore.userRole === 'พนักงานขายข้าว' ? 'promotion-30' : 'promotion-20'">
               <div class="sub-promotion">
-                <div v-for="(promotion) in posStore.receipt.receiptPromotions" :key="promotion.receiptPromotionId" style="text-align: end; width: 100%; padding-right: 40px;">
+                <div v-for="(promotion) in posStore.receipt.receiptPromotions" :key="promotion.receiptPromotionId"
+                  style="text-align: end; width: 100%; padding-right: 40px;">
                   <div style="width: 100%;">
                     <span class="pa-2">{{ promotion.promotion.promotionType }}:</span>
                     <span class="red--text">{{ promotion.discount }} $</span>
@@ -303,29 +319,38 @@ function findCustomer() {
       <v-window-item :value="2" style="height: 100%;">
         <div style="height: 100%;overflow-y: auto">
           <div class="title-detail">
-            <h3>รายละเอียดการสั่งซื้อ</h3>
-            <div class="pa-3">
+            <div class="d-flex justify-space-between pr-6">
+              <h3>รายละเอียดการสั่งซื้อ</h3>
+              <h3>#{{ posStore.queueNumber }}</h3>
+            </div>
+
+            <div class="pa-3" v-if="userStore.userRole !== 'พนักงานขายข้าว'">
               <div>
                 <p class="d-flex justify-space-between pr-10 my-2">
                   <span style="text-align: start;"> สมาชิก</span>
-                  <span style="text-align: end;color: black;">{{ posStore.receipt.customer?.customerName == null ? 'ไม่มี' : posStore.receipt.customer?.customerName }}</span>
+                  <span style="text-align: end;color: black;">{{ posStore.receipt.customer?.customerName == null ?
+                    'ไม่มี' : posStore.receipt.customer?.customerName }}</span>
                 </p>
               </div>
               <div>
                 <p class="d-flex justify-space-between pr-10 my-2">
                   <span style="text-align: start;"> แต้มสะสม</span>
-                  <span style="text-align: end;">{{ posStore.receipt.customer == null ? '0' : posStore.receipt.customer?.customerNumberOfStamp }} Point</span>
+                  <span style="text-align: end;">{{ posStore.receipt.customer == null ? '0' :
+                    posStore.receipt.customer?.customerNumberOfStamp }} Point</span>
                 </p>
               </div>
               <p>เบอร์โทรลูกค้า</p>
             </div>
-            <div>
+            <div v-if="userStore.userRole !== 'พนักงานขายข้าว'">
               <v-row class="d-flex align-center justify-start">
                 <v-col cols="12" md="6" class="d-flex align-center justify-start mt-4">
-                  <v-autocomplete v-model="selectedCustomer" :items="customerStore.customers.map(c => c.customerPhone)" item-text="phone" item-value="phone" label="เบอร์โทรลูกค้า" variant="solo" append-inner-icon="mdi-magnify"></v-autocomplete>
+                  <v-autocomplete v-model="selectedCustomer" :items="customerStore.customers.map(c => c.customerPhone)"
+                    item-text="phone" item-value="phone" label="เบอร์โทรลูกค้า" variant="solo"
+                    append-inner-icon="mdi-magnify"></v-autocomplete>
                 </v-col>
                 <v-col cols="12" md="5" class="d-flex align-center justify-start">
-                  <v-btn class="mr-3" icon="mdi-account-plus" color="#ff9800" @click="openCreateCustomerDialog()"></v-btn>
+                  <v-btn class="mr-3" icon="mdi-account-plus" color="#ff9800"
+                    @click="openCreateCustomerDialog()"></v-btn>
                   <v-btn color="#ff9800" @click="openCreateCustomerDialog()">ประวัติการสั่งซื้อ</v-btn>
                 </v-col>
               </v-row>
@@ -335,10 +360,12 @@ function findCustomer() {
           <div class="payment-method">
             <h3>เลือกวิธีชำระเงิน</h3>
             <div class="d-flex align-center justify-center py-4">
-              <v-btn :class="{ 'selected': posStore.receipt.paymentMethod === 'cash' }" class="payment-button" variant="outlined" style="color: black;" @click="selectPaymentMethod('cash')">
+              <v-btn :class="{ 'selected': posStore.receipt.paymentMethod === 'cash' }" class="payment-button"
+                variant="outlined" style="color: black;" @click="selectPaymentMethod('cash')">
                 เงินสด
               </v-btn>
-              <v-btn :class="{ 'selected': posStore.receipt.paymentMethod === 'qrcode' }" class="payment-button" variant="outlined" style="color: black;" @click="selectPaymentMethod('qrcode')">
+              <v-btn :class="{ 'selected': posStore.receipt.paymentMethod === 'qrcode' }" class="payment-button"
+                variant="outlined" style="color: black;" @click="selectPaymentMethod('qrcode')">
                 แสกนจ่าย
               </v-btn>
             </div>
@@ -351,7 +378,8 @@ function findCustomer() {
                 <div>
                   <p class="d-flex justify-space-between pr-6">
                     <span style="text-align: start;"> สมาชิก:</span>
-                    <span style="text-align: end;">{{ posStore.receipt.customer?.customerName == null ? 'ไม่มี' : posStore.receipt.customer?.customerName }}</span>
+                    <span style="text-align: end;">{{ posStore.receipt.customer?.customerName == null ? 'ไม่มี' :
+                      posStore.receipt.customer?.customerName }}</span>
                   </p>
                 </div>
                 <!-- ทั้งหมด -->
@@ -366,7 +394,8 @@ function findCustomer() {
                       <span style="text-align: start;"> รับมา:</span>
                       <span style="text-align: start;width: 50%;">
                         <v-responsive class="mx-auto" style="height: 10;">
-                          <v-text-field v-model="recive" variant="solo" name="จำนวนเงิน" label="จำนวนเงิน" id="id"></v-text-field>
+                          <v-text-field v-model="recive" variant="solo" name="จำนวนเงิน" label="จำนวนเงิน"
+                            id="id"></v-text-field>
                         </v-responsive>
                       </span>
                     </p>
@@ -375,7 +404,9 @@ function findCustomer() {
                   <div>
                     <p class="d-flex justify-space-between pr-6 my-2">
                       <span style="text-align: start;"> ทอน:</span>
-                      <span style="text-align: end;" :class="recive < 0 || recive < posStore.receipt.receiptNetPrice ? 'red--text' : 'black'">{{ change.toFixed(2) }}</span>
+                      <span style="text-align: end;"
+                        :class="recive < 0 || recive < posStore.receipt.receiptNetPrice ? 'red--text' : 'black'">{{
+                          change.toFixed(2) }}</span>
                     </p>
                   </div>
                   <v-divider></v-divider>
@@ -389,8 +420,10 @@ function findCustomer() {
                   </v-row>
                   <v-row style="width: 100%; padding: 0;">
                     <div class="d-flex justify-center pr-6" style="width: 100%;">
-                      <v-btn style="padding-right: 20px; width: 40%; margin-right: 10px;" color="secondary" rounded @click="prevStep">ย้อนกลับ</v-btn>
-                      <v-btn style="padding-right: 20px; width: 40%; margin-right: 10px;" color="#FF9642" rounded @click="save">บันทึก</v-btn>
+                      <v-btn style="padding-right: 20px; width: 40%; margin-right: 10px;" color="secondary" rounded
+                        @click="prevStep">ย้อนกลับ</v-btn>
+                      <v-btn style="padding-right: 20px; width: 40%; margin-right: 10px;" color="#FF9642" rounded
+                        @click="save">บันทึก</v-btn>
                     </div>
                   </v-row>
                 </div>
@@ -402,8 +435,6 @@ function findCustomer() {
     </v-window>
   </v-app>
 </template>
-
-
 
 <style scoped>
 .selected-item {
@@ -418,12 +449,13 @@ function findCustomer() {
 }
 
 .title-detail {
-  height: 30%;
+  max-height: 30%;
+  height: 60px;
+
 }
 
 .payment-method {
-  margin-top: 50px;
-  height: 25%;
+  max-height: 25%;
 }
 
 .summary-section-2 {
@@ -455,21 +487,38 @@ function findCustomer() {
   flex-direction: column;
 }
 
-.selected-items-list {
+.selected-items-list-40 {
   max-height: 40%;
   height: 150px;
   overflow-y: auto;
 }
 
-.promotion {
+.selected-items-list-50 {
+  max-height: 60%;
+  height: 300px;
+  overflow-y: auto;
+}
+
+.promotion-20 {
   max-height: 20%;
   height: 70px;
   overflow-y: auto;
 }
 
-.summary-section {
-  margin-top: 20px;
+.promotion-30 {
+  max-height: 30%;
+  height: 100px;
+  overflow-y: auto;
+}
+
+.summary-section-25 {
   height: 25%;
+  margin-top: 20px;
+}
+
+.summary-section-30 {
+  height: 30%;
+  margin-top: 20px;
 }
 
 .red--text {
@@ -503,3 +552,4 @@ function findCustomer() {
   margin-bottom: 0.5rem;
 }
 </style>
+
