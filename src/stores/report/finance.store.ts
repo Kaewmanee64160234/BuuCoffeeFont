@@ -57,7 +57,6 @@ export const useReportFinnceStore = defineStore("cashier", () => {
       const res = await financeService.getSumType();
       if (res.data) {
         sumType.value = res.data;
-        console.log(sumType.value)
       }
     } catch (error) {
       console.error(error);

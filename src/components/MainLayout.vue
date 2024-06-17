@@ -81,6 +81,13 @@
           </template>
           Ingredient List
         </v-list-item>
+        <v-list-item @click="logout">
+          <template v-slot:prepend>
+            <img src="../../src/components/img/logo.jpg" alt="Log Out" class="nav-icon" />
+          </template>
+          Log Out
+        </v-list-item>
+
 
       </v-list>
     </v-navigation-drawer>
@@ -94,12 +101,17 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
-
+import { useAuthStore } from '@/stores/auth';
 const drawer = ref(true)
 const rail = ref(true)
 const route = useRoute()
 
-const isLoginPage = computed(() => route.path === '/login')
+const authStore = useAuthStore();
+const isAuthenticated = computed(() => authStore.isLogin);
+
+const logout = () => {
+  authStore.logout();
+};
 </script>
 
 <style scoped>

@@ -34,11 +34,11 @@ export const useAuthStore = defineStore("auth", () => {
 
       authName.value = JSON.parse(localStorage.getItem("user") as string);
     } catch (e) {
-      console.log(e);
+      console.error("Error in login method:", e);
+      throw e; // ส่งต่อ error ไปยัง caller หรือที่ใดก็ได้ที่จะจัดการต่อ
     }
     isLogin.value = true;
   };
-
   const logout = () => {
     localStorage.removeItem("user");
 

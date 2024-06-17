@@ -1,6 +1,44 @@
+
+<template>
+  <v-container class="fill-height d-flex align-center justify-center background-image" fluid>
+    <v-card class="mx-auto my-12 pa-6" width="450" elevation="10">
+      <v-row justify="center">
+        <img src="../components/img/logo.jpg" alt="Logo" class="logo" style="width: 40%; height: 40%;">
+      </v-row>
+      <v-card-text>
+        <v-form ref="form" v-model="valid" lazy-validation>
+          <v-text-field
+            v-model="email"
+            :rules="emailRules"
+            label="Email"
+            required
+          ></v-text-field>
+          <v-text-field
+            v-model="password"
+            :rules="passwordRules"
+            :type="show ? 'text' : 'password'"
+            label="Password"
+            required
+            :append-inner-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
+            @click:append-inner="show = !show"
+          ></v-text-field>
+        </v-form>
+      </v-card-text>
+      <v-card-actions class="d-flex justify-center">
+        <v-btn @click="loginHandler" class="login-btn">
+          เข้าสู่ระบบ
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+    <img src="../components/img/coffeeBaby1.png" alt="Character Top Left" class="character-top-left">
+    <img src="../components/img/coffeeBaby2.png" alt="Character Bottom Right" class="character-bottom-right">
+  </v-container>
+</template>
+
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import Swal from 'sweetalert2';
 import { useAuthStore } from '@/stores/auth';
 
 const authStore = useAuthStore();
@@ -23,52 +61,42 @@ const loginHandler = async () => {
   if (valid.value) {
     try {
       await authStore.login(email.value, password.value);
-      console.log('Login successful');
-      router.push('/report');
-    } catch (error) {
+      // Login successful, show success message
+      Swal.fire({
+        icon: 'success',
+        title: 'Login successful',
+        showConfirmButton: false,
+        timer: 1500
+      });
+      // Redirect to '/report' after successful login
+    } catch (error: any) {
+      // Use 'error: any' to assert 'error' as any type or use a specific type if known
       console.error('Login failed:', error);
+      if (error.response && error.response.data) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Login failed',
+          text: error.response.data.message || 'An error occurred',
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Login failed',
+          text: 'An unexpected error occurred',
+        });
+      }
     }
+  } else {
+    // Form validation failed, show warning message
+    Swal.fire({
+      icon: 'warning',
+      title: 'Form is not valid',
+      text: 'Please fill in the required fields correctly.',
+    });
   }
 };
-</script>
 
-<template>
-  <v-container class="fill-height d-flex align-center justify-center background-image" fluid>
-    <v-card class="mx-auto my-12 pa-6" width="450" elevation="10">
-      <v-row justify="center">
-        <img src="../components/img/logo.jpg" alt="Logo" class="logo" style="width: 40%; height: 40%;">
-      </v-row>
-      <v-card-text>
-        <v-form ref="form" v-model="valid" lazy-validation>
-          <v-text-field
-            v-model="email"
-            :rules="emailRules"
-            label="ชื่อผู้ใช้"
-            required
-          ></v-text-field>
-          <v-text-field
-            v-model="password"
-            :rules="passwordRules"
-            :type="show ? 'text' : 'password'"
-            label="รหัสผ่าน"
-            required
-            :append-inner-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
-            @click:append-inner="show = !show"
-          ></v-text-field>
-        </v-form>
-      </v-card-text>
-      <v-card-actions class="d-flex justify-center">
-        <v-btn @click="loginHandler" class="login-btn" >
-          เข้าสู่ระบบ
-        </v-btn>
-      </v-card-actions>
-      
-      
-    </v-card>
-    <img src="../components/img/coffeeBaby1.png" alt="Character Top Left" class="character-top-left" >
-    <img src="../components/img/coffeeBaby2.png" alt="Character Bottom Right" class="character-bottom-right">
-  </v-container>
-</template>
+</script>
 
 <style scoped>
 .headline {

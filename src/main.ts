@@ -10,6 +10,7 @@ import * as directives from 'vuetify/directives'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
 import '@mdi/font/css/materialdesignicons.css'
 import VueApexCharts from 'vue3-apexcharts';
+import { useAuthStore } from './stores/auth';
 
 const app = createApp(App)
 const vuetify = createVuetify({
