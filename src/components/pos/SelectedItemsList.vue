@@ -407,6 +407,11 @@ async function save() {
   change.value = 0;
   step.value = 1;
   posStore.receipt.paymentMethod = '';
+  posStore.receipt.customer = null;
+  posStore.receipt.receiptId = null;
+  posStore.receipt.receiptStatus = 'รอชำระเงิน';
+  selectedCustomer.value = '';
+
 }
 
 function openCreateCustomerDialog() {

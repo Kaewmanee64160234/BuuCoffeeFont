@@ -479,7 +479,7 @@ export const usePosStore = defineStore("pos", () => {
   };
 
   const updateReceipt = async (id: number, receipt: Receipt) => {
-    console.log("updateReceipt", receipt);
+    console.log("updateReceipt", JSON.stringify(receipt));
     const res = await receiptService.updateReceipt(id, receipt);
     if (res.status === 200) {
       // console.log("Receipt updated successfully", res.data);
