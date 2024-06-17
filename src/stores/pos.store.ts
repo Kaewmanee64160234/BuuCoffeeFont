@@ -12,6 +12,7 @@ import type { Promotion } from "@/types/promotion.type";
 import { useCustomerStore } from "./customer.store";
 import Swal from "sweetalert2";
 import { useUserStore } from "./user.store";
+import { useReceiptStore } from "./receipt.store";
 
 export const usePosStore = defineStore("pos", () => {
   const selectedItems = ref<ReceiptItem[]>([]);
@@ -43,7 +44,8 @@ export const usePosStore = defineStore("pos", () => {
   const customerStore = useCustomerStore();
   const userStore = useUserStore();
   const queueNumber = ref(1);
-  const receiptHistoryDialog = ref(false);
+  const ReceiptDialogPos = ref(false);
+  const receiptStore = useReceiptStore();
   const addToReceipt = (
     product: Product,
     productType: ProductType,
@@ -229,7 +231,10 @@ export const usePosStore = defineStore("pos", () => {
       console.log("Receipt created successfully", res.data);
       currentReceipt.value = res.data;
       await customerStore.getAllCustomers();
+      // await receiptStore.getRecieptIn30Min();
     }
+    await receiptStore.getRecieptIn30Min();
+
   };
 
   const applyPromotion = (promotion: Promotion) => {
@@ -477,6 +482,6 @@ export const usePosStore = defineStore("pos", () => {
     receiptDialog,
     removePromotion,
     queueNumber,
-    receiptHistoryDialog
+    ReceiptDialogPos,
   };
 });

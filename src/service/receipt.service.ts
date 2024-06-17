@@ -22,6 +22,12 @@ function cancelReceipt(id: number) {
   return http.put(`/receipts/cancel/${id}`);
 }
 
+// in-30-min getRecieptIn30Min
+function getRecieptIn30Min() {
+  return http.get("/receipts/in-30-min");
+}
+
+
 
 
 export default {
@@ -30,5 +36,6 @@ export default {
   createReceipt,
   updateReceipt,
   deleteReceipt,
-  cancelReceipt
+  cancelReceipt,
+  getRecieptIn30Min
 };

@@ -52,6 +52,18 @@ export const useReceiptStore = defineStore("receipt", () => {
     );
   });
 
+  // getRecieptIn30Min
+  const getRecieptIn30Min = async () => {
+    try {
+      const response = await receiptService.getRecieptIn30Min();
+      if (response.status === 200) {
+        receipts.value = response.data;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return {
     receipts,
     receipt,
@@ -60,6 +72,7 @@ export const useReceiptStore = defineStore("receipt", () => {
     createReceipt,
     searchQuery,
     historyReceiptDialog,
-    filteredReceipts
+    filteredReceipts,
+    getRecieptIn30Min
   };
 });

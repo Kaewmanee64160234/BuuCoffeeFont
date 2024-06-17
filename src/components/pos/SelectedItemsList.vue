@@ -1,7 +1,6 @@
 <template>
   <div class="h-screen app">
     <AddCustomerDialog />
-    <ReceiptHistoryDetail />
     <v-window v-model="step" transition="fade" class="h-screen">
       <v-window-item :value="1" class="full-height">
         <div class="content-container">
@@ -232,6 +231,7 @@
       </v-window-item>
     </v-window>
   </div>
+  <ReceiptDetailsDialogPos/>
 </template>
 
 <script lang="ts" setup>
@@ -243,7 +243,8 @@ import AddCustomerDialog from '../customer/AddCustomerDialog.vue';
 import type { ReceiptItem } from '../../types/receipt.type';
 import type { Promotion } from '../../types/promotion.type';
 import { useUserStore } from '@/stores/user.store';
-import ReceiptDetailsDialog from '../receipts/ReceiptDialog.vue';
+import {useReceiptStore} from '@/stores/receipt.store';
+import ReceiptDetailsDialogPos from '../receipts/ReceiptDialogPos.vue';
 
 const step = ref(1);
 const posStore = usePosStore();
@@ -253,6 +254,7 @@ const selectedItems = computed(() => posStore.selectedItems);
 const selectedCustomer = ref('');
 const recive = ref(0);
 const change = ref(0);
+const receiptStore = useReceiptStore();
 
 function nextStep() {
   if (selectedItems.value.length === 0) {
@@ -291,7 +293,8 @@ function calculateChange() {
 }
 
 function openReceiptDialog ()  {
-  posStore.receiptHistoryDialog = true;
+  posStore.ReceiptDialogPos = true;
+  console.log(" openReceiptDialog ", posStore.ReceiptDialogPos);
 }
 
 function selectPaymentMethod(method: string) {
@@ -330,7 +333,7 @@ function decreaseQuantity(index: number) {
   }
 }
 
-function save() {
+async function save() {
   if (selectedItems.value.length === 0) {
     Swal.fire({
       icon: 'error',
