@@ -10,7 +10,7 @@
           ></v-btn>
         </template>
       </v-list-item>
-
+      <v-list-item-title>ยินดีต้อนรับ คุณ {{ userStore.currentUser.userName }}</v-list-item-title>
       <v-list density="compact" nav>
         <v-list-item to="/report">
           <template v-slot:prepend>
@@ -99,17 +99,41 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed ,onMounted} from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth';
+import { useUserStore } from "@/stores/user.store";
 const drawer = ref(true)
 const rail = ref(true)
 const route = useRoute()
 const authStore = useAuthStore();
+const userStore = useUserStore();
 const isAuthenticated = computed(() => authStore.isLogin);
+const getUserFromLocalStorage = () => {
+  const userString = localStorage.getItem("user");
+  if (userString) {
+    try {
+      const userObject = JSON.parse(userString);
+      userStore.setUser(userObject);
+      authStore.isLogin = true; 
+    } catch (e) {
+      console.error("Failed to parse user from localStorage:", e);
+      authStore.isLogin = false;
+    }
+  } else {
+    console.log("No user found in localStorage.");
+    authStore.isLogin = false;
+  }
+};
 
+onMounted(async () => {
+  getUserFromLocalStorage();
+});
 const logout = () => {
   authStore.logout();
+  localStorage.removeItem("user");
+  state.isLogin = false;
+  authStore.isLogin = false; // เพิ่มส่วนนี้
 };
 </script>
 

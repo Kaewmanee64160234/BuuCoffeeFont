@@ -24,6 +24,17 @@ function createImportIngredients(ingredient: {
 }) {
   return http.post("/importingredients", ingredient);
 }
+function createCheckIngredients(ingredient: {
+  checkingredientitem: {
+    ingredientId: number;
+    UsedQuantity: number;
+  }[];
+  userId: number;
+  date: Date;
+}) {
+  return http.post("/checkingredients", ingredient);
+}
+
 async function saveIngredient(ingredient: Ingredient & { imageFile: File[] }) {
   const formData = new FormData();
   formData.append('ingredientName', ingredient.ingredientName || '');
@@ -74,6 +85,7 @@ function searchIngredientsByName(name: string) {
 export default {
   getAllIngredients,
   createImportIngredients,
+  createCheckIngredients,
   getAllHistoryImportIngredients,
   saveIngredient,
   updateIngredient,

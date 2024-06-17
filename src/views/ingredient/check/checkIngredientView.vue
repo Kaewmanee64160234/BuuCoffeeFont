@@ -1,15 +1,44 @@
 <script lang="ts" setup>
 import { useIngredientStore } from '@/stores/Ingredient.store';
 import { onMounted } from 'vue';
+import ingredientService from "@/service/ingredient.service";
 
 const ingredientStore = useIngredientStore();
 
 onMounted(async () => {
-    await ingredientStore.getAllIngredients();
-    ingredientStore.ingredients.forEach(item => {
-        ingredientStore.Addingredienttotable(item);
-    });
+  await ingredientStore.getAllIngredients();
+  ingredientStore.ingredients.forEach(item => {
+    ingredientStore.Addingredienttotable(item);
+  });
 });
+
+const saveCheckData = async () => {
+  const ingredientList = ingredientStore.ingredientCheckList.map((item, index) => ({
+    ingredientId: item.ingredientcheck.ingredientId!,
+    UsedQuantity: item.count, 
+  }));
+
+  const checkIngredientsPayload = {
+    date: new Date().toISOString(),
+    userId: 1,
+    checkingredientitems: ingredientList,
+  };
+
+  console.log("Sending data to API:", checkIngredientsPayload);
+
+  try {
+    const response = await ingredientService.createCheckIngredients(checkIngredientsPayload);
+    console.log("API response:", response);
+  } catch (error) {
+    console.error("Error saving check data:", error);
+  }
+};
+
+const logQuantity = (item) => {
+  // Update item.count ให้เป็นค่าที่ป้อนเข้ามาใน input ของแต่ละ item
+  item.count = item.ingredientcheck.ingredientQuantityInStock;
+  console.log("Quantity changed:", item.count);
+};
 </script>
 
 <template>
@@ -37,7 +66,7 @@ onMounted(async () => {
                         </v-btn>
                     </v-col>
                     <v-col>
-                            <v-btn>
+                            <v-btn  @click="saveCheckData ">
                                 <v-icon left>mdi-plus</v-icon>
                                 บันทึกข้อมูล
                             </v-btn>
@@ -73,7 +102,12 @@ onMounted(async () => {
                                     <td>{{ item.ingredientcheck.ingredientName }}</td>
                                     <td>{{ item.ingredientcheck.ingredientSupplier }}</td>
                                     <td>{{ item.ingredientcheck.ingredientMinimun }}</td>
-                                    <td><input type="number" v-model.number="item.count" class="styled-input" /></td>
+                                    <td>
+                    <input type="number"
+                           v-model.number="item.ingredientcheck.ingredientQuantityInStock"
+                           class="styled-input"
+                           @change="logQuantity(item)">
+                  </td>
                                     <td><button @click="ingredientStore.removeIngredient(index)">ลบ</button></td>
                                 </tr>
                             </tbody>

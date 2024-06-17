@@ -40,7 +40,8 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import Swal from 'sweetalert2';
 import { useAuthStore } from '@/stores/auth';
-
+import { useUserStore } from '@/stores/user.store';
+const userStore = useUserStore()
 const authStore = useAuthStore();
 const router = useRouter();
 const show = ref(false);
@@ -61,7 +62,7 @@ const loginHandler = async () => {
   if (valid.value) {
     try {
       await authStore.login(email.value, password.value);
-      // Login successful, show success message
+      if (userStore.currentUser.userId > 0 && userStore.currentUser.userEmail === email.value && userStore.currentUser.userPassword === password.value)
       Swal.fire({
         icon: 'success',
         title: 'Login successful',
