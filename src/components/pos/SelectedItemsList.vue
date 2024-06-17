@@ -12,7 +12,7 @@
               <h3>รายละเอียดการสั่งซื้อ</h3>
               <h3>#{{ posStore.currentReceipt?.queueNumber === null ? posStore.currentReceipt?.queueNumber + 1 : posStore.queueNumber }}</h3>
             </div>
-            <div class="pa-3" v-if="userStore.userRole !== 'พนักงานขายข้าว'">
+            <div class="pa-3" v-if="userStore.user?.userRole !== 'พนักงานขายข้าว'">
               <div>
                 <p class="d-flex justify-space-between pr-10 my-2">
                   <span style="text-align: start;"> สมาชิก</span>
@@ -27,7 +27,7 @@
               </div>
               <p>เบอร์โทรลูกค้า</p>
             </div>
-            <div v-if="userStore.userRole !== 'พนักงานขายข้าว'">
+            <div v-if="userStore.user?.userRole !== 'พนักงานขายข้าว'">
               <v-row class="d-flex align-center justify-start">
                 <v-col cols="12" md="6" class="d-flex align-center justify-start">
                   <v-autocomplete v-model="selectedCustomer" :items="customerStore.customers.map(c => c.customerPhone)"
@@ -44,7 +44,7 @@
             <div class="d-flex justify-end pr-6">
               <v-btn color="red" variant="text" @click="cancelReceipt">ยกเลิกรายการ</v-btn>
             </div>
-            <div :class="userStore.userRole === 'พนักงานขายข้าว' ? 'selected-items-list-50' : 'selected-items-list-40'">
+            <div :class="userStore.user?.userRole === 'พนักงานขายข้าว' ? 'selected-items-list-50' : 'selected-items-list-40'">
               <v-list class="full-width" style="overflow-y: auto;">
                 <v-list-item-group>
                   <div v-for="(item, index) in selectedItems" :key="index" class="selected-item full-width my-2">
@@ -93,11 +93,11 @@
                 </v-list-item-group>
               </v-list>
             </div>
-            <div :class="userStore.userRole === 'พนักงานขายข้าว' ? 'summary-section-30' : 'summary-section-25'" style="width: 100%;">
+            <div :class="userStore.user?.userRole === 'พนักงานขายข้าว' ? 'summary-section-30' : 'summary-section-25'" style="width: 100%;">
               <v-divider></v-divider>
               <h3>สรุปรายการ</h3>
               <v-card-subtitle>โปรโมชั่น:</v-card-subtitle>
-              <div :class="userStore.userRole === 'พนักงานขายข้าว' ? 'promotion-30' : 'promotion-20'">
+              <div :class="userStore.user?.userRole === 'พนักงานขายข้าว' ? 'promotion-30' : 'promotion-20'">
                 <div class="sub-promotion">
                   <div v-for="(promotion) in posStore.receipt.receiptPromotions" :key="promotion.receiptPromotionId" style="text-align: end; width: 100%; padding-right: 40px;">
                     <div style="width: 100%;">
@@ -135,7 +135,7 @@
               <h3>รายละเอียดการสั่งซื้อ</h3>
               <h3>#{{ posStore.currentReceipt?.queueNumber === null ? posStore.currentReceipt?.queueNumber + 1 : posStore.queueNumber }}</h3>
             </div>
-            <div class="pa-3" v-if="userStore.userRole !== 'พนักงานขายข้าว'">
+            <div class="pa-3" v-if="userStore.user?.userRole !== 'พนักงานขายข้าว'">
               <div>
                 <p class="d-flex justify-space-between pr-10 my-2">
                   <span style="text-align: start;"> สมาชิก</span>
@@ -150,7 +150,7 @@
               </div>
               <p>เบอร์โทรลูกค้า</p>
             </div>
-            <div v-if="userStore.userRole !== 'พนักงานขายข้าว'">
+            <div v-if="userStore.user?.userRole !== 'พนักงานขายข้าว'">
               <v-row class="d-flex align-center justify-start">
                 <v-col cols="12" md="6" class="d-flex align-center justify-start mt-4">
                   <v-autocomplete v-model="selectedCustomer" :items="customerStore.customers.map(c => c.customerPhone)" item-text="phone" item-value="phone" label="เบอร์โทรลูกค้า" variant="solo" append-inner-icon="mdi-magnify"></v-autocomplete>
