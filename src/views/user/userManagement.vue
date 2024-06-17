@@ -4,7 +4,6 @@ import { computed, onMounted, ref } from 'vue';
 import AddUserDialog from '@/components/user/AddUserDialog.vue';
 import EditUserDialog from '@/components/user/EditUserDialog.vue';
 import type { User } from '@/types/user.type';
-import Swal from 'sweetalert2';
 
 const userStore = useUserStore();
 const addUserDialog = ref(false);

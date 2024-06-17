@@ -112,20 +112,12 @@ const router = createRouter({
 });
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
-  const userString = localStorage.getItem('user');
-
-  if (userString && !authStore.isLogin) {
-    try {
-      const userObject = JSON.parse(userString);
-      authStore.isLogin = true;
-      authStore.authName = userObject;
-    } catch (e) {
-      console.error("Failed to parse user from localStorage:", e);
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (!authStore.isLogin) {
+      next({ name: 'login' });
+    } else {
+      next();
     }
-  }
-
-  if (to.matched.some(record => record.meta.requiresAuth) && !authStore.isLogin) {
-    next({ name: 'login' });
   } else {
     next();
   }

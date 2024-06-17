@@ -32,6 +32,7 @@ import { defineProps, ref, watch } from 'vue';
 import { useCustomerStore } from '@/stores/customer.store';
 import type { VForm } from 'vuetify/components';
 import type { Customer } from '@/types/customer.type';
+import Swal from 'sweetalert2';
 
 const props = defineProps<{ dialog: boolean, customer: Customer | null }>();
 const form = ref<VForm | null>(null);
@@ -65,9 +66,21 @@ async function saveCustomer() {
         dialog.value = false;
         customerStore.updateCustomerDialog = false;
         await customerStore.getAllCustomers();
+        Swal.fire({
+          title: 'สำเร็จ!',
+          text: 'ข้อมูลลูกค้าได้รับการแก้ไขเรียบร้อยแล้ว!',
+          icon: 'success',
+          confirmButtonText: 'ตกลง'
+        });
       }
     } catch (error) {
       console.error('Failed to update customer:', error);
+      Swal.fire({
+        title: 'เกิดข้อผิดพลาด',
+        text: 'ไม่สามารถแก้ไขข้อมูลลูกค้าได้',
+        icon: 'error',
+        confirmButtonText: 'ตกลง'
+      });
     }
   }
   dialog.value = false;
@@ -78,7 +91,6 @@ function closeDialog() {
   customerStore.updateCustomerDialog = false;
 }
 </script>
-
 
 <style scoped>
 </style>

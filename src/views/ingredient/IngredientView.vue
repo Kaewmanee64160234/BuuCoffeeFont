@@ -48,7 +48,7 @@ watch(paginate, async (newPage, oldPage) => {
             รายการวัตถุดิบ
           </v-col>
           <v-col cols="3">
-            <v-text-field label="Search" append-inner-icon="mdi-magnify" hide-details dense v-model="ingredientStore.keyword"></v-text-field>
+            <v-text-field label="ค้นหา" append-inner-icon="mdi-magnify" hide-details dense v-model="ingredientStore.keyword"></v-text-field>
           </v-col>
         </v-row>
         <v-row>
