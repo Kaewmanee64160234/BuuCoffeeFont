@@ -13,7 +13,6 @@ async function getfindToday() {
   }
 }
 export function createCashier(cashier: Cashier) {
-  console.log(JSON.stringify(cashier));
   return http.post("/cashiers", cashier);
 }
 function getAll() {
