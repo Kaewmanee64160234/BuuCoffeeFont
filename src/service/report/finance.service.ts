@@ -30,6 +30,9 @@ function deleteCashier(id: number) {
 function getGroupedFinance(startDate: string, endDate: string) {
   return http.get(`/receipts/grouped?startDate=${startDate}&endDate=${endDate}`);
 }
+function getTopSellingProducts(date: string) {
+  return http.get(`/receipts/top-selling-products?date=${date}`);
+}
 function getRevenue() {
   return http.get("/importingredients/revenue");
 }
@@ -46,5 +49,6 @@ export default {
   deleteCashier,
   getRevenue,
   getExpenditure,
+  getTopSellingProducts
 
 };
