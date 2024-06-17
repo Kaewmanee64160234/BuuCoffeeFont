@@ -14,7 +14,6 @@ const productStore = useProductStore();
 const categoryStore = useCategoryStore();
 const url = import.meta.env.VITE_URL_PORT;
 const paginate = ref(true);
-const selectedCategory = ref(categoryStore.selectedCategory);
 const ingredientStore = useIngredientStore();
 
 onMounted(async () => {
@@ -30,17 +29,17 @@ const openCreateDialog = () => {
 };
 
 const openUpdateDialog = (product: Product) => {
-  productStore.product = { ...product, file: new File([""], "") };
+  productStore.editedProduct = { ...product, file: new File([""], "") };
   loadProductData();
   productStore.updateProductDialog = true;
 };
 
 const loadProductData = () => {
-  const product = productStore.product;
+  const product = productStore.editedProduct;
 
   productStore.productName = product.productName || '';
   productStore.productPrice = product.productPrice || 0;
-  productStore.selectedCategory = product.category?.categoryName || null;
+  productStore.selectedCategoryForUpdate = product.category?.categoryName || null;
   productStore.imagePreview = product.productImage ? `${url}/products/${product.productId}/image` : null;
 
   if (product.productTypes && Array.isArray(product.productTypes)) {

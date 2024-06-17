@@ -11,6 +11,7 @@ import receiptService from "@/service/receipt.service";
 import type { Promotion } from "@/types/promotion.type";
 import { useCustomerStore } from "./customer.store";
 import Swal from "sweetalert2";
+import { useUserStore } from "./user.store";
 
 export const usePosStore = defineStore("pos", () => {
   const selectedItems = ref<ReceiptItem[]>([]);
@@ -40,7 +41,8 @@ export const usePosStore = defineStore("pos", () => {
   const productStore = useProductStore();
   const receiptDialog = ref(false);
   const customerStore = useCustomerStore();
-  let queueNumber = 1;
+  const userStore = useUserStore();
+  const queueNumber = ref(1);
   const addToReceipt = (
     product: Product,
     productType: ProductType,
@@ -197,12 +199,26 @@ export const usePosStore = defineStore("pos", () => {
 
   // create function create recipt
   const createReceipt = async () => {
-    receipt.value.receiptItems = selectedItems.value;
-    receipt.value.receiptType = "coffee";
-    receipt.value.receiptStatus = "pending";
-    receipt.value.createdDate = new Date();
-    receipt.value.queueNumber = queueNumber;
-    queueNumber++;
+    let receiptStatus = "";
+    if (userStore.userRole == " พนักงานขายกาแฟ") {
+      receiptStatus = "ร้านกาแฟ";
+    } else {
+      receiptStatus = "ร้านข้าว";
+    }
+    if (currentReceipt.value?.queueNumber !== undefined) {
+      receipt.value.receiptItems = selectedItems.value;
+      receipt.value.receiptStatus = receiptStatus;
+      receipt.value.receiptStatus = "paid";
+      receipt.value.createdDate = new Date();
+      receipt.value.queueNumber = currentReceipt.value?.queueNumber + 1;
+    } else {
+      receipt.value.receiptItems = selectedItems.value;
+      receipt.value.receiptType = receiptStatus;
+      receipt.value.receiptStatus = "paid";
+      receipt.value.createdDate = new Date();
+      receipt.value.queueNumber = queueNumber.value;
+    }
+    queueNumber.value++;
     if (receipt.value.receiptTotalDiscount === 0) {
       receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice;
     }
@@ -222,8 +238,8 @@ export const usePosStore = defineStore("pos", () => {
     if (currentDate < new Date(promotion.startDate)) {
       Swal.fire({
         icon: "error",
-        title: "Promotion Expired",
-        text: "The promotion is not valid at this time.",
+        title: "โปรโมชั่นหมดอายุ",
+        text: "โปรโมชั่นไม่สามารถใช้งานได้ในขณะนี้",
       });
       return;
     }
@@ -231,8 +247,8 @@ export const usePosStore = defineStore("pos", () => {
       if (currentDate > new Date(promotion.endDate!)) {
         Swal.fire({
           icon: "error",
-          title: "Promotion Expired noEndDate",
-          text: "The promotion is not valid at this time.",
+          title: "โปรโมชั่นหมดอายุ",
+          text: "โปรโมชั่นไม่สามารถใช้งานได้ในขณะนี้",
         });
         return;
       }
@@ -242,8 +258,8 @@ export const usePosStore = defineStore("pos", () => {
     if (receipt.value.receiptTotalPrice <= 0) {
       Swal.fire({
         icon: "error",
-        title: "Invalid Operation",
-        text: "The total price must be greater than zero to apply a promotion.",
+        title: "การดำเนินการไม่ถูกต้อง",
+        text: "ยอดรวมต้องมากกว่าศูนย์เพื่อใช้โปรโมชั่น",
       });
       return;
     }
@@ -262,8 +278,8 @@ export const usePosStore = defineStore("pos", () => {
           ) {
             Swal.fire({
               icon: "error",
-              title: "Invalid Discount",
-              text: "The customer does not have enough points to redeem.",
+              title: "ส่วนลดไม่ถูกต้อง",
+              text: "ลูกค้ามีคะแนนไม่เพียงพอที่จะแลก",
             });
             return;
           }
@@ -272,8 +288,8 @@ export const usePosStore = defineStore("pos", () => {
         } else {
           Swal.fire({
             icon: "error",
-            title: "Invalid Discount",
-            text: "The customer does not have enough points to redeem.",
+            title: "ส่วนลดไม่ถูกต้อง",
+            text: "ลูกค้ามีคะแนนไม่เพียงพอที่จะแลก",
           });
           return;
         }
@@ -288,8 +304,8 @@ export const usePosStore = defineStore("pos", () => {
       } else {
         Swal.fire({
           icon: "error",
-          title: "Invalid Discount Not in Condition",
-          text: "The total price must be greater than or equal to the condition value to apply a percentage discount.",
+          title: "ส่วนลดไม่ถูกต้อง",
+          text: "ยอดรวมต้องมากกว่าหรือเท่ากับเงื่อนไขการใช้โปรโมชั่น",
         });
         return;
       }
@@ -317,16 +333,16 @@ export const usePosStore = defineStore("pos", () => {
             } else {
               Swal.fire({
                 icon: "error",
-                title: "Product Not enough",
-                text: "The buy product quantity is not enough to apply the promotion.",
+                title: "จำนวนสินค้าไม่เพียงพอ",
+                text: "จำนวนสินค้าซื้อไม่เพียงพอที่จะใช้โปรโมชั่น",
               });
               return;
             }
           } else {
             Swal.fire({
               icon: "error",
-              title: "Invalid Discount Overused",
-              text: "The promotion is not valid for this product.",
+              title: "ส่วนลดไม่ถูกต้อง",
+              text: "โปรโมชั่นไม่สามารถใช้ได้สำหรับสินค้านี้",
             });
             return;
           }
@@ -350,32 +366,32 @@ export const usePosStore = defineStore("pos", () => {
                 } else {
                   Swal.fire({
                     icon: "error",
-                    title: "Invalid Discount Overused",
-                    text: "The promotion is not valid for this product.",
+                    title: "ส่วนลดไม่ถูกต้อง",
+                    text: "โปรโมชั่นไม่สามารถใช้ได้สำหรับสินค้านี้",
                   });
                   return;
                 }
               } else {
                 Swal.fire({
                   icon: "error",
-                  title: "Invalid Discount",
-                  text: "The free product quantity is not enough to apply the promotion.",
+                  title: "ส่วนลดไม่ถูกต้อง",
+                  text: "จำนวนสินค้าฟรีไม่เพียงพอที่จะใช้โปรโมชั่น",
                 });
                 return;
               }
             } else {
               Swal.fire({
                 icon: "error",
-                title: "Invalid Discount",
-                text: "The buy product quantity is not enough to apply the promotion.",
+                title: "จำนวนสินค้าไม่เพียงพอ",
+                text: "จำนวนสินค้าซื้อไม่เพียงพอที่จะใช้โปรโมชั่น",
               });
               return;
             }
           } else {
             Swal.fire({
               icon: "error",
-              title: "Invalid Discount",
-              text: "The promotion is not valid for this product.",
+              title: "ส่วนลดไม่ถูกต้อง",
+              text: "โปรโมชั่นไม่สามารถใช้ได้สำหรับสินค้านี้",
             });
             return;
           }
@@ -383,8 +399,8 @@ export const usePosStore = defineStore("pos", () => {
       } else {
         Swal.fire({
           icon: "error",
-          title: "Not in receipt",
-          text: "The promotion is not valid for this product.",
+          title: "ไม่พบสินค้าในรายการ",
+          text: "โปรโมชั่นไม่สามารถใช้ได้สำหรับสินค้านี้",
         });
         return;
       }
@@ -401,8 +417,8 @@ export const usePosStore = defineStore("pos", () => {
     if (newNetPrice <= 0) {
       Swal.fire({
         icon: "error",
-        title: "Invalid Discount",
-        text: "The discount is too high and would result in a zero or negative total price.",
+        title: "ส่วนลดไม่ถูกต้อง",
+        text: "ส่วนลดมากเกินไปและจะทำให้ยอดรวมเป็นศูนย์หรือค่าติดลบ",
       });
       return;
     }
@@ -459,5 +475,6 @@ export const usePosStore = defineStore("pos", () => {
     currentReceipt,
     receiptDialog,
     removePromotion,
+    queueNumber,
   };
 });

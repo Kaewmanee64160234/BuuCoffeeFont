@@ -38,7 +38,7 @@ const formattedTime = computed(() => {
             <h4 class="header-text">Buu Library</h4>
             <div class="dashed-line"></div>
             <div class="d-flex justify-space-between">
-              <p style="text-align: start">Queue: {{ posStore.currentReceipt?.receiptId }}</p>
+              <p style="text-align: start">Queue: {{ posStore.currentReceipt?.queueNumber }}</p>
               <p style="text-align: start">#{{ posStore.currentReceipt?.receiptId }}</p>
             </div>
             <p style="text-align: start">Staff: {{ posStore.currentReceipt?.user?.userName }}</p>

@@ -37,7 +37,7 @@
     </v-card>
   </v-dialog>
 </template>
-  
+
 <script lang="ts" setup>
 import { ref } from 'vue';
 import { useToppingStore } from '@/stores/topping.store';
@@ -66,14 +66,14 @@ const submitForm = async () => {
         toppingName: toppingName.value,
         toppingPrice: toppingPrice.value,
       };
-  
+
       try {
         await toppingStore.createTopping(newTopping);
         toppingStore.createToppingDialog = false;
-        Swal.fire('Success', 'Topping created successfully!', 'success');
+        Swal.fire('สำเร็จ', 'ท็อปปิ้งถูกสร้างเรียบร้อยแล้ว!', 'success');
       } catch (error) {
         console.error('Error creating topping:', error);
-        Swal.fire('Error', 'An error occurred while creating the topping.', 'error');
+        Swal.fire('ข้อผิดพลาด', 'เกิดข้อผิดพลาดขณะสร้างท็อปปิ้ง.', 'error');
       }
     }
   }

@@ -13,11 +13,11 @@ export const usePromotionStore = defineStore("promotion", () => {
   const itemsPerPage = ref(5);
   const totalItems = ref(0);
   const promotionTypes = [
-    { text: 'Discount by Price', value: 'discountPrice' },
-    { text: 'Buy 1 Get 1', value: 'buy1get1' },
-    { text: 'Use Points for Discount', value: 'usePoints' },
-    { text: 'Discount by Percentage', value: 'discountPercentage' },
-];
+    { text: "ส่วนลดเป็นจำนวนเงิน", value: "discountPrice" },
+    { text: "ซื้อ 1 แถม 1", value: "buy1get1" },
+    { text: "ใช้คะแนนแลกส่วนลด", value: "usePoints" },
+    { text: "ส่วนลดเป็นเปอร์เซ็นต์", value: "discountPercentage" },
+  ];
 
   // Watch for searchQuery
   watch(searchQuery, (value) => {
@@ -32,7 +32,6 @@ export const usePromotionStore = defineStore("promotion", () => {
   watch([searchQuery, currentPage], async () => {
     await getPromotionsPaginate();
   });
-
 
   // Fetch all promotions
   const getAllPromotions = async () => {
@@ -56,10 +55,9 @@ export const usePromotionStore = defineStore("promotion", () => {
       if (res.data) {
         promotions.value = res.data.data;
         totalItems.value = res.data.total;
-        
+
         console.log(res.data);
       }
-
     } catch (error) {
       console.error(error);
     }
@@ -81,12 +79,12 @@ export const usePromotionStore = defineStore("promotion", () => {
   // Update an existing promotion
   const updatePromotion = async (id: number, promotion: Promotion) => {
     try {
+      console.log(JSON.stringify(promotion));
       const res = await promotionService.updatePromotion(id, promotion);
       if (res.data) {
         const index = promotions.value.findIndex((p) => p.promotionId === id);
         promotions.value[index] = res.data;
-      getPromotionsPaginate();
-
+        await getPromotionsPaginate();
       }
     } catch (error) {
       console.error(error);
@@ -158,6 +156,5 @@ export const usePromotionStore = defineStore("promotion", () => {
     totalItems,
     promotionTypes,
     getPromotionByType,
-    
   };
 });

@@ -14,36 +14,36 @@ function chunkPromotions() {
   const chunkSize = 4;
   const chunks: Promotion[][] = [];
   if (promotionStore.promotions.length === 0) {
-    console.log("No promotions available");
+    console.log("ไม่มีโปรโมชั่นที่พร้อมใช้งาน");
     return;
   }
   for (let i = 0; i < promotionStore.promotions.length; i += chunkSize) {
     chunks.push(promotionStore.promotions.slice(i, i + chunkSize));
   }
   promotionChunks.value = chunks;
-  console.log("Chunked Promotions:", promotionChunks.value);
+  console.log("โปรโมชั่นที่แบ่งเป็นกลุ่ม:", promotionChunks.value);
 }
 
 onMounted(async () => {
-  console.log("Fetching promotions...");
-  await promotionStore.getAllPromotions(); // Fetch all promotions from the store
-  console.log("Fetched Promotions:", promotionStore.promotions); // Debugging log
-  chunkPromotions(); // Chunk promotions after fetching
-  await nextTick(); // Ensure DOM update
-  console.log("Carousel items rendered");
+  console.log("กำลังดึงข้อมูลโปรโมชั่น...");
+  await promotionStore.getAllPromotions(); 
+  console.log("โปรโมชั่นที่ดึงข้อมูลมา:", promotionStore.promotions); 
+  chunkPromotions(); 
+  await nextTick(); 
+  console.log("ไอเท็มคารูเซลที่เรนเดอร์");
 });
 
 watch(() => promotionStore.promotions, () => {
-  console.log("Promotions updated:", promotionStore.promotions); // Debugging log
+  console.log("โปรโมชั่นที่อัปเดต:", promotionStore.promotions); 
   chunkPromotions();
-}, { immediate: true });
+});
 
 function applyPromotion(promotion: Promotion) {
   if (posStore.selectedItems.length === 0) {
     Swal.fire({
       icon: 'error',
-      title: 'No Items',
-      text: 'You cannot apply a promotion because there are no items in the receipt.',
+      title: 'ไม่มีรายการ',
+      text: 'คุณไม่สามารถใช้โปรโมชั่นได้เนื่องจากไม่มีรายการในใบเสร็จ',
     });
     return;
   }
@@ -76,7 +76,7 @@ function getButtonClass(promotion: Promotion) {
 
 <template>
   <v-carousel hide-delimiter-background hide-delimiters height="180" style="background-color: #80715E; border-radius: 20px;">
-    <v-carousel-item v-for="(chunk, index) in promotionChunks" :key="chunk[index].promotionId">
+    <v-carousel-item v-for="(chunk, index) in promotionChunks" :key="index">
       <div class="promotion-group">
         <div class="promotion-container">
           <v-card v-for="promotion in chunk" :key="promotion.promotionId" class="promotion-card"
@@ -97,17 +97,15 @@ function getButtonClass(promotion: Promotion) {
   </v-carousel>
 </template>
 
-
-
-
 <style scoped>
-.promotion-group{
+.promotion-group {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 10px;
   height: 100%;
 }
+
 .promotion-container {
   display: flex;
   justify-content: flex-start;
@@ -137,7 +135,7 @@ function getButtonClass(promotion: Promotion) {
 
 .v-card-title {
   text-align: center;
-  font-size: 80%; /* Adjusted font size */
+  font-size: 80%;
 }
 
 .v-card-actions {
@@ -190,4 +188,3 @@ function getButtonClass(promotion: Promotion) {
   word-wrap: break-word;
 }
 </style>
-

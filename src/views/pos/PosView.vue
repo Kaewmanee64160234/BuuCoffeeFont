@@ -24,6 +24,7 @@ const productFilters = ref<Product[]>();
 const searchQuery = ref('');
 const customerStore = useCustomerStore();
 onMounted(async () => {
+  promotionStore.promotions = []
   await productStore.getAllProducts();
   await categoryStore.getAllCategories();
   await toppingStore.getAllToppings();
@@ -37,7 +38,7 @@ onMounted(async () => {
     productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === "กับข้าว".toLocaleLowerCase());
   } else {
     promotionStore.getPromotionByType("ร้านกาแฟ");
-    selectedCategory.value = "coffee";
+    selectedCategory.value = "กาแฟ";
     const cate = categoryStore.categoriesForCreate.findIndex(category => category.categoryName === "กับข้าว")
     categoryStore.categoriesForCreate.splice(cate, 1);
     productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === "coffee".toLocaleLowerCase());
