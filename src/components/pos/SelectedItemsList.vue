@@ -1,6 +1,7 @@
 <template>
   <div class="h-screen app">
     <AddCustomerDialog />
+    <ReceiptHistoryDetail />
     <v-window v-model="step" transition="fade" class="h-screen">
       <v-window-item :value="1" class="full-height">
         <div class="content-container">
@@ -33,7 +34,7 @@
                 </v-col>
                 <v-col cols="12" md="5" class="d-flex align-center justify-start">
                   <v-btn class="mr-3" icon="mdi-account-plus" color="#ff9800" @click="openCreateCustomerDialog()"></v-btn>
-                  <v-btn color="#ff9800" @click="openCreateCustomerDialog()">ประวัติการสั่งซื้อ</v-btn>
+                  <v-btn color="#ff9800" @click="openReceiptDialog()">ประวัติการสั่งซื้อ</v-btn>
                 </v-col>
               </v-row>
             </div>
@@ -154,7 +155,7 @@
                 </v-col>
                 <v-col cols="12" md="5" class="d-flex align-center justify-start">
                   <v-btn class="mr-3" icon="mdi-account-plus" color="#ff9800" @click="openCreateCustomerDialog()"></v-btn>
-                  <v-btn color="#ff9800" @click="openCreateCustomerDialog()">ประวัติการสั่งซื้อ</v-btn>
+                  <v-btn color="#ff9800" @click="openReceiptDialog()">ประวัติการสั่งซื้อ</v-btn>
                 </v-col>
               </v-row>
             </div>
@@ -242,6 +243,7 @@ import AddCustomerDialog from '../customer/AddCustomerDialog.vue';
 import type { ReceiptItem } from '../../types/receipt.type';
 import type { Promotion } from '../../types/promotion.type';
 import { useUserStore } from '@/stores/user.store';
+import ReceiptDetailsDialog from '../receipts/ReceiptDialog.vue';
 
 const step = ref(1);
 const posStore = usePosStore();
@@ -286,6 +288,10 @@ function calculateChange() {
   if (posStore.receipt.paymentMethod === 'cash') {
     change.value = recive.value - posStore.receipt.receiptNetPrice;
   }
+}
+
+function openReceiptDialog ()  {
+  posStore.receiptHistoryDialog = true;
 }
 
 function selectPaymentMethod(method: string) {

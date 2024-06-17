@@ -43,6 +43,7 @@ export const usePosStore = defineStore("pos", () => {
   const customerStore = useCustomerStore();
   const userStore = useUserStore();
   const queueNumber = ref(1);
+  const receiptHistoryDialog = ref(false);
   const addToReceipt = (
     product: Product,
     productType: ProductType,
@@ -476,5 +477,6 @@ export const usePosStore = defineStore("pos", () => {
     receiptDialog,
     removePromotion,
     queueNumber,
+    receiptHistoryDialog
   };
 });

@@ -17,11 +17,18 @@ function updateReceipt(id: number, receipt: Receipt) {
 function deleteReceipt(id: number) {
   return http.delete(`/receipts/${id}`);
 }
+// cancelReceipt
+function cancelReceipt(id: number) {
+  return http.put(`/receipts/cancel/${id}`);
+}
+
+
 
 export default {
   getAllReceipts,
   getReceiptById,
   createReceipt,
   updateReceipt,
-  deleteReceipt
+  deleteReceipt,
+  cancelReceipt
 };
