@@ -67,7 +67,7 @@ const formatDate = (date: any) => {
         <td>{{ item.store }}</td>
         <td>{{ item.total }}</td>
         <td>{{ item.discount }}</td>
-        <td>{{ item.user }}</td>
+        <td>{{ item.user.userName }}</td>
         <td>
             <v-btn color="#FFDD83" class="mr-2" icon="mdi-pencil">ดู</v-btn>
         </td>

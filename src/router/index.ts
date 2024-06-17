@@ -42,31 +42,31 @@ const router = createRouter({
       path: '/ingredientList',
       name: 'ingredients',
       component: () => import('../views/ingredient/IngredientView.vue'),
-      meta: { requiresAuth: true }
+      // meta: { requiresAuth: true }
     },
     {
       path: '/importingredient',
       name: 'importingredients',
       component: () => import('../views/ingredient/import/importIngredientView.vue'),
-      meta: { requiresAuth: true }
+      // meta: { requiresAuth: true }
     },
     {
       path: '/importingredient-history',
       name: 'importingredientsHistory',
       component: () => import('../views/ingredient/import/importIngredientHistoryView.vue'),
-      meta: { requiresAuth: true }
+      // meta: { requiresAuth: true }
     },
     {
       path: '/checkingredient',
       name: 'checkingredient',
       component: () => import('../views/ingredient/check/checkIngredientView.vue'),
-      meta: { requiresAuth: true }
+      // meta: { requiresAuth: true }
     },
     {
       path: '/checkingredient-history',
       name: 'checkingredientHistory',
       component: () => import('../views/ingredient/check/checkIngredientHistoryView.vue'),
-      meta: { requiresAuth: true }
+      // meta: { requiresAuth: true }
     },
     {
       path: '/category',
