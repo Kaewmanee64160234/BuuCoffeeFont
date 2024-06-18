@@ -2,12 +2,15 @@
 import { useHistoryIngredientImportStore } from '@/stores/historyIngredientimport.store';
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router'
+import dialogCheckItem from './dialogImport.vue';
 const ingredientStore = useHistoryIngredientImportStore();
 const router = useRouter();
 onMounted(async () => {
     await ingredientStore.getAllHistoryImportIngredients();
 });
-const showDetail = () => {
+const showDetail = (items) => {
+  ingredientStore.selectedItems = items;
+  ingredientStore.dialogimportkitem = true;
 };
 
 const navigateTo = (routeName: string) => {
@@ -23,7 +26,7 @@ const formatDate = (date: any) => {
 </script>
 
 <template>
-
+<dialogCheckItem/>
     <v-container>
         <v-card>
             <v-card-title>
@@ -71,7 +74,9 @@ const formatDate = (date: any) => {
         <td>{{ item.discount }}</td>
         <td>{{ item.user.userName }}</td>
         <td>
-            <v-btn color="#FFDD83" class="mr-2" icon="mdi-pencil"@click="showDetail(item.importingredientitem)">ดู</v-btn>
+            <v-btn color="#FFDD83" class="mr-2" icon="mdi-pencil" @click="showDetail(item.importingredientitem)">ดู</v-btn>
+
+            <!--  -->
         </td>
     </tr>
 </tbody>

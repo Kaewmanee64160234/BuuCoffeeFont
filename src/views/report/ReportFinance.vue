@@ -20,8 +20,9 @@ function reloadData() {
       <v-card-title>
         <v-row class="d-flex align-center justify-space-between">
           <v-col cols="auto">
-            Dashboard
+            <h3>Dashboard</h3>
           </v-col>
+          
           <v-col cols="auto">
             <v-btn
               color="success"

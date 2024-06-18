@@ -130,8 +130,8 @@ function formatDateThai(dateString: string): string {
     <v-card class="flex-container">
       <v-card-title>
         <v-row>
-          <v-col cols="12" style="font-size: 35px;">
-            จัดการผู้ใช้งาน
+          <v-col cols="9" style="padding: 20px;">
+          <h3>ประวัติการขาย</h3>
           </v-col>
           <v-row style="margin-left: 6%;">
             <v-col class="pa-2 ma-2" cols="3">

@@ -7,6 +7,8 @@ export const useCheckIngredientStore = defineStore(
   "checkIngredient",
   () => {
     const CheckIngredientsHistory = ref<Checkingredient[]>([]);
+    const dialogCheckItem = ref(false);
+    const selectedItems = ref([]);
 
     const getAllHistortIngredients = async () => {
       try {
@@ -22,5 +24,7 @@ export const useCheckIngredientStore = defineStore(
   return {
     CheckIngredientsHistory,
     getAllHistortIngredients,
+    selectedItems,
+    dialogCheckItem,
   };
 });
