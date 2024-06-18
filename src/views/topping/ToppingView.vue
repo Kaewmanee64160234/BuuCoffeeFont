@@ -3,8 +3,8 @@
     <v-card>
       <v-card-title>
         <v-row>
-          <v-col cols="9">
-            ท็อปปิ้ง
+          <v-col cols="9" style="padding: 20px;">
+          <h3>ท้อปปิ้ง</h3>
           </v-col>
           <v-col cols="3">
             <v-text-field 

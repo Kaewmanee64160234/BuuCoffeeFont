@@ -61,8 +61,8 @@ watch(paginate, async (newPage, oldPage) => {
     <v-card>
       <v-card-title>
         <v-row>
-          <v-col cols="9">
-            รายการวัตถุดิบ
+          <v-col cols="9" style="padding: 20px;">
+          <h3>รายการวัตถุดิบ</h3>
           </v-col>
           <v-col cols="3">
             <v-text-field label="ค้นหารายการวัตถุดิบ" append-inner-icon="mdi-magnify" hide-details dense v-model="ingredientStore.keyword"></v-text-field>

@@ -64,6 +64,9 @@
                     <v-row>
                       <v-col cols="12">
                         <v-subheader>{{ step.label }}</v-subheader>
+                      
+
+
                       </v-col>
                       <v-col cols="12">
                         <v-table>
@@ -261,7 +264,12 @@ const handleColdIngredientSelect = (ingredient: Ingredient) => {
     delete productStore.ingredientQuantitiesCold[ingredientId];
   }
 };
-
+const getProductType = (typeName: string) => {
+  console.log("getProductType called with typeName: " + typeName);
+  const pddt =  productDetails.value.find(pt => pt.productTypeName === typeName) as CustomProductType;
+console.log("getProductType called with typeName: " + pddt);
+  return pddt;
+};
 const handleBlendIngredientSelect = (ingredient: Ingredient) => {
   const ingredientId = ingredient.ingredientId;
   const keys = Object.keys(productStore.ingredientQuantitiesBlend);
@@ -310,7 +318,8 @@ const submitForm = async () => {
     if (productStore.selectedIngredientsHot.length > 0) {
       productData.productTypes.push({
         productTypeName: 'Hot',
-        productTypePrice: 0,
+        productTypePrice: 
+        productDetails.value.find(pt => pt.productTypeName === 'Hot')?.productTypePrice || 0,
         recipes: productStore.selectedIngredientsHot.map((ingredientId) => {
           return {
             ingredient: ingredientStore.ingredients.find(i => i.ingredientId === ingredientId)!,
@@ -322,7 +331,7 @@ const submitForm = async () => {
     if (productStore.selectedIngredientsCold.length > 0) {
       productData.productTypes.push({
         productTypeName: 'Cold',
-        productTypePrice: 0,
+        productTypePrice: productDetails.value.find(pt => pt.productTypeName === 'Cold')?.productTypePrice || 0,  
         recipes: productStore.selectedIngredientsCold.map((ingredientId) => {
           return {
             ingredient: ingredientStore.ingredients.find(i => i.ingredientId === ingredientId)!,
@@ -334,7 +343,7 @@ const submitForm = async () => {
     if (productStore.selectedIngredientsBlend.length > 0) {
       productData.productTypes.push({
         productTypeName: 'Blend',
-        productTypePrice: 0,
+        productTypePrice: productDetails.value.find(pt => pt.productTypeName === 'Blend')?.productTypePrice || 0,
         recipes: productStore.selectedIngredientsBlend.map((ingredientId) => {
           return {
             ingredient: ingredientStore.ingredients.find(i => i.ingredientId === ingredientId)!,

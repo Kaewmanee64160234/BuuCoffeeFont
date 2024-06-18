@@ -12,7 +12,7 @@ console.log("receipt", JSON.stringify(receipt));
   return http.post("/receipts", receipt);
 }
 function updateReceipt(id: number, receipt: Receipt) {
-  return http.put(`/receipts/${id}`, receipt);
+  return http.patch(`/receipts/${id}`, receipt);
 }
 function deleteReceipt(id: number) {
   return http.delete(`/receipts/cancel/${id}`);

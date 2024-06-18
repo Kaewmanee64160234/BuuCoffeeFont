@@ -153,6 +153,8 @@ export const usePosStore = defineStore("pos", () => {
     receipt.value.receiptTotalPrice = calculateTotal(selectedItems.value);
     if (receipt.value.receiptTotalDiscount === 0) {
       receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice;
+    }else{
+      receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice - receipt.value.receiptTotalDiscount;
     }
   };
   const calculateTotal = (selectedItems: ReceiptItem[]) => {
@@ -165,6 +167,11 @@ export const usePosStore = defineStore("pos", () => {
   const removeItem = (index: number) => {
     selectedItems.value.splice(index, 1);
     receipt.value.receiptTotalPrice = calculateTotal(selectedItems.value);
+    if( receipt.value.receiptTotalDiscount === 0){
+      receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice ;
+    }else{
+      receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice - receipt.value.receiptTotalDiscount;
+    }
     if (selectedItems.value.length === 0) {
       receipt.value.receiptTotalPrice = 0;
       receipt.value.receiptTotalDiscount = 0;
@@ -174,6 +181,7 @@ export const usePosStore = defineStore("pos", () => {
       receipt.value.receiptStatus = "";
       receipt.value.paymentMethod = "";
     }
+  
   };
 
   const spliceData = (index: number) => {
@@ -188,6 +196,12 @@ export const usePosStore = defineStore("pos", () => {
       selectedItems.value.splice(index, 1);
     }
     receipt.value.receiptTotalPrice = calculateTotal(selectedItems.value);
+    if( receipt.value.receiptTotalDiscount === 0){
+      receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice ;
+    }
+    else{
+      receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice - receipt.value.receiptTotalDiscount;
+    }
     if (selectedItems.value.length === 0) {
       // clear all data
       receipt.value.receiptTotalPrice = 0;
@@ -420,6 +434,9 @@ export const usePosStore = defineStore("pos", () => {
       parseFloat(receipt.value.receiptTotalPrice + "") -
       parseFloat(newTotalDiscount + "");
 
+      receipt.value.receiptTotalDiscount = newTotalDiscount;
+      receipt.value.receiptNetPrice = newNetPrice;
+
     if (newNetPrice <= 0) {
       Swal.fire({
         icon: "error",
@@ -461,6 +478,19 @@ export const usePosStore = defineStore("pos", () => {
       parseFloat(receipt.value.receiptTotalDiscount + "");
   };
 
+  const updateReceipt = async (id: number, receipt: Receipt) => {
+    console.log("updateReceipt", JSON.stringify(receipt));
+    const res = await receiptService.updateReceipt(id, receipt);
+    if (res.status === 200) {
+      // console.log("Receipt updated successfully", res.data);
+      currentReceipt.value = res.data;
+      await customerStore.getAllCustomers();
+      // await receiptStore.getRecieptIn30Min();
+    }
+    await receiptStore.getRecieptIn30Min();
+  }
+
+
   return {
     selectedItems,
     receiptPromotions,
@@ -483,5 +513,6 @@ export const usePosStore = defineStore("pos", () => {
     removePromotion,
     queueNumber,
     ReceiptDialogPos,
+    updateReceipt
   };
 });
