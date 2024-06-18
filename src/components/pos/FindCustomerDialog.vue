@@ -63,7 +63,7 @@ const filteredCustomers = computed(() => {
   </v-dialog>
 </template>
 
-<style>
+<style scoped>
 .scroll {
   max-height: 45vh;
   /* สูงสุดสำหรับการมองเห็น */
