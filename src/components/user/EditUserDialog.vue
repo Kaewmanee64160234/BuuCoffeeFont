@@ -14,19 +14,19 @@
               </v-col>
               <v-col cols="12" md="6">
                 <v-text-field 
-                v-model="userPassword" 
-                label="รหัสผ่าน" 
-                :type="show ? 'text' : 'password'"
-                :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
+                  v-model="userPassword" 
+                  label="รหัสผ่าน" 
+                  :type="show ? 'text' : 'password'"
+                  :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
                   @click:append="show = !show"
-                required>
-                </v-text-field>
+                  required
+                ></v-text-field>
               </v-col>
               <v-col cols="12" md="6">
                 <v-text-field v-model="userEmail" label="อีเมล" required></v-text-field>
               </v-col>
               <v-col cols="12" md="6">
-                <v-text-field v-model="userStatus" label="สถานะผู้ใช้งาน" required></v-text-field>
+                <v-text-field v-model="userStatus" label="สถานะผู้ใช้งาน" :rules="statusRules" required></v-text-field>
               </v-col>
               <v-col>
                 <v-select
@@ -57,6 +57,7 @@ import { defineProps, ref, watch } from 'vue';
 import { useUserStore } from '@/stores/user.store';
 import type { VForm } from 'vuetify/components';
 import type { User } from '@/types/user.type';
+import Swal from 'sweetalert2';
 
 const props = defineProps<{ dialog: boolean, user: User | null }>();
 const form = ref<VForm | null>(null);
@@ -69,6 +70,12 @@ const userPassword = ref(props.user?.userPassword || '');
 const userEmail = ref(props.user?.userEmail || '');
 const userRole = ref(props.user?.userRole || '');
 const userStatus = ref(props.user?.userStatus || '');
+
+// Validation rules
+const statusRules = [
+  (v: string) => !!v || 'สถานะผู้ใช้งานจำเป็นต้องระบุ',
+  (v: string) => /^[A-Za-zก-ฮะาำิีืึุูโเแใไ่้๊๋็่๋์]+$/.test(v) || 'กรุณากรอกสถานะผู้ใช้งานเป็นตัวอักษรเท่านั้น'
+];
 
 watch(() => props.dialog, (newVal) => {
   dialog.value = newVal;
@@ -97,15 +104,26 @@ async function saveUser() {
     try {
       const response = await userStore.updateUser(updatedUser.userId, updatedUser);
       if (response) {
+        Swal.fire({
+          title: 'สำเร็จ!',
+          text: 'แก้ไขผู้ใช้งานเสร็จสิ้น!',
+          icon: 'success',
+          confirmButtonText: 'ตกลง'
+        });
         dialog.value = false;
         userStore.updateUserDialog = false;
         await userStore.getAllUsers();
       }
     } catch (error) {
       console.error('Failed to update user:', error);
+      Swal.fire({
+        title: 'เกิดข้อผิดพลาด',
+        text: 'เกิดข้อผิดพลาดขณะแก้ไขผู้ใช้งาน',
+        icon: 'error',
+        confirmButtonText: 'ตกลง'
+      });
     }
   }
-  dialog.value = false;
 }
 
 function closeDialog() {
@@ -113,7 +131,6 @@ function closeDialog() {
   userStore.updateUserDialog = false;
 }
 </script>
-
 
 <style scoped>
 </style>

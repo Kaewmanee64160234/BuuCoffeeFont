@@ -55,6 +55,15 @@ const handleSearchKeydown = (event: KeyboardEvent) => {
   }
 };
 
+// set receipt selected to pos
+const selectReceipt = (receipt:Receipt) => {
+  posStore.receipt = receipt;
+  posStore.selectedItems = receipt.receiptItems; // assuming items is an array of the selected receipt items
+  posStore.ReceiptDialogPos = false;
+  console.log('Selected Receipt:', receipt);
+};
+
+
 const filteredReceipts = computed(() => {
   if (!receiptStore.searchQuery) {
     return receiptStore.receipts.slice().sort((a, b) => (a.receiptId ?? 0) - (b.receiptId ?? 0));
@@ -130,7 +139,7 @@ function formatDateThai(dateString: string): string {
               <td class="text-center">{{ receipt.paymentMethod || '-' }}</td>
               <td class="text-center">{{ receipt.receiptStatus }}</td>
               <td class="text-center">
-                <v-btn color="yellow" class="mr-2" icon="mdi-pencil" @click="openHistoryReceiptDialog(receipt)"></v-btn>
+                <v-btn color="yellow" class="mr-2" icon="mdi-pencil" @click="selectReceipt(receipt)"></v-btn>
                 <v-btn color="red" icon="mdi-delete" @click="cancelReceipt(receipt)"></v-btn>
               </td>
             </tr>

@@ -36,22 +36,23 @@ const openEditCustomerDialog = (customer: Customer) => {
 const deleteCustomer = async (customerId: number) => {
   try {
     const result = await Swal.fire({
-      title: 'Are you sure?',
-      text: "You won't be able to revert this!",
+      title: 'คุณแน่ใจไหม?',
+      text: "คุณจะไม่สามารถย้อนกลับมาแก้ไขได้อีกแล้วนะ!",
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, delete it!'
+      confirmButtonText: 'ใช่, ลบเลย!',
+      cancelButtonText: 'ยกเลิก'
     });
 
     if (result.isConfirmed) {
       await customerStore.deleteCustomer(customerId);
-      Swal.fire('Deleted!', 'Customer has been deleted.', 'success');
+      Swal.fire('ลบเสร็จสิ้น!', 'ลูกค้าได้ถูกลบแล้ว', 'success');
     }
   } catch (error) {
     console.error('Error deleting customer:', error);
-    Swal.fire('Error', 'An error occurred while deleting the customer.', 'error');
+    Swal.fire('เกิดข้อผิดพลาด', 'เกิดข้อผิดพลาดขณะลบลูกค้า', 'error');
   }
 };
 </script>
@@ -84,7 +85,7 @@ const deleteCustomer = async (customerId: number) => {
             <v-col class="mt-4" cols="3" width="30%">
               <v-btn color="success" @click="addCustomerDialog = true">
                 <v-icon left>mdi-plus</v-icon>
-                Add New Customer
+                เพิ่มลูกค้าใหม่
               </v-btn>
             </v-col>
           </v-row>
@@ -101,7 +102,7 @@ const deleteCustomer = async (customerId: number) => {
               <th class="text-center">ชื่อลูกค้า</th>
               <th class="text-center">เบอร์โทร</th>
               <th class="text-center">แต้มสะสม</th>
-              <th class="text-center">Operations</th>
+              <th class="text-center">การกระทำ</th>
             </tr>
           </thead>
           <tbody>
@@ -120,7 +121,7 @@ const deleteCustomer = async (customerId: number) => {
           </tbody>
           <tbody v-if="!filteredCustomers.length">
             <tr>
-              <td colspan="6" class="text-center">No data</td>
+              <td colspan="6" class="text-center">ไม่มีข้อมูล</td>
             </tr>
           </tbody>
         </v-table>

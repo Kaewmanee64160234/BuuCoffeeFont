@@ -1,4 +1,3 @@
-
 <template>
   <v-container class="fill-height d-flex align-center justify-center background-image" fluid>
     <v-card class="mx-auto my-12 pa-6" width="450" elevation="10">
@@ -96,7 +95,6 @@ const loginHandler = async () => {
     });
   }
 };
-
 </script>
 
 <style scoped>
@@ -126,6 +124,12 @@ const loginHandler = async () => {
 .background-image {
   background: url('../components/img/bg.jpg') no-repeat center center;
   background-size: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1; /* Ensure the background is behind other elements */
 }
 
 .character-top-left {

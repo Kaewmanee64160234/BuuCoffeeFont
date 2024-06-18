@@ -1,9 +1,17 @@
 <template>
-  <MainMenu />
+  <MainMenu v-if="showMainMenu" />
+  <router-view />
 </template>
 
 <script setup lang="ts">
 import MainMenu from '@/components/MainLayout.vue';
+import { useRouter } from 'vue-router';
+import { computed } from 'vue';
+const router = useRouter();
+
+const showMainMenu = computed(() => {
+  return router.currentRoute.value.path !== '/login';
+});
 </script>
 
 <style >

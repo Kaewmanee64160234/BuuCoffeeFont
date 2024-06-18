@@ -9,7 +9,7 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomeView,
-      meta: { requiresAuth: true }
+      // meta: { requiresAuth: true }
     },
     {
       path: '/userManagement',
@@ -18,25 +18,25 @@ const router = createRouter({
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
       component: () => import('../views/user/userManagement.vue'),
-      meta: { requiresAuth: true }
+      // meta: { requiresAuth: true }
     },
     {
       path: '/productsManagement',
       name: 'products',
       component: () => import('../views/product/ProductManagementView.vue'),
-      meta: { requiresAuth: true }
+      // meta: { requiresAuth: true }
     },
     {
       path: '/customersManagement',
       name: 'customers',
       component: () => import('../views/customer/customerManagement.vue'),
-      meta: { requiresAuth: true }
+      // meta: { requiresAuth: true }
     },
     {
       path: '/historyReceipt',
       name: 'historyReceipt',
       component: () => import('../views/receipt/HistoryReceipt.vue'),
-      meta: { requiresAuth: true }
+      // meta: { requiresAuth: true }
     },
     {
       path: '/ingredientList',
@@ -72,35 +72,35 @@ const router = createRouter({
       path: '/category',
       name: 'category',
       component: () => import('../views/category/CategoryView.vue'),
-      meta: { requiresAuth: true }
+      // meta: { requiresAuth: true }
     },
     // toppings
     {
       path: '/topping',
       name: 'topping',
       component: () => import('../views/topping/ToppingView.vue'),
-      meta: { requiresAuth: true }
+      // meta: { requiresAuth: true }
     },
     // promotion
     {
       path: '/promotion',
       name: 'promotion',
       component: () => import('../views/promotion/PromotionView.vue'),
-      meta: { requiresAuth: true }
+      // meta: { requiresAuth: true }
     },
 //Edit
     {
       path: '/report',
       name: 'report',
       component: () => import('../views/report/ReportFinance.vue'),
-      meta: { requiresAuth: true }
+      // meta: { requiresAuth: true }
     },
     // pos
     {
       path: '/pos',
       name: 'pos',
       component: () => import('../views/pos/PosView.vue'),
-      meta: { requiresAuth: true }
+      // meta: { requiresAuth: true }
     },
     {
       path: '/login',
@@ -112,20 +112,12 @@ const router = createRouter({
 });
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
-  const userString = localStorage.getItem('user');
-
-  if (userString && !authStore.isLogin) {
-    try {
-      const userObject = JSON.parse(userString);
-      authStore.isLogin = true;
-      authStore.authName = userObject;
-    } catch (e) {
-      console.error("Failed to parse user from localStorage:", e);
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (!authStore.isLogin) {
+      next({ name: 'login' });
+    } else {
+      next();
     }
-  }
-
-  if (to.matched.some(record => record.meta.requiresAuth) && !authStore.isLogin) {
-    next({ name: 'login' });
   } else {
     next();
   }

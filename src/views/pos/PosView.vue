@@ -29,7 +29,7 @@ onMounted(async () => {
   await categoryStore.getAllCategories();
   await toppingStore.getAllToppings();
   await customerStore.getAllCustomers();
-  if (userStore.user?.userRole === "พนักงานขายข้าว") {
+  if (userStore.currentUser?.userRole === "พนักงานขายข้าว") {
     promotionStore.getPromotionByType("ร้านกับข้าว");
     selectedCategory.value = "กับข้าว";
     const cate = categoryStore.categoriesForCreate.find(category => category.categoryName === "กับข้าว")
@@ -56,14 +56,14 @@ watch(selectedCategory, async (newCategory) => {
 watch(searchQuery, async (newQuery) => {
   if (newQuery === '') {
     productFilters.value = [];
-    if (userStore.user?.userRole === "พนักงานขายข้าว") {
+    if (userStore.currentUser?.userRole === "พนักงานขายข้าว") {
       productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === selectedCategory.value.toLocaleLowerCase() && product.category.categoryName.toLocaleLowerCase() === 'กับข้าว'.toLocaleLowerCase());
     } else {
       productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === selectedCategory.value.toLocaleLowerCase() && product.category.categoryName.toLocaleLowerCase() !== 'กับข้าว'.toLocaleLowerCase());
     }
   } else {
     productFilters.value = [];
-    if (userStore.user?.userRole === "พนักงานขายข้าว") {
+    if (userStore.currentUser?.userRole === "พนักงานขายข้าว") {
       productFilters.value = productStore.products.filter(product => product.productName.toLocaleLowerCase().includes(newQuery.toLocaleLowerCase()) && product.category.categoryName.toLocaleLowerCase() === 'กับข้าว'.toLocaleLowerCase());
     } else {
       productFilters.value = productStore.products.filter(product => product.productName.toLocaleLowerCase().includes(newQuery.toLocaleLowerCase()) && product.category.categoryName.toLocaleLowerCase() !== 'กับข้าว'.toLocaleLowerCase());
@@ -78,6 +78,8 @@ watch(searchQuery, async (newQuery) => {
 <template>
   <v-app style="width: 100vw; height: 100vh;">
     <v-row class="full-width-row" style="height: 100%;">
+
+
       <v-col cols="7" class="d-flex flex-column align-center" style="background-color: #C1B6A9; height: 100%;">
         <v-container fluid class="full-width-container" style="height: 100%;">
           <v-row class="full-width-row">

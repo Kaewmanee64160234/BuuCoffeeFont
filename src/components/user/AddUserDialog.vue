@@ -2,6 +2,7 @@
 import { defineProps, ref, watch } from 'vue';
 import { useUserStore } from '@/stores/user.store';
 import type { VForm } from 'vuetify/components';
+import Swal from 'sweetalert2';
 
 const props = defineProps<{ dialog: boolean }>();
 const form = ref<VForm | null>(null);
@@ -40,8 +41,18 @@ async function saveUser() {
     });
     dialog.value = false;  // Close the dialog
     await userStore.getAllUsers();
+    showSuccessDialog('ผู้ใช้งานรายนี้ถูกสร้างเรียบร้อยแล้ว!');
   }
 }
+
+const showSuccessDialog = (message: string) => {
+  Swal.fire({
+    title: 'เสร็จสิ้น!',
+    text: message,
+    icon: 'success',
+    confirmButtonText: 'ตกลง'
+  });
+};
 
 function closeDialog() {
   dialog.value = false;  // Close the dialog

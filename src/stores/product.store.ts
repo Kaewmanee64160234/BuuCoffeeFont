@@ -144,7 +144,9 @@ export const useProductStore = defineStore("product", () => {
     try {
       const response = await productService.createProduct(product.value!);
       if (response.status === 201) {
+        if(product.value.file !== null){
         await uploadImage(product.value.file, response.data.productId);
+        }
         await getProductPaginate();
       }
     } catch (error) {
