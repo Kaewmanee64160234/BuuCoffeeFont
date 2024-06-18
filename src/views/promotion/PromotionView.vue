@@ -69,63 +69,80 @@
   </v-container>
 </template>
 
-    
-  <script lang="ts" setup>
-  import { usePromotionStore } from '@/stores/promotion.store';
-  import { onMounted, ref } from 'vue';
-  import Swal from 'sweetalert2';
-  import CreatePromotionDialog from '@/components/promotions/CreatePromotionDialog.vue';
-  import UpdatePromotionDialog from '@/components/promotions/UpdatePromotionDialog.vue';
-  import type { Promotion } from '@/types/promotion.type';
-  
-  const promotionStore = usePromotionStore();
-  
-  const headers = ref([
-    { text: 'Promotion ID', value: 'promId' },
-    { text: 'Promotion Name', value: 'promotionName' },
-    { text: 'Promotion Type', value: 'promotionType' },
-    { text: 'Discount Value', value: 'discountValue' },
-    { text: 'Actions', value: 'actions', sortable: false },
-  ]);
-  
-  onMounted(async () => {
-    await promotionStore.getPromotionsPaginate();
-  });
-  
-  const openCreateDialog = () => {
-    promotionStore.promotion = null;
-    promotionStore.createPromotionDialog = true;
-  };
-  
-  const openUpdateDialog = (promotion: Promotion) => {
-    promotionStore.promotion = { ...promotion };
-    promotionStore.updatePromotionDialog = true;
-  };
-  
-  const deletePromotion = async (promId: number) => {
-    try {
-      const result = await Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
+<script lang="ts" setup>
+import { usePromotionStore } from '@/stores/promotion.store';
+import { onMounted, ref } from 'vue';
+import Swal from 'sweetalert2';
+import CreatePromotionDialog from '@/components/promotions/CreatePromotionDialog.vue';
+import UpdatePromotionDialog from '@/components/promotions/UpdatePromotionDialog.vue';
+import type { Promotion } from '@/types/promotion.type';
+
+const promotionStore = usePromotionStore();
+
+const headers = ref([
+  { text: 'Promotion ID', value: 'promId' },
+  { text: 'Promotion Name', value: 'promotionName' },
+  { text: 'Promotion Type', value: 'promotionType' },
+  { text: 'Discount Value', value: 'discountValue' },
+  { text: 'Actions', value: 'actions', sortable: false },
+]);
+
+onMounted(async () => {
+  await promotionStore.getPromotionsPaginate();
+});
+
+const openCreateDialog = () => {
+  promotionStore.promotion = null;
+  promotionStore.createPromotionDialog = true;
+};
+
+const openUpdateDialog = (promotion: Promotion) => {
+  promotionStore.promotion = { ...promotion };
+  promotionStore.updatePromotionDialog = true;
+};
+
+const deletePromotion = async (promId: number) => {
+  try {
+    const result = await Swal.fire({
+      title: 'คุณแน่ใจหรือไม่?',
+      text: "คุณจะไม่สามารถย้อนกลับได้!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'ตกลง, ลบเลย!',
+      cancelButtonText: 'ยกเลิก'
+    });
+
+    if (result.isConfirmed) {
+      await promotionStore.deletePromotion(promId);
+      Swal.fire({
+        title: 'ลบแล้ว!',
+        text: 'โปรโมชั่นถูกลบเรียบร้อยแล้ว.',
+        icon: 'success',
+        confirmButtonText: 'ตกลง',
+        customClass: {
+          confirmButton: 'swal-button'
+        }
       });
-  
-      if (result.isConfirmed) {
-        await promotionStore.deletePromotion(promId);
-        Swal.fire('Deleted!', 'Promotion has been deleted.', 'success');
-      }
-    } catch (error) {
-      console.error('Error deleting promotion:', error);
-      Swal.fire('Error', 'An error occurred while deleting the promotion.', 'error');
     }
-  };
-  </script>
-  
-  <style scoped>
-  /* Add your styles here */
-  </style>
-  
+  } catch (error) {
+    console.error('Error deleting promotion:', error);
+    Swal.fire({
+      title: 'เกิดข้อผิดพลาด',
+      text: 'เกิดข้อผิดพลาดขณะลบโปรโมชั่น.',
+      icon: 'error',
+      confirmButtonText: 'ตกลง',
+      customClass: {
+        confirmButton: 'swal-button'
+      }
+    });
+  }
+};
+</script>
+
+<style scoped>
+.swal-button {
+  font-size: 16px;
+}
+</style>

@@ -25,7 +25,7 @@ const navigateTo = (routeName: string) => {
                         ประวัติเช็ควัตถุดิบ
                     </v-col>
                     <v-col cols="3">
-                        <v-text-field label="Search" append-inner-icon="mdi-magnify" hide-details dense></v-text-field>
+                        <v-text-field label="ค้นหาประวัติการเช็ควัตถุดิบ" append-inner-icon="mdi-magnify" hide-details dense></v-text-field>
                     </v-col>
                 </v-row>
                 <v-row>

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { useIngredientStore } from '@/stores/Ingredient.store';
 import { ref } from "vue";
+import Swal from 'sweetalert2';
 import type { VForm } from "vuetify/components";
 
 const form = ref<VForm | null>(null);
@@ -9,11 +10,33 @@ const IngredientStore = useIngredientStore();
 async function save() {
   const { valid } = await form.value!.validate();
   if (valid) {
-    await IngredientStore.saveIngredient();
+    try {
+      await IngredientStore.saveIngredient();
+      Swal.fire('สำเร็จ', 'วัตถุดิบถูกบันทึกเรียบร้อยแล้ว!', 'success');
+      IngredientStore.dialog = false;
+    } catch (error) {
+      console.error('Error saving ingredient:', error);
+      Swal.fire('เกิดข้อผิดพลาด', 'เกิดข้อผิดพลาดขณะบันทึกวัตถุดิบ.', 'error');
+    }
   }
 }
-</script>
 
+function cancel() {
+  Swal.fire({
+    title: 'คุณแน่ใจหรือไม่?',
+    text: 'คุณต้องการยกเลิกการเพิ่มวัตถุดิบหรือไม่?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'ใช่, ยกเลิก!',
+    cancelButtonText: 'ไม่, กลับไป!',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      IngredientStore.dialog = false;
+      Swal.fire('ยกเลิก', 'การเพิ่มวัตถุดิบถูกยกเลิก.', 'success');
+    }
+  });
+}
+</script>
 
 <template>
   <v-dialog v-model="IngredientStore.dialog" persistent width="1024">
@@ -97,7 +120,7 @@ async function save() {
               color="grey"
               variant="elevated"
               style="font-weight: bold"
-              @click="IngredientStore.dialog = false"
+              @click="cancel"
             >
               ยกเลิก
             </v-btn>
@@ -115,6 +138,7 @@ async function save() {
     </v-card>
   </v-dialog>
 </template>
+
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
@@ -122,4 +146,3 @@ async function save() {
   font-family: 'Kanit', sans-serif;
 }
 </style>
-

@@ -20,8 +20,8 @@ const rules = {
   required: (value: any) => !!value || 'กรุณากรอกข้อมูล',
   email: (value: string) => /.+@.+\..+/.test(value) || 'กรุณากรอกอีเมลให้ถูกต้อง',
   password: (value: string) => value.length >= 4 && /[A-Za-z].*[0-9]|[0-9].*[A-Za-z]/.test(value) || 'รหัสผ่านต้องมีอักขระและมีความยาวมากกว่า 4 ตัว',
-  userName: (value: string) => /^[A-Za-z]+$/.test(value) || 'กรุณากรอกชื่อเป็นตัวอักษรเท่านั้น',
-  userStatus: (value: string) => /^[A-Za-z]+$/.test(value) || 'กรุณากรอกสถานะผู้ใช้งานเป็นตัวอักษรเท่านั้น',
+  userName: (value: string) => /^[A-Za-zก-ฮะ-ๅๆ็่-๋์่-๋\s]+$/.test(value) || 'กรุณากรอกชื่อเป็นตัวอักษรเท่านั้น',
+  userStatus: (value: string) => /^[A-Za-zก-ฮะ-ๅๆ็่-๋์่-๋\s]+$/.test(value) || 'กรุณากรอกสถานะผู้ใช้งานเป็นตัวอักษรเท่านั้น',
 };
 
 watch(() => props.dialog, (newVal) => {

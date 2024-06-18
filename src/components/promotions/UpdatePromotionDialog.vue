@@ -19,10 +19,7 @@
                 item-value="value" label="ประเภทโปรโมชั่น" required></v-select>
               <v-select v-model="promotionStore_" :items="store" item-text="text" item-value="value"
                 label="ร้านที่ใช้promotion" required></v-select>
-              <!-- add check box promotionCanUseManyTimes -->
-
               <v-checkbox v-model="promotionCanUseManyTimes" label="โปรโมชั่นนี้สามารถใช้ได้หลายครั้ง"></v-checkbox>
-
               <v-textarea v-model="description" label="คำอธิบาย" required></v-textarea>
             </v-form>
           </template>
@@ -48,8 +45,7 @@
               </template>
               <template v-if="promotionTypeValue === 'discountPercentage'">
                 <v-text-field v-model="discountValue" label="เปอร์เซ็นต์ส่วนลด" type="number" required></v-text-field>
-                <v-text-field v-model="minimumPrice" label="ราคาขั้นต่ำสำหรับส่วนลด" type="number"
-                  required></v-text-field>
+                <v-text-field v-model="minimumPrice" label="ราคาขั้นต่ำสำหรับส่วนลด" type="number" required></v-text-field>
               </template>
             </v-form>
           </template>
@@ -57,9 +53,7 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <!-- <v-btn v-if="step > 1" @click="previousStep">ย้อนกลับ</v-btn>
-          <v-btn v-if="step < items.length" @click="nextStep">ถัดไป</v-btn> -->
-        <v-btn v-if="step === items.length" @click="updatePromotion()">ยืนยัน</v-btn>
+        <v-btn v-if="step === items.length" @click="updatePromotion">ยืนยัน</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -71,7 +65,6 @@ import { usePromotionStore } from '@/stores/promotion.store';
 import { useProductStore } from '@/stores/product.store';
 import type { Promotion } from '@/types/promotion.type';
 import Swal from 'sweetalert2';
-import type { Product } from '@/types/product.type';
 
 const promotionStore = usePromotionStore();
 const productStore = useProductStore();
@@ -95,13 +88,11 @@ const promotionTypeValue = ref('');
 const promotionId = ref<number | null>(null);
 const productFree = ref('');
 const productBuy = ref('');
-const store = ['ร้านกาแฟ', 'ร้านกับข้าว']
-
-
+const store = ['ร้านกาแฟ', 'ร้านกับข้าว'];
 
 const items = [
-  { title: 'Promotion Details', complete: false },
-  { title: 'Promotion Type Details', complete: false },
+  { title: 'รายละเอียดโปรโมชั่น', complete: false },
+  { title: 'รายละเอียดประเภทโปรโมชั่น', complete: false },
 ];
 
 onMounted(async () => {
@@ -128,15 +119,14 @@ function loadPromotionData() {
     endDate.value = promotion.endDate ? new Date(promotion.endDate).toISOString().substr(0, 10) : '';
     description.value = promotion.promotionDescription || '';
     noEndDate.value = promotion.noEndDate;
-    promotionStore_.value = promotion.promotionForStore,
-      promotionCanUseManyTimes.value = promotion.promotionCanUseManyTimes
+    promotionStore_.value = promotion.promotionForStore;
+    promotionCanUseManyTimes.value = promotion.promotionCanUseManyTimes;
     if (promotion.buyProductId) {
       productBuy.value = productStore.products.find(product => product.productId === promotion.buyProductId)?.productName;
     }
     if (promotion.freeProductId) {
       productFree.value = productStore.products.find(product => product.productId === promotion.freeProductId)?.productName;
     }
-
   }
 }
 
@@ -165,23 +155,18 @@ const closeDialog = async () => {
   description.value = '';
   noEndDate.value = false;
   step.value = 1;
-  // clear promotionStore.promotion
   promotionStore.promotion = null;
-
   promotionStore.updatePromotionDialog = false;
   promotionCanUseManyTimes.value = false;
   productFree.value = null;
   productBuy.value = null;
   await productStore.getAllProducts();
-
-
 };
 
 const updatePromotion = async () => {
   if (!promotionName.value || !promotionTypeValue.value || !startDate.value || (!noEndDate.value && !endDate.value)) {
     return;
   }
-
 
   const updatedPromotion: Promotion = {
     promotionName: promotionName.value,
@@ -190,7 +175,7 @@ const updatePromotion = async () => {
     endDate: noEndDate.value ? null : new Date(endDate.value),
     discountValue: promotionTypeValue.value === 'discountPrice' || promotionTypeValue.value === 'usePoints' || promotionTypeValue.value === 'discountPercentage' ? discountValue.value : null,
     conditionQuantity: promotionTypeValue.value === 'discountPrice' || promotionTypeValue.value === 'usePoints' ? pointsRequired.value : null,
-    buyProductId: promotionTypeValue.value === 'buy1get1' ? productStore.products.find(product => product.productName === productBuy.value)?.productId : null, // Find the product id from the product store (assuming the product store has the products loaded
+    buyProductId: promotionTypeValue.value === 'buy1get1' ? productStore.products.find(product => product.productName === productBuy.value)?.productId : null,
     freeProductId: promotionTypeValue.value === 'buy1get1' ? productStore.products.find(product => product.productName === productFree.value)?.productId : null,
     conditionValue1: promotionTypeValue.value === 'discountPercentage' ? minimumPrice.value : null,
     conditionValue2: promotionTypeValue.value === 'discountPercentage' ? minimumPrice.value : null,
@@ -206,7 +191,17 @@ const updatePromotion = async () => {
   Swal.fire({
     icon: 'success',
     title: 'สำเร็จ',
-    text: 'โปรโมชั่นถูกสร้างเรียบร้อยแล้ว',
+    text: 'โปรโมชั่นถูกแก้ไขเรียบร้อยแล้ว',
+    confirmButtonText: 'ตกลง',
+    customClass: {
+      confirmButton: 'swal-button'
+    }
   });
 };
 </script>
+
+<style scoped>
+.swal-button {
+  font-size: 16px;
+}
+</style>

@@ -2,7 +2,9 @@
   <v-container>
     <v-card>
       <v-card-title>
-        <v-row style="padding: 20px;"><h3>ประเภทสินค้า</h3></v-row>
+        <v-row style="padding: 20px;">
+          <h3>ประเภทสินค้า</h3>
+        </v-row>
         <v-row>
           <v-col cols="12" md="3">
             <v-text-field 
@@ -60,58 +62,74 @@
   </v-container>
 </template>
 
-  
-  <script lang="ts" setup>
-  import { useCategoryStore } from '@/stores/category.store';
-  import { onMounted, ref } from 'vue';
-  import Swal from 'sweetalert2';
-  import CreateCategoryDialog from '@/components/categories/CreateCategoryDialog.vue';
-  import UpdateCategoryDialog from '@/components/categories/UpdateCategoryDialog.vue';
-  import type { Category } from '@/types/category.type';
-  
-  const categoryStore = useCategoryStore();
-  
-  const headers = ref([
-    { text: 'Category ID', value: 'categoryId' },
-    { text: 'Category Name', value: 'categoryName' },
-    { text: 'Have Topping', value: 'haveTopping' },
-    { text: 'Actions', value: 'actions', sortable: false },
-  ]);
-  
-  onMounted(async () => {
-    await categoryStore.getAllCategories();
-  });
-  
-  const openCreateDialog = () => {
-    categoryStore.category = null;
-    categoryStore.createCategoryDialog = true;
-  };
-  
-  const openUpdateDialog = (category: Category) => {
-    categoryStore.category = { ...category };
-    categoryStore.updateCategoryDialog = true;
-  };
-  
-  const deleteCategory = async (categoryId: number) => {
-    try {
-      const result = await Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
-      });
-  
-      if (result.isConfirmed) {
-        await categoryStore.deleteCategory(categoryId);
-        Swal.fire('Deleted!', 'Category has been deleted.', 'success');
-      }
-    } catch (error) {
-      console.error('Error deleting category:', error);
-      Swal.fire('Error', 'An error occurred while deleting the category.', 'error');
+<script lang="ts" setup>
+import { useCategoryStore } from '@/stores/category.store';
+import { onMounted, ref } from 'vue';
+import Swal from 'sweetalert2';
+import CreateCategoryDialog from '@/components/categories/CreateCategoryDialog.vue';
+import UpdateCategoryDialog from '@/components/categories/UpdateCategoryDialog.vue';
+import type { Category } from '@/types/category.type';
+
+const categoryStore = useCategoryStore();
+
+const headers = ref([
+  { text: 'Category ID', value: 'categoryId' },
+  { text: 'Category Name', value: 'categoryName' },
+  { text: 'Have Topping', value: 'haveTopping' },
+  { text: 'Actions', value: 'actions', sortable: false },
+]);
+
+onMounted(async () => {
+  await categoryStore.getAllCategories();
+});
+
+const openCreateDialog = () => {
+  categoryStore.category = null;
+  categoryStore.createCategoryDialog = true;
+};
+
+const openUpdateDialog = (category: Category) => {
+  categoryStore.category = { ...category };
+  categoryStore.updateCategoryDialog = true;
+};
+
+const deleteCategory = async (categoryId: number) => {
+  try {
+    const result = await Swal.fire({
+      title: 'คุณแน่ใจหรือไม่?',
+      text: "คุณต้องการลบหมวดหมู่นี้หรือไม่?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'ใช่, ลบเลย!',
+      cancelButtonText: 'ยกเลิก'
+    });
+
+    if (result.isConfirmed) {
+      await categoryStore.deleteCategory(categoryId);
+      Swal.fire('ลบแล้ว!', 'หมวดหมู่ถูกลบเรียบร้อยแล้ว.', 'success');
     }
-  };
-  </script>
-  
+  } catch (error) {
+    console.error('Error deleting category:', error);
+    Swal.fire('เกิดข้อผิดพลาด', 'เกิดข้อผิดพลาดขณะลบหมวดหมู่.', 'error');
+  }
+};
+</script>
+
+<style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+* {
+  font-family: 'Kanit', sans-serif;
+}
+
+.button-full-width {
+  width: 100%;
+}
+th, td {
+  padding-top: 12px !important; 
+  padding-bottom: 12px !important; 
+  text-align: center !important; 
+}
+</style>
