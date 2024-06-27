@@ -31,6 +31,7 @@ const filteredUsers = computed(() => {
     user.userName.toLowerCase().includes(userStore.searchQuery.toLowerCase())
   );
 });
+
 </script>
 
 <template>
@@ -41,10 +42,10 @@ const filteredUsers = computed(() => {
     <v-card class="flex-container">
       <v-card-title>
         <v-row>
-          <v-col cols="9" style="font-size: 35px;">
-            จัดการผู้ใช้งาน
+          <v-col cols="9" style="padding: 20px;">
+          <h3>จัดการผู้ใช้งาน</h3>
           </v-col>
-          
+   
           <v-row style="margin-left: 6%;">
             <v-col class="pa-2 ma-2" cols="3">
               <v-text-field
@@ -61,7 +62,7 @@ const filteredUsers = computed(() => {
             <v-col class="mt-4" cols="3" width="30%">
               <v-btn color="success" @click="addUserDialog = true">
                 <v-icon left>mdi-plus</v-icon>
-                Add New User
+                เพิ่มผู้ใช้งาน
               </v-btn>
             </v-col>
           </v-row>
@@ -105,7 +106,7 @@ const filteredUsers = computed(() => {
   </v-container>
 </template>
 
-<style>
+<style scoped>
 .flex-container {
   display: flex;
   flex-direction: column;

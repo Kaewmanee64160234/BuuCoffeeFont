@@ -8,21 +8,34 @@ function getReceiptById(id: number) {
   return http.get(`/receipts/${id}`);
 }
 function createReceipt(receipt : Receipt) {
-
 console.log("receipt", JSON.stringify(receipt));
   return http.post("/receipts", receipt);
 }
 function updateReceipt(id: number, receipt: Receipt) {
-  return http.put(`/receipts/${id}`, receipt);
+  return http.patch(`/receipts/${id}`, receipt);
 }
 function deleteReceipt(id: number) {
-  return http.delete(`/receipts/${id}`);
+  return http.delete(`/receipts/cancel/${id}`);
 }
+// cancelReceipt
+function cancelReceipt(id: number) {
+  return http.delete(`/receipts/cancel/${id}`);
+}
+
+// in-30-min getRecieptIn30Min
+function getRecieptIn30Min() {
+  return http.get("/receipts/in-30-min");
+}
+
+
+
 
 export default {
   getAllReceipts,
   getReceiptById,
   createReceipt,
   updateReceipt,
-  deleteReceipt
+  deleteReceipt,
+  cancelReceipt,
+  getRecieptIn30Min
 };

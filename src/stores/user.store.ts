@@ -1,13 +1,36 @@
-import { ref } from 'vue';
-import { defineStore } from 'pinia';
-import type { User } from '@/types/user.type';
-import userService from '@/service/user.service';
+import { ref } from "vue";
+import { defineStore } from "pinia";
+import type { User } from "@/types/user.type";
+import userService from "@/service/user.service";
 
-export const useUserStore = defineStore('user', () => {
+export const useUserStore = defineStore("user", () => {
+  const currentUser = ref<User>({
+    userId: -1,
+    userName: '',
+    userPassword: '',
+    userRole: '',
+    userEmail: '',
+    userStatus: '',
+  });
   const users = ref<User[]>([]);
   const user = ref<User | null>(null);
-  const searchQuery = ref<string>('');
+  const searchQuery = ref<string>("");
   const updateUserDialog = ref(false);
+  // const userRole = ref("พนักงานขายข้าว");
+  const userRole = ref("พนักงานขายกาแฟ");
+  function setUser(user: User) {
+    currentUser.value = { ...user };
+    localStorage.setItem('user', JSON.stringify(user));
+  }
+
+  function getUser() {
+    const userString = localStorage.getItem('user');
+    if (userString) {
+      return JSON.parse(userString) as User;
+    }
+    return currentUser.value;
+  }
+
 
   const getAllUsers = async () => {
     try {
@@ -39,7 +62,7 @@ export const useUserStore = defineStore('user', () => {
         await getAllUsers(); // Ensure that all users are fetched again
       }
     } catch (error) {
-      console.error('Error creating user:', error);
+      console.error("Error creating user:", error);
     }
   };
 
@@ -48,25 +71,23 @@ export const useUserStore = defineStore('user', () => {
       const response = await userService.updateUser(id, updatedUser);
       if (response.status === 200) {
         const updatedUser = response.data;
-        const index = users.value.findIndex(user => user.userId === id);
+        const index = users.value.findIndex((user) => user.userId === id);
         if (index !== -1) {
           users.value[index] = updatedUser;
         }
         return updatedUser;
       }
     } catch (error) {
-      console.error('Failed to update user:', error);
+      console.error("Failed to update user:", error);
       throw error;
     }
   };
-  
-  
 
   const deleteUser = async (id: number) => {
     try {
       const response = await userService.deleteUser(id);
       if (response.status === 200) {
-        users.value = users.value.filter(user => user.userId !== id);
+        users.value = users.value.filter((user) => user.userId !== id);
       }
     } catch (error) {
       console.error(error);
@@ -88,5 +109,9 @@ export const useUserStore = defineStore('user', () => {
     searchQuery,
     updateUserDialog,
     setUserForEdit,
+    currentUser,
+    setUser, 
+    getUser,
+    userRole
   };
 });

@@ -1,52 +1,31 @@
-<template>
-  <v-dialog v-model="dialog" max-width="800px">
-    <v-card>
-      <v-card-title>
-        <span class="text-h5">สมัครสมาชิก</span>
-      </v-card-title>
-      <v-card-text>
-        <v-container>
-          <v-form ref="form">
-            <v-row>
-              <v-col cols="12" md="12">
-                <v-text-field v-model="customerName" label="ชื่อลูกค้า" required></v-text-field>
-              </v-col>
-              <v-col cols="12" md="12">
-                <v-text-field v-model="customerPhone" label="เบอร์โทรศัพท์" required></v-text-field>
-              </v-col>
-            </v-row>
-          </v-form>
-        </v-container>
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn @click="closeDialog">ยกเลิก</v-btn>
-        <v-btn color="orange" @click="saveCustomer">บันทึก</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
-</template>
-
 <script lang="ts" setup>
-import { defineProps, ref, watch } from 'vue';
+import { ref } from 'vue';
 import { useCustomerStore } from '../../stores/customer.store';
 import type { VForm } from 'vuetify/components';
+import Swal from 'sweetalert2';
 
-const props = defineProps<{ dialog: boolean }>();
 const form = ref<VForm | null>(null);
-const dialog = ref(props.dialog);
 
 const customerName = ref('');
 const customerPhone = ref('');
 const customerStore = useCustomerStore();
 
-watch(() => props.dialog, (newVal) => {
-  dialog.value = newVal;
-  if (newVal) {
-    customerName.value = '';
-    customerPhone.value = '';
+const rules = {
+  required: (value: string) => !!value || 'กรุณากรอกข้อมูล',
+  alpha: (value: string) => /^[a-zA-Zก-๙\s]+$/.test(value) || 'กรุณากรอกชื่อเป็นตัวอักษรเท่านั้น',
+  phoneNumber: (value: string) => {
+    const phoneRegex = /^0\d{9}$/;
+    return phoneRegex.test(value) || 'กรุณากรอกเบอร์โทรศัพท์ที่ถูกต้อง (ขึ้นต้นด้วย 0 และมี 10 หลัก)';
   }
-});
+};
+
+// close Dialog 
+function close() {
+  customerStore.openDialogRegisterCustomer = false;
+  // clear data
+  customerName.value = '';
+  customerPhone.value = '';
+}
 
 async function saveCustomer() {
   const { valid } = await form.value!.validate();
@@ -59,18 +38,65 @@ async function saveCustomer() {
         customerNumberOfStamp: 0, // New customer starts with 1 point
         createMemberDate: new Date(),
       });
-      dialog.value = false; // Close the dialog
       await customerStore.getAllCustomers(); // Refresh customer list
+      close();
+      Swal.fire({
+        title: 'สำเร็จ!',
+        text: 'ลูกค้าได้ถูกบันทึกแล้ว',
+        icon: 'success',
+        confirmButtonText: 'ตกลง'
+      });
     } catch (error) {
       console.error('Error saving customer:', error);
+      Swal.fire({
+        title: 'เกิดข้อผิดพลาด',
+        text: 'เกิดข้อผิดพลาดขณะบันทึกลูกค้า',
+        icon: 'error',
+        confirmButtonText: 'ตกลง'
+      });
     }
   }
 }
-
-function closeDialog() {
-  dialog.value = false; // Close the dialog
-}
 </script>
+
+<template>
+  <v-dialog v-model="customerStore.openDialogRegisterCustomer" max-width="800px">
+    <v-card>
+      <v-card-title>
+        <span class="text-h5">สมัครสมาชิก</span>
+      </v-card-title>
+      <v-card-text>
+        <v-container>
+          <v-form ref="form">
+            <v-row>
+              <v-col cols="12" md="12">
+                <v-text-field 
+                  v-model="customerName" 
+                  label="ชื่อลูกค้า" 
+                  :rules="[rules.required, rules.alpha]" 
+                  required
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" md="12">
+                <v-text-field 
+                  v-model="customerPhone" 
+                  label="เบอร์โทรศัพท์" 
+                  :rules="[rules.required, rules.phoneNumber]" 
+                  required
+                ></v-text-field>
+              </v-col>
+            </v-row>
+          </v-form>
+        </v-container>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn @click="close">ยกเลิก</v-btn>
+        <v-btn color="orange" @click="saveCustomer">บันทึก</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+</template>
 
 <style scoped>
 </style>

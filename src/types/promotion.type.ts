@@ -14,5 +14,6 @@ export interface Promotion {
   endDate?: Date;
   noEndDate: boolean;
   promotionForStore: string;
+  promotionCanUseManyTimes: boolean;
   }
   

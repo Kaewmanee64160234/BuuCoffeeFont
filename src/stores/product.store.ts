@@ -8,12 +8,27 @@ import type {
   IngredientQuantities,
   ProductType,
 } from "@/types/productType.type";
+import { useUserStore } from "./user.store";
 
 export const useProductStore = defineStore("product", () => {
   const products = ref<Product[]>([]);
   const updateProductDialog = ref(false);
   const createProductDialog = ref(false);
   const searchQuery = ref<string>("");
+  const searchQueryPos = ref<string>("");
+  const editedProduct = ref<Product & { file: File }>({
+    productId: 0,
+    productName: "",
+    productPrice: 0,
+    productImage: "",
+    category: {
+      categoryId: 0,
+      categoryName: "",
+      haveTopping: false,
+    },
+    file: new File([""], "filename"),
+    productTypes: [],
+  });
 
   const product = ref<Product & { file: File }>({
     productId: 0,
@@ -28,10 +43,11 @@ export const useProductStore = defineStore("product", () => {
     file: new File([""], "filename"),
     productTypes: [],
   });
-
+  const userStore = useUserStore();
   const productName = ref<string>("");
   const productPrice = ref<number>(0);
   const selectedCategory = ref<string | null>(null);
+  const selectedCategoryForUpdate = ref<string | null>(null);
   const imagePreview = ref<string | null>(null);
 
   const selectedIngredientsHot = ref<number[]>([]);
@@ -52,17 +68,18 @@ export const useProductStore = defineStore("product", () => {
 
   const categoryStore = useCategoryStore();
 
-  // watch if selectedCategory 
+  // watch if selectedCategory
   watch(selectedCategory, (newCategory) => {
-    console.log("selectedCategory", newCategory);
+    console.log("selectedCategory", selectedCategory.value);
     if (newCategory) {
-      if(newCategory === 'All'){
-        getProductPaginate()
-      }else{
-        getProductsByCategory(newCategory);
-
+      if (newCategory === "ทั้งหมด") {
+        console.log("selectedCategory====");
+        getProductPaginate();
       }
-
+      if (newCategory !== 1) {
+        console.log(" selectedCategory___", newCategory);
+        getProductsByCategory(newCategory);
+      }
     }
   });
 
@@ -75,8 +92,6 @@ export const useProductStore = defineStore("product", () => {
   const setSelectedProduct = (product: Product) => {
     selectedProduct.value = product;
   };
-
-
 
   const getAllProducts = async () => {
     try {
@@ -129,7 +144,9 @@ export const useProductStore = defineStore("product", () => {
     try {
       const response = await productService.createProduct(product.value!);
       if (response.status === 201) {
+        if(product.value.file !== null){
         await uploadImage(product.value.file, response.data.productId);
+        }
         await getProductPaginate();
       }
     } catch (error) {
@@ -143,7 +160,6 @@ export const useProductStore = defineStore("product", () => {
       console.log("updateProduct", response.status);
       if (response.status === 200) {
         await getProductPaginate();
-
       }
     } catch (error) {
       console.error(error);
@@ -231,5 +247,8 @@ export const useProductStore = defineStore("product", () => {
     itemsPerPage,
     selectedProduct,
     setSelectedProduct,
+    searchQueryPos,
+    editedProduct,
+    selectedCategoryForUpdate
   };
 });

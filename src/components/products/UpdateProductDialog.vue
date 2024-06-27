@@ -29,7 +29,7 @@
                 <v-form ref="form" v-model="valid">
                   <v-row>
                     <v-col cols="12" sm="12">
-                      <v-img max-height="100" style="border-radius: 50%;" :src="imagePreview || `http://localhost:3000/products/${productStore.product.productId}/image`" />
+                      <v-img max-height="100" style="border-radius: 50%;" :src="imagePreview || `http://localhost:3000/products/${productStore.editedProduct.productId}/image`" />
                     </v-col>
                     <v-col cols="12" sm="12">
                       <v-file-input v-model="productImage" label="รูปภาพสินค้า" prepend-icon="mdi-camera" accept="image/*" @change="handleImageUpload" />
@@ -42,7 +42,7 @@
                       <v-text-field variant="solo" v-model="productStore.productPrice" label="ราคา" type="number" required />
                     </v-col>
                     <v-col cols="12" sm="6">
-                      <v-select v-model="productStore.selectedCategory" :items="categoryStore.categoriesForCreate.map(category => category.categoryName)" label="เลือกหมวดหมู่" dense @change="checkCategory"></v-select>
+                      <v-select v-model="productStore.selectedCategoryForUpdate" :items="categoryStore.categoriesForCreate.map(category => category.categoryName)" label="เลือกหมวดหมู่" dense @change="checkCategory"></v-select>
                     </v-col>
                   </v-row>
                 </v-form>
@@ -64,6 +64,9 @@
                     <v-row>
                       <v-col cols="12">
                         <v-subheader>{{ step.label }}</v-subheader>
+                      
+
+
                       </v-col>
                       <v-col cols="12">
                         <v-table>
@@ -153,7 +156,7 @@ const ingredientStore = useIngredientStore();
 
 const e1 = ref(1);
 
-watch(() => productStore.product.category?.categoryName, (newVal) => {
+watch(() => productStore.editedProduct.category?.categoryName, (newVal) => {
   const category = categoryStore.categories.find(c => c.categoryName === newVal);
   isDrink.value = category?.haveTopping === true;
   if (!isDrink.value) {
@@ -261,7 +264,12 @@ const handleColdIngredientSelect = (ingredient: Ingredient) => {
     delete productStore.ingredientQuantitiesCold[ingredientId];
   }
 };
-
+const getProductType = (typeName: string) => {
+  console.log("getProductType called with typeName: " + typeName);
+  const pddt =  productDetails.value.find(pt => pt.productTypeName === typeName) as CustomProductType;
+console.log("getProductType called with typeName: " + pddt);
+  return pddt;
+};
 const handleBlendIngredientSelect = (ingredient: Ingredient) => {
   const ingredientId = ingredient.ingredientId;
   const keys = Object.keys(productStore.ingredientQuantitiesBlend);
@@ -276,7 +284,7 @@ const handleBlendIngredientSelect = (ingredient: Ingredient) => {
 };
 
 const loadProductData = () => {
-  const product = productStore.product;
+  const product = productStore.editedProduct;
 
   productName.value = product.productName;
   productPrice.value = product.productPrice;
@@ -301,7 +309,7 @@ const submitForm = async () => {
   const productData = {
     productName: productStore.productName,
     productPrice: productStore.productPrice,
-    productImage: productStore.product.productImage,
+    productImage: productStore.editedProduct.productImage,
     categoryId: categoryStore.categoriesForCreate.find(category => category.categoryName === selectedCategory.value)?.categoryId || null,
     productTypes: [] as ProductType[]
   };
@@ -310,7 +318,8 @@ const submitForm = async () => {
     if (productStore.selectedIngredientsHot.length > 0) {
       productData.productTypes.push({
         productTypeName: 'Hot',
-        productTypePrice: 0,
+        productTypePrice: 
+        productDetails.value.find(pt => pt.productTypeName === 'Hot')?.productTypePrice || 0,
         recipes: productStore.selectedIngredientsHot.map((ingredientId) => {
           return {
             ingredient: ingredientStore.ingredients.find(i => i.ingredientId === ingredientId)!,
@@ -322,7 +331,7 @@ const submitForm = async () => {
     if (productStore.selectedIngredientsCold.length > 0) {
       productData.productTypes.push({
         productTypeName: 'Cold',
-        productTypePrice: 0,
+        productTypePrice: productDetails.value.find(pt => pt.productTypeName === 'Cold')?.productTypePrice || 0,  
         recipes: productStore.selectedIngredientsCold.map((ingredientId) => {
           return {
             ingredient: ingredientStore.ingredients.find(i => i.ingredientId === ingredientId)!,
@@ -334,7 +343,7 @@ const submitForm = async () => {
     if (productStore.selectedIngredientsBlend.length > 0) {
       productData.productTypes.push({
         productTypeName: 'Blend',
-        productTypePrice: 0,
+        productTypePrice: productDetails.value.find(pt => pt.productTypeName === 'Blend')?.productTypePrice || 0,
         recipes: productStore.selectedIngredientsBlend.map((ingredientId) => {
           return {
             ingredient: ingredientStore.ingredients.find(i => i.ingredientId === ingredientId)!,
@@ -347,40 +356,40 @@ const submitForm = async () => {
   }
 
   try {
-    productStore.product = {
-      category: categoryStore.categories.find(c => c.categoryName === productStore.product.category.categoryName)!,
+    productStore.editedProduct = {
+      category: categoryStore.categories.find(c => c.categoryName === productStore.editedProduct.category.categoryName)!,
       productName: productData.productName,
       productPrice: productData.productPrice,
       productImage: '',
       productTypes: productData.productTypes,
-      productId: productStore.product.productId,
+      productId: productStore.editedProduct.productId,
       file: productImage.value
     };
 
     // if have image file in productImage upload image 
 
-    console.log('Product:', JSON.stringify(productStore.product));
+    console.log('Product:', JSON.stringify(productStore.editedProduct));
 
-    await productStore.updateProduct(productStore.product.productId, productStore.product);
+    await productStore.updateProduct(productStore.editedProduct.productId, productStore.editedProduct);
     if (productImage.value.name !== '') {
       const formData = new FormData();
       formData.append('file', productImage.value);
-      await productStore.updateImageProduct(productStore.product.productId, formData);
+      await productStore.updateImageProduct(productStore.editedProduct.productId, formData);
       imagePreview.value = URL.createObjectURL(productImage.value);
     }
 
     closeDialog();
-    showSuccessDialog('Product updated successfully!');
+    showSuccessDialog('แก้ไขสินค้าเสร็จสิ้น!');
     // reload page
   } catch (error) {
     console.error('Error updating product:', error);
-    Swal.fire('Error', 'An error occurred while updating the product.', 'error');
+    Swal.fire('เกิดข้อผิดพลาด', 'เกิดข้อผิดพลาดขณะแก้ไขสินค้า');
   }
 };
 
 // closeDialog
 const closeDialog = () => {
-  productStore.product = {
+  productStore.editedProduct = {
     category: { categoryId: 0, categoryName: '' },
     productName: '',
     productPrice: 0,
@@ -390,8 +399,8 @@ const closeDialog = () => {
     file: new File([""], "")
   };
   // clear all data in productStore
-  productStore.productName = '';
-  productStore.productPrice = 0;
+  productStore.editedProductName = '';
+  productStore.editedProductPrice = 0;
   productStore.selectedCategory = '';
   productStore.imagePreview = null;
   productStore.isHot = false;
@@ -408,10 +417,10 @@ const closeDialog = () => {
 
 const showSuccessDialog = (message: string) => {
   Swal.fire({
-    title: 'Success!',
+    title: 'สำเร็จ!',
     text: message,
     icon: 'success',
-    confirmButtonText: 'OK'
+    confirmButtonText: 'ตกลง'
   });
 };
 

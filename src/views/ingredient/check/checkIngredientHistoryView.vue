@@ -1,17 +1,33 @@
 <script lang="ts" setup>
-
-import { onMounted, ref } from 'vue';
+import { useCheckIngredientStore } from '@/stores/historyIngredientCheck.store';
+import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import dialogImportItem from './dialogCheck.vue';
 
+const ingredientStore = useCheckIngredientStore();
 const router = useRouter();
 
+onMounted(async () => {
+    await ingredientStore.getAllHistortIngredients();
+});
+
+const formatDate = (dateString: string) => {
+  const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZone: 'UTC' };
+  return new Date(dateString).toLocaleDateString('th-TH', options);
+};
 
 const navigateTo = (routeName: string) => {
     router.push({ name: routeName });
 };
+
+const showDetail = (items) => {
+  ingredientStore.selectedItems = items;
+  ingredientStore.dialogCheckItem = true;
+};
 </script>
 
 <template>
+    <dialogImportItem/>
     <v-container>
         <v-card>
             <v-card-title>
@@ -20,7 +36,7 @@ const navigateTo = (routeName: string) => {
                         ประวัติเช็ควัตถุดิบ
                     </v-col>
                     <v-col cols="3">
-                        <v-text-field label="Search" append-inner-icon="mdi-magnify" hide-details dense></v-text-field>
+                        <v-text-field label="ค้นหาประวัติการเช็ควัตถุดิบ" append-inner-icon="mdi-magnify" hide-details dense></v-text-field>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -51,11 +67,17 @@ const navigateTo = (routeName: string) => {
                 <tbody>
 
                 </tbody>
-                <!-- <tbody v-if="!ingredientStore.ingredients.length">
-                    <tr>
-                        <td colspan="9" class="text-center">No data</td>
-                    </tr>
-                </tbody> -->
+                <tbody>
+    <tr v-for="(item, index) in ingredientStore.CheckIngredientsHistory" :key="index">
+        <td>{{ index + 1 }}</td>
+        <td>{{ formatDate(item.date) }}</td>
+        <td>{{ item.user.userName }}</td>
+        <td>
+            <v-btn color="#FFDD83" class="mr-2" icon="mdi-pencil" @click="showDetail(item.checkingredientitem)">ดู</v-btn>
+
+        </td>
+    </tr>
+</tbody>
             </v-table>
         </v-card>
     </v-container>

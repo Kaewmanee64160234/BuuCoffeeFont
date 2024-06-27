@@ -1,3 +1,4 @@
+
 <template>
   <v-dialog v-model="productStore.createProductDialog" persistent max-width="800px">
     <v-card>
@@ -67,9 +68,9 @@
                         <v-text-field variant="solo" v-model="getProductType(step.label).productTypePrice" label="ราคาประเภทสินค้า" type="number" required />
                       </v-col>
                       <v-col cols="12">
-                        <v-btn icon @click="() => addRecipe(getProductType(step.label))">
+                        <!-- <v-btn icon @click="() => addRecipe(getProductType(step.label))">
                           <v-icon>mdi-plus</v-icon>
-                        </v-btn>
+                        </v-btn> -->
                       </v-col>
                       <v-col cols="12">
                         <v-table>
@@ -122,6 +123,7 @@
   </v-dialog>
 </template>
 
+
 <script lang="ts" setup>
 import { useCategoryStore } from '@/stores/category.store';
 import { useIngredientStore } from '@/stores/Ingredient.store';
@@ -167,6 +169,32 @@ const productTypes = reactive({
   cold: false,
   blend: false
 });
+
+// Add validation rules
+const nameRules = [
+  (v: string) => !!v || 'ชื่อสินค้าจำเป็นต้องระบุ',
+  (value: string) => /^[\u0E00-\u0E7Fa-zA-Z]+$/.test(value) || 'กรุณากรอกชื่อสินค้าเป็นตัวอักษรเท่านั้น',
+];
+
+
+const priceRules = [
+  (v: number) => !!v || 'ราคาสินค้าจำเป็นต้องระบุ',
+  (v: number) => v > 0 || 'ราคาสินค้าต้องมากกว่า 0'
+];
+
+const categoryRules = [
+  (v: string) => !!v || 'หมวดหมู่สินค้าจำเป็นต้องระบุ'
+];
+
+const productTypePriceRules = [
+  (v: number) => !!v || 'กรอกราคาประเภทสินค้า',
+  (v: number) => v > 0 || 'ราคาประเภทสินค้าต้องมากกว่า 0'
+];
+
+const productNumberRules = [
+  (v: number) => !!v || 'กรอกจำนวน',
+  (v: number) => v > 0 || 'ราคาประเภทสินค้าต้องมากกว่า 0'
+];
 
 const computedSteps = computed(() => {
   const stepsArray = [];
@@ -242,9 +270,7 @@ const handleBlendIngredientSelect = (type: CustomProductType, ingredient: Ingred
   }
 };
 const getProductType = (typeName: string): CustomProductType => {
-  console.log("getProductType called with typeName: " + typeName);
-  const pddt =  productDetails.value.find(pt => pt.productTypeName === typeName) as CustomProductType;
-console.log("getProductType called with typeName: " + pddt);
+  const pddt = productDetails.value.find(pt => pt.productTypeName === typeName) as CustomProductType;
   return pddt;
 };
 
@@ -256,8 +282,6 @@ const handleImageUpload = (event: Event) => {
     imagePreview.value = URL.createObjectURL(file);
   }
 };
-
-
 
 const addRecipe = (type: CustomProductType) => {
   type.recipes.push({ ingredient: {} as Ingredient, quantity: 0 });
@@ -328,7 +352,7 @@ const submitForm = async () => {
     if (selectedIngredientsHot.value.length > 0) {
       productData.productTypes.push({
         productTypeName: 'ร้อน',
-        productTypePrice: 0,
+        productTypePrice:  getProductType('ร้อน').productTypePrice,
         recipes: selectedIngredientsHot.value.map((ingredientId) => {
           return {
             ingredient: ingredientStore.ingredients.find(i => i.ingredientId === ingredientId)!,
@@ -340,7 +364,7 @@ const submitForm = async () => {
     if (selectedIngredientsCold.value.length > 0) {
       productData.productTypes.push({
         productTypeName: 'เย็น',
-        productTypePrice: 0,
+        productTypePrice: getProductType('เย็น').productTypePrice,
         recipes: selectedIngredientsCold.value.map((ingredientId) => {
           return {
             ingredient: ingredientStore.ingredients.find(i => i.ingredientId === ingredientId)!,
@@ -352,7 +376,7 @@ const submitForm = async () => {
     if (selectedIngredientsBlend.value.length > 0) {
       productData.productTypes.push({
         productTypeName: 'ปั่น',
-        productTypePrice: 0,
+        productTypePrice: getProductType('ปั่น').productTypePrice,
         recipes: selectedIngredientsBlend.value.map((ingredientId) => {
           return {
             ingredient: ingredientStore.ingredients.find(i => i.ingredientId === ingredientId)!,
@@ -374,7 +398,7 @@ const submitForm = async () => {
   };
   await productStore.createProduct();
   clearData();
-  showSuccessDialog('Product created successfully!');
+  showSuccessDialog('สินค้านี้ถูกสร้างเรียบร้อยแล้ว!');
 };
 
 const clearData = () => {
@@ -398,10 +422,10 @@ const clearData = () => {
 
 const showSuccessDialog = (message: string) => {
   Swal.fire({
-    title: 'Success!',
+    title: 'เสร็จสิ้น!',
     text: message,
     icon: 'success',
-    confirmButtonText: 'OK'
+    confirmButtonText: 'ตกลง'
   });
 };
 
@@ -420,3 +444,5 @@ const disabled = computed(() => {
   return e1.value === 1 ? 'prev' : e1.value === steps.value ? 'next' : undefined;
 });
 </script>
+
+

@@ -9,8 +9,8 @@ const activeComponent = ref<string | null>(null);
 function showComponent(component: string) {
   activeComponent.value = component;
 }
+activeComponent.value = 'finance'; 
 function reloadData() {
-  emit('reloadData');
 }
 </script>
 
@@ -20,8 +20,9 @@ function reloadData() {
       <v-card-title>
         <v-row class="d-flex align-center justify-space-between">
           <v-col cols="auto">
-            รายการวัตถุดิบ
+            <h3>Dashboard</h3>
           </v-col>
+          
           <v-col cols="auto">
             <v-btn
               color="success"
@@ -39,7 +40,7 @@ function reloadData() {
               @click="showComponent('ingredient')"
             >
               <v-icon left>mdi-filter</v-icon>
-              สินค้า
+              วัสถุดิบ
             </v-btn>
           </v-col>
           <v-col cols="auto">
@@ -49,7 +50,7 @@ function reloadData() {
               @click="showComponent('product')"
             >
               <v-icon left>mdi-filter</v-icon>
-              วัสถุดิบ
+              สินค้า
             </v-btn>
           </v-col>
         </v-row>

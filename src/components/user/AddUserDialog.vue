@@ -2,6 +2,7 @@
 import { defineProps, ref, watch } from 'vue';
 import { useUserStore } from '@/stores/user.store';
 import type { VForm } from 'vuetify/components';
+import Swal from 'sweetalert2';
 
 const props = defineProps<{ dialog: boolean }>();
 const form = ref<VForm | null>(null);
@@ -13,6 +14,15 @@ const userEmail = ref('');
 const userRole = ref('');
 const userStatus = ref('');
 const userStore = useUserStore();
+const show = ref(false);
+
+const rules = {
+  required: (value: any) => !!value || 'กรุณากรอกข้อมูล',
+  email: (value: string) => /.+@.+\..+/.test(value) || 'กรุณากรอกอีเมลให้ถูกต้อง',
+  password: (value: string) => value.length >= 4 && /[A-Za-z].*[0-9]|[0-9].*[A-Za-z]/.test(value) || 'รหัสผ่านต้องมีอักขระและมีความยาวมากกว่า 4 ตัว',
+  userName: (value: string) => /^[A-Za-zก-ฮะ-ๅๆ็่-๋์่-๋\s]+$/.test(value) || 'กรุณากรอกชื่อเป็นตัวอักษรเท่านั้น',
+  userStatus: (value: string) => /^[A-Za-zก-ฮะ-ๅๆ็่-๋์่-๋\s]+$/.test(value) || 'กรุณากรอกสถานะผู้ใช้งานเป็นตัวอักษรเท่านั้น',
+};
 
 watch(() => props.dialog, (newVal) => {
   dialog.value = newVal;
@@ -31,8 +41,18 @@ async function saveUser() {
     });
     dialog.value = false;  // Close the dialog
     await userStore.getAllUsers();
+    showSuccessDialog('ผู้ใช้งานรายนี้ถูกสร้างเรียบร้อยแล้ว!');
   }
 }
+
+const showSuccessDialog = (message: string) => {
+  Swal.fire({
+    title: 'เสร็จสิ้น!',
+    text: message,
+    icon: 'success',
+    confirmButtonText: 'ตกลง'
+  });
+};
 
 function closeDialog() {
   dialog.value = false;  // Close the dialog
@@ -51,27 +71,46 @@ function closeDialog() {
           <v-form ref="form">
             <v-row>
               <v-col cols="12" md="6">
-                <v-text-field v-model="userName" label="ชื่อผู้ใช้" required></v-text-field>
+                <v-text-field
+                  v-model="userName"
+                  label="ชื่อผู้ใช้"
+                  :rules="[rules.required, rules.userName]"
+                  required
+                ></v-text-field>
               </v-col>
               <v-col cols="12" md="6">
-                <v-text-field v-model="userPassword" label="รหัสผ่าน" type="password" required></v-text-field>
+                <v-text-field
+                  v-model="userPassword"
+                  label="รหัสผ่าน"
+                  :type="show ? 'text' : 'password'"
+                  :rules="[rules.required, rules.password]"
+                  required
+                  :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
+                  @click:append="show = !show"
+                ></v-text-field>
               </v-col>
               <v-col cols="12" md="6">
-                <v-text-field v-model="userEmail" label="อีเมล" required></v-text-field>
+                <v-text-field
+                  v-model="userEmail"
+                  label="อีเมล"
+                  :rules="[rules.required, rules.email]"
+                  required
+                ></v-text-field>
               </v-col>
               <v-col cols="12" md="6">
-                <v-text-field v-model="userStatus" label="สถานะผู้ใช้งาน" required></v-text-field>
+                <v-text-field
+                  v-model="userStatus"
+                  label="สถานะผู้ใช้งาน"
+                  :rules="[rules.required, rules.userStatus]"
+                  required
+                ></v-text-field>
               </v-col>
-              <v-col>
+              <v-col cols="12" md="6">
                 <v-select
                   v-model="userRole"
                   label="ตำแหน่งงาน"
-                  item-text="name"
-                  :items="[
-                    'พนักงานขายกาแฟ',
-                    'พนักงานขายข้าว',
-                    'ผู้จัดการร้าน'
-                  ]"
+                  :items="['พนักงานขายกาแฟ', 'พนักงานขายข้าว', 'ผู้จัดการร้าน']"
+                  :rules="[rules.required]"
                   required
                 ></v-select>
               </v-col>

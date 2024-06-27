@@ -1,12 +1,17 @@
 import type { Ingredient } from "@/types/ingredient.type";
 import http from "./axios";
-
+function getIngredientlow() {
+  return http.get("/ingredients/low-stock");
+}
 function getAllIngredients(params: any) {
   return http.get("/ingredients", { params: params });
 }
 
 function getAllHistoryImportIngredients() {
   return http.get("/importingredients");
+}
+function getAllHistoryCheckIngredients() {
+  return http.get("/checkingredients");
 }
 function createImportIngredients(ingredient: {
   importingredientitem: {
@@ -22,16 +27,28 @@ function createImportIngredients(ingredient: {
 }) {
   return http.post("/importingredients", ingredient);
 }
-async function saveIngredient(ingredient: Ingredient & { files: File[] }) {
+function createCheckIngredients(ingredient: {
+  checkingredientitem: {
+    ingredientId: number;
+    UsedQuantity: number;
+  }[];
+  userId: number;
+  date: Date;
+}) {
+  return http.post("/checkingredients", ingredient);
+}
+
+async function saveIngredient(ingredient: Ingredient & { imageFile: File[] }) {
   const formData = new FormData();
   formData.append('ingredientName', ingredient.ingredientName || '');
   formData.append('ingredientSupplier', ingredient.ingredientSupplier || '');
   formData.append('ingredientMinimun', `${ingredient.ingredientMinimun}`);
   formData.append('ingredientUnit', ingredient.ingredientUnit || '');
   formData.append('ingredientQuantityPerUnit', `${ingredient.ingredientQuantityPerUnit || 0}`);
-  
-  if (ingredient.files && ingredient.files.length > 0) {
-    formData.append('ingredientImages', ingredient.files[0]);
+  formData.append('ingredientQuantityPerSubUnit', ingredient.ingredientQuantityPerSubUnit || '');
+
+  if (ingredient.imageFile && ingredient.imageFile.length > 0) {
+    formData.append('ingredientImages', ingredient.imageFile[0]);
   }
 
   return http.post("/ingredients", formData, {
@@ -41,17 +58,17 @@ async function saveIngredient(ingredient: Ingredient & { files: File[] }) {
   });
 }
 
-async function updateIngredient(id: number, ingredient: Ingredient & { files: File[] }) {
+async function updateIngredient(id: number, ingredient: Ingredient & { imageFile: File[] }) {
   const formData = new FormData();
   formData.append("ingredientName", ingredient.ingredientName || '');
   formData.append("ingredientSupplier", ingredient.ingredientSupplier || '');
   formData.append("ingredientMinimun", `${ingredient.ingredientMinimun || 0}`);
   formData.append("ingredientUnit", ingredient.ingredientUnit || '');
-  formData.append("ingredientQuantityInStock", `${ingredient.ingredientQuantityInStock}`);
   formData.append("ingredientQuantityPerUnit", `${ingredient.ingredientQuantityPerUnit || 0}`);
-  
-  if (ingredient.files && ingredient.files.length > 0) {
-    formData.append("file", ingredient.files[0]);
+  formData.append('ingredientQuantityPerSubUnit', ingredient.ingredientQuantityPerSubUnit || '');
+
+  if (ingredient.imageFile && ingredient.imageFile.length > 0) {
+    formData.append("imageFile", ingredient.imageFile[0]);
   }
 
   return await http.patch(`/ingredients/${id}`, formData, {
@@ -67,12 +84,16 @@ function searchIngredientsByName(name: string) {
   return http.get("/ingredients/search", { params: { name } });
 }
 
+
 export default {
   getAllIngredients,
   createImportIngredients,
+  createCheckIngredients,
   getAllHistoryImportIngredients,
   saveIngredient,
   updateIngredient,
   deleteIngredient,
-  searchIngredientsByName
+  searchIngredientsByName,
+  getIngredientlow,
+  getAllHistoryCheckIngredients
 };

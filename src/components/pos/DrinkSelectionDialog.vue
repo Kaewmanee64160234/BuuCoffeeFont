@@ -1,90 +1,100 @@
 <template>
-  <v-dialog v-model="posStore.toppingDialog" max-width="600">
-    <v-card>
+  <v-dialog v-model="posStore.toppingDialog" max-width="650">
+    <v-card v-if="productStore.selectedProduct">
       <v-card-title class="d-flex justify-space-between align-center">
-        <div>
-          <span>{{ productStore.selectedProduct?.productName }}</span>
-        </div>
+        <div></div>
         <v-btn icon @click="closeDialog">
           <v-icon color="red">mdi-close</v-icon>
         </v-btn>
       </v-card-title>
       <v-alert v-if="showAlert" type="error" dismissible @input="showAlert = false">
-        Please select a product type before confirming.
+        กรุณาเลือกประเภทสินค้า
       </v-alert>
-      <v-card-subtitle class="d-flex justify-space-between align-center">
-        <div>{{ productStore.selectedProduct?.productName }}</div>
-        <div>{{ productStore.selectedProduct?.productPrice }} $</div>
-      </v-card-subtitle>
       <v-card-text>
-        <v-img :src="productStore.selectedProduct?.productImage" class="mb-4"></v-img>
-        <div class="d-flex flex-column">
-          <span>ตัวเลือก</span>
-          <div class="d-flex justify-space-between">
-            <v-chip
-              v-for="type in productStore.selectedProduct?.productTypes"
-              :key="type?.productTypeId"
-              variant="outlined"
-              :color="selectedType === type ? '#f5a623' : 'gray'"
-              @click="selectType(type)"
-            >
-              {{ type?.productTypeName }} {{ type?.productTypePrice }}
-            </v-chip>
-          </div>
-        </div>
-        <div class="d-flex flex-column">
-          <span>ระดับความหวาน</span>
-          <div class="d-flex justify-space-between">
-            <v-chip
-              v-for="level in sweetnessLevels"
-              :key="level"
-              variant="outlined"
-              :color="selectedSweetness === level ? '#f5a623' : 'gray'"
-              @click="selectSweetness(level)"
-            >
-              {{ level }}%
-            </v-chip>
-          </div>
-        </div>
-        <div class="d-flex flex-column">
-          <span>ท็อปปิ้ง</span>
-          <div class="topping-container d-flex align-center">
-            <v-btn icon @click="prevTopping">
-              <v-icon>mdi-chevron-left</v-icon>
-            </v-btn>
-            <div class="d-flex justify-space-between flex-grow-1">
-              <div v-for="topping in displayedToppings" :key="topping?.toppingId" class="topping-item d-flex flex-column align-center">
-                <v-chip
-                  variant="outlined"
-                  :color="selectedToppings.some(t => t.topping.toppingId === topping?.toppingId) ? '#f5a623' : 'gray'"
-                  @click="toggleTopping(topping)"
-                >
-                  {{ topping?.toppingName }} {{ topping?.toppingPrice }}
-                </v-chip>
-                <div v-if="selectedToppings.some(t => t.topping.toppingId === topping?.toppingId)" class="quantity-controls d-flex align-center mt-2">
-                  <v-btn icon @click="decreaseToppingQuantity(topping)">
-                    <v-icon>mdi-minus</v-icon>
-                  </v-btn>
-                  <span>{{ selectedToppings.find(t => t.topping.toppingId === topping?.toppingId)?.quantity }}</span>
-                  <v-btn icon @click="increaseToppingQuantity(topping)">
-                    <v-icon>mdi-plus</v-icon>
-                  </v-btn>
+        <v-row>
+          <v-col class="d-flex justify-center align-center" style="width: 200px; height: 200px;">
+            <img :src="`http://localhost:3000/products/${productStore.selectedProduct.productId}/image`"
+              class="product-image" />
+          </v-col>
+          <v-col>
+            <v-row>
+              <v-col>
+                <span class="product-name">{{ productStore.selectedProduct.productName }}</span>
+              </v-col>
+              <v-col>
+                <span class="product-price">{{ productStore.selectedProduct.productPrice }} ฿</span>
+              </v-col>
+            </v-row>
+            <v-row class="mt-3">
+              <div class="d-flex flex-column">
+                <span>ตัวเลือก</span>
+                <div class="d-flex flex-wrap">
+                  <v-chip v-for="type in productStore.selectedProduct.productTypes" :key="type.productTypeId"
+                    variant="outlined" :color="selectedType === type ? '#f5a623' : 'gray'" @click="selectType(type)"
+                    class="chip">
+                    {{ type.productTypeName }} {{ type.productTypePrice }}
+                  </v-chip>
                 </div>
               </div>
+            </v-row>
+          </v-col>
+        </v-row>
+        <div class="product-info-container d-flex">
+          <div class="product-options-container">
+            <div class="d-flex flex-column mt-4">
+              <span>ระดับความหวาน</span>
+              <div class="d-flex justify-start">
+                <v-chip v-for="level in sweetnessLevels" :key="level" variant="outlined"
+                  :color="selectedSweetness === level ? '#f5a623' : 'gray'" @click="selectSweetness(level)"
+                  class="chip">
+                  {{ level }}%
+                </v-chip>
+              </div>
             </div>
-            <v-btn icon @click="nextTopping">
-              <v-icon>mdi-chevron-right</v-icon>
-            </v-btn>
+            <div class="d-flex flex-column mt-4">
+              <span>ท็อปปิ้ง</span>
+              <v-carousel hide-delimiters height="80">
+                <v-carousel-item v-for="(toppingGroup, index) in toppingGroups" :key="index">
+                  <div class="d-flex justify-center">
+                    <div v-for="topping in toppingGroup" :key="topping.toppingId"
+                      class="topping-item d-flex flex-column align-center mx-4">
+                      <v-chip variant="outlined"
+                        :color="selectedToppings.some(t => t.topping.toppingId === topping.toppingId) ? '#f5a623' : 'gray'"
+                        @click="toggleTopping(topping)" class="chip">
+                        {{ topping.toppingName }} {{ topping.toppingPrice }}
+                      </v-chip>
+                      <div v-if="selectedToppings.some(t => t.topping.toppingId === topping.toppingId)"
+                        class="quantity-controls d-flex align-center mt-2">
+                        <v-btn size="xs-small" icon @click="decreaseToppingQuantity(topping)">
+                          <v-icon  size="small">mdi-minus</v-icon>
+                        </v-btn>
+                        <span>{{ selectedToppings.find(t => t.topping.toppingId === topping.toppingId)?.quantity }}</span>
+                        <v-btn size="xs-small" icon @click="increaseToppingQuantity(topping)">
+                          <v-icon size="small">mdi-plus</v-icon>
+                        </v-btn>
+                      </div>
+                    </div>
+                  </div>
+                </v-carousel-item>
+              </v-carousel>
+            </div>
           </div>
         </div>
-        <div class="quantity-container d-flex justify-space-between align-center mt-4">
-          <v-btn @click="decreaseQuantity" icon="mdi-minus"></v-btn>
-          <span>{{ quantity }}</span>
-          <v-btn @click="increaseQuantity" icon="mdi-plus"></v-btn>
-        </div>
       </v-card-text>
-      <v-card-actions class="justify-center">
-        <v-btn color="primary" @click="confirmSelection">ยืนยันการทำรายการ</v-btn>
+      <v-card-actions>
+        <v-row class="justify-center align-center w-100">
+          <v-col class="d-flex justify-center align-center">
+            <div class="quantity-container d-flex justify-space-between align-center">
+              <p class="pa-2">จำนวนสินค้า</p>
+              <v-btn variant="elevated" color="#C5C5C5" @click="decreaseQuantity()" icon="mdi-minus"></v-btn>
+              <span class="mx-2">{{ quantity }}</span>
+              <v-btn variant="elevated" color="#FF9642" @click="increaseQuantity()" icon="mdi-plus"></v-btn>
+            </div>
+          </v-col>
+          <v-col class="d-flex justify-center align-center">
+            <v-btn variant="elevated" color="#FF9642" rounded="xl" style="width: 90%;" @click="confirmSelection">ยืนยันการทำรายการ</v-btn>
+          </v-col>
+        </v-row>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -97,7 +107,7 @@ import { useToppingStore } from '@/stores/topping.store';
 import type { ProductType } from '@/types/productType.type';
 import type { Topping } from '@/types/topping.type';
 import type { ProductTypeTopping } from '@/types/productTypeTopping.type';
-import {  ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import Swal from 'sweetalert2';
 
 const posStore = usePosStore();
@@ -106,14 +116,19 @@ const toppingStore = useToppingStore();
 const selectedType = ref<ProductType | null>(null);
 const selectedSweetness = ref<number>(100);
 const selectedToppings = ref<Array<{ topping: Topping; quantity: number }>>([]);
-const quantity = ref<number>(1);
-const toppingIndex = ref<number>(0);
 const productTypeToppings = ref<ProductTypeTopping[]>([]);
+
+const quantity = ref<number>(1);
 const showAlert = ref<boolean>(false);
 
 const sweetnessLevels = [0, 25, 50, 75, 100];
-const displayedToppings = computed(() => {
-  return toppingStore.toppings.slice(toppingIndex.value, toppingIndex.value + 5);
+
+const toppingGroups = computed(() => {
+  const groups = [];
+  for (let i = 0; i < toppingStore.toppings.length; i += 4) {
+    groups.push(toppingStore.toppings.slice(i, i + 4));
+  }
+  return groups;
 });
 
 function selectType(type: ProductType) {
@@ -134,6 +149,16 @@ function toggleTopping(topping: Topping) {
   }
 }
 
+function decreaseQuantity() {
+  if (quantity.value > 1) {
+    quantity.value--;
+  }
+}
+
+function increaseQuantity() {
+  quantity.value++;
+}
+
 function increaseToppingQuantity(topping: Topping) {
   const toppingItem = selectedToppings.value.find((t) => t.topping.toppingId === topping.toppingId);
   if (toppingItem) {
@@ -146,33 +171,15 @@ function decreaseToppingQuantity(topping: Topping) {
   if (toppingItem && toppingItem.quantity > 1) {
     toppingItem.quantity--;
   }
-}
-
-function prevTopping() {
-  if (toppingIndex.value > 0) {
-    toppingIndex.value--;
+  if (toppingItem && toppingItem.quantity === 1) {
+    const index = selectedToppings.value.findIndex((t) => t.topping.toppingId === topping.toppingId);
+    selectedToppings.value.splice(index, 1);
   }
-}
-
-function nextTopping() {
-  if (toppingIndex.value < toppingStore.toppings.length - 5) {
-    toppingIndex.value++;
-  }
-}
-
-function decreaseQuantity() {
-  if (quantity.value > 1) {
-    quantity.value--;
-  }
-}
-
-function increaseQuantity() {
-  quantity.value++;
 }
 
 function closeDialog() {
-  clearData();
   posStore.toppingDialog = false;
+  clearData();
 }
 
 function confirmSelection() {
@@ -203,16 +210,54 @@ function confirmSelection() {
 // clear data
 function clearData() {
   selectedType.value = null;
-  selectedSweetness.value = null;
+  selectedSweetness.value = 0;
   selectedToppings.value = [];
   quantity.value = 1;
-  toppingIndex.value = 0;
-  productStore.selectedProduct= null;
+  productStore.selectedProduct = null;
   productTypeToppings.value = [];
 }
+
+// Watch for changes in posStore.toppingDialog and ensure selectedProduct is set
+watch(
+  () => posStore.toppingDialog,
+  (newVal) => {
+    if (newVal && !productStore.selectedProduct) {
+      console.warn("Topping dialog opened without selected product.");
+      posStore.toppingDialog = false; // Close the dialog if no product is selected
+    }
+  }
+);
 </script>
 
 <style scoped>
+.product-info-container {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
+
+.product-image {
+  width: 130px;
+  height: auto;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.product-options-container {
+  flex-grow: 1;
+}
+
+.product-name {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.product-price {
+  font-size: 20px;
+  color: #f5a623;
+  font-weight: bold;
+}
+
 .promotion-container {
   display: flex;
   justify-content: space-around;
@@ -233,12 +278,12 @@ function clearData() {
   text-align: center;
 }
 
-.justify-center {
-  justify-content: center;
-}
-
 .active {
   background-color: #f5a623;
+}
+
+.chip {
+  margin: 5px;
 }
 
 .topping-container {
@@ -255,6 +300,7 @@ function clearData() {
 
 .quantity-container span {
   margin: 0 10px;
+  font-size: 20px;
 }
 
 .topping-item {

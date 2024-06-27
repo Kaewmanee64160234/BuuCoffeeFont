@@ -9,38 +9,39 @@ import { useMessageStore } from "./message";
 export const useIngredientStore = defineStore("ingredient", () => {
   const loadingStore = useLoadingStore();
   const messageStore = useMessageStore();
-  const loaded = ref(false);
-  const loading = ref(false);
   const ingredient = ref<Ingredient | null>(null);
   const ingredients = ref<Ingredient[]>([]);
+  const ingredientlow = ref<Ingredient[]>([]);
   const importingredients = ref<Importingredient[]>([]);
   const search = ref<string>("");
   const dialog = ref(false); // สถานะของ Dialog
-  const editedIngredient = ref<Ingredient & { files: File[] }>({
-    ingredientName: "",
-    ingredientSupplier: "",
+  const dialogImportItem = ref(false);
+  const editedIngredient = ref<Ingredient>({
+    ingredientName: '',
+    ingredientSupplier: '',
     ingredientMinimun: 0,
-    ingredientUnit: "",
+    ingredientUnit: '',
     ingredientQuantityInStock: 0,
     ingredientQuantityPerUnit: 0,
-    ingredientQuantityPerSubUnit: "",
-    ingredientRemining:0,
-    ingredientImage: "no_image.jpg",
-    files: [],
+    ingredientQuantityPerSubUnit: '',
+    ingredientRemining: 0,
+    ingredientImage: 'no_image.jpg',
+    imageFile: [], // เพิ่ม imageFile ตามที่ระบุใน interface
   });
+  
   watch(dialog, (newDialog, oldDialog) => {
     if (!newDialog) {
       editedIngredient.value = {
-        ingredientName: "",
-        ingredientSupplier: "",
-    ingredientMinimun: 0,
-    ingredientUnit: "",
-    ingredientQuantityInStock: 0,
-    ingredientQuantityPerUnit: 0,
-    ingredientQuantityPerSubUnit: "",
-    ingredientRemining:0,
-    ingredientImage: "no_image.jpg",
-    files: [],
+        ingredientName: '',
+        ingredientSupplier: '',
+        ingredientMinimun: 0,
+        ingredientUnit: '',
+        ingredientQuantityInStock: 0,
+        ingredientQuantityPerUnit: 0,
+        ingredientQuantityPerSubUnit: '',
+        ingredientRemining: 0,
+        ingredientImage: 'no_image.jpg',
+        imageFile: [], // เพิ่ม imageFile ตามที่ระบุใน interface
       };
     }
   });
@@ -85,6 +86,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
       messageStore.showError("Oops!, cannot get ingredients.");
     }
   }
+
   async function searchIngredients(name: string) {
     try {
       const res = await ingredientService.searchIngredientsByName(name);
@@ -94,7 +96,6 @@ export const useIngredientStore = defineStore("ingredient", () => {
       messageStore.showError("Oops!, cannot search ingredients.");
     }
   }
-
 
   const ingredientList = ref<
     { ingredient: Ingredient; count: number; totalunit: number }[]
@@ -127,19 +128,16 @@ export const useIngredientStore = defineStore("ingredient", () => {
   function removeIngredient(index: number) {
     ingredientList.value.splice(index, 1);
   }
-
-
-  // const getAllIngredients = async () => {
-  //   try {
-  //     const response = await ingredientService.getAllIngredients();
-  //     if (response.status === 200) {
-  //       ingredients.value = response.data.data;
-  //       console.log(response.data);
-  //     }
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
+  async function getIngredientlow() {
+    try {
+      const response = await ingredientService.getIngredientlow();
+      if (response.status === 200) {
+        ingredientlow.value = response.data;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   const getAllHistoryImportIngredients = async () => {
     try {
@@ -182,31 +180,56 @@ export const useIngredientStore = defineStore("ingredient", () => {
       console.error("Error saving import data:");
     }
   }
+  // async function saveCheckData() {
+  //   const ingredientList = ingredientCheckList.value.map((item) => ({
+  //     ingredientId: item.ingredientcheck.ingredientId!,
+  //     UsedQuantity: item.count,
+  //   }));
+
+  //   const checkIngredientsPayload = {
+  //     checkingredientitem: ingredientList, 
+  //     userId: 1,
+  //     date: new Date(),
+  //   };
+
+  //   console.log('Sending data to API:', checkIngredientsPayload);
+
+  //   try {
+  //     const response = await ingredientService.createCheckIngredients(checkIngredientsPayload);
+  //     console.log('API response:', response);
+  //   } catch (error) {
+  //     console.error('Error saving check data:', error);
+  //   }
+  // }
   async function saveIngredient() {
     loadingStore.isLoading = true;
     try {
+      let res;
       if (editedIngredient.value.ingredientId) {
-        const res = await ingredientService.updateIngredient(
+        res = await ingredientService.updateIngredient(
           editedIngredient.value.ingredientId,
           editedIngredient.value
-          
         );
       } else {
-        const res = await ingredientService.saveIngredient(editedIngredient.value);
+        res = await ingredientService.saveIngredient(
+          editedIngredient.value
+        );
       }
-      dialog.value = false;
+      dialog.value = false; // ปิด dialog หลังจากบันทึกข้อมูลเสร็จสิ้น
+      await getAllIngredients(); // Refresh ingredient list after save
     } catch (e) {
       console.log(e);
       messageStore.showError("Cannot save product");
+    } finally {
+      loadingStore.isLoading = false; // ให้ isLoading เป็น false ทุกรอบ
     }
-    loadingStore.isLoading = false;
   }
+
   async function setEditedIngredient(ingredient: Ingredient) {
     editedIngredient.value = JSON.parse(JSON.stringify(ingredient));
-    await getAllIngredients(); 
     dialog.value = true;
   }
-  
+
   const deleteIngredient = async (id: number) => {
     try {
       await ingredientService.deleteIngredient(id);
@@ -218,9 +241,11 @@ export const useIngredientStore = defineStore("ingredient", () => {
   };
   return {
     ingredient,
+    // saveCheckData,
     ingredients,
     search,
     dialog,
+    dialogImportItem,
     page,
     keyword,
     take,
@@ -235,6 +260,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
     total,
     importingredients,
     ingredientCheckList,
+    ingredientlow,
     getAllIngredients,
     Addingredient,
     saveImportData,
@@ -243,7 +269,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
     Addingredienttotable,
     saveIngredient,
     deleteIngredient,
-    searchIngredients
-    
+    searchIngredients,
+    getIngredientlow,
   };
 });

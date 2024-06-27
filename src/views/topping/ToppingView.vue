@@ -3,13 +3,13 @@
     <v-card>
       <v-card-title>
         <v-row>
-          <v-col cols="9">
-            ท็อปปิ้ง
+          <v-col cols="9" style="padding: 20px;">
+          <h3>ท้อปปิ้ง</h3>
           </v-col>
           <v-col cols="3">
             <v-text-field 
               v-model="toppingStore.searchQuery" 
-              label="ค้นหา" 
+              label="ค้นหาท็อบปิ้ง" 
               append-inner-icon="mdi-magnify" 
               hide-details 
               dense 
@@ -31,7 +31,7 @@
           <thead>
             <tr>
               <th style="text-align: center;font-weight: bold;">รหัสท็อปปิ้ง</th>
-              <th style="text-align: center;font-weight: bold;">ชื่ท็อปปิ้ง</th>
+              <th style="text-align: center;font-weight: bold;">ชื่อท็อปปิ้ง</th>
               <th style="text-align: center;font-weight: bold;">ราคาท็อปปิ้ง</th>
               <th style="text-align: center;font-weight: bold;">การกระทำ</th>
             </tr>
@@ -61,7 +61,6 @@
     <UpdateToppingDialog />
   </v-container>
 </template>
-
 
 <script lang="ts" setup>
 import { useToppingStore } from '@/stores/topping.store';
@@ -97,22 +96,45 @@ const openUpdateDialog = (topping: Topping) => {
 const deleteTopping = async (toppingId: number) => {
   try {
     const result = await Swal.fire({
-      title: 'Are you sure?',
-      text: "You won't be able to revert this!",
+      title: 'คุณแน่ใจหรือไม่?',
+      text: "คุณจะไม่สามารถย้อนกลับได้!",
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, delete it!'
+      confirmButtonText: 'ตกลง, ลบเลย!',
+      cancelButtonText: 'ยกเลิก'
     });
 
     if (result.isConfirmed) {
       await toppingStore.deleteTopping(toppingId);
-      Swal.fire('Deleted!', 'Topping has been deleted.', 'success');
+      Swal.fire({
+        title: 'ลบแล้ว!',
+        text: 'ท็อปปิ้งถูกลบเรียบร้อยแล้ว.',
+        icon: 'success',
+        confirmButtonText: 'ตกลง',
+        customClass: {
+          confirmButton: 'swal-button'
+        }
+      });
     }
   } catch (error) {
     console.error('Error deleting topping:', error);
-    Swal.fire('Error', 'An error occurred while deleting the topping.', 'error');
+    Swal.fire({
+      title: 'เกิดข้อผิดพลาด',
+      text: 'เกิดข้อผิดพลาดขณะลบท็อปปิ้ง.',
+      icon: 'error',
+      confirmButtonText: 'ตกลง',
+      customClass: {
+        confirmButton: 'swal-button'
+      }
+    });
   }
 };
 </script>
+
+<style scoped>
+.swal-button {
+  font-size: 16px;
+}
+</style>

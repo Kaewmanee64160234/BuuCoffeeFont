@@ -14,7 +14,6 @@ const productStore = useProductStore();
 const categoryStore = useCategoryStore();
 const url = import.meta.env.VITE_URL_PORT;
 const paginate = ref(true);
-const selectedCategory = ref(categoryStore.selectedCategory);
 const ingredientStore = useIngredientStore();
 
 onMounted(async () => {
@@ -30,17 +29,17 @@ const openCreateDialog = () => {
 };
 
 const openUpdateDialog = (product: Product) => {
-  productStore.product = { ...product, file: new File([""], "") };
+  productStore.editedProduct = { ...product, file: new File([""], "") };
   loadProductData();
   productStore.updateProductDialog = true;
 };
 
 const loadProductData = () => {
-  const product = productStore.product;
+  const product = productStore.editedProduct;
 
   productStore.productName = product.productName || '';
   productStore.productPrice = product.productPrice || 0;
-  productStore.selectedCategory = product.category?.categoryName || null;
+  productStore.selectedCategoryForUpdate = product.category?.categoryName || null;
   productStore.imagePreview = product.productImage ? `${url}/products/${product.productId}/image` : null;
 
   if (product.productTypes && Array.isArray(product.productTypes)) {
@@ -90,18 +89,25 @@ const loadProductData = () => {
 
 const confirmDelete = async (deleteAction: () => Promise<void>) => {
   const result = await Swal.fire({
-    title: 'Are you sure?',
-    text: "You won't be able to revert this!",
+    title: 'คุณแน่ใจไหม?',
+    text: "คุณจะไม่สามารถย้อนกลัวมาแก้ไขได้อีกแล้วนะ!",
     icon: 'warning',
     showCancelButton: true,
     confirmButtonColor: '#3085d6',
     cancelButtonColor: '#d33',
-    confirmButtonText: 'Yes, delete it!'
+    confirmButtonText: 'ใช่, ลบเลย!',
+    cancelButtonText: 'ยกเลิก'
   });
 
   if (result.isConfirmed) {
     await deleteAction();
-    Swal.fire('Deleted!', 'Your item has been deleted.', 'success');
+    Swal.fire({
+      title: 'ลบเสร็จสิ้น!',
+      text: 'ลบเรียบร้อยแล้ว',
+      icon: 'success',
+      confirmButtonText: 'ตกลง'
+    });
+    
   }
 };
 
@@ -112,7 +118,7 @@ const deleteProduct = async (productId: number) => {
     });
   } catch (error) {
     console.error('Error deleting product:', error);
-    Swal.fire('Error', 'An error occurred while deleting the product.', 'error');
+    Swal.fire('เกิดข้อผิดพลาด', 'เกิดข้อผิดพลาดขณะลบสินค้า');
   }
 };
 </script>

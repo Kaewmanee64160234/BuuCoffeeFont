@@ -1,15 +1,82 @@
 <script lang="ts" setup>
 import { useIngredientStore } from '@/stores/Ingredient.store';
 import { onMounted } from 'vue';
-
+import ingredientService from "@/service/ingredient.service";
+import Swal from 'sweetalert2';
 const ingredientStore = useIngredientStore();
 
 onMounted(async () => {
-    await ingredientStore.getAllIngredients();
-    ingredientStore.ingredients.forEach(item => {
-        ingredientStore.Addingredienttotable(item);
-    });
+  await ingredientStore.getAllIngredients();
+  ingredientStore.ingredients.forEach(item => {
+    ingredientStore.Addingredienttotable(item);
+  });
 });
+
+const saveCheckData = async () => {
+  const ingredientList = ingredientStore.ingredientCheckList.map((item, index) => ({
+    ingredientId: item.ingredientcheck.ingredientId!,
+    UsedQuantity: item.count, 
+  }));
+
+  const checkIngredientsPayload = {
+    date: new Date().toISOString(),
+    userId: 1,
+    checkingredientitems: ingredientList,
+  };
+
+  console.log("Sending data to API:", checkIngredientsPayload);
+
+  try {
+    // ยืนยันก่อนส่งข้อมูล
+    const confirmation = await Swal.fire({
+      title: 'คุณแน่ใจหรือไม่?',
+      text: 'คุณต้องการบันทึกข้อมูลนี้หรือไม่?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'ใช่, บันทึก!',
+      cancelButtonText: 'ไม่, ยกเลิก!',
+    });
+
+    if (confirmation.isConfirmed) {
+      // แสดงการส่งข้อมูล
+      Swal.fire({
+        title: 'กำลังบันทึกข้อมูล...',
+        text: 'กรุณารอสักครู่ขณะที่เราบันทึกข้อมูลของคุณ.',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      const response = await ingredientService.createCheckIngredients(checkIngredientsPayload);
+      console.log("API response:", response);
+
+      // แสดงผลลัพธ์เมื่อสำเร็จ
+      Swal.fire({
+        title: 'สำเร็จ!',
+        text: 'ข้อมูลของคุณถูกบันทึกเรียบร้อยแล้ว.',
+        icon: 'success',
+      });
+    } else {
+      Swal.fire('ยกเลิก', 'ข้อมูลของคุณไม่ได้ถูกบันทึก.', 'error');
+    }
+  } catch (error) {
+    console.error("Error saving check data:", error);
+
+    // แสดงผลลัพธ์เมื่อเกิดข้อผิดพลาด
+    Swal.fire({
+      title: 'เกิดข้อผิดพลาด!',
+      text: 'เกิดข้อผิดพลาดในการบันทึกข้อมูลของคุณ.',
+      icon: 'error',
+    });
+  }
+};
+
+const logQuantity = (item) => {
+  // Update item.count ให้เป็นค่าที่ป้อนเข้ามาใน input ของแต่ละ item
+  item.count = item.ingredientcheck.ingredientQuantityInStock;
+  console.log("Quantity changed:", item.count);
+};
 </script>
 
 <template>
@@ -37,7 +104,7 @@ onMounted(async () => {
                         </v-btn>
                     </v-col>
                     <v-col>
-                            <v-btn>
+                            <v-btn  @click="saveCheckData ">
                                 <v-icon left>mdi-plus</v-icon>
                                 บันทึกข้อมูล
                             </v-btn>
@@ -73,7 +140,12 @@ onMounted(async () => {
                                     <td>{{ item.ingredientcheck.ingredientName }}</td>
                                     <td>{{ item.ingredientcheck.ingredientSupplier }}</td>
                                     <td>{{ item.ingredientcheck.ingredientMinimun }}</td>
-                                    <td><input type="number" v-model.number="item.count" class="styled-input" /></td>
+                                    <td>
+                    <input type="number"
+                           v-model.number="item.ingredientcheck.ingredientQuantityInStock"
+                           class="styled-input"
+                           @change="logQuantity(item)">
+                  </td>
                                     <td><button @click="ingredientStore.removeIngredient(index)">ลบ</button></td>
                                 </tr>
                             </tbody>

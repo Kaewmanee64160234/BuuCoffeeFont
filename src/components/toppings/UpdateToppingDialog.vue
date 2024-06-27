@@ -9,10 +9,21 @@
           <v-form ref="form" v-model="valid">
             <v-row>
               <v-col cols="12">
-                <v-text-field v-model="toppingStore.topping!.toppingName" label="ชื่อท็อปปิ้ง" required></v-text-field>
+                <v-text-field
+                  v-model="toppingStore.topping!.toppingName"
+                  label="ชื่อท็อปปิ้ง"
+                  :rules="[rules.required, rules.name]"
+                  required
+                ></v-text-field>
               </v-col>
               <v-col cols="12">
-                <v-text-field v-model="toppingStore.topping!.toppingPrice" label="ราคาท็อปปิ้ง" type="number" required></v-text-field>
+                <v-text-field
+                  v-model="toppingStore.topping!.toppingPrice"
+                  label="ราคาท็อปปิ้ง"
+                  type="number"
+                  :rules="[rules.required, rules.price]"
+                  required
+                ></v-text-field>
               </v-col>
             </v-row>
           </v-form>
@@ -36,9 +47,12 @@ import Swal from 'sweetalert2';
 const toppingStore = useToppingStore();
 const form = ref(null);
 const valid = ref(false);
-const toppingName = ref('');
-const toppingPrice = ref(0);
 
+const rules = {
+  required: (value: any) => !!value || 'กรุณากรอกข้อมูล',
+  name: (value: string) => /^[A-Za-zก-ฮะ-ๅๆ็่-๋์่-๋\s]+$/.test(value) || 'ชื่อท็อปปิ้งต้องเป็นตัวอักษรเท่านั้น',
+  price: (value: number) => value > 0 || 'ราคาท็อปปิ้งต้องเป็นจำนวนบวก'
+};
 
 const submitForm = async () => {
   if (!form.value?.validate()) return;
@@ -52,10 +66,32 @@ const submitForm = async () => {
   try {
     await toppingStore.updateTopping(updatedTopping.toppingId, updatedTopping);
     toppingStore.updateToppingDialog = false;
-    Swal.fire('Success', 'Topping updated successfully!', 'success');
+    Swal.fire({
+      title: 'สำเร็จ',
+      text: 'ท็อปปิ้งถูกอัปเดตเรียบร้อยแล้ว!',
+      icon: 'success',
+      confirmButtonText: 'ตกลง',
+      customClass: {
+        confirmButton: 'swal-button'
+      }
+    });
   } catch (error) {
     console.error('Error updating topping:', error);
-    Swal.fire('Error', 'An error occurred while updating the topping.', 'error');
+    Swal.fire({
+      title: 'ข้อผิดพลาด',
+      text: 'เกิดข้อผิดพลาดขณะอัปเดตท็อปปิ้ง.',
+      icon: 'error',
+      confirmButtonText: 'ตกลง',
+      customClass: {
+        confirmButton: 'swal-button'
+      }
+    });
   }
 };
 </script>
+
+<style scoped>
+.swal-button {
+  font-size: 16px;
+}
+</style>

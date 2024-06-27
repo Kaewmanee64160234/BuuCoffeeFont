@@ -1,9 +1,7 @@
 <script lang="ts" setup>
-import { ref, watch ,onMounted} from 'vue';
+import {onMounted } from 'vue';
 import { useReportFinnceStore } from '@/stores/report/finance.store';
-const props = defineProps({
-  dialogVisible: Boolean
-});
+
 const ReportFinnceStore = useReportFinnceStore();
 function formatDate(dateString: string | undefined): string {
   if (!dateString) return ''; // ในกรณีที่ไม่มีวันที่
@@ -16,19 +14,16 @@ function formatDate(dateString: string | undefined): string {
     hour: 'numeric',
     minute: 'numeric',
     second: 'numeric',
-    timeZone: 'Asia/Bangkok', 
-    hour12: false 
+    timeZone: 'Asia/Bangkok',
+    hour12: false
   };
-  return date.toLocaleString('th-TH', options); 
+  return date.toLocaleString('th-TH', options);
 }
 
 
 const clearData = () => {
-    ReportFinnceStore.createHistoryCashierDialog = false;
+  ReportFinnceStore.createHistoryCashierDialog = false;
 };
-watch(() => props.dialogVisible, (newValue) => {
-  ReportFinnceStore.createHistoryCashierDialog = newValue;
-});
 
 onMounted(async () => {
   await ReportFinnceStore.getAll();
@@ -53,13 +48,14 @@ onMounted(async () => {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(item, index) in ReportFinnceStore.historycashiers" :key="index" :class="{ 'red-row': item.deletedAt }">
-    <td>{{ index + 1 }}</td>
-    <td>{{ formatDate(item.createdDate) }}</td>
-    <td>{{ item.cashierAmount }}</td>
-    <td :class="{ 'red-cell': item.deletedAt }">{{ formatDate(item.deletedAt) }}</td>
-    <td>{{ item.user }}</td>
-</tr>
+          <tr v-for="(item, index) in ReportFinnceStore.historycashiers" :key="index"
+            :class="{ 'red-row': item.deletedAt }">
+            <td>{{ index + 1 }}</td>
+            <td>{{ formatDate(item.createdDate) }}</td>
+            <td>{{ item.cashierAmount }}</td>
+            <td :class="{ 'red-cell': item.deletedAt }">{{ formatDate(item.deletedAt) }}</td>
+            <td>{{ item.user }}</td>
+          </tr>
 
 
 
@@ -78,11 +74,10 @@ onMounted(async () => {
 </template>
 <style scoped>
 .red-row {
-    color: red;
+  color: red;
 }
 
 .red-cell {
-    color: red;
+  color: red;
 }
-
 </style>

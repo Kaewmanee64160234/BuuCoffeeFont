@@ -1,13 +1,14 @@
+
 export interface Ingredient {
-  ingredientId?: number; // ไม่เก็บ
+  ingredientId?: number; 
   ingredientImage?: string;
   ingredientName?: string;
   ingredientSupplier?: string;
   ingredientMinimun: number;
   ingredientUnit?: string;
-  ingredientQuantityInStock: number; // ไม่เก็บ
+  ingredientQuantityInStock: number; 
   ingredientQuantityPerUnit?: number;
   ingredientQuantityPerSubUnit?: string;
-  ingredientRemining?: number;
-  files: any;
+  ingredientRemining?: number; 
+  imageFile: File[]; 
 }
