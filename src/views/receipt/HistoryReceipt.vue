@@ -81,7 +81,7 @@ const filteredReceipts = computed(() => {
                   <tbody>
                     <tr v-for="receipt in receiptStore.filteredReceipts" :key="receipt.receiptId">
                       <td class="text-center">{{ receipt.receiptId }}</td>
-                      <td class="text-center">{{ receipt.createdReceipt }}</td>
+                      <td class="text-center">{{ receipt.createdDate }}</td>
                       <td class="text-center">{{ receipt.receiptTotalDiscount }}</td>
                       <td class="text-center">{{ receipt.customer?.customerName }}</td>
                       <td class="text-center">{{ receipt.promotion }}</td>
