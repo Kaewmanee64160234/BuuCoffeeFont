@@ -42,7 +42,7 @@ const haveTopping = ref(false);
 
 const rules = {
   required: (value: any) => !!value || 'กรุณากรอกข้อมูล',
-  categoryName: (value: string) => /^[A-Za-zก-ฮ]+$/.test(value) || 'ชื่อหมวดหมู่ต้องเป็นตัวอักษรเท่านั้น',
+  // categoryName: (value: string) => /^[A-Za-zก-ฮ]+$/.test(value) || 'ชื่อหมวดหมู่ต้องเป็นตัวอักษรเท่านั้น',
 };
 
 const submitForm = async () => {

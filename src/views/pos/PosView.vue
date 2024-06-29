@@ -29,6 +29,7 @@ onMounted(async () => {
   await categoryStore.getAllCategories();
   await toppingStore.getAllToppings();
   await customerStore.getAllCustomers();
+  console.log("cate__", categoryStore.categoriesForCreate)
   if (userStore.currentUser?.userRole === "พนักงานขายข้าว") {
     promotionStore.getPromotionByType("ร้านกับข้าว");
     selectedCategory.value = "กับข้าว";
@@ -41,7 +42,7 @@ onMounted(async () => {
     selectedCategory.value = "กาแฟ";
     const cate = categoryStore.categoriesForCreate.findIndex(category => category.categoryName === "กับข้าว")
     categoryStore.categoriesForCreate.splice(cate, 1);
- 
+console.log("cate",  categoryStore.categoriesForCreate)
    productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === "กาแฟ".toLocaleLowerCase());
 console.log("Filter", productFilters.value)
   }
