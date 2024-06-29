@@ -226,7 +226,7 @@ export const usePosStore = defineStore("pos", () => {
   // create function create recipt
   const createReceipt = async () => {
     let receiptStatus = "";
-    if (userStore.userRole == " พนักงานขายกาแฟ") {
+    if (userStore.currentUser?.userRole == "พนักงานขายกาแฟ") {
       receiptStatus = "ร้านกาแฟ";
     } else {
       receiptStatus = "ร้านข้าว";

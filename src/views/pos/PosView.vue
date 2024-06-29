@@ -40,14 +40,14 @@ onMounted(async () => {
     categoryStore.categoriesForCreate = [];
     categoryStore.categoriesForCreate.push(cate!);
     productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === "กับข้าว".toLocaleLowerCase());
+    promotionStore.promotions = promotionStore.promotions.filter(promotion => promotion.promotionForStore === "ร้านข้าว");
   } else {
     promotionStore.getPromotionByType("ร้านกาแฟ");
     selectedCategory.value = "กาแฟ";
     const cate = categoryStore.categoriesForCreate.findIndex(category => category.categoryName === "กับข้าว")
     categoryStore.categoriesForCreate.splice(cate, 1);
-    console.log("cate",  categoryStore.categoriesForCreate)
     productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === "กาแฟ".toLocaleLowerCase());
-    console.log("Filter", productFilters.value)
+    promotionStore.promotions = promotionStore.promotions.filter(promotion => promotion.promotionForStore === "ร้านกาแฟ");
   }
 });
 
