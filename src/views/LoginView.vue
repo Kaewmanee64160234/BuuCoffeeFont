@@ -1,5 +1,4 @@
 <template>
-
   <v-container class="fill-height d-flex align-center justify-center background-image" fluid >
     <v-card class="mx-auto my-12 pa-6" width="450" elevation="10">
       <v-row justify="center">
@@ -41,7 +40,8 @@ import { useRouter } from 'vue-router';
 import Swal from 'sweetalert2';
 import { useAuthStore } from '@/stores/auth';
 import { useUserStore } from '@/stores/user.store';
-const userStore = useUserStore()
+
+const userStore = useUserStore();
 const authStore = useAuthStore();
 const router = useRouter();
 const show = ref(false);
@@ -63,15 +63,15 @@ const loginHandler = async () => {
     try {
       await authStore.login(email.value, password.value);
       if (userStore.currentUser.userId > 0 && userStore.currentUser.userEmail === email.value && userStore.currentUser.userPassword === password.value)
-      Swal.fire({
-        icon: 'success',
-        title: 'Login successful',
-        showConfirmButton: false,
-        timer: 1500
-      });
-      // Redirect to '/report' after successful login
+        Swal.fire({
+          icon: 'success',
+          title: 'Login successful',
+          showConfirmButton: false,
+          timer: 1500
+        }).then(() => {
+          router.push('/report');
+        });
     } catch (error: any) {
-      // Use 'error: any' to assert 'error' as any type or use a specific type if known
       console.error('Login failed:', error);
       if (error.response && error.response.data) {
         Swal.fire({
@@ -88,7 +88,6 @@ const loginHandler = async () => {
       }
     }
   } else {
-    // Form validation failed, show warning message
     Swal.fire({
       icon: 'warning',
       title: 'Form is not valid',
@@ -130,30 +129,30 @@ const loginHandler = async () => {
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: -1; /* Ensure the background is behind other elements */
+  z-index: -1;
 }
 
 .character-top-left {
   position: absolute;
-  top: 50px; /* Adjust position */
-  left: 460px; /* Adjust position */
-  width: 200px; /* Adjust size as needed */
+  top: 50px;
+  left: 460px;
+  width: 200px;
   height: auto;
-  z-index: 1; /* Ensure it is above the card */
+  z-index: 1;
 }
 
 .character-bottom-right {
   position: absolute;
-  bottom: 60px; /* Adjust position */
-  right: 450px; /* Adjust position */
-  width: 180px; /* Adjust size as needed */
+  bottom: 60px;
+  right: 450px;
+  width: 180px;
   height: auto;
-  z-index: 1; /* Ensure it is above the card */
+  z-index: 1;
 }
 
 .v-btn.login-btn {
   width: 50%;
-  border: 2px solid #C5C5C5; /* เพิ่มเส้นขอบให้ปุ่ม */
+  border: 2px solid #C5C5C5;
   color: #2B28A3;
   text-transform: uppercase;
   font-weight: bold;

@@ -42,7 +42,11 @@ const haveTopping = ref(false);
 
 const rules = {
   required: (value: any) => !!value || 'กรุณากรอกข้อมูล',
+<<<<<<< HEAD
   // categoryName: (value: string) => /^[A-Za-zก-ฮ]+$/.test(value) || 'ชื่อหมวดหมู่ต้องเป็นตัวอักษรเท่านั้น',
+=======
+  categoryName: (value: string) => /^[A-Za-zก-ฮะ-ๅๆ็่-๋์่-๋\s]+$/.test(value) || 'ชื่อหมวดหมู่ต้องไม่มีตัวเลขหรืออักขระพิเศษ',
+>>>>>>> f75c51dadd70013f292927b18f6d892a12fcfa65
 };
 
 const submitForm = async () => {
@@ -57,13 +61,32 @@ const submitForm = async () => {
   try {
     await categoryStore.createCategory(newCategory);
     categoryStore.createCategoryDialog = false;
-    Swal.fire('Success', 'Category created successfully!', 'success');
+    Swal.fire({
+      title: 'สำเร็จ',
+      text: 'สร้างหมวดหมู่เรียบร้อยแล้ว!',
+      icon: 'success',
+      confirmButtonText: 'ตกลง',
+      customClass: {
+        confirmButton: 'swal-button'
+      }
+    });
   } catch (error) {
     console.error('Error creating category:', error);
-    Swal.fire('Error', 'An error occurred while creating the category.', 'error');
+    Swal.fire({
+      title: 'เกิดข้อผิดพลาด',
+      text: 'เกิดข้อผิดพลาดขณะสร้างหมวดหมู่.',
+      icon: 'error',
+      confirmButtonText: 'ตกลง',
+      customClass: {
+        confirmButton: 'swal-button'
+      }
+    });
   }
 };
 </script>
 
 <style scoped>
+.swal-button {
+  font-size: 16px;
+}
 </style>

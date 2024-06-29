@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import { useIngredientStore } from '@/stores/Ingredient.store';
-import IngredientDialog from "@/views/ingredient/IngredientDialog.vue"
+import IngredientDialog from "@/views/ingredient/IngredientDialog.vue";
 import { computed, onMounted, ref, watch } from "vue";
 import { useRouter } from 'vue-router'; 
+import Swal from 'sweetalert2';
 
 const ingredientStore = useIngredientStore();
 const router = useRouter(); 
@@ -14,14 +15,31 @@ const paginate = ref(true);
 onMounted(async () => {
   await ingredientStore.getAllIngredients();
 });
+
 const deleteIngredient = async (id?: number) => {
   if (id !== undefined) {
-    await ingredientStore.deleteIngredient(id);
+    try {
+      const confirmation = await Swal.fire({
+        title: 'คุณแน่ใจหรือไม่?',
+        text: 'คุณต้องการลบวัตถุดิบนี้หรือไม่?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'ใช่, ลบ!',
+        cancelButtonText: 'ไม่, ยกเลิก!',
+      });
+
+      if (confirmation.isConfirmed) {
+        await ingredientStore.deleteIngredient(id);
+        Swal.fire('ลบสำเร็จ', 'วัตถุดิบถูกลบเรียบร้อยแล้ว!', 'success');
+      }
+    } catch (error) {
+      console.error("Error deleting ingredient:", error);
+      Swal.fire('เกิดข้อผิดพลาด', 'เกิดข้อผิดพลาดขณะลบวัตถุดิบ.', 'error');
+    }
   } else {
     console.error("Ingredient ID is undefined");
   }
 };
-
 
 const navigateTo = (routeName: string) => {
   router.push({ name: routeName });
@@ -35,7 +53,6 @@ watch(paginate, async (newPage, oldPage) => {
     await ingredientStore.getAllIngredients();
   }
 });
-
 </script>
 
 <template>
@@ -44,11 +61,11 @@ watch(paginate, async (newPage, oldPage) => {
     <v-card>
       <v-card-title>
         <v-row>
-          <v-col cols="9">
-            รายการวัตถุดิบ
+          <v-col cols="9" style="padding: 20px;">
+          <h3>รายการวัตถุดิบ</h3>
           </v-col>
           <v-col cols="3">
-            <v-text-field label="ค้นหา" append-inner-icon="mdi-magnify" hide-details dense v-model="ingredientStore.keyword"></v-text-field>
+            <v-text-field label="ค้นหารายการวัตถุดิบ" append-inner-icon="mdi-magnify" hide-details dense v-model="ingredientStore.keyword"></v-text-field>
           </v-col>
         </v-row>
         <v-row>
@@ -142,8 +159,6 @@ watch(paginate, async (newPage, oldPage) => {
             :length="ingredientStore.lastPage"
             rounded="circle"
           ></v-pagination>
-
-  
     </v-card>
   </v-container>
 </template>

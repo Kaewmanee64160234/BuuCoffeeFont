@@ -65,8 +65,8 @@ const deleteCustomer = async (customerId: number) => {
     <v-card class="flex-container">
       <v-card-title>
         <v-row>
-          <v-col cols="9" style="font-size: 35px;">
-            จัดการลูกค้า
+          <v-col cols="9" style="padding: 20px;">
+          <h3>จัดการลูกค้า</h3>
           </v-col>
           
           <v-row style="margin-left: 6%;">

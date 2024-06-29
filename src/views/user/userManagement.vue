@@ -42,10 +42,10 @@ const filteredUsers = computed(() => {
     <v-card class="flex-container">
       <v-card-title>
         <v-row>
-          <v-col cols="9" style="font-size: 35px;">
-            จัดการผู้ใช้งาน
+          <v-col cols="9" style="padding: 20px;">
+          <h3>จัดการผู้ใช้งาน</h3>
           </v-col>
-          
+   
           <v-row style="margin-left: 6%;">
             <v-col class="pa-2 ma-2" cols="3">
               <v-text-field
@@ -106,7 +106,7 @@ const filteredUsers = computed(() => {
   </v-container>
 </template>
 
-<style>
+<style scoped>
 .flex-container {
   display: flex;
   flex-direction: column;

@@ -92,12 +92,8 @@
       </v-list>
     </v-navigation-drawer>
 
-    <v-main v-if="isAuthenticated" :class="{ 'main-rail': rail }" style="margin: 0;padding: 0;" :style="{ marginLeft: isLoginPage ? '0' : '3%' }">
+    <v-main :class="{ 'main-rail': rail }" style="margin: 0;padding: 0;" :style="{ marginLeft: isLoginPage ? '0' : '3%' }">
       <router-view></router-view>
-    </v-main>
-
-    <v-main v-else>
-      <LoginView/>  
     </v-main>
   </v-app>
 </template>
@@ -107,8 +103,6 @@ import { ref, computed ,onMounted} from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth';
 import { useUserStore } from "@/stores/user.store";
-import  LoginView from '@/views/LoginView.vue';
-import router from '@/router';
 const drawer = ref(true)
 const rail = ref(true)
 const route = useRoute()
@@ -125,7 +119,6 @@ const getUserFromLocalStorage = () => {
     } catch (e) {
       console.error("Failed to parse user from localStorage:", e);
       authStore.isLogin = false;
-
     }
   } else {
     console.log("No user found in localStorage.");

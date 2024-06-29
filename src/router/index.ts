@@ -1,7 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
-import HomeView from "../views/HomeView.vue";
-import NotFound from "@/views/NotFound.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -9,7 +7,7 @@ const router = createRouter({
       path: "/",
       name: "home",
       component: () => import("../views/report/ReportFinance.vue"),
-      // meta: { requiresAuth: true },
+      meta: { requiresAuth: true },
     },
     {
       path: "/userManagement",
@@ -17,6 +15,7 @@ const router = createRouter({
       // route level code-splitting
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
+
       component: () => import("../views/user/userManagement.vue"),
       // meta: { requiresAuth: true }
     },
@@ -91,9 +90,11 @@ const router = createRouter({
       name: "promotion",
       component: () => import("../views/promotion/PromotionView.vue"),
       // meta: { requiresAuth: true }
+
     },
     //Edit
     {
+
       path: "/report",
       name: "report",
       component: () => import("../views/report/ReportFinance.vue"),
@@ -105,6 +106,7 @@ const router = createRouter({
       name: "pos",
       component: () => import("../views/pos/PosView.vue"),
       // meta: { requiresAuth: true }
+
     },
     {
       path: "/login",
@@ -114,7 +116,7 @@ const router = createRouter({
     {
       path: "/:catchAll(.*)",
       name: "NotFound",
-      component: NotFound,
+      component: () => import("../views/NotFound.vue"),
     },
   ],
 });

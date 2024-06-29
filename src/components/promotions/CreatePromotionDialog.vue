@@ -19,10 +19,7 @@
                 item-value="value" label="ประเภทโปรโมชั่น" required></v-select>
               <v-select v-model="promotionStore_" :items="store" item-text="text" item-value="value"
                 label="ร้านที่ใช้promotion" required></v-select>
-              <!-- add check box promotionCanUseManyTimes -->
-
               <v-checkbox v-model="promotionCanUseManyTimes" label="โปรโมชั่นนี้สามารถใช้ได้หลายครั้ง"></v-checkbox>
-
               <v-textarea v-model="description" label="คำอธิบาย" required></v-textarea>
             </v-form>
           </template>
@@ -48,8 +45,7 @@
               </template>
               <template v-if="promotionTypeValue === 'discountPercentage'">
                 <v-text-field v-model="discountValue" label="เปอร์เซ็นต์ส่วนลด" type="number" required></v-text-field>
-                <v-text-field v-model="minimumPrice" label="ราคาขั้นต่ำสำหรับส่วนลด" type="number"
-                  required></v-text-field>
+                <v-text-field v-model="minimumPrice" label="ราคาขั้นต่ำสำหรับส่วนลด" type="number" required></v-text-field>
               </template>
             </v-form>
           </template>
@@ -57,9 +53,7 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <!-- <v-btn v-if="step > 1" @click="previousStep">ย้อนกลับ</v-btn>
-          <v-btn v-if="step < items.length" @click="nextStep">ถัดไป</v-btn> -->
-        <v-btn v-if="step === items.length" @click="createPromotion()">สร้าง</v-btn>
+        <v-btn v-if="step === items.length" @click="createPromotion">สร้าง</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -92,7 +86,7 @@ const promotionStore_ = ref('');
 const promotionTypeName = ref('');
 const promotionTypeValue = ref('');
 
-const store = ['ร้านกาแฟ', 'ร้านข้าว']
+const store = ['ร้านกาแฟ', 'ร้านข้าว'];
 
 watch(() => promotionTypeName.value, (newValue) => {
   promotionStore.promotionTypes.forEach(promotionType => {
@@ -100,22 +94,12 @@ watch(() => promotionTypeName.value, (newValue) => {
       promotionTypeValue.value = promotionType.value;
     }
   });
-})
-
-
+});
 
 const items = [
-  { title: 'Promotion Details', complete: false },
-  { title: 'Promotion Type Details', complete: false },
+  { title: 'รายละเอียดโปรโมชั่น', complete: false },
+  { title: 'รายละเอียดประเภทโปรโมชั่น', complete: false },
 ];
-
-const nextStep = () => {
-  step.value++;
-};
-
-const previousStep = () => {
-  step.value--;
-};
 
 const closeDialog = () => {
   // clear all data
@@ -133,12 +117,9 @@ const closeDialog = () => {
   description.value = '';
   noEndDate.value = false;
   step.value = 1;
-  // clear promotionStore.promotion
   promotionStore.promotion = null;
-
   promotionStore.createPromotionDialog = false;
   promotionCanUseManyTimes.value = false;
-  
 };
 
 const createPromotion = async () => {
@@ -153,7 +134,7 @@ const createPromotion = async () => {
     endDate: noEndDate.value ? null : new Date(endDate.value),
     discountValue: promotionTypeValue.value === 'discountPrice' || promotionTypeValue.value === 'usePoints' || promotionTypeValue.value === 'discountPercentage' ? discountValue.value : null,
     conditionQuantity: promotionTypeValue.value === 'discountPrice' || promotionTypeValue.value === 'usePoints' ? pointsRequired.value : null,
-    buyProductId: promotionTypeValue.value === 'buy1get1' ? productStore.products.find(product => product.productName === buyProductId.value)?.productId : null, // Find the product id from the product store (assuming the product store has the products loaded
+    buyProductId: promotionTypeValue.value === 'buy1get1' ? productStore.products.find(product => product.productName === buyProductId.value)?.productId : null, 
     freeProductId: promotionTypeValue.value === 'buy1get1' ? productStore.products.find(product => product.productName === freeProductId.value)?.productId : null,
     conditionValue1: promotionTypeValue.value === 'discountPercentage' ? minimumPrice.value : null,
     conditionValue2: promotionTypeValue.value === 'discountPercentage' ? minimumPrice.value : null,
@@ -165,10 +146,20 @@ const createPromotion = async () => {
 
   await promotionStore.createPromotion(newPromotion);
   Swal.fire({
-    icon: 'success',
     title: 'สำเร็จ',
     text: 'โปรโมชั่นถูกสร้างเรียบร้อยแล้ว',
+    icon: 'success',
+    confirmButtonText: 'ตกลง',
+    customClass: {
+      confirmButton: 'swal-button'
+    }
   });
   closeDialog();
 };
 </script>
+
+<style scoped>
+.swal-button {
+  font-size: 16px;
+}
+</style>

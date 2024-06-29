@@ -1,13 +1,13 @@
 import { ref } from "vue";
 import ingredientService from "@/service/ingredient.service";
 import type { Importingredient } from "@/types/importIngredient.type";
-
 import { defineStore } from "pinia";
-
 export const useHistoryIngredientImportStore = defineStore(
   "historyIngredientImport",
   () => {
     const importIngredientsHistory = ref<Importingredient[]>([]);
+    const dialogimportkitem = ref(false);
+    const selectedItems = ref([]);
 
     const getAllHistoryImportIngredients = async () => {
       try {
@@ -19,9 +19,12 @@ export const useHistoryIngredientImportStore = defineStore(
           console.error(error);
       }
   };
+  
 
   return {
       importIngredientsHistory,
+      dialogimportkitem,
       getAllHistoryImportIngredients,
+      selectedItems,
   };
 });

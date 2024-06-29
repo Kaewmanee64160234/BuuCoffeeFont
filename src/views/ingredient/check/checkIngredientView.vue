@@ -29,19 +29,19 @@ const saveCheckData = async () => {
   try {
     // ยืนยันก่อนส่งข้อมูล
     const confirmation = await Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you want to save this data?',
+      title: 'คุณแน่ใจหรือไม่?',
+      text: 'คุณต้องการบันทึกข้อมูลนี้หรือไม่?',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Yes, save it!',
-      cancelButtonText: 'No, cancel!',
+      confirmButtonText: 'ใช่, บันทึก!',
+      cancelButtonText: 'ไม่, ยกเลิก!',
     });
 
     if (confirmation.isConfirmed) {
       // แสดงการส่งข้อมูล
       Swal.fire({
-        title: 'Saving data...',
-        text: 'Please wait while we save your data.',
+        title: 'กำลังบันทึกข้อมูล...',
+        text: 'กรุณารอสักครู่ขณะที่เราบันทึกข้อมูลของคุณ.',
         allowOutsideClick: false,
         didOpen: () => {
           Swal.showLoading();
@@ -53,20 +53,20 @@ const saveCheckData = async () => {
 
       // แสดงผลลัพธ์เมื่อสำเร็จ
       Swal.fire({
-        title: 'Success!',
-        text: 'Your data has been saved successfully.',
+        title: 'สำเร็จ!',
+        text: 'ข้อมูลของคุณถูกบันทึกเรียบร้อยแล้ว.',
         icon: 'success',
       });
     } else {
-      Swal.fire('Cancelled', 'Your data was not saved.', 'error');
+      Swal.fire('ยกเลิก', 'ข้อมูลของคุณไม่ได้ถูกบันทึก.', 'error');
     }
   } catch (error) {
     console.error("Error saving check data:", error);
 
     // แสดงผลลัพธ์เมื่อเกิดข้อผิดพลาด
     Swal.fire({
-      title: 'Error!',
-      text: 'There was an error saving your data.',
+      title: 'เกิดข้อผิดพลาด!',
+      text: 'เกิดข้อผิดพลาดในการบันทึกข้อมูลของคุณ.',
       icon: 'error',
     });
   }

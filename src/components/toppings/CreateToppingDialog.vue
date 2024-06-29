@@ -53,7 +53,7 @@ const toppingPrice = ref(0);
 
 const rules = {
   required: (value: any) => !!value || 'กรุณากรอกข้อมูล',
-  name: (value: string) => /^[A-Za-zก-ฮ\s]+$/.test(value) || 'ชื่อท็อปปิ้งต้องเป็นตัวอักษรเท่านั้น',
+  name: (value: string) => /^[A-Za-zก-ฮะ-ๅๆ็่-๋์่-๋\s]+$/.test(value) || 'ชื่อท็อปปิ้งต้องเป็นตัวอักษรเท่านั้น',
   price: (value: number) => value > 0 || 'ราคาท็อปปิ้งต้องเป็นจำนวนบวก'
 };
 
@@ -70,10 +70,26 @@ const submitForm = async () => {
       try {
         await toppingStore.createTopping(newTopping);
         toppingStore.createToppingDialog = false;
-        Swal.fire('สำเร็จ', 'ท็อปปิ้งถูกสร้างเรียบร้อยแล้ว!', 'success');
+        Swal.fire({
+          title: 'สำเร็จ',
+          text: 'ท็อปปิ้งถูกสร้างเรียบร้อยแล้ว!',
+          icon: 'success',
+          confirmButtonText: 'ตกลง',
+          customClass: {
+            confirmButton: 'swal-button'
+          }
+        });
       } catch (error) {
         console.error('Error creating topping:', error);
-        Swal.fire('ข้อผิดพลาด', 'เกิดข้อผิดพลาดขณะสร้างท็อปปิ้ง.', 'error');
+        Swal.fire({
+          title: 'ข้อผิดพลาด',
+          text: 'เกิดข้อผิดพลาดขณะสร้างท็อปปิ้ง.',
+          icon: 'error',
+          confirmButtonText: 'ตกลง',
+          customClass: {
+            confirmButton: 'swal-button'
+          }
+        });
       }
     }
   }
@@ -81,4 +97,7 @@ const submitForm = async () => {
 </script>
 
 <style scoped>
+.swal-button {
+  font-size: 16px;
+}
 </style>

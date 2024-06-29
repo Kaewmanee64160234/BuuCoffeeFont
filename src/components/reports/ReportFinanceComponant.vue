@@ -1,12 +1,16 @@
 <script lang="ts" setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed , reactive} from 'vue';
 import VueApexCharts from 'vue3-apexcharts';
 import { useReportFinnceStore } from '@/stores/report/finance.store';
 import CreateDialogAddCashier from '../../components/reports/cashier/DialogAddCashier.vue';
 import CreateHistoryDialogCashier from '../../components/reports/cashier/HistoryCashier.vue';
+import { useExpenditureStore } from '@/stores/report/expenditure.store';
+import { useRevenueStore  } from '@/stores/report/revenue.store';
+
 import Swal from 'sweetalert2';
 const ReportFinnceStore = useReportFinnceStore();
-
+const expenditureStore = useExpenditureStore();
+const revenueStore = useRevenueStore();
 const chartSeries = ref([0, 0]);
 const chartOptions = ref({
   chart: {
@@ -83,9 +87,40 @@ onMounted(async () => {
   await ReportFinnceStore.getfindToday();
   await ReportFinnceStore.getSumType();
   await ReportFinnceStore.getDailyReport();
+  await expenditureStore.fetchExpenditure();
+  console.log(expenditureStore.totalExpenditureEndDate);
+  await revenueStore.fetchRevenue();
   await fetchGroupedFinance();
   updateChartData();
 });
+const formatDate = (dateString) => {
+  const dateObj = new Date(dateString);
+  return `${dateObj.getDate()}/${dateObj.getMonth() + 1}/${dateObj.getFullYear()}`;
+};
+const chartOptions2 = reactive({
+  chart: {
+    type: 'bar',
+    stacked: true,
+    height: 400,
+  },
+  xaxis: {
+    categories: [formatDate(expenditureStore.startDate), 'ช่วงการขาย', 'ช่วงการขาย', 'ช่วงการขาย', formatDate(expenditureStore.endDate)],
+  },
+  yaxis: {
+    title: {
+      text: 'จำนวนเงิน',
+    },
+  },
+});
+
+const chartSeries2 = reactive([
+  {
+    name: 'Series A',
+    data: [expenditureStore.totalExpenditureStartDate, 100, 120, 300, expenditureStore.totalExpenditureEndDate],
+    colors: ['#FF6384', '#36A2EB'] 
+  }
+]);
+
 const fetchGroupedFinance = async () => {
   await ReportFinnceStore.fetchGroupedFinance(dateRange.value.startDate, dateRange.value.endDate);
   updateLineChartData();
@@ -261,9 +296,14 @@ const lineChartSeries = ref([
       </v-col>
     </v-row>
     <v-row>
-      <v-col cols="12" md="6">
+      <v-col cols="6" md="6">
         <apexchart type="line" :options="lineChartOptions" :series="lineChartSeries"></apexchart>
       </v-col>
+      <v-col cols="6" md="6">
+      <apexchart :options="chartOptions2" :series="chartSeries2" height="400">
+      </apexchart>
+    </v-col>
+
     </v-row>
   </v-container>
 </template>
