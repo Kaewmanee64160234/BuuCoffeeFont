@@ -6,7 +6,7 @@ const router = createRouter({
     {
       path: "/",
       name: "home",
-      component: () => import("../views/report/ReportFinance.vue"),
+      component: () => import("../views/HomeView.vue"),
       meta: { requiresAuth: true },
     },
     {
@@ -110,7 +110,7 @@ const router = createRouter({
     },
     {
       path: "/login",
-      name: "login",
+      name: "loginPage",
       component: () => import("../views/LoginView.vue"),
     },
     {
@@ -124,6 +124,7 @@ router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (!authStore.isLogin) {
+
       next({ name: "login" });
     } else {
       next();

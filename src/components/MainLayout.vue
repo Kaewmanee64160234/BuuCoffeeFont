@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app >
     <v-navigation-drawer v-if="isAuthenticated" v-model="drawer" :rail="rail" permanent app>
       <v-list-item class="drawer-header">
         <template v-slot:append>
@@ -92,7 +92,7 @@
       </v-list>
     </v-navigation-drawer>
 
-    <v-main :class="{ 'main-rail': rail }" style="margin: 0;padding: 0;" :style="{ marginLeft: isLoginPage ? '0' : '3%' }">
+    <v-main :class="{ 'main-rail': rail }" style="margin: 0;padding: 0;" :style="{ marginLeft: isAuthenticated ? '0' : '3%' }">
       <router-view></router-view>
     </v-main>
   </v-app>
@@ -100,12 +100,12 @@
 
 <script setup>
 import { ref, computed ,onMounted} from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth';
 import { useUserStore } from "@/stores/user.store";
 const drawer = ref(true)
 const rail = ref(true)
-const route = useRoute()
+const router = useRouter();
 const authStore = useAuthStore();
 const userStore = useUserStore();
 const isAuthenticated = computed(() => authStore.isLogin);
@@ -123,6 +123,8 @@ const getUserFromLocalStorage = () => {
   } else {
     console.log("No user found in localStorage.");
     authStore.isLogin = false;
+    router.push("/login");
+    console.log("Redirect to login page");
   }
 };
 
