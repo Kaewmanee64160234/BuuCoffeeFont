@@ -11,18 +11,21 @@ import { useCategoryStore } from '@/stores/category.store';
 import { usePromotionStore } from '@/stores/promotion.store';
 import { useToppingStore } from '@/stores/topping.store';
 import { useUserStore } from '@/stores/user.store';
-import type { Product } from '@/types/product.type';
 import { useCustomerStore } from '@/stores/customer.store';
+import { usePosStore } from '@/stores/pos.store';
+import type { Product } from '@/types/product.type';
 
 const productStore = useProductStore();
 const categoryStore = useCategoryStore();
 const promotionStore = usePromotionStore();
 const toppingStore = useToppingStore();
 const userStore = useUserStore();
-const selectedCategory = ref('');
-const productFilters = ref<Product[]>();
-const searchQuery = ref('');
 const customerStore = useCustomerStore();
+const posStore = usePosStore();
+const selectedCategory = ref('');
+const productFilters = ref<Product[]>([]);
+const searchQuery = ref('');
+
 onMounted(async () => {
   promotionStore.promotions = []
   await productStore.getAllProducts();
@@ -42,55 +45,51 @@ onMounted(async () => {
     selectedCategory.value = "กาแฟ";
     const cate = categoryStore.categoriesForCreate.findIndex(category => category.categoryName === "กับข้าว")
     categoryStore.categoriesForCreate.splice(cate, 1);
-console.log("cate",  categoryStore.categoriesForCreate)
-   productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === "กาแฟ".toLocaleLowerCase());
-console.log("Filter", productFilters.value)
+    console.log("cate",  categoryStore.categoriesForCreate)
+    productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === "กาแฟ".toLocaleLowerCase());
+    console.log("Filter", productFilters.value)
   }
 });
+
 watch(selectedCategory, async (newCategory) => {
   if (newCategory) {
-    productFilters.value = [];
     productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === newCategory.toLocaleLowerCase());
   }
 });
 
 watch(searchQuery, async (newQuery) => {
   if (newQuery === '') {
-    productFilters.value = [];
-    if (userStore.currentUser?.userRole === "พนักงานขายข้าว") {
-      productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === selectedCategory.value.toLocaleLowerCase() && product.category.categoryName.toLocaleLowerCase() === 'กับข้าว'.toLocaleLowerCase());
-    } else {
-      productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === selectedCategory.value.toLocaleLowerCase() && product.category.categoryName.toLocaleLowerCase() !== 'กับข้าว'.toLocaleLowerCase());
-    }
+    productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === selectedCategory.value.toLocaleLowerCase());
   } else {
-    productFilters.value = [];
-    if (userStore.currentUser?.userRole === "พนักงานขายข้าว") {
-      productFilters.value = productStore.products.filter(product => product.productName.toLocaleLowerCase().includes(newQuery.toLocaleLowerCase()) && product.category.categoryName.toLocaleLowerCase() === 'กับข้าว'.toLocaleLowerCase());
-    } else {
-      productFilters.value = productStore.products.filter(product => product.productName.toLocaleLowerCase().includes(newQuery.toLocaleLowerCase()) && product.category.categoryName.toLocaleLowerCase() !== 'กับข้าว'.toLocaleLowerCase());
-    }
+    productFilters.value = productStore.products.filter(product => product.productName.toLocaleLowerCase().includes(newQuery.toLocaleLowerCase()) && product.category.categoryName.toLocaleLowerCase() === selectedCategory.value.toLocaleLowerCase());
   }
 });
 
-
+const toggleNavigationDrawer = () => {
+  posStore.toggleNavigation();
+}
+// marginLeft
+const marginLeft = computed(() => {
+  return posStore.hideNavigation==false ? '3%' : '0';
+});
 </script>
-
 
 <template>
   <v-app style="width: 100vw; height: 100vh;">
-    <v-row class="full-width-row" style="height: 100%;">
-
-
+    <v-row class="full-width-row" style="height: 100%;" :style="{ marginLeft: marginLeft }">
       <v-col cols="7" class="d-flex flex-column align-center" style="background-color: #C1B6A9; height: 100%;">
         <v-container fluid class="full-width-container" style="height: 100%;">
           <v-row class="full-width-row">
-            <v-col cols="12" class="d-flex justify-center align-center ">
+            <v-col cols="12" class="d-flex justify-center align-center">
               <promotion-cards-carousel></promotion-cards-carousel>
             </v-col>
           </v-row>
           <v-row class="full-width-row">
             <v-col cols="12" md="6">
               <v-text-field v-model="searchQuery" append-icon="mdi-magnify" label="ค้นหา" variant="solo" single-line hide-details></v-text-field>
+            </v-col>
+            <v-col cols="12" md="6" class="d-flex justify-end align-center">
+              <v-btn @click="toggleNavigationDrawer">Toggle Navigation</v-btn>
             </v-col>
           </v-row>
           <v-row class="full-width-row">
@@ -127,7 +126,6 @@ watch(searchQuery, async (newQuery) => {
     <receipt-dialog />
   </v-app>
 </template>
-
 <style scoped>
 .full-width-container,
 .full-width-row {
