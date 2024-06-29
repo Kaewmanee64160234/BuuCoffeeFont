@@ -1,5 +1,6 @@
 <template>
-  <v-container class="fill-height d-flex align-center justify-center background-image" fluid>
+
+  <v-container class="fill-height d-flex align-center justify-center background-image" fluid >
     <v-card class="mx-auto my-12 pa-6" width="450" elevation="10">
       <v-row justify="center">
         <img src="../components/img/logo.jpg" alt="Logo" class="logo" style="width: 40%; height: 40%;">
