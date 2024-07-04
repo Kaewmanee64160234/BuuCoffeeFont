@@ -49,7 +49,8 @@ export const useCategoryStore = defineStore("category", () => {
         // pop last category out
         categoriesForCreate.value = categories.value.slice(0, categories.value.length - 1);
 
-
+console.log(categories.value);
+console.log(categoriesForCreate.value);
 
       }
     } catch (error) {

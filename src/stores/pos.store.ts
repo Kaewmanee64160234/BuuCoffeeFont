@@ -46,6 +46,15 @@ export const usePosStore = defineStore("pos", () => {
   const queueNumber = ref(1);
   const ReceiptDialogPos = ref(false);
   const receiptStore = useReceiptStore();
+  const hideNavigation = ref(true);
+
+  // toggleNavigation
+  const toggleNavigation = () => {
+    hideNavigation.value = !hideNavigation.value;
+  };
+  
+
+
   const addToReceipt = (
     product: Product,
     productType: ProductType,
@@ -217,7 +226,7 @@ export const usePosStore = defineStore("pos", () => {
   // create function create recipt
   const createReceipt = async () => {
     let receiptStatus = "";
-    if (userStore.userRole == " พนักงานขายกาแฟ") {
+    if (userStore.currentUser?.userRole == "พนักงานขายกาแฟ") {
       receiptStatus = "ร้านกาแฟ";
     } else {
       receiptStatus = "ร้านข้าว";
@@ -513,6 +522,8 @@ export const usePosStore = defineStore("pos", () => {
     removePromotion,
     queueNumber,
     ReceiptDialogPos,
-    updateReceipt
+    updateReceipt,
+    toggleNavigation,
+    hideNavigation
   };
 });

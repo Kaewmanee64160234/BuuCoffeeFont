@@ -1,6 +1,6 @@
 <template>
   <MainMenu v-if="showMainMenu" />
-  <router-view />
+  <router-view v-if="!showMainMenu" />
 </template>
 
 <script setup lang="ts">

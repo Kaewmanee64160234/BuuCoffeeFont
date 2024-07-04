@@ -1,6 +1,12 @@
 <template>
   <v-app>
-    <v-navigation-drawer v-if="isAuthenticated" v-model="drawer" :rail="rail" permanent app>
+    <v-navigation-drawer
+      v-if="shouldShowDrawer"
+      v-model="drawer"
+      :rail="rail"
+      permanent
+      app
+    >
       <v-list-item class="drawer-header">
         <template v-slot:append>
           <v-btn
@@ -87,54 +93,65 @@
           </template>
           Log Out
         </v-list-item>
-
-
       </v-list>
     </v-navigation-drawer>
 
-    <v-main :class="{ 'main-rail': rail }" style="margin: 0;padding: 0;" :style="{ marginLeft: isLoginPage ? '0' : '3%' }">
+    <v-main :class="{ 'main-rail': rail }" style="margin: 0; padding: 0;" :style="{ marginLeft: isAuthenticated ? '0' : '3%' }">
       <router-view></router-view>
     </v-main>
   </v-app>
 </template>
 
 <script setup>
-import { ref, computed ,onMounted} from 'vue'
-import { useRoute } from 'vue-router'
-import { useAuthStore } from '@/stores/auth';
-import { useUserStore } from "@/stores/user.store";
+import { ref, computed, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import { useUserStore } from '@/stores/user.store'
+import { usePosStore } from '@/stores/pos.store'
+
 const drawer = ref(true)
 const rail = ref(true)
+const router = useRouter()
 const route = useRoute()
-const authStore = useAuthStore();
-const userStore = useUserStore();
-const isAuthenticated = computed(() => authStore.isLogin);
+const authStore = useAuthStore()
+const userStore = useUserStore()
+const posStore = usePosStore()
+
+const isAuthenticated = computed(() => authStore.isLogin)
+
+const shouldShowDrawer = computed(() => {
+  return isAuthenticated.value && !posStore.hideNavigation
+})
+
 const getUserFromLocalStorage = () => {
-  const userString = localStorage.getItem("user");
+  const userString = localStorage.getItem("user")
   if (userString) {
     try {
-      const userObject = JSON.parse(userString);
-      userStore.setUser(userObject);
-      authStore.isLogin = true; 
+      const userObject = JSON.parse(userString)
+      userStore.setUser(userObject)
+      authStore.isLogin = true
     } catch (e) {
-      console.error("Failed to parse user from localStorage:", e);
-      authStore.isLogin = false;
+      console.error("Failed to parse user from localStorage:", e)
+      authStore.isLogin = false
     }
   } else {
-    console.log("No user found in localStorage.");
-    authStore.isLogin = false;
+    console.log("No user found in localStorage.")
+    authStore.isLogin = false
+    router.push("/login")
+    console.log("Redirect to login page")
   }
-};
+}
 
-onMounted(async () => {
-  getUserFromLocalStorage();
-});
+onMounted(() => {
+  getUserFromLocalStorage()
+})
+
 const logout = () => {
-  authStore.logout();
-  localStorage.removeItem("user");
-  state.isLogin = false;
-  authStore.isLogin = false; // เพิ่มส่วนนี้
-};
+  authStore.logout()
+  localStorage.removeItem("user")
+  authStore.isLogin = false
+  router.push("/login")
+}
 </script>
 
 <style scoped>
@@ -144,7 +161,6 @@ const logout = () => {
 
 .v-navigation-drawer.rail {
   width: 56px;
-  /* Adjust this width according to your requirements */
 }
 
 .v-list-item-title {
@@ -160,12 +176,10 @@ const logout = () => {
   padding: 20px;
   transition: margin-left 0.3s ease;
   margin-left: 250px;
-  /* Default margin to match the width of the drawer */
 }
 
 .v-main.main-rail {
   margin-left: 56px;
-  /* Margin when the drawer is minimized */
 }
 
 .nav-icon {
@@ -178,6 +192,6 @@ const logout = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 56px; /* Adjust this height to match the height of the other list items */
+  height: 56px;
 }
 </style>

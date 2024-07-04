@@ -88,7 +88,7 @@ const promotionTypeValue = ref('');
 const promotionId = ref<number | null>(null);
 const productFree = ref('');
 const productBuy = ref('');
-const store = ['ร้านกาแฟ', 'ร้านกับข้าว'];
+const store = ['ร้านกาแฟ', 'ร้านข้าว'];
 
 const items = [
   { title: 'รายละเอียดโปรโมชั่น', complete: false },
