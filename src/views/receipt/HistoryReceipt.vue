@@ -131,7 +131,7 @@ function formatDateThai(dateString: string): string {
           <v-card-title>
             <v-row>
               <v-col cols="12" style="font-size: 35px;">
-                จัดการผู้ใช้งาน
+                จัดการรายการคำสั่งซื้อ
               </v-col>
               <v-row style="margin-left: 6%;">
                 <v-col class="pa-2 ma-2" cols="3">
