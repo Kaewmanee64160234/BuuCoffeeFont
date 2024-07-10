@@ -18,13 +18,22 @@ function deleteReceipt(id: number) {
   return http.delete(`/receipts/cancel/${id}`);
 }
 // cancelReceipt
+
+
 function cancelReceipt(id: number) {
   return http.delete(`/receipts/cancel/${id}`);
 }
 
 // in-30-min getRecieptIn30Min
-function getRecieptIn30Min() {
-  return http.get("/receipts/in-30-min");
+// add qury typeOfProduct
+
+function getRecieptIn30Min(typeOfProduct: string) {
+  return http.get(`/receipts/receipt-in-1-day`, {
+    params: {
+      typeOfProduct,
+    },
+  }
+  );
 }
 
 
