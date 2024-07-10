@@ -56,10 +56,17 @@ const handleSearchKeydown = (event: KeyboardEvent) => {
 };
 
 // set receipt selected to pos
-const selectReceipt = (receipt:Receipt) => {
+const selectReceipt = (receipt: Receipt) => {
+  // Map quantity in each receipt item to an integer
+  receipt.receiptItems = receipt.receiptItems.map(item => ({
+    ...item,
+    quantity: parseInt(item.quantity.toString(), 10),
+  }));
+
   posStore.receipt = receipt;
-  posStore.selectedItems = receipt.receiptItems; // assuming items is an array of the selected receipt items
+  posStore.selectedItems = receipt.receiptItems;
   posStore.ReceiptDialogPos = false;
+  
   console.log('Selected Receipt:', receipt);
 };
 

@@ -54,7 +54,6 @@ export const usePosStore = defineStore("pos", () => {
   };
   
 
-
   const addToReceipt = (
     product: Product,
     productType: ProductType,
@@ -62,10 +61,9 @@ export const usePosStore = defineStore("pos", () => {
     quantity: number,
     sweetness: number
   ) => {
-    // console.log("productType topping", productTypeToppings);
     const parsedQuantity = parseInt(quantity.toString(), 10);
-    const productPrice = parseInt(product.productPrice + "");
-
+    const productPrice = parseInt(product.productPrice.toString(), 10);
+  
     let existingItem;
     if (product.category.haveTopping) {
       existingItem = selectedItems.value.find(
@@ -80,16 +78,16 @@ export const usePosStore = defineStore("pos", () => {
         (item) => item.product?.productId === product.productId
       );
     }
-
+  
     if (existingItem) {
       if (product.category.haveTopping) {
         if (productTypeToppings.length > 0) {
-          existingItem.quantity += parsedQuantity;
+          existingItem.quantity += parseInt(parsedQuantity+"");
           const toppingsTotal = productTypeToppings.reduce(
             (toppingAcc, toppingItem) =>
               toppingAcc +
               parseFloat(toppingItem.topping.toppingPrice.toString()) *
-                parseFloat(toppingItem.quantity + "") *
+                parseFloat(toppingItem.quantity.toString()) *
                 existingItem.quantity,
             0
           );
@@ -104,11 +102,11 @@ export const usePosStore = defineStore("pos", () => {
             (productPrice +
               parseFloat(productType.productTypePrice.toString())) *
             parsedQuantity;
-          existingItem.quantity += parsedQuantity;
+          existingItem.quantity += parseInt(parsedQuantity+'');
         }
       } else {
         existingItem.receiptSubTotal += productPrice * parsedQuantity;
-        existingItem.quantity += parsedQuantity;
+        existingItem.quantity += parseInt(parsedQuantity+'');
       }
     } else {
       if (product.category.haveTopping) {
@@ -117,7 +115,7 @@ export const usePosStore = defineStore("pos", () => {
             (toppingAcc, toppingItem) =>
               toppingAcc +
               parseFloat(toppingItem.topping.toppingPrice.toString()) *
-                parseFloat(toppingItem.quantity + "") *
+                parseFloat(toppingItem.quantity.toString()) *
                 parsedQuantity,
             0
           );
@@ -158,14 +156,18 @@ export const usePosStore = defineStore("pos", () => {
         });
       }
     }
+  
     console.log("last", selectedItems.value[selectedItems.value.length - 1]);
     receipt.value.receiptTotalPrice = calculateTotal(selectedItems.value);
     if (receipt.value.receiptTotalDiscount === 0) {
       receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice;
-    }else{
-      receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice - receipt.value.receiptTotalDiscount;
+    } else {
+      receipt.value.receiptNetPrice =
+        receipt.value.receiptTotalPrice - receipt.value.receiptTotalDiscount;
     }
   };
+  
+
   const calculateTotal = (selectedItems: ReceiptItem[]) => {
     receipt.value.receiptTotalPrice = 0;
     return selectedItems.reduce((acc, item) => {
