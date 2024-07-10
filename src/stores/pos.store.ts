@@ -46,7 +46,7 @@ export const usePosStore = defineStore("pos", () => {
   const queueNumber = ref(1);
   const ReceiptDialogPos = ref(false);
   const receiptStore = useReceiptStore();
-  const hideNavigation = ref(true);
+  const hideNavigation = ref(false);
 
   // toggleNavigation
   const toggleNavigation = () => {

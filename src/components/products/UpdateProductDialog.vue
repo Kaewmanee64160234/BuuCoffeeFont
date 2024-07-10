@@ -146,7 +146,7 @@ const productName = ref('');
 const productPrice = ref(0);
 const productImage = ref(new File([], ''));
 const imagePreview = ref<string | null>(null);
-const selectedCategory = ref('');
+
 const url = import.meta.env.VITE_URL_PORT;
 const productStore = useProductStore();
 const isDrink = ref(false);
@@ -288,12 +288,12 @@ const loadProductData = () => {
 
   productName.value = product.productName;
   productPrice.value = product.productPrice;
-  selectedCategory.value = product.category.categoryName;
+  productStore.selectedCategoryForUpdate = product.category.categoryName;
   imagePreview.value = product.productImage ? `${import.meta.env.VITE_URL_PORT}/products/${product.productId}/image` : null;
 };
 
 const checkCategory = () => {
-  const category = categoryStore.categories.find(c => c.categoryName === selectedCategory.value);
+  const category = categoryStore.categories.find(c => c.categoryName === productStore.selectedCategoryForUpdate);
   isDrink.value = category?.haveTopping === true;
   if (!isDrink.value) {
     productStore.isHot = false;
@@ -310,8 +310,9 @@ const submitForm = async () => {
     productName: productStore.productName,
     productPrice: productStore.productPrice,
     productImage: productStore.editedProduct.productImage,
-    categoryId: categoryStore.categoriesForCreate.find(category => category.categoryName === selectedCategory.value)?.categoryId || null,
-    productTypes: [] as ProductType[]
+    categoryId: categoryStore.categoriesForCreate.find(category => category.categoryName === productStore.selectedCategoryForUpdate)?.categoryId || null,
+    productTypes: [] as ProductType[],
+    category: categoryStore.categoriesForCreate.find(category => category.categoryName === productStore.selectedCategoryForUpdate) || { categoryId: 0, categoryName: '' }
   };
 
   if (isDrink.value) {
@@ -357,13 +358,14 @@ const submitForm = async () => {
 
   try {
     productStore.editedProduct = {
-      category: categoryStore.categories.find(c => c.categoryName === productStore.editedProduct.category.categoryName)!,
+      category: categoryStore.categories.find(c => c.categoryName === productStore.selectedCategoryForUpdate)!,
       productName: productData.productName,
       productPrice: productData.productPrice,
       productImage: '',
       productTypes: productData.productTypes,
       productId: productStore.editedProduct.productId,
       file: productImage.value
+
     };
 
     // if have image file in productImage upload image 
