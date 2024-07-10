@@ -98,12 +98,13 @@ function closeDialog() {
                 ></v-text-field>
               </v-col>
               <v-col cols="12" md="6">
-                <v-text-field
+                <v-select
                   v-model="userStatus"
                   label="สถานะผู้ใช้งาน"
-                  :rules="[rules.required, rules.userStatus]"
+                  :items="['ลาออกแล้ว', 'ยังไม่ลาออก']"
+                  :rules="[rules.required]"
                   required
-                ></v-text-field>
+                ></v-select>
               </v-col>
               <v-col cols="12" md="6">
                 <v-select
