@@ -10,15 +10,31 @@
             <h3 class="text-h6">รายละเอียดโปรโมชั่น</h3>
             <br>
             <v-form ref="form1">
-              <v-text-field v-model="promotionName" label="ชื่อโปรโมชั่น" required></v-text-field>
-              <v-text-field v-model="startDate" label="วันที่เริ่มต้น" type="date" required></v-text-field>
+              <v-text-field 
+                v-model="promotionName" 
+                label="ชื่อโปรโมชั่น" 
+                :rules="[
+                  v => !!v || 'กรุณากรอกชื่อโปรโมชั่น',
+                  v => /^[a-zA-Zก-๙\s]+$/.test(v) || 'กรุณากรอกชื่อเป็นตัวอักษรเท่านั้น'
+                ]"
+                required
+              ></v-text-field>
+              <v-text-field v-model="startDate" label="วันที่เริ่มต้น" type="date" :rules="[v => !!v || 'กรุณาเลือกวันที่เริ่มต้น']" required></v-text-field>
               <v-checkbox v-model="noEndDate" label="ไม่มีวันสิ้นสุด"></v-checkbox>
-              <v-text-field v-if="!noEndDate" v-model="endDate" label="วันที่สิ้นสุด" type="date"></v-text-field>
+              <v-text-field 
+                v-if="!noEndDate"
+                  v-model="endDate"
+                  label="วันที่สิ้นสุด"
+                  type="date"
+                  :rules="[v => !!v || 'กรุณาเลือกวันที่สิ้นสุด']"
+                  :disabled="noEndDate"
+                  required
+              ></v-text-field>
               <v-select v-model="promotionTypeName"
                 :items="promotionStore.promotionTypes.map(promotionType_ => promotionType_.text)" item-text="text"
-                item-value="value" label="ประเภทโปรโมชั่น" required></v-select>
+                item-value="value" label="ประเภทโปรโมชั่น" :rules="[v => !!v || 'กรุณาเลือกประเภทโปรโมชั่น']" required></v-select>
               <v-select v-model="promotionStore_" :items="store" item-text="text" item-value="value"
-                label="ร้านที่ใช้promotion" required></v-select>
+                label="ร้านที่ใช้promotion" :rules="[v => !!v || 'กรุณาเลือกร้านที่ใช้โปรโมชั่น']" required></v-select>
               <v-checkbox v-model="promotionCanUseManyTimes" label="โปรโมชั่นนี้สามารถใช้ได้หลายครั้ง"></v-checkbox>
               <v-textarea v-model="description" label="คำอธิบาย" required></v-textarea>
             </v-form>
@@ -29,23 +45,23 @@
             <br>
             <v-form ref="form2">
               <template v-if="promotionTypeValue === 'discountPrice'">
-                <v-text-field v-model="discountValue" label="มูลค่าส่วนลด" type="number" required></v-text-field>
+                <v-text-field v-model="discountValue" label="มูลค่าส่วนลด" type="number" :rules="[v => !!v || 'กรุณากรอกมูลค่าส่วนลด โดยกรอกเป็นตัวเลขเท่านั้น']" required></v-text-field>
               </template>
               <template v-if="promotionTypeValue === 'buy1get1'">
                 <v-autocomplete v-model="buyProductId"
                   :items="productStore.products.map(product => product.productName)" item-text="productName"
-                  item-value="id" label="ซื้อสินค้า" required></v-autocomplete>
+                  item-value="id" label="ซื้อสินค้า" :rules="[v => !!v || 'กรุณาเลือกสินค้าที่ซื้อ']" required></v-autocomplete>
                 <v-autocomplete v-model="freeProductId"
                   :items="productStore.products.map(product => product.productName)" item-text="productName"
-                  item-value="id" label="สินค้าฟรี" required></v-autocomplete>
+                  item-value="id" label="สินค้าฟรี" :rules="[v => !!v || 'กรุณาเลือกสินค้าฟรี']" required></v-autocomplete>
               </template>
               <template v-if="promotionTypeValue === 'usePoints'">
-                <v-text-field v-model="pointsRequired" label="คะแนนที่ต้องใช้" type="number" required></v-text-field>
-                <v-text-field v-model="discountValue" label="มูลค่าส่วนลด" type="number" required></v-text-field>
+                <v-text-field v-model="pointsRequired" label="คะแนนที่ต้องใช้" type="number" :rules="[v => !!v || 'กรุณากรอกคะแนนที่ต้องใช้ โดยกรอกเป็นตัวเลขเท่านั้น']" required></v-text-field>
+                <v-text-field v-model="discountValue" label="มูลค่าส่วนลด" type="number" :rules="[v => !!v || 'กรุณากรอกมูลค่าส่วนลด โดยกรอกเป็นตัวเลขเท่านั้น']" required></v-text-field>
               </template>
               <template v-if="promotionTypeValue === 'discountPercentage'">
-                <v-text-field v-model="discountValue" label="เปอร์เซ็นต์ส่วนลด" type="number" required></v-text-field>
-                <v-text-field v-model="minimumPrice" label="ราคาขั้นต่ำสำหรับส่วนลด" type="number" required></v-text-field>
+                <v-text-field v-model="discountValue" label="เปอร์เซ็นต์ส่วนลด" type="number" :rules="[v => !!v || 'กรุณากรอกเปอร์เซ็นต์ส่วนลด โดยกรอกเป็นตัวเลขเท่านั้น']" required></v-text-field>
+                <v-text-field v-model="minimumPrice" label="ราคาขั้นต่ำสำหรับส่วนลด" type="number" :rules="[v => !!v || 'กรุณากรอกราคาขั้นต่ำสำหรับส่วนลด โดยกรอกเป็นตัวเลขเท่านั้น']" required></v-text-field>
               </template>
             </v-form>
           </template>
