@@ -50,7 +50,11 @@ const confirmSave = () => {
 
 const saveData = () => {
   ingredientStore.saveImportData(); 
-  Swal.fire('บันทึกข้อมูลสำเร็จ!', '', 'success');
+  Swal.fire({
+        title: 'บันทึกข้อมูลสำเร็จ!',
+        icon: 'success',
+        confirmButtonText: 'ตกลง'
+  });
 };
 
 const saveAndClearForm = async () => {

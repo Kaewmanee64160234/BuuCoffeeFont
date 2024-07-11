@@ -103,7 +103,7 @@ const confirmDelete = async (deleteAction: () => Promise<void>) => {
     await deleteAction();
     Swal.fire({
       title: 'ลบเสร็จสิ้น!',
-      text: 'ลบเรียบร้อยแล้ว',
+      text: 'ลบสินค้าเรียบร้อยแล้ว',
       icon: 'success',
       confirmButtonText: 'ตกลง'
     });

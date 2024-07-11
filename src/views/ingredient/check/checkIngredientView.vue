@@ -56,9 +56,15 @@ const saveCheckData = async () => {
         title: 'สำเร็จ!',
         text: 'ข้อมูลของคุณถูกบันทึกเรียบร้อยแล้ว.',
         icon: 'success',
+        confirmButtonText: 'ตกลง'
       });
     } else {
-      Swal.fire('ยกเลิก', 'ข้อมูลของคุณไม่ได้ถูกบันทึก.', 'error');
+      Swal.fire({
+        title: 'ยกเลิก!',
+        text: 'ข้อมูลของคุณไม่ได้ถูกบันทึก.',
+        icon: 'error',
+        confirmButtonText: 'ตกลง'
+      });
     }
   } catch (error) {
     console.error("Error saving check data:", error);
@@ -141,12 +147,14 @@ const logQuantity = (item) => {
                                     <td>{{ item.ingredientcheck.ingredientSupplier }}</td>
                                     <td>{{ item.ingredientcheck.ingredientMinimun }}</td>
                                     <td>
-                    <input type="number"
-                           v-model.number="item.ingredientcheck.ingredientQuantityInStock"
-                           class="styled-input"
-                           @change="logQuantity(item)">
-                  </td>
-                                    <td><button @click="ingredientStore.removeIngredient(index)">ลบ</button></td>
+                                      <input type="number"
+                                             v-model.number="item.ingredientcheck.ingredientQuantityInStock"
+                                             class="styled-input"
+                                             @change="logQuantity(item)">
+                                    </td>                                     
+                                    <td>
+                                      <button class="red-button" @click="ingredientStore.removeIngredient(index)">ลบ</button>
+                                    </td>
                                 </tr>
                             </tbody>
                         </v-table>
@@ -211,5 +219,32 @@ th, td {
   padding-top: 12px !important; 
   padding-bottom: 12px !important; 
   text-align: center !important; 
+}
+
+.styled-input {
+  border: 2px solid #ccc; /* Adds a border */
+  border-radius: 4px; /* Optional: Rounds the corners */
+  padding: 8px; /* Adds padding for better appearance */
+  font-size: 16px; /* Adjusts the font size */
+  width: 100%; /* Ensures the input takes the full width of its container */
+  box-sizing: border-box; /* Ensures padding and border are included in the element's total width and height */
+}
+
+.styled-input:focus {
+  border-color: #000000; /* Changes the border color when the input is focused */
+  outline: none; /* Removes the default outline */
+}
+
+.red-button {
+  background-color: #EE4E4E; /* Correct hex color with # prefix */
+  color: white; /* Ensures the text is readable */
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 16px; /* Adjust the font size */
+  border-radius: 4px; /* Optional: Adds rounded corners */
+}
+.red-button:hover {
+  background-color: #d43b3b; /* Darken the color on hover */
 }
 </style>
