@@ -89,7 +89,14 @@ const marginLeft = computed(() => {
               <v-text-field v-model="searchQuery" append-icon="mdi-magnify" label="ค้นหา" variant="solo" single-line hide-details></v-text-field>
             </v-col>
             <v-col cols="12" md="6" class="d-flex justify-end align-center">
-              <v-btn @click="toggleNavigationDrawer">Toggle Navigation</v-btn>
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn icon v-bind="attrs" v-on="on" @click="toggleNavigationDrawer">
+                    <v-icon>{{ posStore.hideNavigation ? 'mdi-fullscreen' : 'mdi-fullscreen-exit' }}</v-icon>
+                  </v-btn>
+                </template>
+                <span>{{ posStore.hideNavigation ? 'Full Screen' : 'Exit Full Screen' }}</span>
+              </v-tooltip>
             </v-col>
           </v-row>
           <v-row class="full-width-row">
@@ -126,6 +133,7 @@ const marginLeft = computed(() => {
     <receipt-dialog />
   </v-app>
 </template>
+
 <style scoped>
 .full-width-container,
 .full-width-row {
