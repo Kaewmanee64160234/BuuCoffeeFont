@@ -21,9 +21,12 @@ export const useProductStore = defineStore("product", () => {
     productName: "",
     productPrice: 0,
     productImage: "",
+    countingPoint: false,
+
     category: {
       categoryId: 0,
       categoryName: "",
+
       haveTopping: false,
     },
     file: new File([""], "filename"),
@@ -35,6 +38,7 @@ export const useProductStore = defineStore("product", () => {
     productName: "",
     productPrice: 0,
     productImage: "",
+    countingPoint: false,
     category: {
       categoryId: 0,
       categoryName: "",
@@ -163,10 +167,15 @@ export const useProductStore = defineStore("product", () => {
         ...editedProduct.value,
       };
 
-
+      // if (editedProduct.value.file !== null) {
+      //   const formData = new FormData();
+      //   formData.append("file", editedProduct.value.file);
+      //   await updateImageProduct(id, formData);
+      // }
       const response = await productService.updateProduct(id, updatedProduct);
       console.log("updateProduct", response.status);
       if (response.status === 200) {
+       
         await getProductPaginate();
       }
     } catch (error) {

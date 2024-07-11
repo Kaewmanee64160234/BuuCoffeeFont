@@ -6,6 +6,7 @@ export interface Product {
   productName: string;
   productImage: string;
   productPrice: number;
+  countingPoint:boolean;
   category: Category;
   productTypes?: ProductType[];
 }
@@ -15,6 +16,7 @@ export function mapToProduct(data: any): Product {
     productName: data.productName,
     productImage: data.productImage,
     productPrice: data.productPrice,
+    countingPoint: data.countingPoint,  
     category: data.category,
     productTypes: data.productTypes ? data.productTypes.map((productType: any) => {
       return {
