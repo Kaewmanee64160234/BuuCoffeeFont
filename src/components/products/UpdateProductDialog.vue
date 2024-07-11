@@ -1,5 +1,8 @@
 <template>
   <v-dialog v-model="productStore.updateProductDialog" persistent max-width="800px">
+    {{ 'isHot:' + productStore.isBlend }}
+    {{ 'isCold:'+ productStore.isCold }}
+    {{ 'isBlend:'+ productStore.isBlend }}
     <v-card>
       <v-card-title>
         <span class="headline">แก้ไขสินค้า</span>
@@ -64,9 +67,7 @@
                     <v-row>
                       <v-col cols="12">
                         <v-subheader>{{ step.label }}</v-subheader>
-                      
-
-
+                    
                       </v-col>
                       <v-col cols="12">
                         <v-table>
@@ -316,7 +317,7 @@ const submitForm = async () => {
   };
 
   if (isDrink.value) {
-    if (productStore.selectedIngredientsHot.length > 0) {
+    if (productStore.selectedIngredientsHot.length > 0 && productStore.isHot) {
       productData.productTypes.push({
         productTypeName: 'Hot',
         productTypePrice: 
@@ -329,7 +330,7 @@ const submitForm = async () => {
         })
       });
     }
-    if (productStore.selectedIngredientsCold.length > 0) {
+    if (productStore.selectedIngredientsCold.length > 0 && productStore.isCold ) {
       productData.productTypes.push({
         productTypeName: 'Cold',
         productTypePrice: productDetails.value.find(pt => pt.productTypeName === 'Cold')?.productTypePrice || 0,  
@@ -341,7 +342,7 @@ const submitForm = async () => {
         })
       });
     }
-    if (productStore.selectedIngredientsBlend.length > 0) {
+    if (productStore.selectedIngredientsBlend.length > 0 && productStore.isBlend ) {
       productData.productTypes.push({
         productTypeName: 'Blend',
         productTypePrice: productDetails.value.find(pt => pt.productTypeName === 'Blend')?.productTypePrice || 0,

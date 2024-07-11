@@ -156,6 +156,14 @@ export const useProductStore = defineStore("product", () => {
 
   const updateProduct = async (id: number, updatedProduct: Product) => {
     try {
+      await getProductById(id);
+      // map data new data and old data
+      const updatedProduct = {
+        ...product.value,
+        ...editedProduct.value,
+      };
+
+
       const response = await productService.updateProduct(id, updatedProduct);
       console.log("updateProduct", response.status);
       if (response.status === 200) {
