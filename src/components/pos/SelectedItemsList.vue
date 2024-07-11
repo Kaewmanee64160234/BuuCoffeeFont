@@ -218,7 +218,7 @@
                       <span style="text-align: start;"> รับมา:</span>
                       <span style="text-align: start;width: 50%;">
                         <v-responsive class="mx-auto" style="height: 10;">
-                          <v-text-field v-model="recive" variant="solo" name="จำนวนเงิน" label="จำนวนเงิน"
+                          <v-text-field v-model="recive" type="number" variant="solo" name="จำนวนเงิน" label="จำนวนเงิน"
                             id="id"></v-text-field>
                         </v-responsive>
                       </span>
@@ -230,7 +230,7 @@
                       <span style="text-align: start;"> ทอน:</span>
                       <span style="text-align: end;"
                         :class="recive < 0 || recive < posStore.receipt.receiptNetPrice ? 'red--text' : 'black'">{{
-                          change.toFixed(2) }}</span>
+                          parseFloat(change.toFixed(2)) < 0 ? 'จำนวนเงินไม่พอ' : change.toFixed(2) }}</span>
                     </p>
                   </div>
                   <v-divider></v-divider>
