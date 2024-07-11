@@ -26,7 +26,11 @@
                 <v-text-field v-model="userEmail" label="อีเมล" required></v-text-field>
               </v-col>
               <v-col cols="12" md="6">
-                <v-text-field v-model="userStatus" label="สถานะผู้ใช้งาน" :rules="statusRules" required></v-text-field>
+                <v-select v-model="userStatus" 
+                  label="สถานะผู้ใช้งาน" 
+                  :items="['ลาออกแล้ว', 'ยังไม่ลาออก']"
+                  required>
+                </v-select>
               </v-col>
               <v-col>
                 <v-select
@@ -74,7 +78,7 @@ const userStatus = ref(props.user?.userStatus || '');
 // Validation rules
 const statusRules = [
   (v: string) => !!v || 'สถานะผู้ใช้งานจำเป็นต้องระบุ',
-  (v: string) => /^[A-Za-zก-ฮะาำิีืึุูโเแใไ่้๊๋็่๋์]+$/.test(v) || 'กรุณากรอกสถานะผู้ใช้งานเป็นตัวอักษรเท่านั้น'
+  (v: string) => /^[A-Za-zก-ฮะ-ๅๆ็่-๋์่-๋\s]+$/.test(v) || 'กรุณากรอกสถานะผู้ใช้งานเป็นตัวอักษรเท่านั้น'
 ];
 
 watch(() => props.dialog, (newVal) => {

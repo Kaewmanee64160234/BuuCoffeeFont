@@ -108,7 +108,12 @@ const deleteCategory = async (categoryId: number) => {
 
     if (result.isConfirmed) {
       await categoryStore.deleteCategory(categoryId);
-      Swal.fire('ลบแล้ว!', 'หมวดหมู่ถูกลบเรียบร้อยแล้ว.', 'success');
+      Swal.fire({
+        title: 'ลบเสร็จสิ้น!',
+        text: 'หมวดหมู่ถูกลบเรียบร้อยแล้ว',
+        icon: 'success',
+        confirmButtonText: 'ตกลง'
+      });
     }
   } catch (error) {
     console.error('Error deleting category:', error);

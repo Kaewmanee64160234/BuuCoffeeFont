@@ -30,7 +30,12 @@ const deleteIngredient = async (id?: number) => {
 
       if (confirmation.isConfirmed) {
         await ingredientStore.deleteIngredient(id);
-        Swal.fire('ลบสำเร็จ', 'วัตถุดิบถูกลบเรียบร้อยแล้ว!', 'success');
+        Swal.fire({
+          title: 'ลบสำเร็จ',
+          text: 'วัตถุดิบถูกลบเรียบร้อยแล้ว!',
+          icon: 'success',
+          confirmButtonText: 'ตกลง'
+        });
       }
     } catch (error) {
       console.error("Error deleting ingredient:", error);

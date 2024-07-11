@@ -124,7 +124,7 @@ function formatDateThai(dateString: string): string {
 </script>
 
 <template>
-    <!-- <HistoryReceiptDialog v-model:dialog="historyReceiptDialog" :receipt="selectedReceipt"></HistoryReceiptDialog> -->
+    <HistoryReceiptDialog v-model:dialog="historyReceiptDialog" :receipt="selectedReceipt"></HistoryReceiptDialog>
   
     <v-container>
         <v-card class="flex-container">
@@ -153,7 +153,7 @@ function formatDateThai(dateString: string): string {
             
             <v-spacer> </v-spacer>
           </v-card-title>
-          <v-card width="90%" style="margin-left: 5%; margin-top: 3%;">
+          <v-card width="90%" style="margin-left: 5%; margin-top: 3%; overflow-y: auto;">
             <v-table class="text-center">
                 <thead>
                     <tr>
@@ -179,7 +179,7 @@ function formatDateThai(dateString: string): string {
                       <td class="text-center">{{ receipt.receiptType }}</td>
                       <td class="text-center">{{ receipt.receiptStatus }}</td>
                       <td class="text-center">
-                        <v-btn color="#FFDD83" icon="mdi-eye" ></v-btn>
+                        <v-btn color="#FFDD83" icon="mdi-eye" @click="openHistoryReceiptDialog(receipt)"></v-btn>
                       </td>
                     </tr>
                   </tbody>

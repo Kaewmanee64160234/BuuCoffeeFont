@@ -2,7 +2,7 @@
 import { useCustomerStore } from '../../stores/customer.store';
 import { computed, onMounted, ref } from 'vue';
 import AddCustomerDialog from '@/components/customer/AddCustomerDialog.vue';
-import EditCustomerDialog from '@/components/customer/EditCustomerDialog.vue'; // Ensure this path is correct
+import EditCustomerDialog from '@/components/customer/EditCustomerDialog.vue';
 import type { Customer } from '../../types/customer.type';
 import Swal from 'sweetalert2';
 
@@ -33,6 +33,10 @@ const openEditCustomerDialog = (customer: Customer) => {
   customerStore.updateCustomerDialog = true;
 };
 
+function openCreateCustomerDialog() {
+  customerStore.openDialogRegisterCustomer = true;
+}
+
 const deleteCustomer = async (customerId: number) => {
   try {
     const result = await Swal.fire({
@@ -48,7 +52,12 @@ const deleteCustomer = async (customerId: number) => {
 
     if (result.isConfirmed) {
       await customerStore.deleteCustomer(customerId);
-      Swal.fire('ลบเสร็จสิ้น!', 'ลูกค้าได้ถูกลบแล้ว', 'success');
+      Swal.fire({
+        title: 'ลบเสร็จสิ้น!',
+        text: 'ลบลูกค้าเรียบร้อยแล้ว',
+        icon: 'success',
+        confirmButtonText: 'ตกลง'
+      });
     }
   } catch (error) {
     console.error('Error deleting customer:', error);
@@ -66,7 +75,7 @@ const deleteCustomer = async (customerId: number) => {
       <v-card-title>
         <v-row>
           <v-col cols="9" style="padding: 20px;">
-          <h3>จัดการลูกค้า</h3>
+            <h3>จัดการลูกค้า</h3>
           </v-col>
           
           <v-row style="margin-left: 6%;">
@@ -83,16 +92,15 @@ const deleteCustomer = async (customerId: number) => {
             
             <v-spacer></v-spacer>
             <v-col class="mt-4" cols="3" width="30%">
-              <v-btn color="success" @click="addCustomerDialog = true">
+              <v-btn color="success" @click="openCreateCustomerDialog()">
                 <v-icon left>mdi-plus</v-icon>
                 เพิ่มลูกค้าใหม่
               </v-btn>
             </v-col>
           </v-row>
-          
         </v-row>
         
-        <v-spacer> </v-spacer>
+        <v-spacer></v-spacer>
       </v-card-title>
       <v-card width="90%" style="margin-left: 5%; margin-top: 3%;">
         <v-table class="text-center">
