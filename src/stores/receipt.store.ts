@@ -2,12 +2,14 @@ import { ref, computed } from "vue";
 import { defineStore } from "pinia";
 import type { Receipt } from "@/types/receipt.type";
 import receiptService from "@/service/receipt.service";
+import { useUserStore } from "./user.store";
 
 export const useReceiptStore = defineStore("receipt", () => {
   const receipts = ref<Receipt[]>([]);
   const receipt = ref<Receipt | null>(null);
   const searchQuery = ref<string>("");
   const historyReceiptDialog = ref(false);
+  const userStore = useUserStore();
 
   const getAllReceipts = async () => {
     try {
@@ -55,9 +57,19 @@ export const useReceiptStore = defineStore("receipt", () => {
   // getRecieptIn30Min
   const getRecieptIn30Min = async () => {
     try {
-      const response = await receiptService.getRecieptIn30Min();
+      let typeOfStore = "";
+      if(userStore.currentUser.userRole == "พนักงานขายข้าว"){
+        typeOfStore = "ร้านข้าว"
+      }else{
+        typeOfStore = "ร้านกาแฟ"
+      }
+
+      const response = await receiptService.getRecieptIn30Min(
+        typeOfStore
+      );
       if (response.status === 200) {
         receipts.value = response.data;
+        console.log("receipts", receipts.value);
       }
     } catch (error) {
       console.error(error);
