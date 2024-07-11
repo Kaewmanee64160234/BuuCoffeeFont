@@ -36,13 +36,16 @@
                     </v-col>
                    
                     <v-col cols="12" sm="6">
-                      <v-text-field variant="solo" v-model="productStore.productName" label="ชื่อสินค้า" required />
+                      <v-text-field variant="solo" v-model="productStore.editedProduct.productName" label="ชื่อสินค้า" required />
                     </v-col>
                     <v-col cols="12" sm="6">
-                      <v-text-field variant="solo" v-model="productStore.productPrice" label="ราคา" type="number" required />
+                      <v-text-field variant="solo" v-model="productStore.editedProduct.productPrice" label="ราคา" type="number" required />
                     </v-col>
                     <v-col cols="12" sm="6">
                       <v-select v-model="productStore.selectedCategoryForUpdate" :items="categoryStore.categoriesForCreate.map(category => category.categoryName)" label="เลือกหมวดหมู่" dense @change="checkCategory"></v-select>
+                    </v-col>
+                    <v-col cols="12" sm="6">
+                      <v-checkbox v-model="productStore.editedProduct.countingPoint" label="นับแต้ม" />
                     </v-col>
                   </v-row>
                 </v-form>
@@ -64,9 +67,6 @@
                     <v-row>
                       <v-col cols="12">
                         <v-subheader>{{ step.label }}</v-subheader>
-                      
-
-
                       </v-col>
                       <v-col cols="12">
                         <v-table>
@@ -122,6 +122,7 @@
   </v-dialog>
 </template>
 
+
 <script lang="ts" setup>
 import { useCategoryStore } from '@/stores/category.store';
 import { useIngredientStore } from '@/stores/Ingredient.store';
@@ -166,6 +167,7 @@ watch(() => productStore.editedProduct.category?.categoryName, (newVal) => {
     productDetails.value = [];
   }
 });
+
 onMounted(async () => {
   await categoryStore.getAllCategories();
   await ingredientStore.getAllIngredients();
@@ -188,17 +190,14 @@ const computedSteps = computed(() => {
   if (isDrink.value) {
     if (productStore.isHot) {
       stepValue++;
-
       stepsArray.push({ label: 'ร้อน', value: stepValue });
     }
     if (productStore.isCold) {
       stepValue++;
-
       stepsArray.push({ label: 'เย็น', value: stepValue });
     }
     if (productStore.isBlend) {
       stepValue++;
-
       stepsArray.push({ label: 'ปั่น', value: stepValue });
     }
   }
@@ -264,12 +263,7 @@ const handleColdIngredientSelect = (ingredient: Ingredient) => {
     delete productStore.ingredientQuantitiesCold[ingredientId];
   }
 };
-const getProductType = (typeName: string) => {
-  console.log("getProductType called with typeName: " + typeName);
-  const pddt =  productDetails.value.find(pt => pt.productTypeName === typeName) as CustomProductType;
-console.log("getProductType called with typeName: " + pddt);
-  return pddt;
-};
+
 const handleBlendIngredientSelect = (ingredient: Ingredient) => {
   const ingredientId = ingredient.ingredientId;
   const keys = Object.keys(productStore.ingredientQuantitiesBlend);
@@ -304,23 +298,21 @@ const checkCategory = () => {
 };
 
 const submitForm = async () => {
-  // if (!form.value.validate()) return;
-
   const productData = {
-    productName: productStore.productName,
-    productPrice: productStore.productPrice,
+    productName: productStore.editedProduct.productName,
+    productPrice: productStore.editedProduct.productPrice,
     productImage: productStore.editedProduct.productImage,
+    countingPoint: productStore.editedProduct.countingPoint,
     categoryId: categoryStore.categoriesForCreate.find(category => category.categoryName === productStore.selectedCategoryForUpdate)?.categoryId || null,
     productTypes: [] as ProductType[],
     category: categoryStore.categoriesForCreate.find(category => category.categoryName === productStore.selectedCategoryForUpdate) || { categoryId: 0, categoryName: '' }
   };
 
   if (isDrink.value) {
-    if (productStore.selectedIngredientsHot.length > 0) {
+    if (productStore.selectedIngredientsHot.length > 0 && productStore.isHot) {
       productData.productTypes.push({
         productTypeName: 'Hot',
-        productTypePrice: 
-        productDetails.value.find(pt => pt.productTypeName === 'Hot')?.productTypePrice || 0,
+        productTypePrice: productDetails.value.find(pt => pt.productTypeName === 'Hot')?.productTypePrice || 0,
         recipes: productStore.selectedIngredientsHot.map((ingredientId) => {
           return {
             ingredient: ingredientStore.ingredients.find(i => i.ingredientId === ingredientId)!,
@@ -329,10 +321,10 @@ const submitForm = async () => {
         })
       });
     }
-    if (productStore.selectedIngredientsCold.length > 0) {
+    if (productStore.selectedIngredientsCold.length > 0 && productStore.isCold) {
       productData.productTypes.push({
         productTypeName: 'Cold',
-        productTypePrice: productDetails.value.find(pt => pt.productTypeName === 'Cold')?.productTypePrice || 0,  
+        productTypePrice: productDetails.value.find(pt => pt.productTypeName === 'Cold')?.productTypePrice || 0,
         recipes: productStore.selectedIngredientsCold.map((ingredientId) => {
           return {
             ingredient: ingredientStore.ingredients.find(i => i.ingredientId === ingredientId)!,
@@ -341,7 +333,7 @@ const submitForm = async () => {
         })
       });
     }
-    if (productStore.selectedIngredientsBlend.length > 0) {
+    if (productStore.selectedIngredientsBlend.length > 0 && productStore.isBlend) {
       productData.productTypes.push({
         productTypeName: 'Blend',
         productTypePrice: productDetails.value.find(pt => pt.productTypeName === 'Blend')?.productTypePrice || 0,
@@ -358,21 +350,12 @@ const submitForm = async () => {
 
   try {
     productStore.editedProduct = {
-      category: categoryStore.categories.find(c => c.categoryName === productStore.selectedCategoryForUpdate)!,
-      productName: productData.productName,
-      productPrice: productData.productPrice,
-      productImage: '',
-      productTypes: productData.productTypes,
-      productId: productStore.editedProduct.productId,
+      ...productStore.editedProduct,
+      ...productData,
       file: productImage.value
-
     };
 
-    // if have image file in productImage upload image 
-
-    console.log('Product:', JSON.stringify(productStore.editedProduct));
-
-    await productStore.updateProduct(productStore.editedProduct.productId, productStore.editedProduct);
+    // If there's an image file in productImage, upload the image
     if (productImage.value.name !== '') {
       const formData = new FormData();
       formData.append('file', productImage.value);
@@ -380,16 +363,16 @@ const submitForm = async () => {
       imagePreview.value = URL.createObjectURL(productImage.value);
     }
 
+    await productStore.updateProduct(productStore.editedProduct.productId, productStore.editedProduct);
+
     closeDialog();
     showSuccessDialog('แก้ไขสินค้าเสร็จสิ้น!');
-    // reload page
   } catch (error) {
     console.error('Error updating product:', error);
     Swal.fire('เกิดข้อผิดพลาด', 'เกิดข้อผิดพลาดขณะแก้ไขสินค้า');
   }
 };
 
-// closeDialog
 const closeDialog = () => {
   productStore.editedProduct = {
     category: { categoryId: 0, categoryName: '' },
@@ -398,9 +381,9 @@ const closeDialog = () => {
     productImage: '',
     productTypes: [],
     productId: 0,
+    countingPoint: false,
     file: new File([""], "")
   };
-  // clear all data in productStore
   productStore.editedProductName = '';
   productStore.editedProductPrice = 0;
   productStore.selectedCategory = '';
@@ -443,10 +426,7 @@ function prev() {
   console.log("Current Step (after prev):", e1.value);
 }
 
-
 const disabled = computed(() => {
   return e1.value === 1 ? 'prev' : e1.value === computedSteps.value.length + 2 ? 'next' : undefined;
 });
-
 </script>
-

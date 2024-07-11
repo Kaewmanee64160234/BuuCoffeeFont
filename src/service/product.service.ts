@@ -35,6 +35,7 @@ function createProduct(product: Product) {
   return http.post("/products", product_);
 }
 function updateProduct(id: number, product: Product) {
+
   return http.patch(`/products/${id}`, product);
 }
 function deleteProduct(id: number) {
