@@ -52,7 +52,6 @@ export const usePosStore = defineStore("pos", () => {
   const toggleNavigation = () => {
     hideNavigation.value = !hideNavigation.value;
   };
-  
 
   const addToReceipt = (
     product: Product,
@@ -63,7 +62,7 @@ export const usePosStore = defineStore("pos", () => {
   ) => {
     const parsedQuantity = parseInt(quantity.toString(), 10);
     const productPrice = parseInt(product.productPrice.toString(), 10);
-  
+
     let existingItem;
     if (product.category.haveTopping) {
       existingItem = selectedItems.value.find(
@@ -78,11 +77,11 @@ export const usePosStore = defineStore("pos", () => {
         (item) => item.product?.productId === product.productId
       );
     }
-  
+
     if (existingItem) {
       if (product.category.haveTopping) {
         if (productTypeToppings.length > 0) {
-          existingItem.quantity += parseInt(parsedQuantity+"");
+          existingItem.quantity += parseInt(parsedQuantity + "");
           const toppingsTotal = productTypeToppings.reduce(
             (toppingAcc, toppingItem) =>
               toppingAcc +
@@ -102,11 +101,11 @@ export const usePosStore = defineStore("pos", () => {
             (productPrice +
               parseFloat(productType.productTypePrice.toString())) *
             parsedQuantity;
-          existingItem.quantity += parseInt(parsedQuantity+'');
+          existingItem.quantity += parseInt(parsedQuantity + "");
         }
       } else {
         existingItem.receiptSubTotal += productPrice * parsedQuantity;
-        existingItem.quantity += parseInt(parsedQuantity+'');
+        existingItem.quantity += parseInt(parsedQuantity + "");
       }
     } else {
       if (product.category.haveTopping) {
@@ -156,7 +155,7 @@ export const usePosStore = defineStore("pos", () => {
         });
       }
     }
-  
+
     console.log("last", selectedItems.value[selectedItems.value.length - 1]);
     receipt.value.receiptTotalPrice = calculateTotal(selectedItems.value);
     if (receipt.value.receiptTotalDiscount === 0) {
@@ -166,7 +165,6 @@ export const usePosStore = defineStore("pos", () => {
         receipt.value.receiptTotalPrice - receipt.value.receiptTotalDiscount;
     }
   };
-  
 
   const calculateTotal = (selectedItems: ReceiptItem[]) => {
     receipt.value.receiptTotalPrice = 0;
@@ -178,10 +176,11 @@ export const usePosStore = defineStore("pos", () => {
   const removeItem = (index: number) => {
     selectedItems.value.splice(index, 1);
     receipt.value.receiptTotalPrice = calculateTotal(selectedItems.value);
-    if( receipt.value.receiptTotalDiscount === 0){
-      receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice ;
-    }else{
-      receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice - receipt.value.receiptTotalDiscount;
+    if (receipt.value.receiptTotalDiscount === 0) {
+      receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice;
+    } else {
+      receipt.value.receiptNetPrice =
+        receipt.value.receiptTotalPrice - receipt.value.receiptTotalDiscount;
     }
     if (selectedItems.value.length === 0) {
       receipt.value.receiptTotalPrice = 0;
@@ -192,7 +191,6 @@ export const usePosStore = defineStore("pos", () => {
       receipt.value.receiptStatus = "";
       receipt.value.paymentMethod = "";
     }
-  
   };
 
   const spliceData = (index: number) => {
@@ -207,11 +205,11 @@ export const usePosStore = defineStore("pos", () => {
       selectedItems.value.splice(index, 1);
     }
     receipt.value.receiptTotalPrice = calculateTotal(selectedItems.value);
-    if( receipt.value.receiptTotalDiscount === 0){
-      receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice ;
-    }
-    else{
-      receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice - receipt.value.receiptTotalDiscount;
+    if (receipt.value.receiptTotalDiscount === 0) {
+      receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice;
+    } else {
+      receipt.value.receiptNetPrice =
+        receipt.value.receiptTotalPrice - receipt.value.receiptTotalDiscount;
     }
     if (selectedItems.value.length === 0) {
       // clear all data
@@ -259,7 +257,6 @@ export const usePosStore = defineStore("pos", () => {
       // await receiptStore.getRecieptIn30Min();
     }
     await receiptStore.getRecieptIn30Min();
-
   };
 
   const applyPromotion = (promotion: Promotion) => {
@@ -438,6 +435,7 @@ export const usePosStore = defineStore("pos", () => {
     }
 
     // Check if the new discount would result in a negative or zero net price
+    // Calculate the new total discount and new net price
     const newTotalDiscount =
       parseFloat(receipt.value.receiptTotalDiscount + "") +
       parseFloat(newDiscount + "");
@@ -445,9 +443,7 @@ export const usePosStore = defineStore("pos", () => {
       parseFloat(receipt.value.receiptTotalPrice + "") -
       parseFloat(newTotalDiscount + "");
 
-      receipt.value.receiptTotalDiscount = newTotalDiscount;
-      receipt.value.receiptNetPrice = newNetPrice;
-
+    // Check if the new net price is less than or equal to zero
     if (newNetPrice <= 0) {
       Swal.fire({
         icon: "error",
@@ -456,6 +452,10 @@ export const usePosStore = defineStore("pos", () => {
       });
       return;
     }
+
+    // Apply the new discount and update the net price
+    receipt.value.receiptTotalDiscount = newTotalDiscount;
+    receipt.value.receiptNetPrice = newNetPrice;
 
     // Apply the promotion
     receipt.value.receiptPromotions.push({
@@ -499,8 +499,7 @@ export const usePosStore = defineStore("pos", () => {
       // await receiptStore.getRecieptIn30Min();
     }
     await receiptStore.getRecieptIn30Min();
-  }
-
+  };
 
   return {
     selectedItems,
@@ -526,6 +525,6 @@ export const usePosStore = defineStore("pos", () => {
     ReceiptDialogPos,
     updateReceipt,
     toggleNavigation,
-    hideNavigation
+    hideNavigation,
   };
 });
