@@ -16,6 +16,7 @@ export const useProductStore = defineStore("product", () => {
   const createProductDialog = ref(false);
   const searchQuery = ref<string>("");
   const searchQueryPos = ref<string>("");
+  const ProductTypes = ref<ProductType[]>([]);
   const editedProduct = ref<Product & { file: File }>({
     productId: 0,
     productName: "",
@@ -292,5 +293,6 @@ export const useProductStore = defineStore("product", () => {
     searchQueryPos,
     editedProduct,
     selectedCategoryForUpdate,
+    ProductTypes
   };
 });

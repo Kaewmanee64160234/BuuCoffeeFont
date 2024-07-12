@@ -45,6 +45,7 @@ const loadProductData = () => {
   if (product.productTypes && Array.isArray(product.productTypes)) {
     product.productTypes.forEach(productType => {
       if (productType.productTypeName === 'ร้อน') {
+      
         productStore.isHot = true;
         productStore.selectedIngredientsHot = productType.recipes?.map(recipeItem => recipeItem.ingredient.IngredientId) || [];
         productStore.ingredientQuantitiesHot = productType.recipes?.reduce((acc, recipeItem) => {

@@ -1,6 +1,11 @@
 <template>
   <v-dialog v-model="productStore.updateProductDialog" persistent max-width="800px">
     <v-card>
+      {{ productStore.productTypes }}
+      {{ productTyprPriceHot }}
+      {{ productTyprPriceCold }}
+      {{ productTyprPriceBlend }}
+
       <v-card-title>
         <span class="headline">แก้ไขสินค้า</span>
       </v-card-title>
@@ -29,20 +34,26 @@
                 <v-form ref="form" v-model="valid">
                   <v-row>
                     <v-col cols="12" sm="12">
-                      <v-img max-height="100" style="border-radius: 50%;" :src="imagePreview || `http://localhost:3000/products/${productStore.editedProduct.productId}/image`" />
+                      <v-img max-height="100" style="border-radius: 50%;"
+                        :src="imagePreview || `http://localhost:3000/products/${productStore.editedProduct.productId}/image`" />
                     </v-col>
                     <v-col cols="12" sm="12">
-                      <v-file-input v-model="productImage" label="รูปภาพสินค้า" prepend-icon="mdi-camera" accept="image/*" @change="handleImageUpload" />
+                      <v-file-input v-model="productImage" label="รูปภาพสินค้า" prepend-icon="mdi-camera"
+                        accept="image/*" @change="handleImageUpload" />
                     </v-col>
-                   
+
                     <v-col cols="12" sm="6">
-                      <v-text-field variant="solo" v-model="productStore.editedProduct.productName" label="ชื่อสินค้า" required />
+                      <v-text-field variant="solo" v-model="productStore.editedProduct.productName" label="ชื่อสินค้า"
+                        required />
                     </v-col>
                     <v-col cols="12" sm="6">
-                      <v-text-field variant="solo" v-model="productStore.editedProduct.productPrice" label="ราคา" type="number" required />
+                      <v-text-field variant="solo" v-model="productStore.editedProduct.productPrice" label="ราคา"
+                        type="number" required />
                     </v-col>
                     <v-col cols="12" sm="6">
-                      <v-select v-model="productStore.selectedCategoryForUpdate" :items="categoryStore.categoriesForCreate.map(category => category.categoryName)" label="เลือกหมวดหมู่" dense @change="checkCategory"></v-select>
+                      <v-select v-model="productStore.selectedCategoryForUpdate"
+                        :items="categoryStore.categoriesForCreate.map(category => category.categoryName)"
+                        label="เลือกหมวดหมู่" dense @change="checkCategory"></v-select>
                     </v-col>
                     <v-col cols="12" sm="6">
                       <v-checkbox v-model="productStore.editedProduct.countingPoint" label="นับแต้ม" />
@@ -54,19 +65,30 @@
               <v-stepper-window-item v-if="isDrink" :value="2">
                 <v-form ref="form" v-model="valid">
                   <v-row class="d-flex justify-space-between">
-                    <v-checkbox label="ร้อน" v-model="productStore.isHot" @change="handleProductTypeChange('ร้อน', productStore.isHot)"></v-checkbox>
-                    <v-checkbox label="เย็น" v-model="productStore.isCold" @change="handleProductTypeChange('เย็น', productStore.isCold)"></v-checkbox>
-                    <v-checkbox label="ปั่น" v-model="productStore.isBlend" @change="handleProductTypeChange('ปั่น', productStore.isBlend)"></v-checkbox>
+                    <v-checkbox label="ร้อน" v-model="productStore.isHot"
+                      @change="handleProductTypeChange('ร้อน', productStore.isHot)"></v-checkbox>
+                    <v-checkbox label="เย็น" v-model="productStore.isCold"
+                      @change="handleProductTypeChange('เย็น', productStore.isCold)"></v-checkbox>
+                    <v-checkbox label="ปั่น" v-model="productStore.isBlend"
+                      @change="handleProductTypeChange('ปั่น', productStore.isBlend)"></v-checkbox>
                   </v-row>
                 </v-form>
               </v-stepper-window-item>
 
-              <v-stepper-window-item v-for="(step, index) in computedSteps" :key="`content-${index+3}`" :value="step.value">
+              <v-stepper-window-item v-for="(step, index) in computedSteps" :key="`content-${index + 3}`"
+                :value="step.value">
                 <v-form ref="form" v-model="valid">
                   <v-container>
                     <v-row>
                       <v-col cols="12">
                         <v-subheader>{{ step.label }}</v-subheader>
+
+                        <v-text-field v-if="step.label == 'ร้อน'" variant="solo" v-model="productTyprPriceHot"
+                          label="ราคาประเภทสินค้า" type="number" required />
+                        <v-text-field v-else-if="step.label == 'เย็น'" variant="solo" v-model="productTyprPriceCold"
+                          label="ราคาประเภทสินค้า" type="number" required />
+                        <v-text-field v-else variant="solo" v-model="productTyprPriceBlend" label="ราคาประเภทสินค้า"
+                          type="number" required />
                       </v-col>
                       <v-col cols="12">
                         <v-table>
@@ -82,21 +104,37 @@
                           <tbody>
                             <tr v-for="ingredient in ingredientStore.ingredients" :key="ingredient.ingredientId">
                               <td>
-                                <v-checkbox v-if="step.label === 'ร้อน'" :value="ingredient.ingredientId" v-model="productStore.selectedIngredientsHot" @change="handleHotIngredientSelect(ingredient)">
+                                <v-checkbox v-if="step.label === 'ร้อน'" :value="ingredient.ingredientId"
+                                  v-model="productStore.selectedIngredientsHot"
+                                  @change="handleHotIngredientSelect(ingredient)">
                                 </v-checkbox>
-                                <v-checkbox v-if="step.label === 'เย็น'" :value="ingredient.ingredientId" v-model="productStore.selectedIngredientsCold" @change="handleColdIngredientSelect(ingredient)">
+                                <v-checkbox v-if="step.label === 'เย็น'" :value="ingredient.ingredientId"
+                                  v-model="productStore.selectedIngredientsCold"
+                                  @change="handleColdIngredientSelect(ingredient)">
                                 </v-checkbox>
-                                <v-checkbox v-if="step.label === 'ปั่น'" :value="ingredient.ingredientId" v-model="productStore.selectedIngredientsBlend" @change="handleBlendIngredientSelect(ingredient)">
+                                <v-checkbox v-if="step.label === 'ปั่น'" :value="ingredient.ingredientId"
+                                  v-model="productStore.selectedIngredientsBlend"
+                                  @change="handleBlendIngredientSelect(ingredient)">
                                 </v-checkbox>
                               </td>
                               <td>
-                                <v-img :src="`${url}/ingredients/${ingredient.ingredientId}/image`" height="100"></v-img>
+                                <v-img :src="`${url}/ingredients/${ingredient.ingredientId}/image`"
+                                  height="100"></v-img>
                               </td>
                               <td>{{ ingredient.ingredientName }}</td>
                               <td>
-                                <v-text-field variant="solo" v-if="step.label === 'ร้อน' && productStore.selectedIngredientsHot.includes(ingredient.ingredientId)" v-model="productStore.ingredientQuantitiesHot[ingredient.ingredientId]" type="number" min="0" label="จำนวน"></v-text-field>
-                                <v-text-field variant="solo" v-if="step.label === 'เย็น' && productStore.selectedIngredientsCold.includes(ingredient.ingredientId)" v-model="productStore.ingredientQuantitiesCold[ingredient.ingredientId]" type="number" min="0" label="จำนวน"></v-text-field>
-                                <v-text-field variant="solo" v-if="step.label === 'ปั่น' && productStore.selectedIngredientsBlend.includes(ingredient.ingredientId)" v-model="productStore.ingredientQuantitiesBlend[ingredient.ingredientId]" type="number" min="0" label="จำนวน"></v-text-field>
+                                <v-text-field variant="solo"
+                                  v-if="step.label === 'ร้อน' && productStore.selectedIngredientsHot.includes(ingredient.ingredientId)"
+                                  v-model="productStore.ingredientQuantitiesHot[ingredient.ingredientId]" type="number"
+                                  min="0" label="จำนวน"></v-text-field>
+                                <v-text-field variant="solo"
+                                  v-if="step.label === 'เย็น' && productStore.selectedIngredientsCold.includes(ingredient.ingredientId)"
+                                  v-model="productStore.ingredientQuantitiesCold[ingredient.ingredientId]" type="number"
+                                  min="0" label="จำนวน"></v-text-field>
+                                <v-text-field variant="solo"
+                                  v-if="step.label === 'ปั่น' && productStore.selectedIngredientsBlend.includes(ingredient.ingredientId)"
+                                  v-model="productStore.ingredientQuantitiesBlend[ingredient.ingredientId]"
+                                  type="number" min="0" label="จำนวน"></v-text-field>
                               </td>
                               <td>{{ ingredient.ingredientUnit }}</td>
                             </tr>
@@ -121,7 +159,6 @@
     </v-card>
   </v-dialog>
 </template>
-
 
 <script lang="ts" setup>
 import { useCategoryStore } from '@/stores/category.store';
@@ -148,12 +185,16 @@ const productPrice = ref(0);
 const productImage = ref(new File([], ''));
 const imagePreview = ref<string | null>(null);
 
+
 const url = import.meta.env.VITE_URL_PORT;
 const productStore = useProductStore();
 const isDrink = ref(false);
 const productDetails = ref<CustomProductType[]>([]);
 const categoryStore = useCategoryStore();
 const ingredientStore = useIngredientStore();
+const productTyprPriceHot = ref(0);
+const productTyprPriceCold = ref(0);
+const productTyprPriceBlend = ref(0);
 
 const e1 = ref(1);
 
@@ -172,6 +213,7 @@ onMounted(async () => {
   await categoryStore.getAllCategories();
   await ingredientStore.getAllIngredients();
 
+
   // Auto add steps if ingredients are present
   if (productStore.selectedIngredientsHot.length > 0) {
     productStore.isHot = true;
@@ -182,6 +224,20 @@ onMounted(async () => {
   if (productStore.selectedIngredientsBlend.length > 0) {
     productStore.isBlend = true;
   }
+  for (const productType of productStore.productTypes) {
+    if (productType.productTypeName === 'ร้อน') {
+      productStore.isHot = true;
+      productTyprPriceHot.value = productType.productTypePrice;
+
+    } else if (productType.productTypeName === 'เย็น') {
+      productStore.isCold = true;
+      productTyprPriceCold.value = productType.productTypePrice;
+    } else if (productType.productTypeName === 'ปั่น') {
+      productStore.isBlend = true;
+      productTyprPriceBlend.value = productType.productTypePrice;
+    }
+  }
+
 });
 
 const computedSteps = computed(() => {
@@ -312,7 +368,7 @@ const submitForm = async () => {
     if (productStore.selectedIngredientsHot.length > 0 && productStore.isHot) {
       productData.productTypes.push({
         productTypeName: 'Hot',
-        productTypePrice: productDetails.value.find(pt => pt.productTypeName === 'Hot')?.productTypePrice || 0,
+        productTypePrice: productTyprPriceHot.value || 0,
         recipes: productStore.selectedIngredientsHot.map((ingredientId) => {
           return {
             ingredient: ingredientStore.ingredients.find(i => i.ingredientId === ingredientId)!,
@@ -324,7 +380,7 @@ const submitForm = async () => {
     if (productStore.selectedIngredientsCold.length > 0 && productStore.isCold) {
       productData.productTypes.push({
         productTypeName: 'Cold',
-        productTypePrice: productDetails.value.find(pt => pt.productTypeName === 'Cold')?.productTypePrice || 0,
+        productTypePrice: productTyprPriceCold.value || 0,
         recipes: productStore.selectedIngredientsCold.map((ingredientId) => {
           return {
             ingredient: ingredientStore.ingredients.find(i => i.ingredientId === ingredientId)!,
@@ -336,7 +392,7 @@ const submitForm = async () => {
     if (productStore.selectedIngredientsBlend.length > 0 && productStore.isBlend) {
       productData.productTypes.push({
         productTypeName: 'Blend',
-        productTypePrice: productDetails.value.find(pt => pt.productTypeName === 'Blend')?.productTypePrice || 0,
+        productTypePrice: productTyprPriceBlend.value || 0,
         recipes: productStore.selectedIngredientsBlend.map((ingredientId) => {
           return {
             ingredient: ingredientStore.ingredients.find(i => i.ingredientId === ingredientId)!,
@@ -398,6 +454,7 @@ const closeDialog = () => {
   productStore.selectedIngredientsBlend = [];
   productStore.ingredientQuantitiesBlend = {};
   productStore.updateProductDialog = false;
+
 };
 
 const showSuccessDialog = (message: string) => {
@@ -429,4 +486,9 @@ function prev() {
 const disabled = computed(() => {
   return e1.value === 1 ? 'prev' : e1.value === computedSteps.value.length + 2 ? 'next' : undefined;
 });
+
+const getProductType = (typeName: string): CustomProductType => {
+  const pddt = productStore.productTypes.find(pt => pt.productTypeName === typeName) as CustomProductType;
+  return pddt;
+};
 </script>
