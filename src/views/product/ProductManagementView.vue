@@ -45,7 +45,7 @@ const loadProductData = () => {
   if (product.productTypes && Array.isArray(product.productTypes)) {
     product.productTypes.forEach(productType => {
       if (productType.productTypeName === 'ร้อน') {
-      
+      productStore.productTypePriceHot = productType.productTypePrice;
         productStore.isHot = true;
         productStore.selectedIngredientsHot = productType.recipes?.map(recipeItem => recipeItem.ingredient.IngredientId) || [];
         productStore.ingredientQuantitiesHot = productType.recipes?.reduce((acc, recipeItem) => {
@@ -55,6 +55,7 @@ const loadProductData = () => {
       }
 
       if (productType.productTypeName === 'เย็น') {
+        productStore.productTypePriceCold = productType.productTypePrice;
         productStore.isCold = true;
         productStore.selectedIngredientsCold = productType.recipes?.map(recipeItem => recipeItem.ingredient.IngredientId) || [];
         productStore.ingredientQuantitiesCold = productType.recipes?.reduce((acc, recipeItem) => {
@@ -65,6 +66,7 @@ const loadProductData = () => {
 
       if (productType.productTypeName === 'ปั่น') {
         productStore.isBlend = true;
+        productStore.productTypePriceBlend = productType.productTypePrice;
         productStore.selectedIngredientsBlend = productType.recipes?.map(recipeItem => recipeItem.ingredient.IngredientId) || [];
         productStore.ingredientQuantitiesBlend = productType.recipes?.reduce((acc, recipeItem) => {
           acc[recipeItem.ingredient.IngredientId] = recipeItem.quantity;

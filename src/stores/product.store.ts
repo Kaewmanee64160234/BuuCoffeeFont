@@ -61,6 +61,9 @@ export const useProductStore = defineStore("product", () => {
   const ingredientQuantitiesHot = ref<IngredientQuantities>({});
   const ingredientQuantitiesCold = ref<IngredientQuantities>({});
   const ingredientQuantitiesBlend = ref<IngredientQuantities>({});
+  const productTypePriceHot = ref(0);
+  const productTypePriceCold = ref(0);
+  const productTypePriceBlend = ref(0);
   const productTypes = ref<ProductType[]>([]);
   const isHot = ref<boolean>(false);
   const isCold = ref<boolean>(false);
@@ -185,7 +188,7 @@ export const useProductStore = defineStore("product", () => {
         editedProduct.value.productTypes !== product.value.productTypes;
       const countingPointChnage =
         editedProduct.value.countingPoint !== product.value.countingPoint;
-        console.log(countingPointChnage);
+      console.log(countingPointChnage);
       console.log("productNameChnage", productNameChnage);
       console.log("productPriceChnage", productPriceChnage);
       console.log("categoryChnage", categoryChnage);
@@ -197,13 +200,12 @@ export const useProductStore = defineStore("product", () => {
         productPriceChnage ||
         categoryChnage ||
         productTypesChnage ||
-        countingPointChnage 
+        countingPointChnage
       ) {
         const response = await productService.updateProduct(id, updatedProduct);
         console.log("updateProduct", response.status);
       }
-        await getProductPaginate();
-
+      await getProductPaginate();
     } catch (error) {
       console.error(error);
     }
@@ -293,6 +295,9 @@ export const useProductStore = defineStore("product", () => {
     searchQueryPos,
     editedProduct,
     selectedCategoryForUpdate,
-    ProductTypes
+    ProductTypes,
+    productTypePriceHot,
+    productTypePriceCold,
+    productTypePriceBlend,
   };
 });

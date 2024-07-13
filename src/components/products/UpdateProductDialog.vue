@@ -1,10 +1,7 @@
 <template>
   <v-dialog v-model="productStore.updateProductDialog" persistent max-width="800px">
     <v-card>
-      {{ productStore.productTypes }}
-      {{ productTyprPriceHot }}
-      {{ productTyprPriceCold }}
-      {{ productTyprPriceBlend }}
+
 
       <v-card-title>
         <span class="headline">แก้ไขสินค้า</span>
@@ -83,11 +80,11 @@
                       <v-col cols="12">
                         <v-subheader>{{ step.label }}</v-subheader>
 
-                        <v-text-field v-if="step.label == 'ร้อน'" variant="solo" v-model="productTyprPriceHot"
+                        <v-text-field v-if="step.label == 'ร้อน'" variant="solo" v-model="productStore.productTypePriceHot"
                           label="ราคาประเภทสินค้า" type="number" required />
-                        <v-text-field v-else-if="step.label == 'เย็น'" variant="solo" v-model="productTyprPriceCold"
+                        <v-text-field v-else-if="step.label == 'เย็น'" variant="solo" v-model="productStore.productTypePriceCold"
                           label="ราคาประเภทสินค้า" type="number" required />
-                        <v-text-field v-else variant="solo" v-model="productTyprPriceBlend" label="ราคาประเภทสินค้า"
+                        <v-text-field v-else variant="solo" v-model="productStore.productTypePriceBlend" label="ราคาประเภทสินค้า"
                           type="number" required />
                       </v-col>
                       <v-col cols="12">
@@ -185,16 +182,13 @@ const productPrice = ref(0);
 const productImage = ref(new File([], ''));
 const imagePreview = ref<string | null>(null);
 
-
 const url = import.meta.env.VITE_URL_PORT;
 const productStore = useProductStore();
 const isDrink = ref(false);
 const productDetails = ref<CustomProductType[]>([]);
 const categoryStore = useCategoryStore();
 const ingredientStore = useIngredientStore();
-const productTyprPriceHot = ref(0);
-const productTyprPriceCold = ref(0);
-const productTyprPriceBlend = ref(0);
+
 
 const e1 = ref(1);
 
@@ -213,7 +207,6 @@ onMounted(async () => {
   await categoryStore.getAllCategories();
   await ingredientStore.getAllIngredients();
 
-
   // Auto add steps if ingredients are present
   if (productStore.selectedIngredientsHot.length > 0) {
     productStore.isHot = true;
@@ -224,21 +217,9 @@ onMounted(async () => {
   if (productStore.selectedIngredientsBlend.length > 0) {
     productStore.isBlend = true;
   }
-  for (const productType of productStore.productTypes) {
-    if (productType.productTypeName === 'ร้อน') {
-      productStore.isHot = true;
-      productTyprPriceHot.value = productType.productTypePrice;
-
-    } else if (productType.productTypeName === 'เย็น') {
-      productStore.isCold = true;
-      productTyprPriceCold.value = productType.productTypePrice;
-    } else if (productType.productTypeName === 'ปั่น') {
-      productStore.isBlend = true;
-      productTyprPriceBlend.value = productType.productTypePrice;
-    }
-  }
-
+  
 });
+
 
 const computedSteps = computed(() => {
   const stepsArray = [];
@@ -367,8 +348,8 @@ const submitForm = async () => {
   if (isDrink.value) {
     if (productStore.selectedIngredientsHot.length > 0 && productStore.isHot) {
       productData.productTypes.push({
-        productTypeName: 'Hot',
-        productTypePrice: productTyprPriceHot.value || 0,
+        productTypeName: 'ร้อน',
+        productTypePrice: productStore.productTypePriceHot || 0,
         recipes: productStore.selectedIngredientsHot.map((ingredientId) => {
           return {
             ingredient: ingredientStore.ingredients.find(i => i.ingredientId === ingredientId)!,
@@ -379,8 +360,8 @@ const submitForm = async () => {
     }
     if (productStore.selectedIngredientsCold.length > 0 && productStore.isCold) {
       productData.productTypes.push({
-        productTypeName: 'Cold',
-        productTypePrice: productTyprPriceCold.value || 0,
+        productTypeName: 'เย็น',
+        productTypePrice: productStore.productTypePriceCold || 0,
         recipes: productStore.selectedIngredientsCold.map((ingredientId) => {
           return {
             ingredient: ingredientStore.ingredients.find(i => i.ingredientId === ingredientId)!,
@@ -391,8 +372,8 @@ const submitForm = async () => {
     }
     if (productStore.selectedIngredientsBlend.length > 0 && productStore.isBlend) {
       productData.productTypes.push({
-        productTypeName: 'Blend',
-        productTypePrice: productTyprPriceBlend.value || 0,
+        productTypeName: 'ปั่น',
+        productTypePrice: productStore.productTypePriceBlend || 0,
         recipes: productStore.selectedIngredientsBlend.map((ingredientId) => {
           return {
             ingredient: ingredientStore.ingredients.find(i => i.ingredientId === ingredientId)!,
