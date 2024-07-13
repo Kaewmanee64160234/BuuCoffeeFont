@@ -455,7 +455,7 @@ const disabled = computed(() => {
                                   v-model="ingredientQuantitiesBlend[ingredient.ingredientId]" type="number" min="0"
                                   label="จำนวน" />
                               </td>
-                              <td>{{ ingredient.ingredientUnit }}</td>
+                              <td>{{ ingredient.ingredientQuantityPerSubUnit }}</td>
                             </tr>
                           </tbody>
                         </v-table>

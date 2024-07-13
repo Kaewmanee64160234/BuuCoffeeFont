@@ -133,7 +133,8 @@
                                   v-model="productStore.ingredientQuantitiesBlend[ingredient.ingredientId]"
                                   type="number" min="0" label="จำนวน"></v-text-field>
                               </td>
-                              <td>{{ ingredient.ingredientUnit }}</td>
+                              <td>{{ ingredient.ingredientQuantityPerSubUnit }}</td>
+
                             </tr>
                           </tbody>
                         </v-table>
