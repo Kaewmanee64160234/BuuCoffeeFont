@@ -1,8 +1,6 @@
 <template>
   <v-dialog v-model="productStore.updateProductDialog" persistent max-width="800px">
     <v-card>
-
-
       <v-card-title>
         <span class="headline">แก้ไขสินค้า</span>
       </v-card-title>
@@ -79,13 +77,16 @@
                     <v-row>
                       <v-col cols="12">
                         <v-subheader>{{ step.label }}</v-subheader>
-
                         <v-text-field v-if="step.label == 'ร้อน'" variant="solo" v-model="productStore.productTypePriceHot"
                           label="ราคาประเภทสินค้า" type="number" required />
                         <v-text-field v-else-if="step.label == 'เย็น'" variant="solo" v-model="productStore.productTypePriceCold"
                           label="ราคาประเภทสินค้า" type="number" required />
                         <v-text-field v-else variant="solo" v-model="productStore.productTypePriceBlend" label="ราคาประเภทสินค้า"
                           type="number" required />
+                      </v-col>
+                      <v-col cols="12">
+                        <!-- Search bar for filtering ingredients -->
+                        <v-text-field variant="solo"  v-model="searchQuery" label="ค้นหาวัตถุดิบ" prepend-icon="mdi-magnify" />
                       </v-col>
                       <v-col cols="12">
                         <v-table>
@@ -99,7 +100,7 @@
                             </tr>
                           </thead>
                           <tbody>
-                            <tr v-for="ingredient in ingredientStore.ingredients" :key="ingredient.ingredientId">
+                            <tr v-for="ingredient in filteredIngredients" :key="ingredient.ingredientId">
                               <td>
                                 <v-checkbox v-if="step.label === 'ร้อน'" :value="ingredient.ingredientId"
                                   v-model="productStore.selectedIngredientsHot"
@@ -134,7 +135,6 @@
                                   type="number" min="0" label="จำนวน"></v-text-field>
                               </td>
                               <td>{{ ingredient.ingredientQuantityPerSubUnit }}</td>
-
                             </tr>
                           </tbody>
                         </v-table>
@@ -190,8 +190,15 @@ const productDetails = ref<CustomProductType[]>([]);
 const categoryStore = useCategoryStore();
 const ingredientStore = useIngredientStore();
 
-
 const e1 = ref(1);
+const searchQuery = ref('');
+
+const filteredIngredients = computed(() => {
+  if (!searchQuery.value) return ingredientStore.ingredients;
+  return ingredientStore.ingredients.filter((ingredient) =>
+    ingredient.ingredientName.toLowerCase().includes(searchQuery.value.toLowerCase())
+  );
+});
 
 watch(() => productStore.editedProduct.category?.categoryName, (newVal) => {
   const category = categoryStore.categories.find(c => c.categoryName === newVal);
@@ -220,7 +227,6 @@ onMounted(async () => {
   }
   
 });
-
 
 const computedSteps = computed(() => {
   const stepsArray = [];
@@ -436,7 +442,7 @@ const closeDialog = () => {
   productStore.selectedIngredientsBlend = [];
   productStore.ingredientQuantitiesBlend = {};
   productStore.updateProductDialog = false;
-
+  searchQuery.value = ''; // Reset search query when closing the dialog
 };
 
 const showSuccessDialog = (message: string) => {
@@ -453,6 +459,7 @@ function next() {
   const maxStep = computedSteps.value.length + 2; // +2 because step 1 is Product Details and step 2 is Select Product Type
   if (e1.value < maxStep) {
     e1.value++;
+    searchQuery.value = ''; // Reset search query when clicking next
   }
   console.log("Current Step (after next):", e1.value);
 }
