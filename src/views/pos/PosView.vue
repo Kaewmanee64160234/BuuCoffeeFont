@@ -96,11 +96,10 @@ const handleBarcodeInput = async () => {
 };
 
 const addToCart = (product: Product) => {
-  if (product.category.haveTopping) {
-    posStore.addToReceipt(product, {}, [], 1, 100);
-  } else {
-    posStore.addToReceipt(product, {}, [], 1, null);
-  }
+  if (product.category.haveTopping==false) {
+    posStore.addToReceipt(product, null, [], 1, null);
+
+  } 
 };
 </script>
 
@@ -115,9 +114,9 @@ const addToCart = (product: Product) => {
             </v-col>
           </v-row>
           <v-row class="full-width-row">
-            <v-col cols="12" md="6">
+            <!-- <v-col cols="12" md="6">
               <v-text-field v-model="searchQuery" append-icon="mdi-magnify" label="ค้นหา" variant="solo" single-line hide-details></v-text-field>
-            </v-col>
+            </v-col> -->
             <v-col cols="12" md="6">
               <v-text-field v-model="barcode" append-icon="mdi-barcode" label="สแกนบาร์โค้ด" variant="solo" single-line hide-details @change="handleBarcodeInput"></v-text-field>
             </v-col>

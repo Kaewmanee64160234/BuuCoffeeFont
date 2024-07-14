@@ -1,34 +1,3 @@
-<script lang="ts" setup>
-import { usePosStore } from '@/stores/pos.store';
-import { ref, computed } from 'vue';
-import dayjs from 'dayjs';
-
-const posStore = usePosStore();
-const receiptContent = ref(null);
-
-const closeDialog = () => {
-  posStore.receiptDialog = false;
-};
-
-const printReceipt = () => {
-  const printContents = document.getElementById('printableArea')!.innerHTML;
-  const originalContents = document.body.innerHTML;
-
-  document.body.innerHTML = printContents;
-  window.print();
-  document.body.innerHTML = originalContents;
-  window.location.reload();
-};
-
-const formattedDate = computed(() => {
-  return dayjs(posStore.currentReceipt?.createdDate).format('DD/MM/YYYY');
-});
-
-const formattedTime = computed(() => {
-  return dayjs(posStore.currentReceipt?.createdDate).format('HH:mm');
-});
-</script>
-
 <template>
   <v-dialog v-model="posStore.receiptDialog" max-width="400">
     <v-card>
@@ -60,9 +29,14 @@ const formattedTime = computed(() => {
             <h4 class="text-center">Receipt</h4>
             <div v-for="item in posStore.currentReceipt?.receiptItems" :key="item.receiptItemId" class="receipt-item">
               <div class="item-details">
-                <div class="item-info d-flex justify-space-between ">
-                  <p class="product-name">{{ item.quantity }} x {{ item.product?.productName }} {{
-                    item.product?.category.haveTopping ? item.productType?.productTypeName : '' }}</p>
+                <div class="item-info d-flex justify-space-between">
+                  <p class="product-name">
+                    {{ item.quantity }} x {{ item.product?.productName }} {{
+                    item.product?.category.haveTopping ? item.productType?.productTypeName : '' }}
+                    
+                    <span style="font-weight: lighter;" v-if="item.product?.category.haveTopping==true" >({{ parseFloat(item.product?.productPrice+"")+parseFloat(item.productType?.productTypePrice!+'') }} ฿)</span>  
+                </p>
+
                   <p class="product-price">{{ item.receiptSubTotal.toFixed(2) }} ฿</p>
                 </div>
               </div>
@@ -71,7 +45,7 @@ const formattedTime = computed(() => {
               </p>
               <p v-if="item.productTypeToppings.length > 0" class="toppings">
                 <span v-for="topping in item.productTypeToppings" :key="topping.productTypeToppingId">
-                  {{ topping.quantity }}x {{ topping.topping.toppingName }} <br>
+                  {{ topping.quantity }}x {{ topping.topping.toppingName }}({{topping.topping.toppingPrice  }} ฿) <br>
                 </span>
               </p>
             </div>
@@ -87,8 +61,6 @@ const formattedTime = computed(() => {
                 <p> {{ promotion.discount }} ฿</p>
               </div>
             </div>
-
-
 
             <p class="total">
               Total:
@@ -108,7 +80,6 @@ const formattedTime = computed(() => {
             <p>{{ posStore.currentReceipt?.paymentMethod?.toUpperCase() }}</p>
           </div>
           <div class="dashed-line"></div>
-
         </div>
       </v-card-text>
       <v-card-actions class="justify-center">
@@ -119,6 +90,37 @@ const formattedTime = computed(() => {
   </v-dialog>
 </template>
 
+<script lang="ts" setup>
+import { usePosStore } from '@/stores/pos.store';
+import { ref, computed } from 'vue';
+import dayjs from 'dayjs';
+
+const posStore = usePosStore();
+const receiptContent = ref(null);
+
+const closeDialog = () => {
+  posStore.receiptDialog = false;
+};
+
+const printReceipt = () => {
+  const printContents = document.getElementById('printableArea')!.innerHTML;
+  const originalContents = document.body.innerHTML;
+
+  document.body.innerHTML = printContents;
+  window.print();
+  document.body.innerHTML = originalContents;
+  window.location.reload();
+};
+
+const formattedDate = computed(() => {
+  return dayjs(posStore.currentReceipt?.createdDate).format('DD/MM/YYYY');
+});
+
+const formattedTime = computed(() => {
+  return dayjs(posStore.currentReceipt?.createdDate).format('HH:mm');
+});
+</script>
+
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Playwrite+NL:wght@100..400&display=swap');
 
@@ -127,7 +129,6 @@ const formattedTime = computed(() => {
   font-size: 15px;
   font-weight: 400;
   padding-bottom: 10px;
-
 }
 
 .receipt-content {
@@ -174,8 +175,6 @@ const formattedTime = computed(() => {
 }
 
 .item-details {
-  /* display: flex;
-  align-items: center; */
   margin-bottom: 5px;
 }
 
