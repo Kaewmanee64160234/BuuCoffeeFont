@@ -29,25 +29,23 @@
                 <v-form ref="form" v-model="valid">
                   <v-row>
                     <v-col cols="12" sm="12">
-                      <v-img v-if="imagePreview" :src="imagePreview" max-height="100"
-                        style="border-radius: 50%;"></v-img>
+                      <v-img v-if="imagePreview" :src="imagePreview" max-height="100" style="border-radius: 50%;"></v-img>
                     </v-col>
                     <v-col cols="12" sm="12">
-                      <v-file-input v-model="productImage" label="รูปภาพสินค้า" prepend-icon="mdi-camera"
-                        accept="image/*" @change="handleImageUpload" />
+                      <v-file-input v-model="productImage" label="รูปภาพสินค้า" prepend-icon="mdi-camera" accept="image/*" @change="handleImageUpload" />
                     </v-col>
-
                     <v-col cols="12" sm="6">
                       <v-text-field variant="solo" v-model="productName" label="ชื่อสินค้า" required />
                     </v-col>
-                   
                     <v-col cols="12" sm="6">
                       <v-text-field variant="solo" v-model="productPrice" label="ราคา" type="number" required />
                     </v-col>
                     <v-col cols="12" sm="6">
-                      <v-select v-model="productStore.product.category.categoryName"
-                        :items="categoryStore.categoriesForCreate.map(category => category.categoryName)"
-                        label="เลือกหมวดหมู่" dense @change="checkCategory" />
+                      <v-select v-model="productStore.product.category.categoryName" :items="categoryStore.categoriesForCreate.map(category => category.categoryName)" label="เลือกหมวดหมู่" dense @change="checkCategory" />
+                    </v-col>
+                   
+                    <v-col cols="12" sm="6">
+                      <v-text-field variant="solo" v-model="barcode" label="บาร์โค้ด" />
                     </v-col>
                     <v-col cols="12" sm="6">
                       <v-checkbox v-model="productStore.product.countingPoint" label="นับแต้ม" />
@@ -59,29 +57,24 @@
               <v-stepper-window-item v-if="isDrink" :value="2">
                 <v-form ref="form" v-model="valid">
                   <v-row class="d-flex justify-space-between">
-                    <v-checkbox label="ร้อน" v-model="productTypes.hot"
-                      @change="() => handleProductTypeChange('ร้อน', productTypes.hot)" />
-                    <v-checkbox label="เย็น" v-model="productTypes.cold"
-                      @change="() => handleProductTypeChange('เย็น', productTypes.cold)" />
-                    <v-checkbox label="ปั่น" v-model="productTypes.blend"
-                      @change="() => handleProductTypeChange('ปั่น', productTypes.blend)" />
+                    <v-checkbox label="ร้อน" v-model="productTypes.hot" @change="() => handleProductTypeChange('ร้อน', productTypes.hot)" />
+                    <v-checkbox label="เย็น" v-model="productTypes.cold" @change="() => handleProductTypeChange('เย็น', productTypes.cold)" />
+                    <v-checkbox label="ปั่น" v-model="productTypes.blend" @change="() => handleProductTypeChange('ปั่น', productTypes.blend)" />
                   </v-row>
                 </v-form>
               </v-stepper-window-item>
 
-              <v-stepper-window-item v-for="(step, index) in computedSteps" :key="`content-${index + 3}`"
-                :value="step.value">
+              <v-stepper-window-item v-for="(step, index) in computedSteps" :key="`content-${index + 3}`" :value="step.value">
                 <v-form ref="form" v-model="valid">
                   <v-container>
                     <v-row>
                       <v-col cols="12">
                         <v-subheader>{{ step.label }}</v-subheader>
-                        <v-text-field variant="solo" v-model="getProductType(step.label).productTypePrice"
-                          label="ราคาประเภทสินค้า" type="number" required />
+                        <v-text-field variant="solo" v-model="getProductType(step.label).productTypePrice" label="ราคาประเภทสินค้า" type="number" required />
                       </v-col>
                       <v-col cols="12">
                         <!-- Search bar for filtering ingredients -->
-                        <v-text-field variant="solo" v-model="searchQuery"  label="ค้นหาวัตถุดิบ" prepend-icon="mdi-magnify"  />
+                        <v-text-field variant="solo" v-model="searchQuery" label="ค้นหาวัตถุดิบ" prepend-icon="mdi-magnify" />
                       </v-col>
                       <v-col cols="12">
                         <v-table>
@@ -97,37 +90,18 @@
                           <tbody>
                             <tr v-for="ingredient in filteredIngredients" :key="ingredient.ingredientId">
                               <td>
-                                <v-checkbox v-if="step.label === 'ร้อน'"
-                                  v-model="getProductType(step.label).selectedIngredients"
-                                  :value="ingredient.ingredientId"
-                                  @change="() => handleHotIngredientSelect(getProductType(step.label), ingredient)" />
-                                <v-checkbox v-if="step.label === 'เย็น'"
-                                  v-model="getProductType(step.label).selectedIngredients"
-                                  :value="ingredient.ingredientId"
-                                  @change="() => handleColdIngredientSelect(getProductType(step.label), ingredient)" />
-                                <v-checkbox v-if="step.label === 'ปั่น'"
-                                  v-model="getProductType(step.label).selectedIngredients"
-                                  :value="ingredient.ingredientId"
-                                  @change="() => handleBlendIngredientSelect(getProductType(step.label), ingredient)" />
+                                <v-checkbox v-if="step.label === 'ร้อน'" v-model="getProductType(step.label).selectedIngredients" :value="ingredient.ingredientId" @change="() => handleHotIngredientSelect(getProductType(step.label), ingredient)" />
+                                <v-checkbox v-if="step.label === 'เย็น'" v-model="getProductType(step.label).selectedIngredients" :value="ingredient.ingredientId" @change="() => handleColdIngredientSelect(getProductType(step.label), ingredient)" />
+                                <v-checkbox v-if="step.label === 'ปั่น'" v-model="getProductType(step.label).selectedIngredients" :value="ingredient.ingredientId" @change="() => handleBlendIngredientSelect(getProductType(step.label), ingredient)" />
                               </td>
                               <td>
-                                <v-img :src="`http://localhost:3000/ingredients/${ingredient.ingredientId}/image`"
-                                  height="100" />
+                                <v-img :src="`http://localhost:3000/ingredients/${ingredient.ingredientId}/image`" height="100" />
                               </td>
                               <td>{{ ingredient.ingredientName }}</td>
                               <td>
-                                <v-text-field variant="solo"
-                                  v-if="step.label === 'ร้อน' && selectedIngredientsHot.includes(ingredient.ingredientId)"
-                                  v-model="ingredientQuantitiesHot[ingredient.ingredientId]" type="number" min="0"
-                                  label="จำนวน" />
-                                <v-text-field variant="solo"
-                                  v-if="step.label === 'เย็น' && selectedIngredientsCold.includes(ingredient.ingredientId)"
-                                  v-model="ingredientQuantitiesCold[ingredient.ingredientId]" type="number" min="0"
-                                  label="จำนวน" />
-                                <v-text-field variant="solo"
-                                  v-if="step.label === 'ปั่น' && selectedIngredientsBlend.includes(ingredient.ingredientId)"
-                                  v-model="ingredientQuantitiesBlend[ingredient.ingredientId]" type="number" min="0"
-                                  label="จำนวน" />
+                                <v-text-field variant="solo" v-if="step.label === 'ร้อน' && selectedIngredientsHot.includes(ingredient.ingredientId)" v-model="ingredientQuantitiesHot[ingredient.ingredientId]" type="number" min="0" label="จำนวน" />
+                                <v-text-field variant="solo" v-if="step.label === 'เย็น' && selectedIngredientsCold.includes(ingredient.ingredientId)" v-model="ingredientQuantitiesCold[ingredient.ingredientId]" type="number" min="0" label="จำนวน" />
+                                <v-text-field variant="solo" v-if="step.label === 'ปั่น' && selectedIngredientsBlend.includes(ingredient.ingredientId)" v-model="ingredientQuantitiesBlend[ingredient.ingredientId]" type="number" min="0" label="จำนวน" />
                               </td>
                               <td>{{ ingredient.ingredientQuantityPerSubUnit }}</td>
                             </tr>
@@ -140,8 +114,7 @@
               </v-stepper-window-item>
             </v-stepper-window>
 
-            <v-stepper-actions v-if="isDrink" :disabled="disabled" @click:next="next"
-              @click:prev="prev"></v-stepper-actions>
+            <v-stepper-actions v-if="isDrink" :disabled="disabled" @click:next="next" @click:prev="prev"></v-stepper-actions>
           </template>
         </v-stepper>
       </v-card-text>
@@ -180,6 +153,7 @@ const form = ref(null);
 const valid = ref(false);
 const productName = ref('');
 const productPrice = ref(0);
+const barcode = ref(''); // New barcode ref
 const productImage = ref(new File([], ''));
 const imagePreview = ref<string | null>(null);
 const selectedCategory = ref(null);
@@ -355,6 +329,7 @@ const submitForm = async () => {
   const productData = {
     productName: productName.value,
     productPrice: productPrice.value,
+    barcode: barcode.value, // Include barcode in product data
     productImage: productImage.value,
     categoryId: selectedCategory.value,
     productTypes: [] as ProductType[]
@@ -431,6 +406,7 @@ const submitForm = async () => {
     category: categoryStore.categories.find(c => c.categoryName === productStore.product.category.categoryName)!,
     productName: productData.productName,
     productPrice: productData.productPrice,
+    barcode: productData.barcode, // Include barcode in product object
     productImage: '',
     productTypes: productData.productTypes,
     productId: 0,
@@ -444,6 +420,7 @@ const submitForm = async () => {
 const clearData = () => {
   productName.value = '';
   productPrice.value = 0;
+  barcode.value = ''; // Clear barcode field
   productImage.value = new File([], '');
   imagePreview.value = null;
   selectedCategory.value = null;

@@ -23,6 +23,8 @@ export const useProductStore = defineStore("product", () => {
     productPrice: 0,
     productImage: "",
     countingPoint: false,
+    barcode: "",
+
 
     category: {
       categoryId: 0,
@@ -38,6 +40,7 @@ export const useProductStore = defineStore("product", () => {
     productId: 0,
     productName: "",
     productPrice: 0,
+    barcode: "",
     productImage: "",
     countingPoint: false,
     category: {
@@ -69,6 +72,7 @@ export const useProductStore = defineStore("product", () => {
   const isCold = ref<boolean>(false);
   const isBlend = ref<boolean>(false);
   const selectedProduct = ref<Product>();
+  const barcode = ref("");
 
   const totalProducts = ref(0);
   const currentPage = ref(1);
@@ -299,5 +303,6 @@ export const useProductStore = defineStore("product", () => {
     productTypePriceHot,
     productTypePriceCold,
     productTypePriceBlend,
+    barcode
   };
 });
