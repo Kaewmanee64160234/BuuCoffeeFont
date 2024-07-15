@@ -45,10 +45,15 @@
                       <v-text-field variant="solo" v-model="productStore.editedProduct.productPrice" label="ราคา"
                         type="number" required />
                     </v-col>
+                  
+                  
                     <v-col cols="12" sm="6">
                       <v-select v-model="productStore.selectedCategoryForUpdate"
                         :items="categoryStore.categoriesForCreate.map(category => category.categoryName)"
                         label="เลือกหมวดหมู่" dense @change="checkCategory"></v-select>
+                    </v-col>
+                    <v-col cols="12" sm="6">
+                      <v-text-field variant="solo" v-model="productStore.editedProduct.barcode" label="บาร์โค้ด" />
                     </v-col>
                     <v-col cols="12" sm="6">
                       <v-checkbox v-model="productStore.editedProduct.countingPoint" label="นับแต้ม" />
@@ -180,6 +185,7 @@ const form = ref(null);
 const valid = ref(false);
 const productName = ref('');
 const productPrice = ref(0);
+const barcode = ref(''); // New ref for barcode
 const productImage = ref(new File([], ''));
 const imagePreview = ref<string | null>(null);
 
@@ -225,7 +231,6 @@ onMounted(async () => {
   if (productStore.selectedIngredientsBlend.length > 0) {
     productStore.isBlend = true;
   }
-  
 });
 
 const computedSteps = computed(() => {
@@ -326,6 +331,7 @@ const loadProductData = () => {
 
   productName.value = product.productName;
   productPrice.value = product.productPrice;
+  barcode.value = product.barcode; // Load barcode value
   productStore.selectedCategoryForUpdate = product.category.categoryName;
   imagePreview.value = product.productImage ? `${import.meta.env.VITE_URL_PORT}/products/${product.productId}/image` : null;
 };
@@ -345,6 +351,7 @@ const submitForm = async () => {
   const productData = {
     productName: productStore.editedProduct.productName,
     productPrice: productStore.editedProduct.productPrice,
+    barcode: productStore.editedProduct.barcode,
     productImage: productStore.editedProduct.productImage,
     countingPoint: productStore.editedProduct.countingPoint,
     categoryId: categoryStore.categoriesForCreate.find(category => category.categoryName === productStore.selectedCategoryForUpdate)?.categoryId || null,
@@ -422,6 +429,7 @@ const closeDialog = () => {
     category: { categoryId: 0, categoryName: '' },
     productName: '',
     productPrice: 0,
+    barcode: '', // Clear barcode value
     productImage: '',
     productTypes: [],
     productId: 0,

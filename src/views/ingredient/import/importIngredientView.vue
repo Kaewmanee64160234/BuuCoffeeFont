@@ -27,7 +27,7 @@ function onSearch() {
 
 const rules = {
   required: (value: any) => !!value || 'กรุณากรอกข้อมูล',
-  name: (value: string) => /^[A-Za-zก-ฮ\s]+$/.test(value) || 'ชื่อหมวดหมู่ต้องเป็นตัวอักษรเท่านั้น',
+  name: (value: string) => /^[a-zA-Zก-๙\s]+$/.test(value) || 'ชื่อหมวดหมู่ต้องเป็นตัวอักษรเท่านั้น',
   number: (value: any) => /^[0-9]+$/.test(value) || 'กรุณากรอกข้อมูลเป็นตัวเลข'
 };
 const confirmSave = () => {

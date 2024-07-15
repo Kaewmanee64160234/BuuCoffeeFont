@@ -58,14 +58,15 @@ const saveCheckData = async () => {
         icon: 'success',
         confirmButtonText: 'ตกลง'
       });
-    } else {
-      Swal.fire({
-        title: 'ยกเลิก!',
-        text: 'ข้อมูลของคุณไม่ได้ถูกบันทึก.',
-        icon: 'error',
-        confirmButtonText: 'ตกลง'
-      });
-    }
+    } 
+    // else {
+    //   Swal.fire({
+    //     title: 'ยกเลิก!',
+    //     text: 'ข้อมูลของคุณไม่ได้ถูกบันทึก.',
+    //     icon: 'error',
+    //     confirmButtonText: 'ตกลง'
+    //   });
+    // }
   } catch (error) {
     console.error("Error saving check data:", error);
 

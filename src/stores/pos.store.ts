@@ -48,6 +48,32 @@ export const usePosStore = defineStore("pos", () => {
   const receiptStore = useReceiptStore();
   const hideNavigation = ref(false);
 
+  // Load queue number from local storage
+  const loadQueueNumber = () => {
+    const storedQueueData = localStorage.getItem('queueData');
+    const currentDate = new Date().toDateString();
+    if (storedQueueData) {
+      const { date, number } = JSON.parse(storedQueueData);
+      if (date === currentDate) {
+        queueNumber.value = number;
+      } else {
+        queueNumber.value = 1;
+        localStorage.setItem('queueData', JSON.stringify({ date: currentDate, number: queueNumber.value }));
+      }
+    } else {
+      localStorage.setItem('queueData', JSON.stringify({ date: currentDate, number: queueNumber.value }));
+    }
+  };
+
+  // Save queue number to local storage
+  const saveQueueNumber = () => {
+    const currentDate = new Date().toDateString();
+    localStorage.setItem('queueData', JSON.stringify({ date: currentDate, number: queueNumber.value }));
+  };
+
+  // Initialize queue number on store creation
+  loadQueueNumber();
+
   // toggleNavigation
   const toggleNavigation = () => {
     hideNavigation.value = !hideNavigation.value;
@@ -245,6 +271,7 @@ export const usePosStore = defineStore("pos", () => {
       receipt.value.queueNumber = queueNumber.value;
     }
     queueNumber.value++;
+    saveQueueNumber();
     if (receipt.value.receiptTotalDiscount === 0) {
       receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice;
     }

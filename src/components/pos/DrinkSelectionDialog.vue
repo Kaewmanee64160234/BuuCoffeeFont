@@ -66,7 +66,7 @@
                       <div v-if="selectedToppings.some(t => t.topping.toppingId === topping.toppingId)"
                         class="quantity-controls d-flex align-center mt-2">
                         <v-btn size="xs-small" icon @click="decreaseToppingQuantity(topping)">
-                          <v-icon  size="small">mdi-minus</v-icon>
+                          <v-icon size="small">mdi-minus</v-icon>
                         </v-btn>
                         <span>{{ selectedToppings.find(t => t.topping.toppingId === topping.toppingId)?.quantity }}</span>
                         <v-btn size="xs-small" icon @click="increaseToppingQuantity(topping)">
@@ -207,17 +207,15 @@ function confirmSelection() {
   closeDialog();
 }
 
-// clear data
 function clearData() {
   selectedType.value = null;
-  selectedSweetness.value = 0;
+  selectedSweetness.value = 100;
   selectedToppings.value = [];
   quantity.value = 1;
   productStore.selectedProduct = null;
   productTypeToppings.value = [];
 }
 
-// Watch for changes in posStore.toppingDialog and ensure selectedProduct is set
 watch(
   () => posStore.toppingDialog,
   (newVal) => {
@@ -227,6 +225,7 @@ watch(
     }
   }
 );
+
 </script>
 
 <style scoped>
