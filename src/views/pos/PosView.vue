@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, watch } from 'vue';
 import PromotionCardsCarousel from '@/components/pos/PromotionCardsCarousel.vue';
-import SearchBar from '@/components/pos/SearchBar.vue';
 import ProductCard from '@/components/pos/ProductCard.vue';
 import SelectedItemsList from '@/components/pos/SelectedItemsList.vue';
 import DrinkSelectionDialog from '@/components/pos/DrinkSelectionDialog.vue';
@@ -14,6 +13,7 @@ import { useUserStore } from '@/stores/user.store';
 import { useCustomerStore } from '@/stores/customer.store';
 import { usePosStore } from '@/stores/pos.store';
 import type { Product } from '@/types/product.type';
+import Swal from 'sweetalert2';
 
 const productStore = useProductStore();
 const categoryStore = useCategoryStore();
@@ -25,53 +25,82 @@ const posStore = usePosStore();
 const selectedCategory = ref('');
 const productFilters = ref<Product[]>([]);
 const searchQuery = ref('');
+const barcode = ref('');
 
 onMounted(async () => {
-  promotionStore.promotions = []
+  promotionStore.promotions = [];
   await productStore.getAllProducts();
   await categoryStore.getAllCategories();
   await toppingStore.getAllToppings();
   await customerStore.getAllCustomers();
-  console.log("cate__", categoryStore.categoriesForCreate)
+  
   if (userStore.currentUser?.userRole === "พนักงานขายข้าว") {
     promotionStore.getPromotionByType("ร้านกับข้าว");
     selectedCategory.value = "กับข้าว";
-    const cate = categoryStore.categoriesForCreate.find(category => category.categoryName === "กับข้าว")
-    categoryStore.categoriesForCreate = [];
-    categoryStore.categoriesForCreate.push(cate!);
-    productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === "กับข้าว".toLocaleLowerCase());
+    const cate = categoryStore.categoriesForCreate.find(category => category.categoryName === "กับข้าว");
+    categoryStore.categoriesForCreate = [cate!];
+    productFilters.value = productStore.products.filter(product => product.category.categoryName.toLowerCase() === "กับข้าว".toLowerCase());
     promotionStore.promotions = promotionStore.promotions.filter(promotion => promotion.promotionForStore === "ร้านข้าว");
   } else {
     promotionStore.getPromotionByType("ร้านกาแฟ");
     selectedCategory.value = "กาแฟ";
-    const cate = categoryStore.categoriesForCreate.findIndex(category => category.categoryName === "กับข้าว")
-    categoryStore.categoriesForCreate.splice(cate, 1);
-    productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === "กาแฟ".toLocaleLowerCase());
+    const cateIndex = categoryStore.categoriesForCreate.findIndex(category => category.categoryName === "กับข้าว");
+    if (cateIndex !== -1) categoryStore.categoriesForCreate.splice(cateIndex, 1);
+    productFilters.value = productStore.products.filter(product => product.category.categoryName.toLowerCase() === "กาแฟ".toLowerCase());
     promotionStore.promotions = promotionStore.promotions.filter(promotion => promotion.promotionForStore === "ร้านกาแฟ");
   }
 });
 
-watch(selectedCategory, async (newCategory) => {
+watch(selectedCategory, (newCategory) => {
   if (newCategory) {
-    productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === newCategory.toLocaleLowerCase());
+    productFilters.value = productStore.products.filter(product => product.category.categoryName.toLowerCase() === newCategory.toLowerCase());
   }
 });
 
-watch(searchQuery, async (newQuery) => {
+watch(searchQuery, (newQuery) => {
   if (newQuery === '') {
-    productFilters.value = productStore.products.filter(product => product.category.categoryName.toLocaleLowerCase() === selectedCategory.value.toLocaleLowerCase());
+    productFilters.value = productStore.products.filter(product => product.category.categoryName.toLowerCase() === selectedCategory.value.toLowerCase());
   } else {
-    productFilters.value = productStore.products.filter(product => product.productName.toLocaleLowerCase().includes(newQuery.toLocaleLowerCase()) && product.category.categoryName.toLocaleLowerCase() === selectedCategory.value.toLocaleLowerCase());
+    productFilters.value = productStore.products.filter(product => product.productName.toLowerCase().includes(newQuery.toLowerCase()) && product.category.categoryName.toLowerCase() === selectedCategory.value.toLowerCase());
   }
 });
 
 const toggleNavigationDrawer = () => {
   posStore.toggleNavigation();
-}
-// marginLeft
+};
+
 const marginLeft = computed(() => {
-  return posStore.hideNavigation==false ? '3%' : '0';
+  return posStore.hideNavigation ? '0' : '3%';
 });
+
+const handleBarcodeInput = async () => {
+  if (barcode.value) {
+    const foundProduct = productStore.products.find(product => product.barcode === barcode.value);
+    if (foundProduct) {
+      productStore.selectedProduct = foundProduct; // Set the selected product
+      if (foundProduct.category.haveTopping) {
+        posStore.selectedProduct = foundProduct;
+        posStore.toppingDialog = true;
+      } else {
+        addToCart(foundProduct);
+      }
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'ไม่พบสินค้า',
+        text: 'ไม่พบสินค้าที่มีบาร์โค้ดนี้',
+      });
+    }
+    barcode.value = '';
+  }
+};
+
+const addToCart = (product: Product) => {
+  if (product.category.haveTopping==false) {
+    posStore.addToReceipt(product, null, [], 1, null);
+
+  } 
+};
 </script>
 
 <template>
@@ -85,8 +114,11 @@ const marginLeft = computed(() => {
             </v-col>
           </v-row>
           <v-row class="full-width-row">
-            <v-col cols="12" md="6">
+            <!-- <v-col cols="12" md="6">
               <v-text-field v-model="searchQuery" append-icon="mdi-magnify" label="ค้นหา" variant="solo" single-line hide-details></v-text-field>
+            </v-col> -->
+            <v-col cols="12" md="6">
+              <v-text-field v-model="barcode" append-icon="mdi-barcode" label="สแกนบาร์โค้ด" variant="solo" single-line hide-details @change="handleBarcodeInput"></v-text-field>
             </v-col>
             <v-col cols="12" md="6" class="d-flex justify-end align-center">
               <v-tooltip bottom>

@@ -16,12 +16,15 @@ export const useProductStore = defineStore("product", () => {
   const createProductDialog = ref(false);
   const searchQuery = ref<string>("");
   const searchQueryPos = ref<string>("");
+  const ProductTypes = ref<ProductType[]>([]);
   const editedProduct = ref<Product & { file: File }>({
     productId: 0,
     productName: "",
     productPrice: 0,
     productImage: "",
     countingPoint: false,
+    barcode: "",
+
 
     category: {
       categoryId: 0,
@@ -37,6 +40,7 @@ export const useProductStore = defineStore("product", () => {
     productId: 0,
     productName: "",
     productPrice: 0,
+    barcode: "",
     productImage: "",
     countingPoint: false,
     category: {
@@ -60,11 +64,15 @@ export const useProductStore = defineStore("product", () => {
   const ingredientQuantitiesHot = ref<IngredientQuantities>({});
   const ingredientQuantitiesCold = ref<IngredientQuantities>({});
   const ingredientQuantitiesBlend = ref<IngredientQuantities>({});
+  const productTypePriceHot = ref(0);
+  const productTypePriceCold = ref(0);
+  const productTypePriceBlend = ref(0);
   const productTypes = ref<ProductType[]>([]);
   const isHot = ref<boolean>(false);
   const isCold = ref<boolean>(false);
   const isBlend = ref<boolean>(false);
   const selectedProduct = ref<Product>();
+  const barcode = ref("");
 
   const totalProducts = ref(0);
   const currentPage = ref(1);
@@ -148,8 +156,8 @@ export const useProductStore = defineStore("product", () => {
     try {
       const response = await productService.createProduct(product.value!);
       if (response.status === 201) {
-        if(product.value.file !== null){
-        await uploadImage(product.value.file, response.data.productId);
+        if (product.value.file !== null) {
+          await uploadImage(product.value.file, response.data.productId);
         }
         await getProductPaginate();
       }
@@ -158,7 +166,7 @@ export const useProductStore = defineStore("product", () => {
     }
   };
 
-  const updateProduct = async (id: number, updatedProduct: Product) => {
+  const updateProduct = async (id: number, updatedProduct_: Product) => {
     try {
       await getProductById(id);
       // map data new data and old data
@@ -167,17 +175,41 @@ export const useProductStore = defineStore("product", () => {
         ...editedProduct.value,
       };
 
-      // if (editedProduct.value.file !== null) {
-      //   const formData = new FormData();
-      //   formData.append("file", editedProduct.value.file);
-      //   await updateImageProduct(id, formData);
-      // }
-      const response = await productService.updateProduct(id, updatedProduct);
-      console.log("updateProduct", response.status);
-      if (response.status === 200) {
-       
-        await getProductPaginate();
+      if (updatedProduct.file !== null) {
+        const formData = new FormData();
+        formData.append("file", editedProduct.value.file);
+        await updateImageProduct(id, formData);
       }
+      // update if data have chnage
+      const productNameChnage =
+        editedProduct.value.productName !== product.value.productName;
+      const productPriceChnage =
+        editedProduct.value.productPrice !== product.value.productPrice;
+      const categoryChnage =
+        editedProduct.value.category.categoryName !==
+        product.value.category.categoryName;
+      const productTypesChnage =
+        editedProduct.value.productTypes !== product.value.productTypes;
+      const countingPointChnage =
+        editedProduct.value.countingPoint !== product.value.countingPoint;
+      console.log(countingPointChnage);
+      console.log("productNameChnage", productNameChnage);
+      console.log("productPriceChnage", productPriceChnage);
+      console.log("categoryChnage", categoryChnage);
+      console.log("productTypesChnage", productTypesChnage);
+      console.log("countingPointChnage", countingPointChnage);
+      console.log("updatedProduct", updatedProduct);
+      if (
+        productNameChnage ||
+        productPriceChnage ||
+        categoryChnage ||
+        productTypesChnage ||
+        countingPointChnage
+      ) {
+        const response = await productService.updateProduct(id, updatedProduct);
+        console.log("updateProduct", response.status);
+      }
+      await getProductPaginate();
     } catch (error) {
       console.error(error);
     }
@@ -266,6 +298,11 @@ export const useProductStore = defineStore("product", () => {
     setSelectedProduct,
     searchQueryPos,
     editedProduct,
-    selectedCategoryForUpdate
+    selectedCategoryForUpdate,
+    ProductTypes,
+    productTypePriceHot,
+    productTypePriceCold,
+    productTypePriceBlend,
+    barcode
   };
 });

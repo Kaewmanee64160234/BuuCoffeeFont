@@ -77,18 +77,23 @@ function getButtonClass(promotion: Promotion) {
 
 <template>
   <v-carousel hide-delimiter-background hide-delimiters height="180" style="background-color: #80715E; border-radius: 20px;">
-    <v-carousel-item v-for="(chunk, index) in promotionChunks" :key="index">
+    <v-carousel-item v-for="(chunk, index) in promotionChunks" :key="chunk[index]">
       <div class="promotion-group">
         <div class="promotion-container">
-          <v-card v-for="promotion in chunk" :key="promotion.promotionId" class="promotion-card"
+         <v-card v-for="promotion in chunk" :key="promotion.promotionId" class="promotion-card"
             :class="{ 'applied-promotion': isPromotionApplied(promotion) }" @click="togglePromotion(promotion)">
             <v-card-title class="text-center wrap-text">{{ promotion.promotionName }}</v-card-title>
             <v-card-actions class="justify-center">
-              <v-btn
+              <v-btn v-if="promotion.promotionCanUseManyTimes == false"
                 :class="getButtonClass(promotion)"
                 class="btn-apply-promotion"
                 @click.stop="togglePromotion(promotion)">
                 {{ isPromotionApplied(promotion) ? 'ยกเลิก' : 'ใช้โปรโมชั่นนี้' }}
+              </v-btn>
+              <!-- if usemanytime ==true -->
+              <v-btn v-else  class="btn-apply-promotion"
+                @click.stop="applyPromotion(promotion)">
+                 ใช้โปรโมชั่นนี้
               </v-btn>
             </v-card-actions>
           </v-card>

@@ -13,6 +13,7 @@ function createProduct(product: Product) {
     productPrice: product.productPrice,
     productImage: product.productImage,
     categoryId: product.category.categoryId,
+    barcode:product.barcode,
     productTypes:
       product.productTypes?.length! > 0
         ? product.productTypes!.map((productType) => {

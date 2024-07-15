@@ -37,7 +37,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="category in categoryStore.categories" :key="category.categoryId" style="text-align: center;">
+            <tr v-for="category in categoryStore.categoriesForCreate" :key="category.categoryId" style="text-align: center;">
               <td>{{ category.categoryId }}</td>
               <td>{{ category.categoryName }}</td>
               <td>{{ category.haveTopping ? 'ได้' : 'ไม่ได้' }}</td>
@@ -49,7 +49,7 @@
               </td>
             </tr>
           </tbody>
-          <tbody v-if="!categoryStore.categories || categoryStore.categories.length === 0">
+          <tbody v-if="!categoryStore.categoriesForCreate || categoryStore.categories.length === 0">
             <tr>
               <td colspan="4" class="text-center">ไม่มีข้อมูล</td>
             </tr>
