@@ -44,6 +44,7 @@ function applyPromotion(promotion: Promotion) {
       icon: 'error',
       title: 'ไม่มีรายการ',
       text: 'คุณไม่สามารถใช้โปรโมชั่นได้เนื่องจากไม่มีรายการในใบเสร็จ',
+      confirmButtonText: 'ตกลง'
     });
     return;
   }
