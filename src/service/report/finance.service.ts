@@ -19,7 +19,10 @@ function getAll() {
   return http.get("/cashiers");
 }
 function getDailyReport() {
-  return http.get("/receipts/daily-report");
+  return http.get("/receipts/daily-report?receiptType=ร้านกาแฟ");
+}
+function getDailyReportFood() {
+  return http.get("/receipts/daily-report?receiptType=ร้านข้าว");
 }
 function getSumType() {
   return http.get("/receipts/sum");
@@ -44,6 +47,7 @@ export default {
   createCashier,
   getAll,
   getDailyReport,
+  getDailyReportFood,
   getGroupedFinance,
   getSumType,
   deleteCashier,
