@@ -64,6 +64,8 @@ console.log(categoriesForCreate.value);
       const res = await categoryService.createCategory(category);
       if (res.data) {
         categories.value.push(res.data);
+        getAllCategories();
+
       }
     } catch (error) {
       console.error(error);
@@ -78,6 +80,7 @@ console.log(categoriesForCreate.value);
       if (res.data) {
         const index = categories.value.findIndex((c) => c.categoryId === id);
         categories.value[index] = res.data;
+        getAllCategories();
       }
     } catch (error) {
       console.error(error);

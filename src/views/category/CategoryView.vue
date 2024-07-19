@@ -37,8 +37,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="category in categoryStore.categoriesForCreate" :key="category.categoryId" style="text-align: center;">
-              <td>{{ category.categoryId }}</td>
+            <tr v-for="(category,index) in categoryStore.categoriesForCreate" :key="index" style="text-align: center;">
+              <td>{{ index+1 }}</td>
               <td>{{ category.categoryName }}</td>
               <td>{{ category.haveTopping ? 'ได้' : 'ไม่ได้' }}</td>
               <td>

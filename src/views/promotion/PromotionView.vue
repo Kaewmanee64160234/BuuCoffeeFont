@@ -39,8 +39,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="promotion in promotionStore.promotions" :key="promotion.promotionId" style="text-align: center;">
-              <td>{{ promotion.promotionId }}</td>
+            <tr v-for="(promotion,index) in promotionStore.promotions" :key="promotion.promotionId" style="text-align: center;">
+              <td>{{ index+1 }}</td>
               <td>{{ promotion.promotionName }}</td>
               <td>{{ promotion.promotionType }}</td>
               <td>{{ promotion.discountValue === null ? '-' : promotion.discountValue }}</td>
