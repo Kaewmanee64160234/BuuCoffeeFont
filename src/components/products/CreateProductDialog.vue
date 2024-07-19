@@ -423,7 +423,8 @@ const clearData = () => {
   barcode.value = ''; // Clear barcode field
   productImage.value = new File([], '');
   imagePreview.value = null;
-  selectedCategory.value = null;
+  selectedCategory.value = null; // Clear selected category
+  productStore.product.category.categoryName = ''; // Clear category in product store
   productTypes.hot = false;
   productTypes.cold = false;
   productTypes.blend = false;

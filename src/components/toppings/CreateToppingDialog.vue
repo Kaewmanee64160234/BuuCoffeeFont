@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="toppingStore.createToppingDialog" persistent max-width="600px">
+  <v-dialog v-model="toppingStore.createToppingDialog" persistent max-width="600px" @click:outside="resetForm">
     <v-card>
       <v-card-title>
         <span class="headline">สร้างท็อปปิ้ง</span>
@@ -31,7 +31,7 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" @click="toppingStore.createToppingDialog = false">ปิด</v-btn>
+        <v-btn color="blue darken-1" @click="closeDialog">ปิด</v-btn>
         <v-btn color="blue darken-1" @click="submitForm" :disabled="!valid">บันทึก</v-btn>
       </v-card-actions>
     </v-card>
@@ -57,6 +57,21 @@ const rules = {
   price: (value: number) => value > 0 || 'ราคาท็อปปิ้งต้องเป็นจำนวนบวก'
 };
 
+const resetForm = () => {
+  toppingName.value = '';
+  toppingPrice.value = 0;
+  if (form.value) {
+    form.value.reset();
+    form.value.resetValidation();
+  }
+  valid.value = false;
+};
+
+const closeDialog = () => {
+  toppingStore.createToppingDialog = false;
+  resetForm();
+};
+
 const submitForm = async () => {
   if (form.value) {
     const isValid = await form.value.validate();
@@ -79,6 +94,7 @@ const submitForm = async () => {
             confirmButton: 'swal-button'
           }
         });
+        resetForm();
       } catch (error) {
         console.error('Error creating topping:', error);
         Swal.fire({

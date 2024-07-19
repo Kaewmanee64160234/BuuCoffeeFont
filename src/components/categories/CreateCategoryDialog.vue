@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="categoryStore.createCategoryDialog" persistent max-width="600px">
+  <v-dialog v-model="categoryStore.createCategoryDialog" persistent max-width="600px" @click:outside="resetForm">
     <v-card>
       <v-card-title>
         <span class="headline">สร้างหมวดหมู่</span>
@@ -20,7 +20,7 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" @click="categoryStore.createCategoryDialog = false">ปิด</v-btn>
+        <v-btn color="blue darken-1" @click="closeDialog">ปิด</v-btn>
         <v-btn color="blue darken-1" @click="submitForm" :disabled="!valid">บันทึก</v-btn>
       </v-card-actions>
     </v-card>
@@ -45,6 +45,21 @@ const rules = {
   categoryName: (value: string) => /^[A-Za-zก-ฮะ-ๅๆ็่-๋์่-๋\s]+$/.test(value) || 'ชื่อหมวดหมู่ต้องไม่มีตัวเลขหรืออักขระพิเศษ',
 };
 
+const resetForm = () => {
+  if (form.value) {
+    form.value.reset();
+    form.value.resetValidation();
+  }
+  categoryName.value = '';
+  haveTopping.value = false;
+  valid.value = false;
+};
+
+const closeDialog = () => {
+  categoryStore.createCategoryDialog = false;
+  resetForm();
+};
+
 const submitForm = async () => {
   if (!form.value?.validate()) return;
 
@@ -66,6 +81,7 @@ const submitForm = async () => {
         confirmButton: 'swal-button'
       }
     });
+    resetForm();
   } catch (error) {
     console.error('Error creating category:', error);
     Swal.fire({
