@@ -22,7 +22,6 @@
               <p style="text-align: start">Date: {{ formattedDate }}</p>
               <p style="text-align: start">Time: {{ formattedTime }}</p>
             </div>
-
             <div class="dashed-line"></div>
           </div>
           <div class="receipt-body">
@@ -33,19 +32,19 @@
                   <p class="product-name">
                     {{ item.quantity }} x {{ item.product?.productName }} {{
                     item.product?.category.haveTopping ? item.productType?.productTypeName : '' }}
-                    
-                    <span style="font-weight: lighter;" v-if="item.product?.category.haveTopping==true" >({{ parseFloat(item.product?.productPrice+"")+parseFloat(item.productType?.productTypePrice!+'') }} ฿)</span>  
-                </p>
-
+                  </p>
                   <p class="product-price">{{ item.receiptSubTotal.toFixed(2) }} ฿</p>
                 </div>
               </div>
               <p class="toppings" v-if="item.product?.category.haveTopping">
                 ความหวาน {{ item.sweetnessLevel }}%
               </p>
-              <p v-if="item.productTypeToppings.length > 0" class="toppings">
+              <p v-if="item.productTypeToppings && item.productTypeToppings.length > 0 && item.product?.category.haveTopping" class="toppings">
                 <span v-for="topping in item.productTypeToppings" :key="topping.productTypeToppingId">
-                  {{ topping.quantity }}x {{ topping.topping.toppingName }}({{topping.topping.toppingPrice  }} ฿) <br>
+                  <span v-if="topping.topping">
+                    {{ topping.quantity }} x {{ topping.topping.toppingName }} 
+                    ({{ topping.topping.toppingPrice ? topping.topping.toppingPrice : 0 }} ฿) <br>
+                  </span>
                 </span>
               </p>
             </div>
@@ -61,7 +60,6 @@
                 <p> {{ promotion.discount }} ฿</p>
               </div>
             </div>
-
             <p class="total">
               Total:
               <span class="float-right">{{ posStore.currentReceipt?.receiptTotalPrice }} ฿</span>
@@ -89,6 +87,7 @@
     </v-card>
   </v-dialog>
 </template>
+
 
 <script lang="ts" setup>
 import { usePosStore } from '@/stores/pos.store';
