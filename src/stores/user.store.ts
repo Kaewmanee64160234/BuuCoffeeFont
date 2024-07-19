@@ -98,6 +98,21 @@ export const useUserStore = defineStore("user", () => {
     user.value = userToEdit;
   };
 
+  // getCurrentUser
+  const getCurrentUser = async () => {
+    try {
+    //  get user from local storage
+    const user = localStorage.getItem('user');
+    if (user) {
+      currentUser.value = JSON.parse(user);
+    }
+    }
+    catch (error) {
+      console.error('Error getting current user:', error);
+    }
+
+  };
+
   return {
     users,
     user,
@@ -112,6 +127,7 @@ export const useUserStore = defineStore("user", () => {
     currentUser,
     setUser, 
     getUser,
-    userRole
+    userRole,
+    getCurrentUser
   };
 });

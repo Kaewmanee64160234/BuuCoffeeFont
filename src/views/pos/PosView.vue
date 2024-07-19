@@ -28,19 +28,23 @@ const searchQuery = ref('');
 const barcode = ref('');
 
 onMounted(async () => {
+  // get user from local storage
+
   promotionStore.promotions = [];
   await productStore.getAllProducts();
   await categoryStore.getAllCategories();
   await toppingStore.getAllToppings();
   await customerStore.getAllCustomers();
+  userStore.getCurrentUser();
+
   
-  if (userStore.currentUser?.userRole === "พนักงานขายข้าว") {
-    promotionStore.getPromotionByType("ร้านกับข้าว");
+  if (userStore.currentUser?.userRole == "พนักงานขายข้าว") {
+    promotionStore.getPromotionByType("ร้านข้าว");
     selectedCategory.value = "กับข้าว";
     categoryStore.categoriesForCreate = categoryStore.categoriesForCreate.filter(category => !category.haveTopping);
     productFilters.value = productStore.products.filter(product => !product.category.haveTopping);
     promotionStore.promotions = promotionStore.promotions.filter(promotion => promotion.promotionForStore === "ร้านข้าว");
-  } else if( userStore.currentUser?.userRole === "พนักงานขายกาแฟ") {
+  } else if( userStore.currentUser?.userRole == "พนักงานขายกาแฟ") {
     promotionStore.getPromotionByType("ร้านกาแฟ");
     selectedCategory.value = "กาแฟ";
     const cateIndex = categoryStore.categoriesForCreate.findIndex(category => category.categoryName === "กับข้าว");
@@ -109,18 +113,17 @@ const addToCart = (product: Product) => {
 
 <template>
   <v-app style="width: 100vw; height: 100vh;">
+
     <v-row class="full-width-row" style="height: 100%;" :style="{ marginLeft: marginLeft }">
       <v-col cols="7" class="d-flex flex-column align-center" style="background-color: #C1B6A9; height: 100%;">
         <v-container fluid class="full-width-container" style="height: 100%;">
           <v-row class="full-width-row">
             <v-col cols="12" class="d-flex justify-center align-center">
+
               <promotion-cards-carousel></promotion-cards-carousel>
             </v-col>
           </v-row>
           <v-row class="full-width-row">
-            <!-- <v-col cols="12" md="6">
-              <v-text-field v-model="searchQuery" append-icon="mdi-magnify" label="ค้นหา" variant="solo" single-line hide-details></v-text-field>
-            </v-col> -->
             <v-col cols="12" md="6">
               <v-text-field v-model="barcode" append-icon="mdi-barcode" label="สแกนบาร์โค้ด" variant="solo" single-line hide-details @change="handleBarcodeInput"></v-text-field>
             </v-col>
@@ -144,7 +147,8 @@ const addToCart = (product: Product) => {
               </v-tabs>
             </v-col>
           </v-row>
-          <v-row class="full-width-row" style="flex: 1; overflow-y: auto;">
+
+          <v-row class="full-width-row product-list-container" style="flex: 1; overflow-y: auto;">
             <v-tabs-items v-model="selectedCategory" style="width: 100%;">
               <v-tab-item>
                 <v-container fluid class="full-width-container">
@@ -155,13 +159,16 @@ const addToCart = (product: Product) => {
                   </v-row>
                 </v-container>
               </v-tab-item>
+
             </v-tabs-items>
           </v-row>
+
           <drink-selection-dialog></drink-selection-dialog>
         </v-container>
       </v-col>
       <v-col cols="5" class="d-flex flex-column" style="margin: 0; padding: 10px; height: 100%;">
         <v-sheet style="height: 100%; display: flex; flex-direction: column;">
+      
           <selected-items-list style="flex: 1;"></selected-items-list>
         </v-sheet>
       </v-col>
@@ -170,12 +177,18 @@ const addToCart = (product: Product) => {
   </v-app>
 </template>
 
+
 <style scoped>
 .full-width-container,
 .full-width-row {
   width: 100%;
   margin: 0;
   padding: 0;
+}
+
+.product-list-container {
+  height: calc(100vh - 250px); /* Adjust based on the height of other elements */
+  overflow-y: auto;
 }
 
 .product-card {
@@ -204,5 +217,51 @@ const addToCart = (product: Product) => {
 
 .text-center {
   text-align: center;
+}
+
+/* Add scrollbar styles */
+.product-list-container::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.product-list-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.product-list-container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 6px;
+  border: 3px solid #f1f1f1;
+}
+
+.product-list-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Firefox */
+.product-list-container {
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f1f1f1;
+}
+
+/* Edge, IE 10+ */
+.product-list-container::-ms-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.product-list-container::-ms-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.product-list-container::-ms-scrollbar-thumb {
+  background: #888;
+  border-radius: 6px;
+  border: 3px solid #f1f1f1;
+}
+
+.product-list-container::-ms-scrollbar-thumb:hover {
+  background: #555;
 }
 </style>
