@@ -11,7 +11,13 @@ export const useReportFinnceStore = defineStore("cashier", () => {
   const sumType = ref<{ cash: string; qrcode: string }>({ cash: "", qrcode: "" });
   const topSellingProduct = ref<TopSellingProduct[]>([]);
   const dailyReport = ref<{ totalSales: number; totalDiscount: number ; totalTransactions: number}>({ totalSales: 0, totalDiscount: 0, totalTransactions:0});
+  const dailyReportFood = ref<{ totalSales: number; totalDiscount: number ; totalTransactions: number}>({ totalSales: 0, totalDiscount: 0, totalTransactions:0});
   const state = reactive({
+    groupedByDay: {},
+    groupedByMonth: {},
+    groupedByYear: {},
+  });
+  const stateFood = reactive({
     groupedByDay: {},
     groupedByMonth: {},
     groupedByYear: {},
@@ -69,7 +75,16 @@ export const useReportFinnceStore = defineStore("cashier", () => {
       const res = await financeService.getDailyReport();
       if (res.data) {
         dailyReport.value = res.data;
-        console.log(dailyReport.value)
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const getDailyReportFood = async () => {
+    try {
+      const res = await financeService.getDailyReportFood();
+      if (res.data) {
+        dailyReportFood.value = res.data;
       }
     } catch (error) {
       console.error(error);
@@ -82,6 +97,18 @@ export const useReportFinnceStore = defineStore("cashier", () => {
         state.groupedByDay = response.data.groupedByDay;
         state.groupedByMonth = response.data.groupedByMonth;
         state.groupedByYear = response.data.groupedByYear;
+      }
+    } catch (error) {
+      console.error("Error fetching grouped finance:", error);
+    }
+  };
+  const fetchGroupedFinanceFood = async (startDate: string, endDate: string) => {
+    try {
+      const response = await financeService.getGroupedFinanceFood(startDate, endDate);
+      if (response.data) {
+        stateFood.groupedByDay = response.data.groupedByDay;
+        stateFood.groupedByMonth = response.data.groupedByMonth;
+        stateFood.groupedByYear = response.data.groupedByYear;
       }
     } catch (error) {
       console.error("Error fetching grouped finance:", error);
@@ -104,7 +131,9 @@ export const useReportFinnceStore = defineStore("cashier", () => {
     historycashiers,
     sumType,
     dailyReport,
+    dailyReportFood,
     state,
+    stateFood,
     topSellingProduct,
     createCashier,
     getfindToday,
@@ -112,6 +141,8 @@ export const useReportFinnceStore = defineStore("cashier", () => {
     deleteCashier,
     getSumType,
     getDailyReport,
+    getDailyReportFood,
+    fetchGroupedFinanceFood,
     fetchGroupedFinance,
     getTopSellingProduct,
     
