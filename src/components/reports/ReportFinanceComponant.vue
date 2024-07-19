@@ -87,6 +87,7 @@ onMounted(async () => {
   await ReportFinnceStore.getfindToday();
   await ReportFinnceStore.getSumType();
   await ReportFinnceStore.getDailyReport();
+  await ReportFinnceStore.getDailyReportFood();
   await expenditureStore.fetchExpenditure();
   console.log(expenditureStore.totalExpenditureEndDate);
   await revenueStore.fetchRevenue();
@@ -207,68 +208,117 @@ const lineChartSeries = ref([
   <CreateDialogAddCashier/>
   <CreateHistoryDialogCashier/>
   <v-container>
+    <v-carousel hide-delimiter-background hide-delimiters height="300" style="background-color: #C7AE8D; border-radius: 20px;">
+      <v-carousel-item>
+        <v-card-title class="text-center">
+          <v-btn icon>
+                      <v-icon >mdi-coffee-maker</v-icon>
+                    </v-btn>  ยอดขายวันนี้ร้านกาแฟ
+                   
+                  </v-card-title>
+                  <v-row class="px-4">
+  <v-col cols="12" md="4">
+    <v-card>
+      <apexchart type="donut" :options="chartOptions" :series="chartSeries"></apexchart>
+    </v-card>
+  </v-col>
+  <v-col cols="12" md="8">
     <v-row>
-      <v-col cols="12" md="4">
+      <v-col cols="12" md="6" class="px-2">
         <v-card>
-          <apexchart type="donut" :options="chartOptions" :series="chartSeries"></apexchart>
+          <v-card-title class="d-flex justify-space-between align-center">
+            เงินในลิ้นชัก
+            <v-btn icon>
+              <v-icon @click="openHistoryDialog">mdi-eye</v-icon>
+            </v-btn>
+          </v-card-title>
+          <template v-if="ReportFinnceStore.cashiers !== null && Object.keys(ReportFinnceStore.cashiers).length !== 0">
+            <v-card-subtitle>
+              เงินต้น : {{ ReportFinnceStore.cashiers.cashierAmount }}
+              <span @click="deleteCashier(ReportFinnceStore.cashiers.cashierId)">
+                <v-icon>mdi-delete</v-icon>
+                <v-card-subtitle>ยอดรวมเงินสดวันนี้ :{{sum}}</v-card-subtitle>
+              </span>
+            </v-card-subtitle>
+          </template>
+          <template v-else>
+            <v-btn @click="openCreateDialog">กรอกจำนวนเงินวันนี้</v-btn>
+          </template>
         </v-card>
       </v-col>
-      <v-col cols="12" md="8">
-        <v-row>
-          <v-col cols="12" md="6">
-            <v-card>
-              <v-card-title class="d-flex justify-space-between align-center">
-                เงินในลิ้นชัก
-                <v-btn icon>
-                  <v-icon @click="openHistoryDialog">mdi-eye</v-icon>
-                </v-btn>
-              </v-card-title>
-              <template v-if="ReportFinnceStore.cashiers !== null && Object.keys(ReportFinnceStore.cashiers).length !== 0">
-                <v-card-subtitle>
-                  เงินต้น : {{ ReportFinnceStore.cashiers.cashierAmount }} 
-                  <span @click="deleteCashier(ReportFinnceStore.cashiers.cashierId)">
-                    <v-icon>mdi-delete</v-icon>
-                    <v-card-subtitle>ยอดรวมเงินสดวันนี้ :{{sum}}</v-card-subtitle>
-                  </span>
-                </v-card-subtitle>
-              </template>
-              <template v-else>
-                <v-btn @click="openCreateDialog">กรอกจำนวนเงินวันนี้</v-btn>
-              </template>
-         
-            </v-card>
-          </v-col>
-          <v-col cols="12" md="6">
-            <v-card>
-              <v-card-title class="d-flex justify-space-between align-center">
-                รายได้
-   
-              </v-card-title>
-              <v-card-subtitle class="text-h4">{{ ReportFinnceStore.dailyReport.totalSales }}</v-card-subtitle>
-            </v-card>
-          </v-col>
-          <v-col cols="12" md="6">
-            <v-card>
-              <v-card-title class="d-flex justify-space-between align-center">
-                จำนวนรายการ
-   
-              </v-card-title>
-              <v-card-subtitle class="text-h4">{{ ReportFinnceStore.dailyReport.totalTransactions }}</v-card-subtitle>
-            </v-card>
-          </v-col>
-          <v-col cols="12" md="6">
-            <v-card>
-              <v-card-title class="d-flex justify-space-between align-center">
-                ส่วนลด
-  
-              </v-card-title>
-              <v-card-subtitle class="text-h4">{{ ReportFinnceStore.dailyReport.totalDiscount }}</v-card-subtitle>
-   
-            </v-card>
-          </v-col>
-        </v-row>
+      <v-col cols="12" md="6" class="px-2">
+        <v-card>
+          <v-card-title class="d-flex justify-space-between align-center">
+            รายได้
+          </v-card-title>
+          <v-card-subtitle class="text-h4">{{ ReportFinnceStore.dailyReport.totalSales }}</v-card-subtitle>
+        </v-card>
+      </v-col>
+      <v-col cols="12" md="6" class="px-2">
+        <v-card>
+          <v-card-title class="d-flex justify-space-between align-center">
+            จำนวนรายการ
+          </v-card-title>
+          <v-card-subtitle class="text-h4">{{ ReportFinnceStore.dailyReport.totalTransactions }}</v-card-subtitle>
+        </v-card>
+      </v-col>
+      <v-col cols="12" md="6" class="px-2">
+        <v-card>
+          <v-card-title class="d-flex justify-space-between align-center">
+            ส่วนลด
+          </v-card-title>
+          <v-card-subtitle class="text-h4">{{ ReportFinnceStore.dailyReport.totalDiscount }}</v-card-subtitle>
+        </v-card>
       </v-col>
     </v-row>
+  </v-col>
+</v-row>
+
+      </v-carousel-item>
+      <v-carousel-item>
+        <v-card-title class="text-center">
+          <v-btn icon>
+                      <v-icon >mdi-pasta</v-icon>
+                    </v-btn>  ยอดขายวันนี้ร้านอาหาร                 
+                  </v-card-title>
+                  <v-row justify="center" no-gutters>
+    <v-col cols="12" md="8">
+      <v-row>
+        <v-col cols="12" md="4">
+          <v-card>
+            <v-card-title class="d-flex justify-space-between align-center">
+              รายได้
+            </v-card-title>
+            <v-card-subtitle class="text-h4">
+              {{ ReportFinnceStore.dailyReportFood.totalSales }}
+            </v-card-subtitle>
+          </v-card>
+        </v-col>
+        <v-col cols="12" md="4">
+          <v-card>
+            <v-card-title class="d-flex justify-space-between align-center">
+              จำนวนรายการ
+            </v-card-title>
+            <v-card-subtitle class="text-h4">
+              {{ ReportFinnceStore.dailyReportFood.totalTransactions }}
+            </v-card-subtitle>
+          </v-card>
+        </v-col>
+        <v-col cols="12" md="4">
+          <v-card>
+            <v-card-title class="d-flex justify-space-between align-center">
+              ส่วนลด
+            </v-card-title>
+            <v-card-subtitle class="text-h4">
+              {{ ReportFinnceStore.dailyReportFood.totalDiscount }}
+            </v-card-subtitle>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-col>
+  </v-row>
+      </v-carousel-item>
+    </v-carousel>
     <v-row>
       <v-col cols="12" md="4">
         <v-text-field
