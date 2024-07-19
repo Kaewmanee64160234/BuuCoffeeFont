@@ -37,17 +37,21 @@ onMounted(async () => {
   if (userStore.currentUser?.userRole === "พนักงานขายข้าว") {
     promotionStore.getPromotionByType("ร้านกับข้าว");
     selectedCategory.value = "กับข้าว";
-    const cate = categoryStore.categoriesForCreate.find(category => category.categoryName === "กับข้าว");
-    categoryStore.categoriesForCreate = [cate!];
-    productFilters.value = productStore.products.filter(product => product.category.categoryName.toLowerCase() === "กับข้าว".toLowerCase());
+    categoryStore.categoriesForCreate = categoryStore.categoriesForCreate.filter(category => !category.haveTopping);
+    productFilters.value = productStore.products.filter(product => !product.category.haveTopping);
     promotionStore.promotions = promotionStore.promotions.filter(promotion => promotion.promotionForStore === "ร้านข้าว");
-  } else {
+  } else if( userStore.currentUser?.userRole === "พนักงานขายกาแฟ") {
     promotionStore.getPromotionByType("ร้านกาแฟ");
     selectedCategory.value = "กาแฟ";
     const cateIndex = categoryStore.categoriesForCreate.findIndex(category => category.categoryName === "กับข้าว");
     if (cateIndex !== -1) categoryStore.categoriesForCreate.splice(cateIndex, 1);
     productFilters.value = productStore.products.filter(product => product.category.categoryName.toLowerCase() === "กาแฟ".toLowerCase());
     promotionStore.promotions = promotionStore.promotions.filter(promotion => promotion.promotionForStore === "ร้านกาแฟ");
+  }else{
+    promotionStore.getAllPromotions();
+    selectedCategory.value = categoryStore.categoriesForCreate[0].categoryName;
+    productFilters.value = productStore.products.filter(product => product.category.categoryName.toLowerCase() === selectedCategory.value.toLowerCase());
+
   }
 });
 
