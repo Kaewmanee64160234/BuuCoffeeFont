@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onMounted, computed , reactive} from 'vue';
+import { ref, onMounted, computed , watch} from 'vue';
 import VueApexCharts from 'vue3-apexcharts';
 import { useReportFinnceStore } from '@/stores/report/finance.store';
 import CreateDialogAddCashier from '../../components/reports/cashier/DialogAddCashier.vue';
@@ -241,6 +241,13 @@ const lineChartSeries2 = ref([
     data: []
   }
 ]);
+watch(
+  [dateRange, groupBy],
+  () => {
+    fetchGroupedFinance();
+  },
+  { immediate: true }
+);
 </script>
 
 <template>
@@ -357,6 +364,68 @@ const lineChartSeries2 = ref([
     </v-col>
   </v-row>
       </v-carousel-item>
+      <v-carousel-item>
+  <v-card-title class="text-center">
+    <v-btn icon>
+      <v-icon>mdi-chart-histogram</v-icon>
+    </v-btn>
+    กำไร & ต้นทุนร้านกาแฟ
+  </v-card-title>
+  <v-row justify="center" align="center" no-gutters>
+    <v-col cols="auto">
+      <div class="date-picker">
+        <input v-model="startDate" type="date" placeholder="Start Date" />
+        <input v-model="endDate" type="date" placeholder="End Date" />
+      </div>
+    </v-col>
+  </v-row>
+  <v-row justify="center" align="center">
+    <v-col cols="12" md="4">
+      <v-card class="d-flex justify-center align-center">
+        <v-card-title class="text-center">
+          ต้นทุน
+        </v-card-title>
+        <v-card-subtitle class="text-h4">
+          4000
+        </v-card-subtitle>
+      </v-card>
+    </v-col>
+    <v-col cols="12" md="4">
+      <v-card class="d-flex justify-center align-center">
+        <v-card-title class="text-center">
+          ยอดขาย
+        </v-card-title>
+        <v-card-subtitle class="text-h4">
+          5000
+        </v-card-subtitle>
+      </v-card>
+    </v-col>
+  </v-row>
+  <v-row justify="center" align="center">
+    <v-col cols="12" md="4">
+      <v-card class="d-flex justify-center align-center">
+        <v-card-title class="text-center">
+          ส่วนลด
+        </v-card-title>
+        <v-card-subtitle class="text-h4">
+          500
+        </v-card-subtitle>
+      </v-card>
+    </v-col>
+    <v-col cols="12" md="4">
+      <v-card class="d-flex justify-center align-center">
+        <v-card-title class="text-center">
+          จำนวนรายการ
+        </v-card-title>
+        <v-card-subtitle class="text-h4">
+          150
+        </v-card-subtitle>
+      </v-card>
+    </v-col>
+  </v-row>
+</v-carousel-item>
+
+
     </v-carousel>
     <v-row>
       <v-col cols="12" md="4">
@@ -380,19 +449,14 @@ const lineChartSeries2 = ref([
           v-model="groupBy"
         ></v-select>
       </v-col>
-      <v-col cols="12">
-        <v-btn @click="fetchGroupedFinance">อัปเดตกราฟ</v-btn>
-      </v-col>
     </v-row>
     <v-row>
       <v-col cols="6" md="6">
         <apexchart type="line" :options="lineChartOptions" :series="lineChartSeries"></apexchart>
-     </v-col>
-          
-    <v-col cols="6" md="6">
-      <apexchart type="line" :options="lineChartOptions2" :series="lineChartSeries2"></apexchart>
-    </v-col>
-
+      </v-col>
+      <v-col cols="6" md="6">
+        <apexchart type="line" :options="lineChartOptions2" :series="lineChartSeries2"></apexchart>
+      </v-col>
     </v-row>
   </v-container>
 </template>

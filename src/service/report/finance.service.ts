@@ -1,4 +1,6 @@
 import type { Cashier } from "@/types/report/cashier.type";
+import type { ProductUsage } from "@/types/report/productUsage.type";
+import axios, { AxiosError } from 'axios';
 import http from "../axios";
 
 async function getfindToday() {
@@ -36,6 +38,12 @@ function getGroupedFinance(startDate: string, endDate: string) {
 function getGroupedFinanceFood(startDate: string, endDate: string) {
   return http.get(`/receipts/grouped?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}&receiptType=${encodeURIComponent('ร้านข้าว')}`);
 }
+function getProductsUsage(startDate: string, endDate: string, receiptType: string) {
+  return http.get(`/receipts/products-usage?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}&receiptType=${encodeURIComponent(receiptType)}`);
+}
+function getIngradientsUsage(startDate: string, endDate: string) {
+  return http.get(`/receipts/ingredient-usage-report?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`);
+}
 function getTopSellingProducts(date: string) {
   return http.get(`/receipts/top-selling-products?date=${date}`);
 }
@@ -51,12 +59,14 @@ export default {
   createCashier,
   getAll,
   getDailyReport,
+  getProductsUsage,
   getDailyReportFood,
   getGroupedFinance,
   getSumType,
   deleteCashier,
   getRevenue,
   getExpenditure,
-  getTopSellingProducts
+  getTopSellingProducts,
+  getIngradientsUsage
 
 };
