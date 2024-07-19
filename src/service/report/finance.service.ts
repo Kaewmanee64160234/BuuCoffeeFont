@@ -31,7 +31,10 @@ function deleteCashier(id: number) {
   return http.delete(`/cashiers/${id}`);
 }
 function getGroupedFinance(startDate: string, endDate: string) {
-  return http.get(`/receipts/grouped?startDate=${startDate}&endDate=${endDate}`);
+  return http.get(`/receipts/grouped?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}&receiptType=${encodeURIComponent('ร้านกาแฟ')}`);
+}
+function getGroupedFinanceFood(startDate: string, endDate: string) {
+  return http.get(`/receipts/grouped?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}&receiptType=${encodeURIComponent('ร้านข้าว')}`);
 }
 function getTopSellingProducts(date: string) {
   return http.get(`/receipts/top-selling-products?date=${date}`);
@@ -44,6 +47,7 @@ function getExpenditure() {
 }
 export default {
   getfindToday,
+  getGroupedFinanceFood,
   createCashier,
   getAll,
   getDailyReport,

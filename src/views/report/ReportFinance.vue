@@ -29,8 +29,8 @@ function reloadData() {
               class="button-full-width"
               @click="showComponent('finance')"
             >
-              <v-icon left>mdi-filter</v-icon>
-              ยอดขาย
+              <v-icon left>mdi-finance </v-icon>
+               ยอดขาย
             </v-btn>
           </v-col>
           <v-col cols="auto">

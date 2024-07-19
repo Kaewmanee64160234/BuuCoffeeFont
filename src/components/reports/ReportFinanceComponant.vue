@@ -54,6 +54,7 @@ const dateRange = ref({
 });
 const groupBy = ref<'day' | 'month' | 'year'>('day');
 const updateLineChartData = () => {
+  // Update line chart data for store (ร้านกาแฟ)
   let groupedData;
   switch (groupBy.value) {
     case 'day':
@@ -78,52 +79,56 @@ const updateLineChartData = () => {
 
   lineChartSeries.value = [
     {
-      name: 'ยอดขาย',
+      name: 'ยอดขายร้านกาแฟ',
       data: data
     }
   ];
+
+  // Update line chart data for food (ข้าว)
+  let groupedDataFood;
+  switch (groupBy.value) {
+    case 'day':
+      groupedDataFood = ReportFinnceStore.stateFood.groupedByDay;
+      break;
+    case 'month':
+      groupedDataFood = ReportFinnceStore.stateFood.groupedByMonth;
+      break;
+    case 'year':
+      groupedDataFood = ReportFinnceStore.stateFood.groupedByYear;
+      break;
+  }
+  const categoriesFood = Object.keys(groupedDataFood);
+  const dataFood = Object.values(groupedDataFood);
+
+  lineChartOptions2.value = {
+    ...lineChartOptions2.value,
+    xaxis: {
+      categories: categoriesFood
+    }
+  };
+
+  lineChartSeries2.value = [
+    {
+      name: 'ยอดขายข้าว',
+      data: dataFood
+    }
+  ];
 };
+
 onMounted(async () => {
   await ReportFinnceStore.getfindToday();
   await ReportFinnceStore.getSumType();
-  await ReportFinnceStore.getDailyReport();
-  await ReportFinnceStore.getDailyReportFood();
+  await ReportFinnceStore.getDailyReport(); //ยอดขายรายวันของร้านกาแฟ
+  await ReportFinnceStore.getDailyReportFood(); //ยอดขายรายวันของข้าว
   await expenditureStore.fetchExpenditure();
-  console.log(expenditureStore.totalExpenditureEndDate);
   await revenueStore.fetchRevenue();
   await fetchGroupedFinance();
   updateChartData();
 });
-const formatDate = (dateString) => {
-  const dateObj = new Date(dateString);
-  return `${dateObj.getDate()}/${dateObj.getMonth() + 1}/${dateObj.getFullYear()}`;
-};
-const chartOptions2 = reactive({
-  chart: {
-    type: 'bar',
-    stacked: true,
-    height: 400,
-  },
-  xaxis: {
-    categories: [formatDate(expenditureStore.startDate), 'ช่วงการขาย', 'ช่วงการขาย', 'ช่วงการขาย', formatDate(expenditureStore.endDate)],
-  },
-  yaxis: {
-    title: {
-      text: 'จำนวนเงิน',
-    },
-  },
-});
-
-const chartSeries2 = reactive([
-  {
-    name: 'Series A',
-    data: [expenditureStore.totalExpenditureStartDate, 100, 120, 300, expenditureStore.totalExpenditureEndDate],
-    colors: ['#FF6384', '#36A2EB'] 
-  }
-]);
 
 const fetchGroupedFinance = async () => {
   await ReportFinnceStore.fetchGroupedFinance(dateRange.value.startDate, dateRange.value.endDate);
+  await ReportFinnceStore.fetchGroupedFinanceFood(dateRange.value.startDate, dateRange.value.endDate);
   updateLineChartData();
 };
 const sum = computed(() => {
@@ -183,7 +188,7 @@ const lineChartOptions = ref({
     curve: 'straight'
   },
   title: {
-    text: 'ยอดขาย',
+    text: 'ยอดขายร้านกาแฟ',
     align: 'center'
   },
   xaxis: {
@@ -198,7 +203,41 @@ const lineChartOptions = ref({
 
 const lineChartSeries = ref([
   {
-    name: 'ยอดขาย',
+    name: 'ยอดขายร้านกาแฟ',
+    data: []
+  }
+]);
+const lineChartOptions2 = ref({ 
+  chart: {
+    height: 350,
+    type: 'line',
+    zoom: {
+      enabled: false
+    }
+  },
+  dataLabels: {
+    enabled: false
+  },
+  stroke: {
+    curve: 'straight'
+  },
+  title: {
+    text: 'ยอดขายร้านข้าว',
+    align: 'center'
+  },
+  xaxis: {
+    categories: []
+  },
+  tooltip: {
+    x: {
+      format: 'dd/MM/yy HH:mm'
+    }
+  }
+});
+
+const lineChartSeries2 = ref([
+  {
+    name: 'ยอดขายข้าว',
     data: []
   }
 ]);
@@ -348,10 +387,10 @@ const lineChartSeries = ref([
     <v-row>
       <v-col cols="6" md="6">
         <apexchart type="line" :options="lineChartOptions" :series="lineChartSeries"></apexchart>
-      </v-col>
-      <v-col cols="6" md="6">
-      <apexchart :options="chartOptions2" :series="chartSeries2" height="400">
-      </apexchart>
+     </v-col>
+          
+    <v-col cols="6" md="6">
+      <apexchart type="line" :options="lineChartOptions2" :series="lineChartSeries2"></apexchart>
     </v-col>
 
     </v-row>
