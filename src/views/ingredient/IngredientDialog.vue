@@ -39,19 +39,7 @@ function cancel() {
   // ingredientRemining: 0;
   // ingredientImage: 'no_image.jpg';
   // imageFile: []; // เพิ่ม imageFile ตามที่ระบุใน interface
-  Swal.fire({
-    title: 'คุณแน่ใจหรือไม่?',
-    text: 'คุณต้องการยกเลิกการเพิ่มวัตถุดิบหรือไม่?',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'ใช่, ยกเลิก!',
-    cancelButtonText: 'ไม่, กลับไป!',
-  }).then((result) => {
-    if (result.isConfirmed) {
-      ingredientStore.dialog = false; // Ensure the dialog state is updated
-      Swal.fire('ยกเลิก', 'การเพิ่มวัตถุดิบถูกยกเลิก.', 'success');
-    }
-  });
+  
 }
 </script>
 
