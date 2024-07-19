@@ -37,8 +37,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="topping in toppingStore.toppings" :key="topping.toppingId" style="text-align: center;">
-              <td>{{ topping.toppingId }}</td>
+            <tr v-for="(topping,index) in toppingStore.toppings" :key="topping.toppingId" style="text-align: center;">
+              <td>{{index+1 }}</td>
               <td>{{ topping.toppingName }}</td>
               <td>{{ topping.toppingPrice }}</td>
               <td>

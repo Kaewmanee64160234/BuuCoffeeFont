@@ -6,11 +6,30 @@
 <script setup lang="ts">
 import MainMenu from '@/components/MainLayout.vue';
 import { useRouter } from 'vue-router';
-import { computed } from 'vue';
-const router = useRouter();
+import { computed, ref, onMounted } from 'vue';
+import { useUserStore } from './stores/user.store';
+import type { User } from './types/user.type';
 
+const router = useRouter();
+const userStore = useUserStore();
+const user = ref<User>({
+  userId: null,
+  name: null,
+  email: null,
+  token: null,
+
+});
 const showMainMenu = computed(() => {
-  return router.currentRoute.value.path !== '/login';
+  return user.value !== null && router.currentRoute.value.path !== '/login';
+});
+
+onMounted(() => {
+  const storedUser = localStorage.getItem('user'); // Get user from local storage
+  if (storedUser) {
+    user.value = JSON.parse(storedUser);
+    userStore.currentUser = user.value;
+    console.log('User from local storage:', user.value);
+  }
 });
 </script>
 
