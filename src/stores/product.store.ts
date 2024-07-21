@@ -24,6 +24,7 @@ export const useProductStore = defineStore("product", () => {
     productImage: "",
     countingPoint: false,
     barcode: "",
+    storeType: "",
 
 
     category: {
@@ -42,6 +43,8 @@ export const useProductStore = defineStore("product", () => {
     productPrice: 0,
     barcode: "",
     productImage: "",
+    storeType: "",
+
     countingPoint: false,
     category: {
       categoryId: 0,
@@ -192,13 +195,8 @@ export const useProductStore = defineStore("product", () => {
         editedProduct.value.productTypes !== product.value.productTypes;
       const countingPointChnage =
         editedProduct.value.countingPoint !== product.value.countingPoint;
-      console.log(countingPointChnage);
-      console.log("productNameChnage", productNameChnage);
-      console.log("productPriceChnage", productPriceChnage);
-      console.log("categoryChnage", categoryChnage);
-      console.log("productTypesChnage", productTypesChnage);
-      console.log("countingPointChnage", countingPointChnage);
-      console.log("updatedProduct", updatedProduct);
+        
+
       if (
         productNameChnage ||
         productPriceChnage ||

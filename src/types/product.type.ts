@@ -7,6 +7,7 @@ export interface Product {
   productImage: string;
   productPrice: number;
   countingPoint:boolean;
+  storeType: string;
   barcode:string;
   category: Category;
   productTypes?: ProductType[];
@@ -14,6 +15,7 @@ export interface Product {
 export function mapToProduct(data: any): Product {
   return {
     productId: data.productId,
+    storeType: data.storeType,
     productName: data.productName,
     productImage: data.productImage,
     productPrice: data.productPrice,
@@ -26,6 +28,7 @@ export function mapToProduct(data: any): Product {
         productTypeName: productType.productTypeName,
         productTypePrice: productType.productTypePrice,
         selectedIngredients: productType.selectedIngredients,
+        
         ingredientQuantities: productType.ingredientQuantities,
         product: productType.product,
         recipes: productType.recipes ? productType.recipes.map((recipe: any) => {
@@ -40,6 +43,7 @@ export function mapToProduct(data: any): Product {
               minimum: recipe.ingredient.ingredientMinimun,
               unit: recipe.ingredient.ingredientUnit,
               quantityInStock: recipe.ingredient.ingredientQuantityInStock,
+
               quantityPerUnit: recipe.ingredient.ingredientQuantityPerUnit,
             } : null,
           };
