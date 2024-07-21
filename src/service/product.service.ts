@@ -14,6 +14,8 @@ function createProduct(product: Product) {
     productImage: product.productImage,
     categoryId: product.category.categoryId,
     barcode:product.barcode,
+    storeType: product.storeType,
+    countingPoint:product.countingPoint,
     productTypes:
       product.productTypes?.length! > 0
         ? product.productTypes!.map((productType) => {

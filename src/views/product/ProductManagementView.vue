@@ -41,6 +41,10 @@ const loadProductData = () => {
   productStore.productPrice = product.productPrice || 0;
   productStore.selectedCategoryForUpdate = product.category?.categoryName || null;
   productStore.imagePreview = product.productImage ? `${url}/products/${product.productId}/image` : null;
+  productStore.barcode = product.barcode
+  productStore.storeName = product.storeType
+  productStore.countingPoint = product.countingPoint
+  
 
   if (product.productTypes && Array.isArray(product.productTypes)) {
     product.productTypes.forEach(productType => {
