@@ -355,6 +355,7 @@ const submitForm = async () => {
   if (isDrink.value) {
     if (productStore.selectedIngredientsHot.length > 0 && productStore.isHot) {
       productData.productTypes.push({
+        productTypeId: productStore.selectedIngredientsHot[0],
         productTypeName: 'ร้อน',
         productTypePrice: productStore.productTypePriceHot || 0,
         recipes: productStore.selectedIngredientsHot.map((ingredientId) => {
@@ -367,6 +368,7 @@ const submitForm = async () => {
     }
     if (productStore.selectedIngredientsCold.length > 0 && productStore.isCold) {
       productData.productTypes.push({
+        productTypeId: productStore.selectedIngredientsCold[0],
         productTypeName: 'เย็น',
         productTypePrice: productStore.productTypePriceCold || 0,
         recipes: productStore.selectedIngredientsCold.map((ingredientId) => {
@@ -379,6 +381,7 @@ const submitForm = async () => {
     }
     if (productStore.selectedIngredientsBlend.length > 0 && productStore.isBlend) {
       productData.productTypes.push({
+        productTypeId: productStore.selectedIngredientsBlend[0],
         productTypeName: 'ปั่น',
         productTypePrice: productStore.productTypePriceBlend || 0,
         recipes: productStore.selectedIngredientsBlend.map((ingredientId) => {
