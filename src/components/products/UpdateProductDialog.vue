@@ -56,7 +56,10 @@
                       <v-text-field variant="solo" v-model="productStore.editedProduct.barcode" label="บาร์โค้ด" />
                     </v-col>
                     <v-col cols="12" sm="6">
-                      <v-checkbox v-model="productStore.editedProduct.countingPoint" label="นับแต้ม" />
+                      <v-select v-model="productStore.storeName" :items="storeNames" label="เลือกชื่อร้าน" dense />
+                    </v-col>
+                    <v-col cols="12" sm="6">
+                      <v-checkbox v-model="productStore.countingPoint" label="นับแต้ม" />
                     </v-col>
                   </v-row>
                 </v-form>
@@ -183,9 +186,7 @@ interface CustomProductType extends ProductType {
 
 const form = ref(null);
 const valid = ref(false);
-const productName = ref('');
-const productPrice = ref(0);
-const barcode = ref(''); // New ref for barcode
+
 const productImage = ref(new File([], ''));
 const imagePreview = ref<string | null>(null);
 
@@ -195,7 +196,7 @@ const isDrink = ref(false);
 const productDetails = ref<CustomProductType[]>([]);
 const categoryStore = useCategoryStore();
 const ingredientStore = useIngredientStore();
-
+const storeNames = ['ร้านข้าว','ร้านกาแฟ']
 const e1 = ref(1);
 const searchQuery = ref('');
 
@@ -326,15 +327,6 @@ const handleBlendIngredientSelect = (ingredient: Ingredient) => {
   }
 };
 
-const loadProductData = () => {
-  const product = productStore.editedProduct;
-
-  productName.value = product.productName;
-  productPrice.value = product.productPrice;
-  barcode.value = product.barcode; // Load barcode value
-  productStore.selectedCategoryForUpdate = product.category.categoryName;
-  imagePreview.value = product.productImage ? `${import.meta.env.VITE_URL_PORT}/products/${product.productId}/image` : null;
-};
 
 const checkCategory = () => {
   const category = categoryStore.categories.find(c => c.categoryName === productStore.selectedCategoryForUpdate);
@@ -353,7 +345,8 @@ const submitForm = async () => {
     productPrice: productStore.editedProduct.productPrice,
     barcode: productStore.editedProduct.barcode,
     productImage: productStore.editedProduct.productImage,
-    countingPoint: productStore.editedProduct.countingPoint,
+    storeType: productStore.storeName,
+    countingPoint: productStore.countingPoint,
     categoryId: categoryStore.categoriesForCreate.find(category => category.categoryName === productStore.selectedCategoryForUpdate)?.categoryId || null,
     productTypes: [] as ProductType[],
     category: categoryStore.categoriesForCreate.find(category => category.categoryName === productStore.selectedCategoryForUpdate) || { categoryId: 0, categoryName: '' }
@@ -462,30 +455,11 @@ const showSuccessDialog = (message: string) => {
   });
 };
 
-function next() {
-  console.log("Current Step (before next):", e1.value);
-  const maxStep = computedSteps.value.length + 2; // +2 because step 1 is Product Details and step 2 is Select Product Type
-  if (e1.value < maxStep) {
-    e1.value++;
-    searchQuery.value = ''; // Reset search query when clicking next
-  }
-  console.log("Current Step (after next):", e1.value);
-}
 
-function prev() {
-  console.log("Current Step (before prev):", e1.value);
-  if (e1.value > 1) {
-    e1.value--;
-  }
-  console.log("Current Step (after prev):", e1.value);
-}
 
 const disabled = computed(() => {
   return e1.value === 1 ? 'prev' : e1.value === computedSteps.value.length + 2 ? 'next' : undefined;
 });
 
-const getProductType = (typeName: string): CustomProductType => {
-  const pddt = productStore.productTypes.find(pt => pt.productTypeName === typeName) as CustomProductType;
-  return pddt;
-};
+
 </script>

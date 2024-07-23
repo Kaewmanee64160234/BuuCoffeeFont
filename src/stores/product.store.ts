@@ -24,8 +24,7 @@ export const useProductStore = defineStore("product", () => {
     productImage: "",
     countingPoint: false,
     barcode: "",
-
-
+    storeType: "",
     category: {
       categoryId: 0,
       categoryName: "",
@@ -42,6 +41,8 @@ export const useProductStore = defineStore("product", () => {
     productPrice: 0,
     barcode: "",
     productImage: "",
+    storeType: "",
+
     countingPoint: false,
     category: {
       categoryId: 0,
@@ -57,6 +58,7 @@ export const useProductStore = defineStore("product", () => {
   const selectedCategory = ref<string | null>(null);
   const selectedCategoryForUpdate = ref<string | null>(null);
   const imagePreview = ref<string | null>(null);
+  const countingPoint = ref(false);
 
   const selectedIngredientsHot = ref<number[]>([]);
   const selectedIngredientsCold = ref<number[]>([]);
@@ -73,6 +75,7 @@ export const useProductStore = defineStore("product", () => {
   const isBlend = ref<boolean>(false);
   const selectedProduct = ref<Product>();
   const barcode = ref("");
+  const storeName = ref("");
 
   const totalProducts = ref(0);
   const currentPage = ref(1);
@@ -169,51 +172,52 @@ export const useProductStore = defineStore("product", () => {
   const updateProduct = async (id: number, updatedProduct_: Product) => {
     try {
       await getProductById(id);
-      // map data new data and old data
+      // map new data and old data
       const updatedProduct = {
         ...product.value,
         ...editedProduct.value,
       };
-
-      if (updatedProduct.file !== null) {
+  
+      // Check if there is a new file before attempting to update the image
+      if (editedProduct.value.file && editedProduct.value.file.name) {
         const formData = new FormData();
         formData.append("file", editedProduct.value.file);
         await updateImageProduct(id, formData);
       }
-      // update if data have chnage
-      const productNameChnage =
+  
+      // Check for changes in various fields
+      const productNameChanged =
         editedProduct.value.productName !== product.value.productName;
-      const productPriceChnage =
+      const productPriceChanged =
         editedProduct.value.productPrice !== product.value.productPrice;
-      const categoryChnage =
-        editedProduct.value.category.categoryName !==
-        product.value.category.categoryName;
-      const productTypesChnage =
-        editedProduct.value.productTypes !== product.value.productTypes;
-      const countingPointChnage =
+      const categoryChanged =
+        editedProduct.value.category.categoryName !== product.value.category.categoryName;
+      const productTypesChanged =
+        JSON.stringify(editedProduct.value.productTypes) !== JSON.stringify(product.value.productTypes);
+      const countingPointChanged =
         editedProduct.value.countingPoint !== product.value.countingPoint;
-      console.log(countingPointChnage);
-      console.log("productNameChnage", productNameChnage);
-      console.log("productPriceChnage", productPriceChnage);
-      console.log("categoryChnage", categoryChnage);
-      console.log("productTypesChnage", productTypesChnage);
-      console.log("countingPointChnage", countingPointChnage);
-      console.log("updatedProduct", updatedProduct);
+      const storeTypeChanged = 
+        editedProduct.value.storeType !== product.value.storeType;
+  
+      // Update only if there are changes
       if (
-        productNameChnage ||
-        productPriceChnage ||
-        categoryChnage ||
-        productTypesChnage ||
-        countingPointChnage
+        productNameChanged ||
+        productPriceChanged ||
+        categoryChanged ||
+        productTypesChanged ||
+        countingPointChanged ||
+        storeTypeChanged
       ) {
         const response = await productService.updateProduct(id, updatedProduct);
         console.log("updateProduct", response.status);
       }
+  
       await getProductPaginate();
     } catch (error) {
       console.error(error);
     }
   };
+  
 
   const deleteProduct = async (id: number) => {
     try {
@@ -303,6 +307,8 @@ export const useProductStore = defineStore("product", () => {
     productTypePriceHot,
     productTypePriceCold,
     productTypePriceBlend,
-    barcode
+    barcode,
+    storeName,
+    countingPoint
   };
 });
