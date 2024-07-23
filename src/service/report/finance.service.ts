@@ -26,6 +26,9 @@ function getDailyReport() {
 function getDailyReportFood() {
   return http.get("/receipts/daily-report?receiptType=ร้านข้าว");
 }
+function getcoffeeSummary() {
+  return http.get("/receipts/coffee-summary");
+}
 function getSumType() {
   return http.get("/receipts/sum");
 }
@@ -61,6 +64,7 @@ export default {
   getDailyReport,
   getProductsUsage,
   getDailyReportFood,
+  getcoffeeSummary,
   getGroupedFinance,
   getSumType,
   deleteCashier,

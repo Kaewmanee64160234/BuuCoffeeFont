@@ -120,6 +120,7 @@ onMounted(async () => {
   await ReportFinnceStore.getSumType();
   await ReportFinnceStore.getDailyReport(); //ยอดขายรายวันของร้านกาแฟ
   await ReportFinnceStore.getDailyReportFood(); //ยอดขายรายวันของข้าว
+  await ReportFinnceStore.getcoffeeSummary();
   await expenditureStore.fetchExpenditure();
   await revenueStore.fetchRevenue();
   await fetchGroupedFinance();
@@ -386,7 +387,7 @@ watch(
           ต้นทุน
         </v-card-title>
         <v-card-subtitle class="text-h4">
-          4000
+          {{ ReportFinnceStore.coffeeSummary.totalCost }}
         </v-card-subtitle>
       </v-card>
     </v-col>
@@ -396,7 +397,7 @@ watch(
           ยอดขาย
         </v-card-title>
         <v-card-subtitle class="text-h4">
-          5000
+          {{ ReportFinnceStore.coffeeSummary.totalSales }}
         </v-card-subtitle>
       </v-card>
     </v-col>
@@ -408,7 +409,7 @@ watch(
           ส่วนลด
         </v-card-title>
         <v-card-subtitle class="text-h4">
-          500
+          {{ ReportFinnceStore.coffeeSummary.totalDiscount }}
         </v-card-subtitle>
       </v-card>
     </v-col>
@@ -418,7 +419,7 @@ watch(
           จำนวนรายการ
         </v-card-title>
         <v-card-subtitle class="text-h4">
-          150
+          {{ ReportFinnceStore.coffeeSummary.totalOrders }}
         </v-card-subtitle>
       </v-card>
     </v-col>
