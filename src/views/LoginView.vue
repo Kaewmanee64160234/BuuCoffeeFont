@@ -9,14 +9,14 @@
           <v-text-field
             v-model="email"
             :rules="emailRules"
-            label="Email"
+            label="อีเมลผู้ใช้งาน"
             required
           ></v-text-field>
           <v-text-field
             v-model="password"
             :rules="passwordRules"
             :type="show ? 'text' : 'password'"
-            label="Password"
+            label="รหัสผ่าน"
             required
             :append-inner-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
             @click:append-inner="show = !show"
