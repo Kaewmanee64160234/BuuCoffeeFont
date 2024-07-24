@@ -10,5 +10,4 @@ export interface Ingredient {
   ingredientQuantityPerUnit?: number;
   ingredientQuantityPerSubUnit?: string;
   ingredientRemining?: number; 
-  imageFile: File[]; 
 }

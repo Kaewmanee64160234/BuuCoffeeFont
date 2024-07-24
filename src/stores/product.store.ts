@@ -171,8 +171,10 @@ export const useProductStore = defineStore("product", () => {
         if (product.value.file !== null) {
           await uploadImage(product.value.file, response.data.productId);
         }
-        await getProductPaginate();
+        window.location.reload();
       }
+      await getProductPaginate();
+
     } catch (error) {
       console.error(error);
     }

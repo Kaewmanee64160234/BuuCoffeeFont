@@ -38,7 +38,9 @@ function createCheckIngredients(ingredient: {
   return http.post("/checkingredients", ingredient);
 }
 
-async function saveIngredient(ingredient: Ingredient & { imageFile: File[] }) {
+async function saveIngredient(ingredient: Ingredient & { imageFile: File }) {
+  console.log("Image file', " + JSON.stringify(ingredient));
+  
   const formData = new FormData();
   formData.append('ingredientName', ingredient.ingredientName || '');
   formData.append('ingredientSupplier', ingredient.ingredientSupplier || '');
@@ -47,8 +49,8 @@ async function saveIngredient(ingredient: Ingredient & { imageFile: File[] }) {
   formData.append('ingredientQuantityPerUnit', `${ingredient.ingredientQuantityPerUnit || 0}`);
   formData.append('ingredientQuantityPerSubUnit', ingredient.ingredientQuantityPerSubUnit || '');
 
-  if (ingredient.imageFile && ingredient.imageFile.length > 0) {
-    formData.append('ingredientImages', ingredient.imageFile[0]);
+  if (ingredient.imageFile) {
+    formData.append('imageFile', ingredient.imageFile, ingredient.imageFile.name);
   }
 
   return http.post("/ingredients", formData, {
