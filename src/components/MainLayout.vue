@@ -16,22 +16,27 @@
           ></v-btn>
         </template>
       </v-list-item>
-      <v-list-item-title>ยินดีต้อนรับ คุณ {{ userStore.currentUser.userName }}</v-list-item-title>
+      <v-list-item-title v-if="!rail" class="username">ยินดีต้อนรับ คุณ {{ userStore.currentUser.userName }}</v-list-item-title>
       <v-list density="compact" nav>
         <v-list-item to="/report">
           <template v-slot:prepend>
             <img src="../../src/components/img/dashboard.png" alt="Report" class="nav-icon" />
           </template>
-          Report
+          รายงาน
         </v-list-item>
 
         <v-list-item to="/pos">
           <template v-slot:prepend>
             <img src="../../src/components/img/store.png" alt="POS" class="nav-icon" />
           </template>
-          POS
+          ระบบขาย
         </v-list-item>
-
+        <v-list-item to="/historyReceipt">
+          <template v-slot:prepend>
+            <img src="../../src/components/img/receipt.png" alt="History Receipt" class="nav-icon" />
+          </template>
+          ประวัติการขาย
+        </v-list-item>
         <v-list-item to="/productsManagement">
           <template v-slot:prepend>
             <img src="../../src/components/img/product.png" alt="Products Management" class="nav-icon" />
@@ -74,12 +79,7 @@
           Topping Management
         </v-list-item>
 
-        <v-list-item to="/historyReceipt">
-          <template v-slot:prepend>
-            <img src="../../src/components/img/receipt.png" alt="History Receipt" class="nav-icon" />
-          </template>
-          History Receipt
-        </v-list-item>
+       
 
         <v-list-item to="/ingredientList">
           <template v-slot:prepend>

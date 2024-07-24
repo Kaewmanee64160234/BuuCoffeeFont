@@ -18,42 +18,46 @@ function reloadData() {
   <v-container>
     <v-card>
       <v-card-title>
-        <v-row class="d-flex align-center justify-space-between">
-          <v-col cols="auto">
-            <h3>Dashboard</h3>
-          </v-col>
-          
-          <v-col cols="auto">
-            <v-btn
-              color="success"
-              class="button-full-width"
-              @click="showComponent('finance')"
-            >
-              <v-icon left>mdi-finance </v-icon>
-               ยอดขาย
-            </v-btn>
-          </v-col>
-          <v-col cols="auto">
-            <v-btn
-              color="success"
-              class="button-full-width"
-              @click="showComponent('ingredient')"
-            >
-              <v-icon left>mdi-filter</v-icon>
-              วัสถุดิบ
-            </v-btn>
-          </v-col>
-          <v-col cols="auto">
-            <v-btn
-              color="success"
-              class="button-full-width"
-              @click="showComponent('product')"
-            >
-              <v-icon left>mdi-filter</v-icon>
-              สินค้า
-            </v-btn>
+        <v-row>
+          <v-col cols="9" style="padding: 20px;">
+          <h3>Dashboard</h3>
           </v-col>
         </v-row>
+        <v-row>
+  <v-col cols="4">
+    <v-btn
+      color="success"
+      class="button-full-width"
+      block
+      @click="showComponent('finance')"
+    >
+    <v-icon left size="30">mdi-store</v-icon>
+      รายงานยอดขาย
+    </v-btn>
+  </v-col>
+  <v-col cols="4">
+    <v-btn
+      color="success"
+      class="button-full-width"
+      block
+      @click="showComponent('ingredient')"
+    >
+      <v-icon left size="25">mdi-cart-arrow-down</v-icon>
+      รายงานวัตถุดิบ
+    </v-btn>
+  </v-col>
+  <v-col cols="4">
+    <v-btn
+      color="success"
+      class="button-full-width"
+      block
+      @click="showComponent('product')"
+    >
+      <v-icon left size="25">mdi-cart-percent</v-icon>
+      รายงานสินค้า และ โปรโมชั่น
+    </v-btn>
+  </v-col>
+</v-row> 
       </v-card-title>
 
       <v-card-text>
