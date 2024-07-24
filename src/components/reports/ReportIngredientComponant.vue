@@ -108,35 +108,43 @@ onMounted(async () => {
 
 
 const ingredientsUsage = computed(() => productUsageStore.ingredientsUsage);
-
+const sortedIngredients = computed(() => {
+  return ingredientStore.ingredientlow.slice().sort((a, b) => a.ingredientQuantityInStock - b.ingredientQuantityInStock);
+});
 </script>
 <template>
-       <div class="section">
-        <h2>วัตถุดิบเหลือน้อย</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>ลำดับ</th>
-              <th>ชื่อ</th>
-              <th>ผู้จัดหา</th>
-              <th>จำนวน</th>
-            </tr>
-          </thead>
-          <tbody>
-          <tr v-for="(item, index) in ingredientStore.ingredientlow" :key="index">
+     <div class="section">
+      <h2>วัตถุดิบเหลือน้อย</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ลำดับ</th>
+            <th>ชื่อ</th>
+            <th>ผู้จัดหา</th>
+            <th>จำนวน</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(item, index) in sortedIngredients" :key="index" :class="{'negative-quantity': item.ingredientQuantityInStock < 0}">
             <td>{{ index + 1 }}</td>
             <td>{{ item.ingredientName }}</td>
             <td>{{ item.ingredientSupplier }}</td>
-         <td>{{ item.ingredientQuantityInStock }}</td>
+            <td>
+              {{ item.ingredientQuantityInStock }}
+              <span v-if="item.ingredientQuantityInStock < 0" class="reminder" style="color: red;"><v-icon left>mdi-alert</v-icon>
+  "อย่าลืม import สินค้าเข้า"
+</span>
+
+            </td>
           </tr>
         </tbody>
-        <tbody v-if="!ingredientStore.ingredientlow.length">
+        <tbody v-if="!sortedIngredients.length">
           <tr>
-            <td colspan="9" class="text-center">No data</td>
+            <td colspan="4" class="text-center">No data</td>
           </tr>
         </tbody>
-        </table>
-      </div>
+      </table>
+    </div>
       <v-carousel hide-delimiter-background hide-delimiters style="border-radius: 20px;">
       <!-- Slide 1: Import Data -->
       <v-carousel-item>
