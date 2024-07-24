@@ -43,16 +43,12 @@
                       <v-text-field variant="solo" v-model="productPrice" label="ราคา" type="number" :rules="priceRules" required />
                     </v-col>
                     <v-col cols="12" sm="6">
-<<<<<<< HEAD
-                      <v-select v-model="selectedCategory" :items="categoryStore.categories.map(category => category.categoryName)" label="เลือกหมวดหมู่" dense :rules="categoryRules" @change="checkCategory" />
-                    </v-col>
-=======
+
                       <v-select v-model="productStore.product.category.categoryName"
                         :items="categoryStore.categoriesForCreate.map(category => category.categoryName)"
                         label="เลือกหมวดหมู่" dense @change="checkCategory" />
                     </v-col>
 
->>>>>>> fa868b65f1cc6fed5b750c093a8c04558efa2a44
                     <v-col cols="12" sm="6">
                       <v-text-field variant="solo" v-model="barcode" label="บาร์โค้ด" />
                     </v-col>
@@ -86,12 +82,7 @@
                     <v-row>
                       <v-col cols="12">
                         <v-subheader>{{ step.label }}</v-subheader>
-<<<<<<< HEAD
-                        <v-text-field variant="solo" v-model="getProductType(step.label).productTypePrice" label="ราคาประเภทสินค้า" type="number" :rules="productTypePriceRules" required />
-                      </v-col>
-                      <v-col cols="12">
-                        <v-text-field variant="solo" v-model="searchQuery" label="ค้นหาวัตถุดิบ" prepend-icon="mdi-magnify" />
-=======
+
                         <v-text-field variant="solo" v-model="getProductType(step.label).productTypePrice"
                           label="ราคาประเภทสินค้า" type="number" required />
                       </v-col>
@@ -99,7 +90,6 @@
                         <!-- Search bar for filtering ingredients -->
                         <v-text-field variant="solo" v-model="searchQuery" label="ค้นหาวัตถุดิบ"
                           prepend-icon="mdi-magnify" />
->>>>>>> fa868b65f1cc6fed5b750c093a8c04558efa2a44
                       </v-col>
                       <v-col cols="12">
                         <v-table>
@@ -134,11 +124,7 @@
                               </td>
                               <td>{{ ingredient.ingredientName }}</td>
                               <td>
-<<<<<<< HEAD
-                                <v-text-field variant="solo" v-if="step.label === 'ร้อน' && selectedIngredientsHot.includes(ingredient.ingredientId)" v-model="ingredientQuantitiesHot[ingredient.ingredientId]" type="number" min="0" label="จำนวน" :rules="productNumberRules" />
-                                <v-text-field variant="solo" v-if="step.label === 'เย็น' && selectedIngredientsCold.includes(ingredient.ingredientId)" v-model="ingredientQuantitiesCold[ingredient.ingredientId]" type="number" min="0" label="จำนวน" :rules="productNumberRules" />
-                                <v-text-field variant="solo" v-if="step.label === 'ปั่น' && selectedIngredientsBlend.includes(ingredient.ingredientId)" v-model="ingredientQuantitiesBlend[ingredient.ingredientId]" type="number" min="0" label="จำนวน" :rules="productNumberRules" />
-=======
+
                                 <v-text-field variant="solo"
                                   v-if="step.label === 'ร้อน' && selectedIngredientsHot.includes(ingredient.ingredientId)"
                                   v-model="ingredientQuantitiesHot[ingredient.ingredientId]" type="number" min="0"
@@ -151,7 +137,6 @@
                                   v-if="step.label === 'ปั่น' && selectedIngredientsBlend.includes(ingredient.ingredientId)"
                                   v-model="ingredientQuantitiesBlend[ingredient.ingredientId]" type="number" min="0"
                                   label="จำนวน" />
->>>>>>> fa868b65f1cc6fed5b750c093a8c04558efa2a44
                               </td>
                               <td>{{ ingredient.ingredientQuantityPerSubUnit }}</td>
                             </tr>
