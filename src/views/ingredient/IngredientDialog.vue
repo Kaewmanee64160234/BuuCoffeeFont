@@ -26,19 +26,24 @@ async function save() {
     try {
       console.log(ingredientStore.editedIngredient.file);
       await ingredientStore.saveIngredient();
+     
+      ingredientStore.dialog = false;
       Swal.fire({
         title: 'สำเร็จ',
         text: 'วัตถุดิบถูกบันทึกเรียบร้อยแล้ว!',
         icon: 'success',
         confirmButtonText: 'ตกลง'
+      }).then(() => {
+        window.location.reload();
+
       });
-      ingredientStore.dialog = false;
       imagePreview.value = null;
     } catch (error) {
       console.error('Error saving ingredient:', error);
       Swal.fire('เกิดข้อผิดพลาด', 'เกิดข้อผิดพลาดขณะบันทึกวัตถุดิบ.', 'error');
     }
   }
+
 }
 
 function cancel() {
@@ -60,8 +65,8 @@ function cancel() {
               <v-col cols="12" sm="12" class="d-flex justify-center align-center">
                 <v-img v-if="imagePreview" :src="imagePreview" width="200" height="200" class="rounded-card"></v-img>
                 <v-img v-else-if="ingredientStore.editedIngredient.ingredientId"
-                  :src="`http://localhost:3000/ingredients/${ingredientStore.editedIngredient.ingredientId}/image`" width="200" height="200"
-                  class="rounded-card"></v-img>
+                  :src="`http://localhost:3000/ingredients/${ingredientStore.editedIngredient.ingredientId}/image`"
+                  width="200" height="200" class="rounded-card"></v-img>
                 <v-img v-else src="https://via.placeholder.com/200" width="200" height="200"
                   class="rounded-card"></v-img>
               </v-col>

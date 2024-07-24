@@ -210,7 +210,10 @@ export const useIngredientStore = defineStore("ingredient", () => {
       if (editedIngredient.value.ingredientId) {
         res = await ingredientService.updateIngredient(
           editedIngredient.value.ingredientId,
-          editedIngredient.value
+          {
+            ...editedIngredient.value,
+            imageFile: editedIngredient.value.file,
+          }
         );
       } else {
         res = await ingredientService.saveIngredient(
@@ -222,6 +225,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
         );
       }
       dialog.value = false; // ปิด dialog หลังจากบันทึกข้อมูลเสร็จสิ้น
+      window.location.reload();
       await getAllIngredients(); // Refresh ingredient list after save
     } catch (e) {
       console.log(e);
