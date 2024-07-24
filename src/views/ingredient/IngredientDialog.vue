@@ -59,6 +59,9 @@ function cancel() {
             <v-row>
               <v-col cols="12" sm="12" class="d-flex justify-center align-center">
                 <v-img v-if="imagePreview" :src="imagePreview" width="200" height="200" class="rounded-card"></v-img>
+                <v-img v-else-if="ingredientStore.editedIngredient.ingredientId"
+                  :src="`http://localhost:3000/ingredients/${ingredientStore.editedIngredient.ingredientId}/image`" width="200" height="200"
+                  class="rounded-card"></v-img>
                 <v-img v-else src="https://via.placeholder.com/200" width="200" height="200"
                   class="rounded-card"></v-img>
               </v-col>
