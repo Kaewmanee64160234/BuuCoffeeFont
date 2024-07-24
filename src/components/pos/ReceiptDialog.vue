@@ -40,7 +40,9 @@
                 ความหวาน {{ item.sweetnessLevel }}%
               </p>
               <p v-if="item.productTypeToppings && item.productTypeToppings.length > 0 && item.product?.category.haveTopping" class="toppings">
+
                 <span v-for="topping in item.productTypeToppings" :key="topping.productTypeToppingId">
+                 
                   <span v-if="topping.topping">
                     {{ topping.quantity }} x {{ topping.topping.toppingName }} 
                     ({{ topping.topping.toppingPrice ? topping.topping.toppingPrice : 0 }} ฿) <br>

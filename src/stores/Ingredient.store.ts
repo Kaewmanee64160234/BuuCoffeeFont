@@ -16,7 +16,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
   const search = ref<string>("");
   const dialog = ref(false); // สถานะของ Dialog
   const dialogImportItem = ref(false);
-  const editedIngredient = ref<Ingredient>({
+  const editedIngredient = ref<Ingredient & { file: File }>({
     ingredientName: '',
     ingredientSupplier: '',
     ingredientMinimun: 0,
@@ -26,7 +26,8 @@ export const useIngredientStore = defineStore("ingredient", () => {
     ingredientQuantityPerSubUnit: '',
     ingredientRemining: 0,
     ingredientImage: 'no_image.jpg',
-    imageFile: [], // เพิ่ม imageFile ตามที่ระบุใน interface
+    file: new File([""], "filename"),
+
   });
   
   watch(dialog, (newDialog, oldDialog) => {
@@ -41,7 +42,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
         ingredientQuantityPerSubUnit: '',
         ingredientRemining: 0,
         ingredientImage: 'no_image.jpg',
-        imageFile: [], // เพิ่ม imageFile ตามที่ระบุใน interface
+        file: new File([""], "filename"),
       };
     }
   });
@@ -203,19 +204,28 @@ export const useIngredientStore = defineStore("ingredient", () => {
   // }
   async function saveIngredient() {
     loadingStore.isLoading = true;
+    
     try {
       let res;
       if (editedIngredient.value.ingredientId) {
         res = await ingredientService.updateIngredient(
           editedIngredient.value.ingredientId,
-          editedIngredient.value
+          {
+            ...editedIngredient.value,
+            imageFile: editedIngredient.value.file,
+          }
         );
       } else {
         res = await ingredientService.saveIngredient(
-          editedIngredient.value
+          {
+            ...editedIngredient.value,
+            imageFile: editedIngredient.value.file,
+
+          }
         );
       }
       dialog.value = false; // ปิด dialog หลังจากบันทึกข้อมูลเสร็จสิ้น
+      window.location.reload();
       await getAllIngredients(); // Refresh ingredient list after save
     } catch (e) {
       console.log(e);

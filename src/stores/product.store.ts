@@ -32,7 +32,16 @@ export const useProductStore = defineStore("product", () => {
       haveTopping: false,
     },
     file: new File([""], "filename"),
-    productTypes: [],
+    productTypes: [
+      {
+        productTypeId: 0,
+        productTypeName: "",
+        productTypePrice: 0,
+        selectedIngredients: [],
+        ingredientQuantities: {},
+       
+      }
+    ],
   });
 
   const product = ref<Product & { file: File }>({
@@ -162,8 +171,10 @@ export const useProductStore = defineStore("product", () => {
         if (product.value.file !== null) {
           await uploadImage(product.value.file, response.data.productId);
         }
-        await getProductPaginate();
+        window.location.reload();
       }
+      await getProductPaginate();
+
     } catch (error) {
       console.error(error);
     }
@@ -208,6 +219,7 @@ export const useProductStore = defineStore("product", () => {
         countingPointChanged ||
         storeTypeChanged
       ) {
+        console.log(JSON.stringify(updatedProduct));
         const response = await productService.updateProduct(id, updatedProduct);
         console.log("updateProduct", response.status);
       }

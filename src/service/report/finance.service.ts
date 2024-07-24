@@ -26,6 +26,9 @@ function getDailyReport() {
 function getDailyReportFood() {
   return http.get("/receipts/daily-report?receiptType=ร้านข้าว");
 }
+function getcoffeeSummary() {
+  return http.get("/receipts/coffee-summary");
+}
 function getSumType() {
   return http.get("/receipts/sum");
 }
@@ -44,6 +47,9 @@ function getProductsUsage(startDate: string, endDate: string, receiptType: strin
 function getIngradientsUsage(startDate: string, endDate: string) {
   return http.get(`/receipts/ingredient-usage-report?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`);
 }
+function getPromotionsUsage(startDate: string, endDate: string) {
+  return http.get(`/promotions/usage?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`);
+}
 function getTopSellingProducts(date: string) {
   return http.get(`/receipts/top-selling-products?date=${date}`);
 }
@@ -56,11 +62,13 @@ function getExpenditure() {
 export default {
   getfindToday,
   getGroupedFinanceFood,
+  getPromotionsUsage,
   createCashier,
   getAll,
   getDailyReport,
   getProductsUsage,
   getDailyReportFood,
+  getcoffeeSummary,
   getGroupedFinance,
   getSumType,
   deleteCashier,

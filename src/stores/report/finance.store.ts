@@ -11,6 +11,7 @@ export const useReportFinnceStore = defineStore("cashier", () => {
   const sumType = ref<{ cash: string; qrcode: string }>({ cash: "", qrcode: "" });
   const topSellingProduct = ref<TopSellingProduct[]>([]);
   const dailyReport = ref<{ totalSales: number; totalDiscount: number ; totalTransactions: number}>({ totalSales: 0, totalDiscount: 0, totalTransactions:0});
+  const coffeeSummary = ref<{ totalSales: number; totalCost: number ; totalDiscount: number ; totalOrders:number}>({ totalSales: 0, totalCost: 0, totalDiscount:0,totalOrders:0});
   const dailyReportFood = ref<{ totalSales: number; totalDiscount: number ; totalTransactions: number}>({ totalSales: 0, totalDiscount: 0, totalTransactions:0});
   const state = reactive({
     groupedByDay: {},
@@ -80,6 +81,16 @@ export const useReportFinnceStore = defineStore("cashier", () => {
       console.error(error);
     }
   };
+  const getcoffeeSummary = async () => {
+    try {
+      const res = await financeService.getcoffeeSummary();
+      if (res.data) {
+        coffeeSummary.value = res.data;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
   const getDailyReportFood = async () => {
     try {
       const res = await financeService.getDailyReportFood();
@@ -132,6 +143,7 @@ export const useReportFinnceStore = defineStore("cashier", () => {
     sumType,
     dailyReport,
     dailyReportFood,
+    coffeeSummary,
     state,
     stateFood,
     topSellingProduct,
@@ -142,6 +154,7 @@ export const useReportFinnceStore = defineStore("cashier", () => {
     getSumType,
     getDailyReport,
     getDailyReportFood,
+    getcoffeeSummary,
     fetchGroupedFinanceFood,
     fetchGroupedFinance,
     getTopSellingProduct,

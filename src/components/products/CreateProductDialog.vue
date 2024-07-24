@@ -450,6 +450,8 @@ const submitForm = async () => {
   await productStore.createProduct();
   clearData();
   showSuccessDialog('สินค้านี้ถูกสร้างเรียบร้อยแล้ว!');
+
+
 };
 
 const clearData = () => {

@@ -16,7 +16,7 @@
           ></v-btn>
         </template>
       </v-list-item>
-      <v-list-item-title>ยินดีต้อนรับ คุณ {{ userStore.currentUser.userName }}</v-list-item-title>
+      <v-list-item-title v-if="!rail" class="username">ยินดีต้อนรับ คุณ {{ userStore.currentUser.userName }}</v-list-item-title>
       <v-list density="compact" nav>
         <v-list-item to="/report">
           <template v-slot:prepend>
@@ -29,9 +29,15 @@
           <template v-slot:prepend>
             <img src="../../src/components/img/store.png" alt="การขาย" class="nav-icon" />
           </template>
-          การขาย
-        </v-list-item>
 
+          ระบบขาย
+        </v-list-item>
+        <v-list-item to="/historyReceipt">
+          <template v-slot:prepend>
+            <img src="../../src/components/img/receipt.png" alt="History Receipt" class="nav-icon" />
+          </template>
+          ประวัติการขาย
+        </v-list-item>
         <v-list-item to="/productsManagement">
           <template v-slot:prepend>
             <img src="../../src/components/img/product.png" alt="จัดการสินค้า" class="nav-icon" />
