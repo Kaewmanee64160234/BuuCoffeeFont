@@ -116,16 +116,30 @@ const updateLineChartData = () => {
 };
 
 onMounted(async () => {
-  await ReportFinnceStore.getfindToday();
-  await ReportFinnceStore.getSumType();
-  await ReportFinnceStore.getDailyReport(); //ยอดขายรายวันของร้านกาแฟ
-  await ReportFinnceStore.getDailyReportFood(); //ยอดขายรายวันของข้าว
-  await ReportFinnceStore.getcoffeeSummary();
-  await expenditureStore.fetchExpenditure();
-  await revenueStore.fetchRevenue();
-  await fetchGroupedFinance();
-  updateChartData();
+  try {
+    await ReportFinnceStore.getfindToday();
+    await ReportFinnceStore.getSumType();
+    await ReportFinnceStore.getDailyReport(); //ยอดขายรายวันของร้านกาแฟ
+    await ReportFinnceStore.getDailyReportFood(); //ยอดขายรายวันของข้าว
+    await ReportFinnceStore.getcoffeeSummary();
+    await expenditureStore.fetchExpenditure();
+    await revenueStore.fetchRevenue();
+    await fetchGroupedFinance();
+    updateChartData();
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if ((error as any).response && (error as any).response.status === 404) {
+        openCreateDialog(); // เปิด dialog เมื่อเจอข้อผิดพลาด 404
+      } else {
+        console.error(error.message); // แสดงข้อความข้อผิดพลาด
+      }
+    } else {
+      console.error('Unknown error', error);
+    }
+  }
 });
+
+
 
 const fetchGroupedFinance = async () => {
   await ReportFinnceStore.fetchGroupedFinance(dateRange.value.startDate, dateRange.value.endDate);
@@ -243,7 +257,16 @@ const lineChartSeries2 = ref([
   }
 ]);
 watch(
-  [dateRange, groupBy],
+  () => [dateRange.value.startDate, dateRange.value.endDate],
+  () => {
+    fetchGroupedFinance();
+  },
+  { immediate: true }
+);
+
+// Watch สำหรับ groupBy
+watch(
+  () => groupBy.value,
   () => {
     fetchGroupedFinance();
   },
@@ -370,15 +393,15 @@ watch(
     <v-btn icon>
       <v-icon>mdi-chart-histogram</v-icon>
     </v-btn>
-    กำไร & ต้นทุนร้านกาแฟ
+    กำไร & ต้นทุนร้านกาแฟทั้งหมด
   </v-card-title>
   <v-row justify="center" align="center" no-gutters>
-    <v-col cols="auto">
+    <!-- <v-col cols="auto">
       <div class="date-picker">
         <input v-model="startDate" type="date" placeholder="Start Date" />
         <input v-model="endDate" type="date" placeholder="End Date" />
       </div>
-    </v-col>
+    </v-col> -->
   </v-row>
   <v-row justify="center" align="center">
     <v-col cols="12" md="4">
@@ -428,28 +451,24 @@ watch(
 
 
     </v-carousel>
+    <v-row>--</v-row>
     <v-row>
-      <v-col cols="12" md="4">
-        <v-text-field
-          label="เริ่มวันที่"
-          v-model="dateRange.startDate"
-          type="date"
-        ></v-text-field>
-      </v-col>
-      <v-col cols="12" md="4">
-        <v-text-field
-          label="ถึงวันที่"
-          v-model="dateRange.endDate"
-          type="date"
-        ></v-text-field>
-      </v-col>
-      <v-col cols="12" md="4">
-        <v-select
-          label="กรองตาม"
-          :items="['day', 'month', 'year']"
-          v-model="groupBy"
-        ></v-select>
-      </v-col>
+      <v-text-field
+  label="เริ่มวันที่"
+  v-model="dateRange.startDate"
+  type="date"
+/>
+<v-text-field
+  label="ถึงวันที่"
+  v-model="dateRange.endDate"
+  type="date"
+/>
+<v-select
+  label="กรองตาม"
+  :items="['day', 'month', 'year']"
+  v-model="groupBy"
+/>
+
     </v-row>
     <v-row>
       <v-col cols="6" md="6">

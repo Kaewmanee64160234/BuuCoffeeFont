@@ -1,12 +1,21 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
 import { useProductUsageStore } from '@/stores/report/productUsage.store';
+import { usePromotionsUsageStore } from '@/stores/report/promotionUseage.store';
 import type { ProductUsage } from '@/types/report/productUsage.type';
 import VueApexCharts from 'vue3-apexcharts';
-
+const promotionUsagestore = usePromotionsUsageStore();
 const productUsageStore = useProductUsageStore();
 const startDate = ref('');
 const endDate = ref('');
+const startDateforpromo = ref('2024-07-01');
+const endDateforpromo = ref('2024-07-31');
+const fetchPromotionsUsage = async () => {
+  await promotionUsagestore.loadPromotionsUsage(startDateforpromo.value, endDateforpromo.value);
+  console.log('Loaded promotions usage:', promotionUsagestore.promotionsUsage.values);
+};
+
+const promotionsUsage = promotionUsagestore.promotionsUsage;
 const receiptType = ref('ร้านกาแฟ');
 const receiptOptions = ref([
   { value: 'ร้านกาแฟ', text: 'ร้านกาแฟ' },
@@ -59,11 +68,15 @@ const updateChartData = () => {
 
 
 onMounted(async () => {
+  await fetchPromotionsUsage();
   await fetchData();
 });
 
 watch([startDate, endDate, receiptType], async () => {
   await fetchData();
+});
+watch([startDateforpromo, endDateforpromo], async () => {
+  await fetchPromotionsUsage();
 });
 
 </script>
@@ -89,9 +102,6 @@ watch([startDate, endDate, receiptType], async () => {
               outlined
             ></v-text-field>
           </v-col>
-          <!-- <v-col cols="auto">
-            <v-btn @click="fetchData">Load Data</v-btn>
-          </v-col> -->
         </v-row>
         <v-row align="center" justify="center" class="mb-4">
           <h2>สินค้าขายดี</h2>
@@ -152,5 +162,44 @@ watch([startDate, endDate, receiptType], async () => {
         </v-row>
       </v-col>
     </v-row>
+    <v-row>
+        <v-col cols="12" md="6">
+          <v-text-field
+            label="Start Date"
+            type="date"
+            v-model="startDateforpromo"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="12" md="6">
+          <v-text-field
+            label="End Date"
+            type="date"
+            v-model="endDateforpromo"
+          ></v-text-field>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
+          <h2>รายงานโปรโมชั่น</h2>
+        </v-col>
+      </v-row>
+      <v-row v-if="promotionsUsage.length">
+      <v-col cols="12" md="3" v-for="(item, index) in promotionUsagestore.promotionsUsage" :key="index">
+        <v-card class="promotion-card">
+          <v-card-title>{{ item.promotionName }}</v-card-title>
+          <v-card-subtitle>
+            จำนวนครั้งที่ใช้ : {{ item.usageCount }}
+          </v-card-subtitle>
+          <v-card-text>
+            ยอดรวมส่วนลด: {{ item.totalDiscount }}
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
+<style scoped>
+.promotion-card {
+  background-color: #FFF9C4; /* Light yellow background */
+}
+</style>
