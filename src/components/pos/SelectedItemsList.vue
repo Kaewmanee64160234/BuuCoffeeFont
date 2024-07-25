@@ -419,11 +419,22 @@ function openCreateCustomerDialog() {
 
 function cancelReceipt() {
   posStore.selectedItems = [];
-  posStore.receipt.receiptTotalPrice = 0;
-  posStore.receipt.receiptTotalDiscount = 0;
-  posStore.receipt.receiptNetPrice = 0;
-  posStore.receipt.receiptPromotions = [];
+  posStore.receipt = {
+    receiptTotalPrice: 0,
+    receiptTotalDiscount: 0,
+    receiptNetPrice: 0,
+    receiptPromotions: [],
+    receiptItems: [],
+    receiptStatus: 'รอชำระเงิน',
+    paymentMethod: '',
+    createdDate: new Date(),
+    queueNumber: posStore.queueNumber,
+    receiptType: '',
+    updatedDate: new Date(),
+  };
+  
   posStore.receiptDialog = false;
+
   recive.value = 0;
   change.value = 0;
   step.value = 1;
