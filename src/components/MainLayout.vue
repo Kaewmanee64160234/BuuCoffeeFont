@@ -20,15 +20,16 @@
       <v-list density="compact" nav>
         <v-list-item to="/report">
           <template v-slot:prepend>
-            <img src="../../src/components/img/dashboard.png" alt="Report" class="nav-icon" />
+            <img src="../../src/components/img/dashboard.png" alt="รายงานสรุปผล" class="nav-icon" />
           </template>
-          รายงาน
+          รายงานสรุปผล
         </v-list-item>
 
         <v-list-item to="/pos">
           <template v-slot:prepend>
-            <img src="../../src/components/img/store.png" alt="POS" class="nav-icon" />
+            <img src="../../src/components/img/store.png" alt="การขาย" class="nav-icon" />
           </template>
+
           ระบบขาย
         </v-list-item>
         <v-list-item to="/historyReceipt">
@@ -39,59 +40,64 @@
         </v-list-item>
         <v-list-item to="/productsManagement">
           <template v-slot:prepend>
-            <img src="../../src/components/img/product.png" alt="Products Management" class="nav-icon" />
+            <img src="../../src/components/img/product.png" alt="จัดการสินค้า" class="nav-icon" />
           </template>
-          Products Management
+          จัดการสินค้า
         </v-list-item>
 
         <v-list-item to="/userManagement">
           <template v-slot:prepend>
-            <img src="../../src/components/img/user.png" alt="User Management" class="nav-icon" />
+            <img src="../../src/components/img/user.png" alt="จัดการผู้ใช้งาน" class="nav-icon" />
           </template>
-          User Management
+          จัดการผู้ใช้งาน
         </v-list-item>
 
         <v-list-item to="/customersManagement">
           <template v-slot:prepend>
-            <img src="../../src/components/img/customer.png" alt="Customers Management" class="nav-icon" />
+            <img src="../../src/components/img/customer.png" alt="จัดการลูกค้า" class="nav-icon" />
           </template>
-          Customers Management
+          จัดการลูกค้า
         </v-list-item>
 
         <v-list-item to="/promotion">
           <template v-slot:prepend>
-            <img src="../../src/components/img/promotion.png" alt="Promotion Management" class="nav-icon" />
+            <img src="../../src/components/img/promotion.png" alt="จัดการโปรโมชัน" class="nav-icon" />
           </template>
-          Promotion Management
+          จัดการโปรโมชัน
         </v-list-item>
 
         <v-list-item to="/category">
           <template v-slot:prepend>
-            <img src="../../src/components/img/inventory.png" alt="Category Management" class="nav-icon" />
+            <img src="../../src/components/img/inventory.png" alt="จัดการหมวดหมู่" class="nav-icon" />
           </template>
-          Category Management
+          จัดการหมวดหมู่
         </v-list-item>
 
         <v-list-item to="/topping">
           <template v-slot:prepend>
-            <img src="../../src/components/img/topping.png" alt="Topping Management" class="nav-icon" />
+            <img src="../../src/components/img/topping.png" alt="จัดการท็อปปิ้ง" class="nav-icon" />
           </template>
-          Topping Management
+          จัดการท็อปปิ้ง
         </v-list-item>
 
-       
+        <v-list-item to="/historyReceipt">
+          <template v-slot:prepend>
+            <img src="../../src/components/img/receipt.png" alt="ใบเสร็จ" class="nav-icon" />
+          </template>
+          ประวัติใบเสร็จ
+        </v-list-item>
 
         <v-list-item to="/ingredientList">
           <template v-slot:prepend>
-            <img src="../../src/components/img/groceries.png" alt="Ingredient List" class="nav-icon" />
+            <img src="../../src/components/img/groceries.png" alt="รายการวัตถุดิบ" class="nav-icon" />
           </template>
-          Ingredient List
+          รายการวัตถุดิบ
         </v-list-item>
         <v-list-item @click="logout">
           <template v-slot:prepend>
-            <img src="../../src/components/img/logo.jpg" alt="Log Out" class="nav-icon" />
+            <img src="../../src/components/img/logo.jpg" alt="ออกจากระบบ" class="nav-icon" />
           </template>
-          Log Out
+          ออกจากระบบ
         </v-list-item>
       </v-list>
     </v-navigation-drawer>

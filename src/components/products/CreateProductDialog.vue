@@ -37,12 +37,13 @@
                         accept="image/*" @change="handleImageUpload" />
                     </v-col>
                     <v-col cols="12" sm="6">
-                      <v-text-field variant="solo" v-model="productName" label="ชื่อสินค้า" required />
+                      <v-text-field variant="solo" v-model="productName" label="ชื่อสินค้า" :rules="nameRules" required />
                     </v-col>
                     <v-col cols="12" sm="6">
-                      <v-text-field variant="solo" v-model="productPrice" label="ราคา" type="number" required />
+                      <v-text-field variant="solo" v-model="productPrice" label="ราคา" type="number" :rules="priceRules" required />
                     </v-col>
                     <v-col cols="12" sm="6">
+
                       <v-select v-model="productStore.product.category.categoryName"
                         :items="categoryStore.categoriesForCreate.map(category => category.categoryName)"
                         label="เลือกหมวดหมู่" dense @change="checkCategory" />
@@ -81,6 +82,7 @@
                     <v-row>
                       <v-col cols="12">
                         <v-subheader>{{ step.label }}</v-subheader>
+
                         <v-text-field variant="solo" v-model="getProductType(step.label).productTypePrice"
                           label="ราคาประเภทสินค้า" type="number" required />
                       </v-col>
@@ -122,6 +124,7 @@
                               </td>
                               <td>{{ ingredient.ingredientName }}</td>
                               <td>
+
                                 <v-text-field variant="solo"
                                   v-if="step.label === 'ร้อน' && selectedIngredientsHot.includes(ingredient.ingredientId)"
                                   v-model="ingredientQuantitiesHot[ingredient.ingredientId]" type="number" min="0"
@@ -178,11 +181,7 @@ interface CustomProductType extends ProductType {
   ingredientQuantities: IngredientQuantities;
 }
 
-const dialog = ref(false);
-const step = ref(1);
-const steps = ref(5);
 const e1 = ref(1);
-const form = ref(null);
 const valid = ref(false);
 const productName = ref('');
 const productPrice = ref(0);
@@ -254,7 +253,7 @@ const filteredIngredients = computed(() => {
   );
 });
 
-watch(() => productStore.product.category.categoryName, (newVal) => {
+watch(() => selectedCategory.value, (newVal) => {
   const category = categoryStore.categories.find(c => c.categoryName === newVal);
   isDrink.value = category?.haveTopping === true;
   if (!isDrink.value) {
@@ -337,11 +336,12 @@ const addRecipe = (type: CustomProductType) => {
 };
 
 const checkCategory = () => {
-  isDrink.value = productStore.product.category.categoryName === "เครื่องดื่ม";
+  const category = categoryStore.categories.find(c => c.categoryName === selectedCategory.value);
+  isDrink.value = category?.haveTopping === true;
 };
 
 const submitForm = async () => {
-  if (!productStore.product.category.categoryName) {
+  if (!selectedCategory.value) {
     alert('Please select a valid category.');
     return;
   }
@@ -356,17 +356,13 @@ const submitForm = async () => {
     return;
   }
 
-  if (!productStore.product.category.categoryName) {
-    alert('Please select a category.');
-    return;
-  }
-
   const productData = {
     productName: productName.value,
     productPrice: productPrice.value,
     barcode: barcode.value, // Include barcode in product data
     productImage: productImage.value,
-    categoryId: selectedCategory.value,
+    categoryId: categoryStore.categories.find(c => c.categoryName === selectedCategory.value)?.categoryId,
+
     storeType: storeName.value,
     countingPoint:productStore.product.countingPoint,
     productTypes: [] as ProductType[]
@@ -440,7 +436,7 @@ const submitForm = async () => {
   }
 
   productStore.product = {
-    category: categoryStore.categories.find(c => c.categoryName === productStore.product.category.categoryName)!,
+    category: categoryStore.categories.find(c => c.categoryName === selectedCategory.value)!,
     productName: productData.productName,
     storeType: productData.storeType,
     countingPoint: productData.countingPoint,
@@ -465,7 +461,6 @@ const clearData = () => {
   productImage.value = new File([], '');
   imagePreview.value = null;
   selectedCategory.value = null; // Clear selected category
-  productStore.product.category.categoryName = ''; // Clear category in product store
   productTypes.hot = false;
   productTypes.cold = false;
   productTypes.blend = false;
@@ -477,6 +472,7 @@ const clearData = () => {
   ingredientQuantitiesCold.value = {};
   ingredientQuantitiesBlend.value = {};
   productStore.createProductDialog = false;
+  e1.value = 1; // Reset stepper to first step
 };
 
 const showSuccessDialog = (message: string) => {
@@ -488,8 +484,20 @@ const showSuccessDialog = (message: string) => {
   });
 };
 
+function next() {
+  if (e1.value < 3 + computedSteps.value.length) {
+    e1.value++;
+    searchQuery.value = ''; // Reset search query when clicking next
+  }
+}
+
+function prev() {
+  if (e1.value > 1) {
+    e1.value--;
+  }
+}
 
 const disabled = computed(() => {
-  return e1.value === 1 ? 'prev' : e1.value === steps.value ? 'next' : undefined;
+  return e1.value === 1 ? 'prev' : e1.value === 3 + computedSteps.value.length ? 'next' : undefined;
 });
 </script>

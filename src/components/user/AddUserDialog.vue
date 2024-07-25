@@ -6,7 +6,7 @@ import Swal from 'sweetalert2';
 
 const props = defineProps<{ dialog: boolean }>();
 const form = ref<VForm | null>(null);
-const dialog = ref(props.dialog);
+const dialog = ref(false);
 
 const userName = ref('');
 const userPassword = ref('');
@@ -26,7 +26,19 @@ const rules = {
 
 watch(() => props.dialog, (newVal) => {
   dialog.value = newVal;
+  if (newVal) {
+    resetForm();
+  }
 });
+
+function resetForm() {
+  userName.value = '';
+  userPassword.value = '';
+  userEmail.value = '';
+  userRole.value = '';
+  userStatus.value = '';
+  form.value?.resetValidation();
+}
 
 async function saveUser() {
   const { valid } = await form.value!.validate();
@@ -39,9 +51,9 @@ async function saveUser() {
       userRole: userRole.value,
       userStatus: userStatus.value
     });
-    dialog.value = false;  // Close the dialog
-    await userStore.getAllUsers();
     showSuccessDialog('ผู้ใช้งานรายนี้ถูกสร้างเรียบร้อยแล้ว!');
+    closeDialog();
+    await userStore.getAllUsers();
   }
 }
 
@@ -56,7 +68,14 @@ const showSuccessDialog = (message: string) => {
 
 function closeDialog() {
   dialog.value = false;  // Close the dialog
+  userStore.createUserDialog = false;  // Ensure the dialog state is reset in the store
 }
+
+watch(dialog, (newVal) => {
+  if (!newVal) {
+    resetForm();
+  }
+});
 </script>
 
 <template>

@@ -32,7 +32,7 @@
                   required>
                 </v-select>
               </v-col>
-              <v-col>
+              <v-col cols="12" md="6">
                 <v-select
                   v-model="userRole"
                   label="ตำแหน่งงาน"
