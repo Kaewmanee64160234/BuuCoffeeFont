@@ -80,12 +80,7 @@
           จัดการท็อปปิ้ง
         </v-list-item>
 
-        <v-list-item to="/historyReceipt">
-          <template v-slot:prepend>
-            <img src="../../src/components/img/receipt.png" alt="ใบเสร็จ" class="nav-icon" />
-          </template>
-          ประวัติใบเสร็จ
-        </v-list-item>
+
 
         <v-list-item to="/ingredientList">
           <template v-slot:prepend>

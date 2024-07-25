@@ -102,8 +102,8 @@ const deleteCustomer = async (customerId: number) => {
         
         <v-spacer></v-spacer>
       </v-card-title>
-      <v-card width="90%" style="margin-left: 5%; margin-top: 3%;">
-        <v-table class="text-center">
+
+        <v-table class="text-center" style="margin-left: 5%; margin-top: 3%;">
           <thead>
             <tr>
               <th class="text-center"></th>
@@ -133,7 +133,7 @@ const deleteCustomer = async (customerId: number) => {
             </tr>
           </tbody>
         </v-table>
-      </v-card>
+    
     </v-card>
   </v-container>
 </template>
