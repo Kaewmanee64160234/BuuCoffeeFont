@@ -112,18 +112,16 @@ const addToCart = (product: Product) => {
 </script>
 
 <template>
-  <v-app style="width: 100vw; height: 100vh;">
-
-    <v-row class="full-width-row" style="height: 100%;" :style="{ marginLeft: marginLeft }">
-      <v-col cols="7" class="d-flex flex-column align-center" style="background-color: #C1B6A9; height: 100%;">
-        <v-container fluid class="full-width-container" style="height: 100%;">
-          <v-row class="full-width-row">
-            <v-col cols="12" class="d-flex justify-center align-center">
-
+  <v-app style="width: 100vw; height: 100vh; overflow: hidden;">
+    <v-row class="full-width-row" :style="{ marginLeft: marginLeft, height: '100%' }">
+      <v-col cols="7" class="d-flex flex-column align-center" style="background-color: #C1B6A9; height: 100%; overflow: hidden;">
+        <v-container fluid class="full-width-container" style="height: 100%; overflow: hidden;">
+          <v-row class="full-width-row" style="overflow: hidden;">
+            <v-col cols="12" class="d-flex justify-center align-center" style="overflow: hidden;">
               <promotion-cards-carousel></promotion-cards-carousel>
             </v-col>
           </v-row>
-          <v-row class="full-width-row">
+          <v-row class="full-width-row" style="overflow: hidden;">
             <v-col cols="12" md="6">
               <v-text-field v-model="barcode" append-icon="mdi-barcode" label="สแกนบาร์โค้ด" variant="solo" single-line hide-details @change="handleBarcodeInput"></v-text-field>
             </v-col>
@@ -138,16 +136,15 @@ const addToCart = (product: Product) => {
               </v-tooltip>
             </v-col>
           </v-row>
-          <v-row class="full-width-row">
-            <v-col cols="12" md="6">
-              <v-tabs v-model="selectedCategory" align-tabs="start" color="brown">
+          <v-row class="full-width-row" style="overflow: hidden;">
+            <v-col cols="12">
+              <v-tabs v-model="selectedCategory" align-tabs="start" color="brown" class="full-width-tabs">
                 <v-tab v-for="category in categoryStore.categoriesForCreate" :key="category.categoryId" :value="category.categoryName">
                   {{ category.categoryName }}
                 </v-tab>
               </v-tabs>
             </v-col>
           </v-row>
-
           <v-row class="full-width-row product-list-container" style="flex: 1; overflow-y: auto;">
             <v-tabs-items v-model="selectedCategory" style="width: 100%;">
               <v-tab-item>
@@ -159,16 +156,13 @@ const addToCart = (product: Product) => {
                   </v-row>
                 </v-container>
               </v-tab-item>
-
             </v-tabs-items>
           </v-row>
-
           <drink-selection-dialog></drink-selection-dialog>
         </v-container>
       </v-col>
-      <v-col cols="5" class="d-flex flex-column" style="margin: 0; padding: 10px; height: 100%;">
+      <v-col cols="5" class="d-flex flex-column" style="margin: 0; padding: 10px; height: 100%; overflow: hidden;">
         <v-sheet style="height: 100%; display: flex; flex-direction: column;">
-      
           <selected-items-list style="flex: 1;"></selected-items-list>
         </v-sheet>
       </v-col>
@@ -177,13 +171,16 @@ const addToCart = (product: Product) => {
   </v-app>
 </template>
 
-
 <style scoped>
 .full-width-container,
 .full-width-row {
   width: 100%;
   margin: 0;
   padding: 0;
+}
+
+.full-width-tabs {
+  width: 100%;
 }
 
 .product-list-container {
@@ -265,3 +262,5 @@ const addToCart = (product: Product) => {
   background: #555;
 }
 </style>
+
+

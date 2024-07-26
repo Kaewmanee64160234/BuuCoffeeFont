@@ -44,7 +44,7 @@
                     </v-col>
                     <v-col cols="12" sm="6">
 
-                      <v-select v-model="productStore.product.category.categoryName"
+                      <v-select v-model="selectedCategory"
                         :items="categoryStore.categoriesForCreate.map(category => category.categoryName)"
                         label="เลือกหมวดหมู่" dense @change="checkCategory" />
                     </v-col>
