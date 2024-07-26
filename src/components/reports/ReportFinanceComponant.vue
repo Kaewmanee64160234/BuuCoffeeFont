@@ -307,10 +307,10 @@ watch(
                   <template
                     v-if="ReportFinnceStore.cashiers !== null && Object.keys(ReportFinnceStore.cashiers).length !== 0">
                     <v-card-subtitle>
-                      เงินต้น : {{ ReportFinnceStore.cashiers.cashierAmount }}
+                      เงินต้น : {{ ReportFinnceStore.cashiers.cashierAmount }} บาท
                       <span @click="deleteCashier(ReportFinnceStore.cashiers.cashierId)">
                         <v-icon>mdi-delete</v-icon>
-                        <v-card-subtitle>ยอดรวมเงินสดวันนี้ :{{ sum }}</v-card-subtitle>
+                        <v-card-subtitle>ยอดรวมเงินสดวันนี้ :{{ sum }} บาท</v-card-subtitle>
                       </span>
                     </v-card-subtitle>
                   </template>
@@ -324,7 +324,7 @@ watch(
                   <v-card-title class="d-flex justify-space-between align-center">
                     รายได้
                   </v-card-title>
-                  <v-card-subtitle class="text-h4">{{ ReportFinnceStore.dailyReport.totalSales }}</v-card-subtitle>
+                  <v-card-subtitle class="text-h4">{{ ReportFinnceStore.dailyReport.totalSales }} บาท</v-card-subtitle>
                 </v-card>
               </v-col>
               <v-col cols="12" md="6" class="px-2">
@@ -333,7 +333,7 @@ watch(
                     จำนวนรายการ
                   </v-card-title>
                   <v-card-subtitle class="text-h4">{{ ReportFinnceStore.dailyReport.totalTransactions
-                    }}</v-card-subtitle>
+                    }} รายการ</v-card-subtitle>
                 </v-card>
               </v-col>
               <v-col cols="12" md="6" class="px-2">
@@ -341,7 +341,7 @@ watch(
                   <v-card-title class="d-flex justify-space-between align-center">
                     ส่วนลด
                   </v-card-title>
-                  <v-card-subtitle class="text-h4">{{ ReportFinnceStore.dailyReport.totalDiscount }}</v-card-subtitle>
+                  <v-card-subtitle class="text-h4">{{ ReportFinnceStore.dailyReport.totalDiscount }} บาท</v-card-subtitle>
                 </v-card>
               </v-col>
             </v-row>
@@ -365,7 +365,7 @@ watch(
               รายได้
             </v-card-title>
             <v-card-subtitle class="text-h4">
-              {{ ReportFinnceStore.dailyReportFood.totalSales }}
+              {{ ReportFinnceStore.dailyReportFood.totalSales }} บาท
             </v-card-subtitle>
           </v-card>
         </v-col>
@@ -375,7 +375,7 @@ watch(
               จำนวนรายการ
             </v-card-title>
             <v-card-subtitle class="text-h4">
-              {{ ReportFinnceStore.dailyReportFood.totalTransactions }}
+              {{ ReportFinnceStore.dailyReportFood.totalTransactions }} รายการ
             </v-card-subtitle>
           </v-card>
         </v-col>
@@ -385,7 +385,7 @@ watch(
               ส่วนลด
             </v-card-title>
             <v-card-subtitle class="text-h4">
-              {{ ReportFinnceStore.dailyReportFood.totalDiscount }}
+              {{ ReportFinnceStore.dailyReportFood.totalDiscount }} บาท
             </v-card-subtitle>
           </v-card>
         </v-col>
@@ -403,12 +403,6 @@ watch(
           กำไร & ต้นทุนร้านกาแฟทั้งหมด
         </v-card-title>
         <v-row justify="center" align="center" no-gutters>
-          <!-- <v-col cols="auto">
-      <div class="date-picker">
-        <input v-model="startDate" type="date" placeholder="Start Date" />
-        <input v-model="endDate" type="date" placeholder="End Date" />
-      </div>
-    </v-col> -->
         </v-row>
         <v-row justify="center" align="center">
           <v-col cols="12" md="4">
@@ -417,7 +411,7 @@ watch(
                 ต้นทุน
               </v-card-title>
               <v-card-subtitle class="text-h4">
-                {{ ReportFinnceStore.coffeeSummary.totalCost }}
+                {{ ReportFinnceStore.coffeeSummary.totalCost }} บาท
               </v-card-subtitle>
             </v-card>
           </v-col>
@@ -427,7 +421,7 @@ watch(
                 ยอดขาย
               </v-card-title>
               <v-card-subtitle class="text-h4">
-                {{ ReportFinnceStore.coffeeSummary.totalSales }}
+                {{ ReportFinnceStore.coffeeSummary.totalSales }} บาท
               </v-card-subtitle>
             </v-card>
           </v-col>
@@ -439,7 +433,7 @@ watch(
                 ส่วนลด
               </v-card-title>
               <v-card-subtitle class="text-h4">
-                {{ ReportFinnceStore.coffeeSummary.totalDiscount }}
+                {{ ReportFinnceStore.coffeeSummary.totalDiscount }} บาท
               </v-card-subtitle>
             </v-card>
           </v-col>
@@ -449,7 +443,7 @@ watch(
                 จำนวนรายการ
               </v-card-title>
               <v-card-subtitle class="text-h4">
-                {{ ReportFinnceStore.coffeeSummary.totalOrders }}
+                {{ ReportFinnceStore.coffeeSummary.totalOrders }} รายการ
               </v-card-subtitle>
             </v-card>
           </v-col>

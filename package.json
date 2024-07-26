@@ -27,7 +27,8 @@
     "vue": "^3.4.21",
     "vue-router": "^4.3.0",
     "vue3-apexcharts": "^1.5.3",
-    "vuetify": "^3.6.9"
+    "vuetify": "^3.6.9",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@mdi/font": "^7.4.47",

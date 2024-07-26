@@ -2,11 +2,42 @@
   <v-dialog v-model="reciptStore.historyReceiptDialog" max-width="1090px">
     <v-card>
       <v-card-title>
-        <span class="text-h5">
-          บันทึกการสั่งซื้อ วันที่ {{ formattedReceiptDate }} เวลา {{ formattedReceiptTime }}<br> ลูกค้า : {{
-            reciptStore.receipt?.customer?.customerName || 'ไม่มีข้อมูล' }}
-        </span>
-      </v-card-title>
+  <!-- First Row: Date and Status -->
+  <v-row>
+    <v-col cols="6">
+      <span >
+        บันทึกการสั่งซื้อ วันที่ {{ reciptStore.receipt?.createdDate }}
+      </span>
+    </v-col>
+    <v-col cols="6" class="text-right">
+     
+
+      <span v-if="reciptStore.receipt?.receiptStatus === 'cancel'">
+        เวลาที่ยกเลิก : {{ reciptStore.receipt?.updatedDate }}
+      </span>
+    </v-col>
+  </v-row>
+
+  <!-- Second Row: Customer and Cancellation Time -->
+  <v-row>
+    <v-col cols="6">
+      <span>
+        ลูกค้า : {{ reciptStore.receipt?.customer?.customerName || 'ไม่มีข้อมูล' }}
+      </span>
+    </v-col>
+    <v-col cols="6" class="text-right">
+      <span >
+        สถานะ : 
+        <template v-if="reciptStore.receipt?.receiptStatus === 'paid'">
+          {{ reciptStore.receipt?.receiptStatus }} <v-icon>mdi-check</v-icon>
+        </template>
+        <template v-if="reciptStore.receipt?.receiptStatus === 'cancel'">
+          {{ reciptStore.receipt?.receiptStatus }} <v-icon>mdi-cancel</v-icon>
+        </template>
+      </span>
+    </v-col>
+  </v-row>
+</v-card-title>
       <v-card-text>
         <v-container>
           <v-table dense>

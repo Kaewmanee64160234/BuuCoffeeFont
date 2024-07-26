@@ -18,6 +18,7 @@
       </v-list-item>
       <v-list-item-title v-if="!rail" class="username">ยินดีต้อนรับ คุณ {{ userStore.currentUser.userName }}</v-list-item-title>
       <v-list density="compact" nav>
+        <v-subheader v-if="!rail">การขาย</v-subheader>
         <v-list-item to="/report">
           <template v-slot:prepend>
             <img src="../../src/components/img/dashboard.png" alt="รายงานสรุปผล" class="nav-icon" />
@@ -29,15 +30,17 @@
           <template v-slot:prepend>
             <img src="../../src/components/img/store.png" alt="การขาย" class="nav-icon" />
           </template>
-
           ระบบขาย
         </v-list-item>
+
         <v-list-item to="/historyReceipt">
           <template v-slot:prepend>
             <img src="../../src/components/img/receipt.png" alt="History Receipt" class="nav-icon" />
           </template>
           ประวัติการขาย
         </v-list-item>
+
+        <v-subheader v-if="!rail">จัดการสินค้าและผู้ใช้งาน</v-subheader>
         <v-list-item to="/productsManagement">
           <template v-slot:prepend>
             <img src="../../src/components/img/product.png" alt="จัดการสินค้า" class="nav-icon" />
@@ -59,6 +62,7 @@
           จัดการลูกค้า
         </v-list-item>
 
+        <v-subheader v-if="!rail">โปรโมชันและหมวดหมู่</v-subheader>
         <v-list-item to="/promotion">
           <template v-slot:prepend>
             <img src="../../src/components/img/promotion.png" alt="จัดการโปรโมชัน" class="nav-icon" />
@@ -80,19 +84,15 @@
           จัดการท็อปปิ้ง
         </v-list-item>
 
-        <v-list-item to="/historyReceipt">
-          <template v-slot:prepend>
-            <img src="../../src/components/img/receipt.png" alt="ใบเสร็จ" class="nav-icon" />
-          </template>
-          ประวัติใบเสร็จ
-        </v-list-item>
-
+        <v-subheader v-if="!rail">วัตถุดิบ</v-subheader>
         <v-list-item to="/ingredientList">
           <template v-slot:prepend>
             <img src="../../src/components/img/groceries.png" alt="รายการวัตถุดิบ" class="nav-icon" />
           </template>
           รายการวัตถุดิบ
         </v-list-item>
+
+        <v-subheader v-if="!rail">อื่นๆ</v-subheader>
         <v-list-item @click="logout">
           <template v-slot:prepend>
             <img src="../../src/components/img/logo.jpg" alt="ออกจากระบบ" class="nav-icon" />
@@ -163,6 +163,7 @@ const logout = () => {
 <style scoped>
 .v-navigation-drawer {
   width: 250px;
+  background-color: #f2e4d8; /* Light brown background color */
 }
 
 .v-navigation-drawer.rail {
@@ -199,5 +200,17 @@ const logout = () => {
   align-items: center;
   justify-content: center;
   height: 56px;
+}
+
+.v-list-item.rail .nav-icon {
+  margin-right: 0;
+  margin-left: 8px; /* Adjust the left margin for consistent spacing */
+}
+
+.v-subheader {
+  font-size: 14px;
+  font-weight: bold;
+  color: #6d4c41; /* Darker brown color */
+  padding: 8px 16px;
 }
 </style>
