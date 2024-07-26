@@ -8,31 +8,33 @@ import HistoryReceiptDialog from '@/components/receipts/HistoryReceiptDialog.vue
 const receiptsStore = useReceiptsStore();
 const startDate = ref('');
 const endDate = ref('');
-const receiptType = ref<string>('ร้านกาแฟ'); 
+const receiptType = ref<string>('ร้านกาแฟ');
 const receiptStore = useReceiptStore();
 const historyReceiptDialog = ref(false);
 const selectedReceipt = ref<Receipt | null>(null);
-  const fetchData = async () => {
+const fetchData = async () => {
   await receiptsStore.fetchReceipts(startDate.value, endDate.value, receiptType.value);
 };
 const exportToExcel = () => {
   fetchData();
   const formattedReceipts = formatReceiptsForExcel(receiptsStore.receipts);
-  const worksheet = XLSX.utils.json_to_sheet(formattedReceipts, { header: [
-    'receiptTotalPrice',
-    'receiptTotalDiscount',
-    'receiptNetPrice',
-    'receiptStatus',
-    'receiptType',
-    'queueNumber',
-    'paymentMethod',
-    'createdDate',
-    'updatedDate',
-    'receiptItems',
-    'userName',
-    'customer',
-    'receiptPromotions',
-  ]});
+  const worksheet = XLSX.utils.json_to_sheet(formattedReceipts, {
+    header: [
+      'receiptTotalPrice',
+      'receiptTotalDiscount',
+      'receiptNetPrice',
+      'receiptStatus',
+      'receiptType',
+      'queueNumber',
+      'paymentMethod',
+      'createdDate',
+      'updatedDate',
+      'receiptItems',
+      'userName',
+      'customer',
+      'receiptPromotions',
+    ]
+  });
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, 'Receipts');
 
@@ -60,7 +62,7 @@ onMounted(async () => {
 const openHistoryReceiptDialog = (receipt: Receipt) => {
   // selectedReceipt.value = receipt;
   receiptStore.receipt = receipt;
- receiptStore.historyReceiptDialog = true;
+  receiptStore.historyReceiptDialog = true;
 };
 
 const handleSearchKeydown = (event: KeyboardEvent) => {
@@ -90,7 +92,7 @@ function formatDateThai(dateString: string): string {
   ];
   const day = date.getDate();
   const month = months[date.getMonth()];
-  const year = date.getFullYear() + 543; 
+  const year = date.getFullYear() + 543;
   return `${day} ${month} พ.ศ.${year}`;
 }
 const formatReceiptsForExcel = (receipts: Receipt[]) => {
@@ -121,151 +123,137 @@ const formatReceiptsForExcel = (receipts: Receipt[]) => {
 };
 const statusClass = (status: string) => {
   return {
-    'text-success': status === 'paid', 
-    'text-danger': status === 'cancel' 
+    'text-success': status === 'paid',
+    'text-danger': status === 'cancel'
   };
 };
 
 const statusText = (status: string) => {
   switch (status) {
     case 'paid':
-      return 'สำเร็จ';  
+      return 'สำเร็จ';
     case 'cancel':
-      return 'ยกเลิก'; 
+      return 'ยกเลิก';
     default:
-      return status;  
+      return status;
   }
 };
 
 
 </script>
 <style scoped>
-  .flex-container {
-    display: flex;
-    flex-direction: column;
-    height: 95vh;
-  }
-  .text-success {
+.flex-container {
+  display: flex;
+  flex-direction: column;
+  height: 95vh;
+}
+
+.text-success {
   color: #4caf50;
 }
+
 .text-danger {
   color: #f44336;
 }
-  </style>
-  
-  <template>
-    <HistoryReceiptDialog v-model:dialog="historyReceiptDialog" :receipt="selectedReceipt" />
+
+.table-container {
+  max-height: 70vh; 
+  overflow-y: auto;
+  margin-left: 2%;
+  margin-top: 3%;
+}
+</style>
+
+<template>
+  <HistoryReceiptDialog v-model:dialog="historyReceiptDialog" :receipt="selectedReceipt" />
 
   <v-container>
     <v-card class="flex-container">
       <v-card-title>
         <v-row>
           <v-col cols="9" style="padding: 20px;">
-          <h3>ประวัติการขาย</h3>         
+            <h3>ประวัติการขาย</h3>
           </v-col>
-         
-
-
-  
           <v-row>
-      <v-col cols="12" md="4">
-        <v-text-field
-          v-model="startDate"
-          label="Start Date"
-          type="date"
-          outlined
-          dense
-        ></v-text-field>
-      </v-col>
-      <v-col cols="12" md="4">
-        <v-text-field
-          v-model="endDate"
-          label="End Date"
-          type="date"
-          outlined
-          dense
-        ></v-text-field>
-      </v-col>
-      <v-col cols="12" md="4">
-        <v-radio-group
-          v-model="receiptType"
-          row
-        >
-          <v-radio
-            label="ร้านข้าว"
-            value="ร้านข้าว"
-          ></v-radio>
-          <v-radio
-            label="ร้านกาแฟ"
-            value="ร้านกาแฟ"
-          ></v-radio>
-        </v-radio-group>
-      </v-col>
-    </v-row>
-    <v-row class="mt-4" justify="end">
-      <v-btn @click="fetchData" color="primary" class="mr-2">
-        Fetch Data
-      </v-btn>
-      <v-btn @click="exportToExcel" color="success">
-        Export to Excel
-      </v-btn>
-    </v-row>
+            <v-col cols="12" md="4">
+              <v-text-field v-model="startDate" label="Start Date" type="date" outlined dense hide-details
+                variant="solo"></v-text-field>
+            </v-col>
+            <v-col cols="12" md="4">
+              <v-text-field v-model="endDate" label="End Date" type="date" outlined dense hide-details
+                variant="solo"></v-text-field>
+            </v-col>
+            <v-col cols="12" md="4">
+              <v-radio-group v-model="receiptType" row>
+                <v-radio label="ร้านข้าว" value="ร้านข้าว"></v-radio>
+                <v-radio label="ร้านกาแฟ" value="ร้านกาแฟ"></v-radio>
+              </v-radio-group>
+            </v-col>
+          </v-row>
+          <v-row class="mt-4" justify="end">
+            <v-btn @click="fetchData" color="primary" class="mr-2">
+              โหลดข้อมูล
+            </v-btn>
+            <v-btn @click="exportToExcel" color="success">
+              Export to Excel
+            </v-btn>
+          </v-row>
 
         </v-row>
         <v-spacer></v-spacer>
       </v-card-title>
 
-  <v-table class="text-center" style="max-height: 400px; overflow-y: auto;margin-left: 2%; margin-top: 3%;">
-    <thead>
-      <tr>
-        <th class="text-center">ID</th>
-        <th class="text-center">วันที่ออกใบเสร็จ</th>
-        <th class="text-center">สถานะใบเสร็จ</th>
-        <th class="text-center">ราคารวมสุทธิ</th>
-        <th class="text-center">ส่วนลด</th>
-        <th class="text-center">สมาชิก</th>
-        <!-- <th class="text-center">แต้มสะสม</th> -->
-        <th class="text-center">โปรโมชั่น</th>
-   
-        <th class="text-center">รูปแบบการจ่ายเงิน</th>
-        <th class="text-center">พนักงาน</th>
-        <th class="text-center">Operations</th>
-      </tr>
-    </thead>
-    <tbody>
-  <tr v-for="(receipt, index) in filteredReceipts" :key="receipt.receiptId">
-    <td class="text-center">{{ index + 1 }}</td>
-    <td class="text-center">{{ formatDateThai(receipt.createdDate + '') }}</td>
-    <td class="text-center">
-      <span :class="statusClass(receipt.receiptStatus)">
-        {{ statusText(receipt.receiptStatus) }}
-      </span>
-    </td>
-    <td class="text-center">{{ receipt.receiptNetPrice }}</td>
-    <td class="text-center">{{ receipt.receiptTotalDiscount }}</td>
-    <td class="text-center">{{ receipt.customer?.customerName || '-' }}</td>
-    <!-- <td class="text-center">{{ receipt.customer?.customerNumberOfStamp || 0 }}</td> -->
-    <td class="text-center">
-      <span v-if="receipt.receiptPromotions && receipt.receiptPromotions.length > 0">
-        มีการใช้โปรโมชั่น
-      </span>
-      <span v-else>
-        -
-      </span>
-    </td>
-    <td class="text-center">{{ receipt.paymentMethod || '-' }}</td>
-    <td class="text-center">{{ receipt.user?.userName }}</td>
-    <td class="text-center">
-      <v-btn color="#FFDD83" icon="mdi-eye" @click="openHistoryReceiptDialog(receipt)"></v-btn>
-    </td>
-  </tr>
-  <tr v-if="!filteredReceipts.length">
-    <td colspan="10" class="text-center">No data</td>
-  </tr>
-</tbody>
+      <v-table class="text-center table-container">
+        <thead>
+          <tr>
+            <th class="text-center"></th>
+            <th class="text-center">วันที่ออกใบเสร็จ</th>
+            <th class="text-center">สถานะใบเสร็จ</th>
+            <th class="text-center">ราคารวมสุทธิ</th>
+            <th class="text-center">ส่วนลด</th>
+            <th class="text-center">สมาชิก</th>
+            <!-- <th class="text-center">แต้มสะสม</th> -->
+            <th class="text-center">โปรโมชั่น</th>
 
-  </v-table>
-      </v-card>
+            <th class="text-center">รูปแบบการจ่ายเงิน</th>
+            <th class="text-center">พนักงาน</th>
+            <th class="text-center">Operations</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(receipt, index) in filteredReceipts" :key="receipt.receiptId">
+            <td class="text-center">{{ index + 1 }}</td>
+            <td class="text-center">{{ formatDateThai(receipt.createdDate + '') }}</td>
+            <td class="text-center">
+              <span :class="statusClass(receipt.receiptStatus)">
+                {{ statusText(receipt.receiptStatus) }}
+              </span>
+            </td>
+            <td class="text-center">{{ receipt.receiptNetPrice }}</td>
+            <td class="text-center">{{ receipt.receiptTotalDiscount }}</td>
+            <td class="text-center">{{ receipt.customer?.customerName || '-' }}</td>
+            <!-- <td class="text-center">{{ receipt.customer?.customerNumberOfStamp || 0 }}</td> -->
+            <td class="text-center">
+              <span v-if="receipt.receiptPromotions && receipt.receiptPromotions.length > 0">
+                มีการใช้โปรโมชั่น
+              </span>
+              <span v-else>
+                -
+              </span>
+            </td>
+            <td class="text-center">{{ receipt.paymentMethod || '-' }}</td>
+            <td class="text-center">{{ receipt.user?.userName }}</td>
+            <td class="text-center">
+              <v-btn color="#FFDD83" icon="mdi-eye" @click="openHistoryReceiptDialog(receipt)"></v-btn>
+            </td>
+          </tr>
+          <tr v-if="!filteredReceipts.length">
+            <td colspan="10" class="text-center">No data</td>
+          </tr>
+        </tbody>
+
+      </v-table>
+    </v-card>
 
   </v-container>
-  </template>
+</template>

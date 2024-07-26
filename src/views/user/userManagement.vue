@@ -52,8 +52,8 @@ const filteredUsers = computed(() => {
                 v-model="userStore.searchQuery"
                 label="ค้นหาผู้ใช้งาน"
                 append-inner-icon="mdi-magnify"
-                hide-details
-                dense
+                dense hide-details variant="solo"
+                outlined
                 @keydown="handleSearchKeydown"
               ></v-text-field>
             </v-col>

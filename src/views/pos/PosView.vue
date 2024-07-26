@@ -134,8 +134,8 @@ const addToCart = (product: Product) => {
                     <v-icon>{{ posStore.hideNavigation ? 'mdi-fullscreen' : 'mdi-fullscreen-exit' }}</v-icon>
                   </v-btn>
                 </template>
-                <span>{{ posStore.hideNavigation ? 'Full Screen' : 'Exit Full Screen' }}</span>
-              </v-tooltip>
+                <span>{{posStore.hideNavigation ? 'Full Screen' : 'Exit Full Screen' }}</span>
+              </v-tooltip> 
             </v-col>
           </v-row>
           <v-row class="full-width-row">

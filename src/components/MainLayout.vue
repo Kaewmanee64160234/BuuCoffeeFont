@@ -163,7 +163,7 @@ const logout = () => {
 <style scoped>
 .v-navigation-drawer {
   width: 250px;
-  background-color: #f2e4d8; /* Light brown background color */
+  background-color: #f2e4d8; 
 }
 
 .v-navigation-drawer.rail {
@@ -195,6 +195,13 @@ const logout = () => {
   margin-right: 16px;
 }
 
+.v-list-item.rail .nav-icon {
+  width: 24px; 
+  height: 24px;
+  margin-right: 0;
+  margin-left: 8px; 
+}
+
 .drawer-header {
   display: flex;
   align-items: center;
@@ -204,13 +211,14 @@ const logout = () => {
 
 .v-list-item.rail .nav-icon {
   margin-right: 0;
-  margin-left: 8px; /* Adjust the left margin for consistent spacing */
+  margin-left: 8px; 
 }
 
 .v-subheader {
   font-size: 14px;
   font-weight: bold;
-  color: #6d4c41; /* Darker brown color */
+  color: #6d4c41;
   padding: 8px 16px;
 }
 </style>
+

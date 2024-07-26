@@ -452,9 +452,9 @@ watch(
     </v-carousel>
     <v-row>--</v-row>
     <v-row>
-      <v-text-field label="เริ่มวันที่" v-model="dateRange.startDate" type="date" />
-      <v-text-field label="ถึงวันที่" v-model="dateRange.endDate" type="date" />
-      <v-select label="กรองตาม" :items="['day', 'month', 'year']" v-model="groupBy" />
+      <v-text-field label="เริ่มวันที่" v-model="dateRange.startDate" type="date" dense hide-details variant="solo"/>
+      <v-text-field label="ถึงวันที่" v-model="dateRange.endDate" type="date" dense hide-details variant="solo"/>
+      <v-select label="กรองตาม" :items="['day', 'month', 'year']" v-model="groupBy" dense hide-details variant="solo"/>
 
     </v-row>
     <v-row>

@@ -84,8 +84,8 @@ const deleteCustomer = async (customerId: number) => {
                 v-model="customerStore.searchQuery"
                 label="ค้นหาลูกค้า"
                 append-inner-icon="mdi-magnify"
-                hide-details
-                dense
+                dense hide-details variant="solo"
+                outlined
                 @keydown="handleSearchKeydown"
               ></v-text-field>
             </v-col>

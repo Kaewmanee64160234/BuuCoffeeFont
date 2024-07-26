@@ -95,6 +95,7 @@ watch([startDateforpromo, endDateforpromo], async () => {
                   label="Start Date"
                   type="date"
                   outlined
+                  dense hide-details variant="solo"
                 ></v-text-field>
               </v-col>
               <v-col cols="auto">
@@ -103,6 +104,7 @@ watch([startDateforpromo, endDateforpromo], async () => {
                   label="End Date"
                   type="date"
                   outlined
+                  dense hide-details variant="solo"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -173,6 +175,7 @@ watch([startDateforpromo, endDateforpromo], async () => {
                   label="Start Date"
                   type="date"
                   outlined
+                  dense hide-details variant="solo"
                 ></v-text-field>
               </v-col>
               <v-col cols="auto">
@@ -181,6 +184,7 @@ watch([startDateforpromo, endDateforpromo], async () => {
                   label="End Date"
                   type="date"
                   outlined
+                  dense hide-details variant="solo"
                 ></v-text-field>
               </v-col>
             </v-row>
