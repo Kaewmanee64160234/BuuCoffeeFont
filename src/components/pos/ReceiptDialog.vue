@@ -31,7 +31,7 @@
                 <div class="item-info d-flex justify-space-between">
                   <p class="product-name">
                     {{ item.quantity }} x {{ item.product?.productName }} {{
-                    item.product?.category.haveTopping ? item.productType?.productTypeName : '' }}
+                      item.product?.category.haveTopping ? item.productType?.productTypeName : '' }}
                   </p>
                   <p class="product-price">{{ item.receiptSubTotal.toFixed(2) }} ฿</p>
                 </div>
@@ -39,12 +39,13 @@
               <p class="toppings" v-if="item.product?.category.haveTopping">
                 ความหวาน {{ item.sweetnessLevel }}%
               </p>
-              <p v-if="item.productTypeToppings && item.productTypeToppings.length > 0 && item.product?.category.haveTopping" class="toppings">
+              <p v-if="item.productTypeToppings && item.productTypeToppings.length > 0 && item.product?.category.haveTopping"
+                class="toppings">
 
                 <span v-for="topping in item.productTypeToppings" :key="topping.productTypeToppingId">
-                 
+
                   <span v-if="topping.topping">
-                    {{ topping.quantity }} x {{ topping.topping.toppingName }} 
+                    {{ topping.quantity }} x {{ topping.topping.toppingName }}
                     ({{ topping.topping.toppingPrice ? topping.topping.toppingPrice : 0 }} ฿) <br>
                   </span>
                 </span>
@@ -55,12 +56,10 @@
           <div class="receipt-summary">
             <p>Items: {{ posStore.currentReceipt?.receiptItems.length }}</p>
             <p>Promotions:</p>
-            <div v-if="posStore.currentReceipt?.receiptNetPrice" class="promotion">
-              <div class="d-flex justify-space-between toppings"
-                v-for="promotion in posStore.currentReceipt?.receiptPromotions" :key="promotion.promotion.promotionId">
-                <p>{{ promotion.promotion.promotionName }}</p>
-                <p> {{ promotion.discount }} ฿</p>
-              </div>
+            <div class="d-flex justify-space-between toppings"
+              v-for="promotion in posStore.currentReceipt?.receiptPromotions" :key="promotion.promotion.promotionId">
+              <p>{{ promotion.promotion.promotionName }}</p>
+              <p> {{ promotion.discount }} ฿</p>
             </div>
             <p class="total">
               Total:

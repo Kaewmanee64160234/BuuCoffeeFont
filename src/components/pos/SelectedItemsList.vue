@@ -115,7 +115,7 @@
                   <div v-for="(promotion) in posStore.receipt.receiptPromotions" :key="promotion.receiptPromotionId"
                     style="text-align: end; width: 100%; padding-right: 40px;">
                     <div style="width: 100%;">
-                      <span class="pa-2">{{ promotion.promotion.promotionType }}:</span>
+                      <span class="pa-2">{{ promotion.promotion.promotionName }}:</span>
                       <span class="red--text">{{ promotion.discount }} $</span>
                       <v-btn size="small" icon variant="text" @click="removePromotion(promotion.promotion)">
                         <v-icon color="red">mdi-delete</v-icon>

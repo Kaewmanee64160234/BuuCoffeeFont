@@ -113,7 +113,6 @@ export const usePromotionStore = defineStore("promotion", () => {
     }
   };
 
-  // Search promotions
   const searchPromotion = async () => {
     try {
       const response = await promotionService.searchPromotions(

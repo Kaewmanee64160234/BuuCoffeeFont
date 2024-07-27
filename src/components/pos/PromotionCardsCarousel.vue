@@ -6,6 +6,7 @@ import type { Promotion } from '@/types/promotion.type';
 import Swal from 'sweetalert2';
 import { useUserStore } from '@/stores/user.store';
 
+
 const posStore = usePosStore();
 const promotionStore = usePromotionStore();
 const userStore = useUserStore();
@@ -41,6 +42,7 @@ watch(() => promotionStore.promotions, () => {
 });
 
 function applyPromotion(promotion: Promotion) {
+  console.log("กำลังใช้โปรโมชั่น:", promotion);
   if (posStore.selectedItems.length === 0) {
     Swal.fire({
       icon: 'error',
@@ -51,7 +53,35 @@ function applyPromotion(promotion: Promotion) {
     return;
   }
 
-  posStore.applyPromotion(promotion);
+  if (promotion.promotionType === "usePoints") {
+    if (posStore.selectedItems.length == 1) {
+      if (posStore.selectedItems[0].product?.category.haveTopping) {
+        posStore.applyPromotion(promotion, posStore.selectedItems[0]);
+      } else {
+        posStore.applyPromotion(promotion);
+
+      }
+    } else {
+      // find have product have topping in selected items
+      const itemsWithToppings = posStore.selectedItems.filter(item => item.product?.category.haveTopping);
+      if (itemsWithToppings.length === 0) {
+        Swal.fire({
+          icon: 'error',
+          title: 'ไม่มีรายการ',
+          text: 'คุณไม่สามารถใช้โปรโมชั่นได้เนื่องจากไม่มีรายการที่มีท็อปปิ้ง',
+          confirmButtonText: 'ตกลง'
+        });
+        return;
+      }
+      posStore.selectUsePointDialog = true;
+      promotionStore.promotion = promotion;
+    }
+
+  } else {
+    posStore.applyPromotion(promotion);
+
+  }
+
 }
 
 function removePromotion(promotion: Promotion) {
@@ -78,7 +108,8 @@ function getButtonClass(promotion: Promotion) {
 </script>
 
 <template>
-  <v-carousel hide-delimiter-background hide-delimiters height="180" style="background-color: #80715E; border-radius: 20px;">
+  <v-carousel hide-delimiter-background hide-delimiters height="180"
+    style="background-color: #80715E; border-radius: 20px;">
     <template v-if="userStore.currentUser.userRole == 'พนักงานขายข้าว'">
       <v-carousel-item v-for="(chunk, index) in promotionChunks" :key="index">
         <div class="promotion-group">
@@ -87,8 +118,8 @@ function getButtonClass(promotion: Promotion) {
               :class="{ 'applied-promotion': isPromotionApplied(promotion) }" @click="togglePromotion(promotion)">
               <v-card-title class="text-center wrap-text">{{ promotion.promotionName }}</v-card-title>
               <v-card-actions class="justify-center">
-                <v-btn v-if="!promotion.promotionCanUseManyTimes" :class="getButtonClass(promotion)" class="btn-apply-promotion"
-                  @click.stop="togglePromotion(promotion)">
+                <v-btn v-if="!promotion.promotionCanUseManyTimes" :class="getButtonClass(promotion)"
+                  class="btn-apply-promotion" @click.stop="togglePromotion(promotion)">
                   {{ isPromotionApplied(promotion) ? 'ยกเลิก' : 'ใช้โปรโมชั่นนี้' }}
                 </v-btn>
                 <!-- if usemanytime ==true -->
@@ -109,8 +140,8 @@ function getButtonClass(promotion: Promotion) {
               :class="{ 'applied-promotion': isPromotionApplied(promotion) }" @click="togglePromotion(promotion)">
               <v-card-title class="text-center wrap-text">{{ promotion.promotionName }}</v-card-title>
               <v-card-actions class="justify-center">
-                <v-btn v-if="!promotion.promotionCanUseManyTimes" :class="getButtonClass(promotion)" class="btn-apply-promotion"
-                  @click.stop="togglePromotion(promotion)">
+                <v-btn v-if="!promotion.promotionCanUseManyTimes" :class="getButtonClass(promotion)"
+                  class="btn-apply-promotion" @click.stop="togglePromotion(promotion)">
                   {{ isPromotionApplied(promotion) ? 'ยกเลิก' : 'ใช้โปรโมชั่นนี้' }}
                 </v-btn>
                 <!-- if usemanytime ==true -->
@@ -145,7 +176,8 @@ function getButtonClass(promotion: Promotion) {
 }
 
 .promotion-card {
-  width: 160px; /* Increased width */
+  width: 160px;
+  /* Increased width */
   height: 120px;
   display: flex;
   flex-direction: column;

@@ -32,12 +32,10 @@
                 <v-text-field v-model="discountValue" label="มูลค่าส่วนลด" type="number" required></v-text-field>
               </template>
               <template v-if="promotionTypeValue === 'buy1get1'">
-                <v-autocomplete v-model="productBuy"
-                  :items="productStore.products.map(product => product.productName)" item-text="productName"
-                  item-value="id" label="ซื้อสินค้า" required></v-autocomplete>
-                <v-autocomplete v-model="productFree"
-                  :items="productStore.products.map(product => product.productName)" item-text="productName"
-                  item-value="id" label="สินค้าฟรี" required></v-autocomplete>
+                <v-autocomplete v-model="productBuy" :items="productStore.products.map(product => product.productName)"
+                  item-text="productName" item-value="id" label="ซื้อสินค้า" required></v-autocomplete>
+                <v-autocomplete v-model="productFree" :items="productStore.products.map(product => product.productName)"
+                  item-text="productName" item-value="id" label="สินค้าฟรี" required></v-autocomplete>
               </template>
               <template v-if="promotionTypeValue === 'usePoints'">
                 <v-text-field v-model="pointsRequired" label="คะแนนที่ต้องใช้" type="number" required></v-text-field>
@@ -45,7 +43,8 @@
               </template>
               <template v-if="promotionTypeValue === 'discountPercentage'">
                 <v-text-field v-model="discountValue" label="เปอร์เซ็นต์ส่วนลด" type="number" required></v-text-field>
-                <v-text-field v-model="minimumPrice" label="ราคาขั้นต่ำสำหรับส่วนลด" type="number" required></v-text-field>
+                <v-text-field v-model="minimumPrice" label="ราคาขั้นต่ำสำหรับส่วนลด" type="number"
+                  required></v-text-field>
               </template>
             </v-form>
           </template>
@@ -127,6 +126,10 @@ function loadPromotionData() {
     if (promotion.freeProductId) {
       productFree.value = productStore.products.find(product => product.productId === promotion.freeProductId)?.productName;
     }
+    if(promotion.promotionType === 'usePoints'){
+      pointsRequired.value = promotion.conditionQuantity;
+
+    }
   }
 }
 
@@ -184,6 +187,11 @@ const updatePromotion = async () => {
     promotionForStore: promotionStore_.value,
     promotionCanUseManyTimes: promotionCanUseManyTimes.value,
   };
+
+
+  if (promotionTypeValue.value === 'usePoints' && !pointsRequired.value) {
+    updatedPromotion.conditionValue1 = pointsRequired.value;
+  }
 
   await promotionStore.updatePromotion(promotionId.value!, updatedPromotion);
   closeDialog();

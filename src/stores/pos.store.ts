@@ -16,12 +16,14 @@ import { useReceiptStore } from "./receipt.store";
 
 export const usePosStore = defineStore("pos", () => {
   const selectedItems = ref<ReceiptItem[]>([]);
+  const selectedItemsUsePromotion = ref<ReceiptItem[]>([]);
   const receiptPromotions = ref<ReceiptPromotion[]>([]);
   const customerPhone = ref<string>("");
   const customerPoints = ref<number>(0);
   const totalDiscount = ref<number>(0);
   const totalPrice = ref<number>(0);
   const netPrice = ref<number>(0);
+  const selectUsePointDialog = ref(false);
   const receipt = ref<Receipt>({
     receiptType: "",
     receiptTotalDiscount: 0,
@@ -32,7 +34,12 @@ export const usePosStore = defineStore("pos", () => {
     receiptPromotions: [],
     receiptTotalPrice: 0,
     paymentMethod: "",
-    customer: null,
+    customer: {
+      customerId: 0,
+      customerName: "",
+      customerPhone: "",
+      customerNumberOfStamp: 0,
+    },
   });
 
   const currentReceipt = ref<Receipt>();
@@ -50,7 +57,7 @@ export const usePosStore = defineStore("pos", () => {
 
   // Load queue number from local storage
   const loadQueueNumber = () => {
-    const storedQueueData = localStorage.getItem('queueData');
+    const storedQueueData = localStorage.getItem("queueData");
     const currentDate = new Date().toDateString();
     if (storedQueueData) {
       const { date, number } = JSON.parse(storedQueueData);
@@ -58,17 +65,26 @@ export const usePosStore = defineStore("pos", () => {
         queueNumber.value = number;
       } else {
         queueNumber.value = 1;
-        localStorage.setItem('queueData', JSON.stringify({ date: currentDate, number: queueNumber.value }));
+        localStorage.setItem(
+          "queueData",
+          JSON.stringify({ date: currentDate, number: queueNumber.value })
+        );
       }
     } else {
-      localStorage.setItem('queueData', JSON.stringify({ date: currentDate, number: queueNumber.value }));
+      localStorage.setItem(
+        "queueData",
+        JSON.stringify({ date: currentDate, number: queueNumber.value })
+      );
     }
   };
 
   // Save queue number to local storage
   const saveQueueNumber = () => {
     const currentDate = new Date().toDateString();
-    localStorage.setItem('queueData', JSON.stringify({ date: currentDate, number: queueNumber.value }));
+    localStorage.setItem(
+      "queueData",
+      JSON.stringify({ date: currentDate, number: queueNumber.value })
+    );
   };
 
   // Initialize queue number on store creation
@@ -286,11 +302,12 @@ export const usePosStore = defineStore("pos", () => {
     await receiptStore.getRecieptIn30Min();
   };
 
-  const applyPromotion = (promotion: Promotion) => {
+  const applyPromotion = (promotion: Promotion, reciptItem?: ReceiptItem) => {
     const currentDate = new Date();
 
     // Check if the promotion is within the valid date range
     if (currentDate < new Date(promotion.startDate)) {
+      console.log("currentDate", currentDate);
       Swal.fire({
         icon: "error",
         title: "โปรโมชั่นหมดอายุ",
@@ -298,15 +315,15 @@ export const usePosStore = defineStore("pos", () => {
       });
       return;
     }
-    if (promotion.noEndDate == false) {
-      if (currentDate > new Date(promotion.endDate!)) {
-        Swal.fire({
-          icon: "error",
-          title: "โปรโมชั่นหมดอายุ",
-          text: "โปรโมชั่นไม่สามารถใช้งานได้ในขณะนี้",
-        });
-        return;
-      }
+    if (!promotion.noEndDate && currentDate > new Date(promotion.endDate!)) {
+      console.log("currentDate2", currentDate);
+
+      Swal.fire({
+        icon: "error",
+        title: "โปรโมชั่นหมดอายุ",
+        text: "โปรโมชั่นไม่สามารถใช้งานได้ในขณะนี้",
+      });
+      return;
     }
 
     // Initial validation: check if receipt total price is valid
@@ -326,10 +343,18 @@ export const usePosStore = defineStore("pos", () => {
       promotion.promotionType === "usePoints"
     ) {
       if (promotion.promotionType === "usePoints") {
+        if (reciptItem == null) {
+          Swal.fire({
+            icon: "error",
+            title: "ส่วนลดไม่ถูกต้อง",
+            text: "โปรโมชั่นไม่สามารถใช้ได้",
+          });
+          return;
+        }
         if (receipt.value.customer !== null) {
           if (
             receipt.value.customer!.customerNumberOfStamp <
-            promotion.discountValue!
+            promotion.conditionQuantity!
           ) {
             Swal.fire({
               icon: "error",
@@ -338,8 +363,9 @@ export const usePosStore = defineStore("pos", () => {
             });
             return;
           }
+
           receipt.value.customer!.customerNumberOfStamp -=
-            promotion.discountValue!;
+            promotion.conditionQuantity!;
         } else {
           Swal.fire({
             icon: "error",
@@ -349,13 +375,29 @@ export const usePosStore = defineStore("pos", () => {
           return;
         }
       }
-      newDiscount = promotion.discountValue!;
+      console.log("reciptItem", reciptItem);
+      if(reciptItem?.quantity == 1){
+        if (reciptItem?.receiptSubTotal! < promotion.discountValue!) {
+          newDiscount = reciptItem?.receiptSubTotal!;
+        } else {
+          newDiscount = promotion.discountValue!;
+        }
+      }else{
+        const receiptSubTotal = reciptItem?.receiptSubTotal! / reciptItem?.quantity!;
+        if (receiptSubTotal < promotion.discountValue!) {
+          newDiscount = receiptSubTotal;
+        } else {
+          newDiscount = promotion.discountValue!;
+        }
+      }
+    
     }
+
     if (promotion.promotionType === "discountPercentage") {
       if (promotion.conditionValue1! <= receipt.value.receiptTotalPrice) {
         newDiscount =
-          parseInt(receipt.value.receiptTotalPrice + "") *
-          (parseInt(promotion.discountValue! + "") / 100);
+          parseFloat(receipt.value.receiptTotalPrice + "") *
+          (parseFloat(promotion.discountValue! + "") / 100);
       } else {
         Swal.fire({
           icon: "error",
@@ -365,6 +407,7 @@ export const usePosStore = defineStore("pos", () => {
         return;
       }
     }
+
     if (promotion.promotionType === "buy1get1") {
       const product = selectedItems.value.find(
         (item) => item.product?.productId === promotion.buyProductId
@@ -377,11 +420,6 @@ export const usePosStore = defineStore("pos", () => {
           const numberOfUsedPromotions = receipt.value.receiptPromotions.filter(
             (item) => item.promotion.promotionId === promotion.promotionId
           ).length;
-          console.log(
-            "numberOfUsedPromotions",
-            product.quantity - numberOfUsedPromotions * 2
-          );
-
           if (product.quantity - numberOfUsedPromotions * 2 >= 2) {
             if (product.quantity >= 2) {
               newDiscount = product.product?.productPrice!;
@@ -402,13 +440,9 @@ export const usePosStore = defineStore("pos", () => {
             return;
           }
         } else {
-          // check if the product is in the receipt
           if (product && product2) {
-            // check if the product quantity is more than the promotion condition
             if (product.quantity >= promotion.conditionValue1!) {
-              // check if the product2 quantity is more than the promotion condition
               if (product2.quantity >= promotion.conditionValue2!) {
-                // check if the promotion is not used before
                 const numberOfUsedPromotions =
                   receipt.value.receiptPromotions.filter(
                     (item) =>
@@ -462,7 +496,6 @@ export const usePosStore = defineStore("pos", () => {
     }
 
     // Check if the new discount would result in a negative or zero net price
-    // Calculate the new total discount and new net price
     const newTotalDiscount =
       parseFloat(receipt.value.receiptTotalDiscount + "") +
       parseFloat(newDiscount + "");
@@ -470,8 +503,7 @@ export const usePosStore = defineStore("pos", () => {
       parseFloat(receipt.value.receiptTotalPrice + "") -
       parseFloat(newTotalDiscount + "");
 
-    // Check if the new net price is less than or equal to zero
-    if (newNetPrice <= 0) {
+    if (newNetPrice < 0) {
       Swal.fire({
         icon: "error",
         title: "ส่วนลดไม่ถูกต้อง",
@@ -553,5 +585,6 @@ export const usePosStore = defineStore("pos", () => {
     updateReceipt,
     toggleNavigation,
     hideNavigation,
+    selectUsePointDialog,
   };
 });

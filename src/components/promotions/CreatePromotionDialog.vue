@@ -13,9 +13,7 @@
               <v-text-field 
                 v-model="promotionName" 
                 label="ชื่อโปรโมชั่น" 
-                :rules="[
-                  v => !!v || 'กรุณากรอกชื่อโปรโมชั่น',
-                ]"
+                :rules="[ v => !!v || 'กรุณากรอกชื่อโปรโมชั่น',]"
                 required
               ></v-text-field>
               <v-text-field v-model="startDate" label="วันที่เริ่มต้น" type="date" :rules="[v => !!v || 'กรุณาเลือกวันที่เริ่มต้น']" required></v-text-field>
@@ -25,7 +23,7 @@
                   v-model="endDate"
                   label="วันที่สิ้นสุด"
                   type="date"
-                  :rules="[v => !!v || 'กรุณาเลือกวันที่สิ้นสุด']"
+                  :rules="[ v => !!v || 'กรุณาเลือกวันที่สิ้นสุด']"
                   :disabled="noEndDate"
                   required
               ></v-text-field>
@@ -151,13 +149,20 @@ const createPromotion = async () => {
     conditionQuantity: promotionTypeValue.value === 'discountPrice' || promotionTypeValue.value === 'usePoints' ? pointsRequired.value : null,
     buyProductId: promotionTypeValue.value === 'buy1get1' ? productStore.products.find(product => product.productName === buyProductId.value)?.productId : null, 
     freeProductId: promotionTypeValue.value === 'buy1get1' ? productStore.products.find(product => product.productName === freeProductId.value)?.productId : null,
+
     conditionValue1: promotionTypeValue.value === 'discountPercentage' ? minimumPrice.value : null,
     conditionValue2: promotionTypeValue.value === 'discountPercentage' ? minimumPrice.value : null,
     promotionDescription: description.value,
     noEndDate: noEndDate.value,
     promotionForStore: promotionStore_.value,
     promotionCanUseManyTimes: promotionCanUseManyTimes.value,
+
   };
+
+  if(promotionTypeValue.value === 'usePoints' && !pointsRequired.value){
+    newPromotion.conditionValue1 = discountValue.value;
+   
+  }
 
   await promotionStore.createPromotion(newPromotion);
   Swal.fire({
