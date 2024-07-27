@@ -7,14 +7,8 @@
         </v-row>
         <v-row>
           <v-col cols="12" md="3">
-            <v-text-field 
-              v-model="categoryStore.searchQuery" 
-              label="ค้นหาหมวดหมู่" 
-              append-inner-icon="mdi-magnify"
-              hide-details 
-              dense 
-              variant="solo"
-            ></v-text-field>
+            <v-text-field v-model="categoryStore.searchQuery" label="ค้นหาหมวดหมู่" append-inner-icon="mdi-magnify"
+              hide-details dense variant="solo"></v-text-field>
           </v-col>
           <v-spacer></v-spacer>
           <v-col cols="12" md="3" class="d-flex justify-center align-center">
@@ -42,19 +36,13 @@
               <td>{{ category.categoryName }}</td>
               <td>{{ category.haveTopping ? 'ได้' : 'ไม่ได้' }}</td>
               <td>
-                <v-btn 
-                  color="#FFDD83" 
-                  icon="mdi-pencil" 
-                  class="mr-2" 
-                  :disabled="category.categoryName === 'กาแฟ' || category.categoryName === 'กับข้าว'"
-                  @click="openUpdateDialog(category)">
+                <v-btn v-if="category.categoryName !== 'กาแฟ' && category.categoryName !== 'กับข้าว'" color="#FFDD83"
+                  icon="mdi-pencil" class="mr-2" @click="openUpdateDialog(category)">
                 </v-btn>
-                <v-btn 
-                  color="#F55050" 
-                  icon="mdi-delete" 
-                  :disabled="category.categoryName === 'กาแฟ' || category.categoryName === 'กับข้าว'"
-                  @click="deleteCategory(category.categoryId)">
+                <v-btn v-if="category.categoryName !== 'กาแฟ' && category.categoryName !== 'กับข้าว'" color="#F55050"
+                  icon="mdi-delete" @click="deleteCategory(category.categoryId)">
                 </v-btn>
+
               </td>
             </tr>
           </tbody>
@@ -142,9 +130,11 @@ const deleteCategory = async (categoryId: number) => {
 .button-full-width {
   width: 100%;
 }
-th, td {
-  padding-top: 12px !important; 
-  padding-bottom: 12px !important; 
-  text-align: center !important; 
+
+th,
+td {
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
+  text-align: center !important;
 }
 </style>
