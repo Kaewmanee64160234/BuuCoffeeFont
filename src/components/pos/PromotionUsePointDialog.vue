@@ -15,7 +15,7 @@ const selectedReceiptItem = ref<ReceiptItem>();
 
 
 const itemsWithToppings = computed(() => 
-  posStore.selectedItems.filter(item => item.product?.category.haveTopping)
+  posStore.selectedItemsUsePromotion.filter(item => item.product?.category.haveTopping)
 );
 
 const applySelectedPromotion = () => {

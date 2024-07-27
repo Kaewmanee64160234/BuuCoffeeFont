@@ -54,9 +54,12 @@ function applyPromotion(promotion: Promotion) {
   }
 
   if (promotion.promotionType === "usePoints") {
+    if ( posStore.selectedItemsUsePromotion.length == 0 && posStore.receipt.receiptPromotions.length ==0 ) {
+      posStore.selectedItemsUsePromotion = posStore.selectedItems.filter(item => item.product?.category.haveTopping);
+    }
     if (posStore.selectedItems.length == 1) {
-      if (posStore.selectedItems[0].product?.category.haveTopping) {
-        posStore.applyPromotion(promotion, posStore.selectedItems[0]);
+      if (posStore.selectedItemsUsePromotion[0].product?.category.haveTopping) {
+        posStore.applyPromotion(promotion, posStore.selectedItemsUsePromotion[0]);
       } else {
         posStore.applyPromotion(promotion);
 

@@ -376,21 +376,37 @@ export const usePosStore = defineStore("pos", () => {
         }
       }
       console.log("reciptItem", reciptItem);
-      if(reciptItem?.quantity == 1){
+      if (reciptItem?.quantity == 1) {
         if (reciptItem?.receiptSubTotal! < promotion.discountValue!) {
           newDiscount = reciptItem?.receiptSubTotal!;
         } else {
           newDiscount = promotion.discountValue!;
         }
-      }else{
-        const receiptSubTotal = reciptItem?.receiptSubTotal! / reciptItem?.quantity!;
+      } else {
+        const receiptSubTotal =
+          reciptItem?.receiptSubTotal! / reciptItem?.quantity!;
         if (receiptSubTotal < promotion.discountValue!) {
           newDiscount = receiptSubTotal;
         } else {
           newDiscount = promotion.discountValue!;
         }
       }
-    
+      // split item out of posStore.selectedItemsUsePromotion find by deteail
+      const index = selectedItemsUsePromotion.value.findIndex(
+        (item) =>
+          item.product?.productId === reciptItem?.product?.productId &&
+          item.receiptSubTotal === reciptItem?.receiptSubTotal &&
+          item.sweetnessLevel === reciptItem?.sweetnessLevel &&
+          item.productTypeToppings === reciptItem?.productTypeToppings &&
+          item.productType === reciptItem?.productType
+      );
+      if (index !== -1) {
+        if (selectedItemsUsePromotion.value[index].quantity == 1) {
+          selectedItemsUsePromotion.value.splice(index, 1);
+        } else {
+          selectedItemsUsePromotion.value[index].quantity -= 1;
+        }
+      }
     }
 
     if (promotion.promotionType === "discountPercentage") {
@@ -535,12 +551,15 @@ export const usePosStore = defineStore("pos", () => {
     );
     if (index !== -1) {
       console.log("Promotion removed", receipt.value.receiptPromotions);
-      if(receipt.value.receiptPromotions[index].promotion.promotionType === "usePoints"){
+      if (
+        receipt.value.receiptPromotions[index].promotion.promotionType ===
+        "usePoints"
+      ) {
         receipt.value.customer!.customerNumberOfStamp +=
-        promotion.conditionQuantity!;
+          promotion.conditionQuantity!;
       }
       receipt.value.receiptPromotions.splice(index, 1);
-
+      selectedItemsUsePromotion.value = selectedItems.value;
     }
     // calculate total discount
     receipt.value.receiptTotalDiscount = receipt.value.receiptPromotions.reduce(
@@ -592,5 +611,6 @@ export const usePosStore = defineStore("pos", () => {
     toggleNavigation,
     hideNavigation,
     selectUsePointDialog,
+    selectedItemsUsePromotion,
   };
 });
