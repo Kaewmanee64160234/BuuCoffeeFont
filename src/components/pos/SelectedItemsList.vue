@@ -1,3 +1,223 @@
+<script lang="ts" setup>
+import { ref, computed, watch, onMounted } from 'vue';
+import { usePosStore } from '@/stores/pos.store';
+import { useCustomerStore } from '@/stores/customer.store';
+import Swal from 'sweetalert2';
+import AddCustomerDialog from '../customer/AddCustomerDialog.vue';
+import type { Receipt, ReceiptItem } from '../../types/receipt.type';
+import type { Promotion } from '../../types/promotion.type';
+import { useUserStore } from '@/stores/user.store';
+import { useReceiptStore } from '@/stores/receipt.store';
+import ReceiptDetailsDialogPos from '../receipts/ReceiptDialogPos.vue';
+
+const step = ref(1);
+const posStore = usePosStore();
+const customerStore = useCustomerStore();
+const userStore = useUserStore();
+const selectedItems = computed(() => posStore.selectedItems);
+const selectedCustomer = ref('');
+const recive = ref(0);
+const change = ref(0);
+const receiptStore = useReceiptStore();
+
+onMounted(async () => {
+  await receiptStore.getRecieptIn30Min();
+});
+
+function nextStep() {
+  if (selectedItems.value.length === 0) {
+    Swal.fire({
+      icon: 'error',
+      title: 'ข้อมูลไม่สมบูรณ์',
+      text: 'กรุณาเพิ่มรายการอย่างน้อยหนึ่งรายการในใบเสร็จ',
+    });
+    return;
+  }
+  if (posStore.receipt.paymentMethod === '' && step.value === 2) {
+    Swal.fire({
+      icon: 'error',
+      title: 'ข้อมูลไม่สมบูรณ์',
+      text: 'กรุณาเลือกวิธีการชำระเงิน',
+    });
+    return;
+  }
+  step.value++;
+  console.log('Next Step:', step.value);
+}
+
+function prevStep() {
+  step.value--;
+  console.log('Previous Step:', step.value);
+}
+
+function removeItem(index: number) {
+  posStore.removeItem(index);
+}
+
+function calculateChange() {
+  if (posStore.receipt.paymentMethod === 'cash') {
+    change.value = recive.value - posStore.receipt.receiptNetPrice;
+  }
+}
+
+function openReceiptDialog() {
+  posStore.ReceiptDialogPos = true;
+  console.log(" openReceiptDialog ", posStore.ReceiptDialogPos);
+}
+
+function selectPaymentMethod(method: string) {
+  console.log(`Selected payment method: ${method}`);
+  posStore.receipt.paymentMethod = method;
+  if (method === 'cash') {
+    calculateChange();
+  } else {
+    change.value = 0;
+  }
+}
+
+watch(() => recive.value, () => {
+  calculateChange();
+});
+
+function increaseQuantity(item: ReceiptItem) {
+  console.log('increase quantity', item);
+  if (item.product?.category.haveTopping) {
+    if (item.productTypeToppings.length > 0) {
+      posStore.addToReceipt(item.product, item.productType, item.productTypeToppings, 1, item.sweetnessLevel);
+    } else {
+      posStore.addToReceipt(item.product, item.productType, [], 1, item.sweetnessLevel);
+    }
+  } else {
+    posStore.addToReceipt(item.product, {}, [], 1, null);
+  }
+}
+
+function decreaseQuantity(index: number) {
+  const item = selectedItems.value[index];
+  if (item.quantity === 1) {
+    removeItem(index);
+  } else {
+    posStore.spliceData(index);
+  }
+}
+
+async function save() {
+  if (selectedItems.value.length === 0) {
+    Swal.fire({
+      icon: 'error',
+      title: 'ข้อมูลไม่สมบูรณ์',
+      text: 'กรุณาเพิ่มรายการอย่างน้อยหนึ่งรายการในใบเสร็จ',
+    });
+    return;
+  }
+  if (posStore.receipt.paymentMethod === '') {
+    Swal.fire({
+      icon: 'error',
+      title: 'ข้อมูลไม่สมบูรณ์',
+      text: 'กรุณาเลือกวิธีการชำระเงิน',
+    });
+    return;
+  }
+  if (posStore.receipt.paymentMethod === 'cash' && recive.value < posStore.receipt.receiptNetPrice) {
+    Swal.fire({
+      icon: 'error',
+      title: 'ข้อมูลไม่สมบูรณ์',
+      text: 'กรุณาป้อนจำนวนเงินสดที่ได้รับที่ถูกต้อง',
+    });
+    return;
+  }
+  if (posStore.receipt.receiptId) {
+    posStore.updateReceipt(posStore.receipt.receiptId, posStore.receipt);
+  } else {
+    posStore.createReceipt();
+  }
+  posStore.selectedItems = [];
+  posStore.receipt.receiptTotalPrice = 0;
+  posStore.receipt.receiptTotalDiscount = 0;
+  posStore.receipt.receiptNetPrice = 0;
+  posStore.receipt.receiptPromotions = [];
+  posStore.receiptDialog = true;
+  recive.value = 0;
+  change.value = 0;
+  step.value = 1;
+  posStore.receipt.paymentMethod = '';
+  posStore.receipt.customer = null;
+  posStore.receipt.receiptId = null;
+  posStore.receipt.receiptStatus = 'รอชำระเงิน';
+  selectedCustomer.value = '';
+}
+
+function openCreateCustomerDialog() {
+  customerStore.openDialogRegisterCustomer = true;
+}
+
+function cancelReceipt() {
+  posStore.selectedItems = [];
+  posStore.receipt = {
+    receiptTotalPrice: 0,
+    receiptTotalDiscount: 0,
+    receiptNetPrice: 0,
+    receiptPromotions: [],
+    receiptItems: [],
+    receiptStatus: 'รอชำระเงิน',
+    paymentMethod: '',
+    createdDate: new Date(),
+    queueNumber: posStore.queueNumber,
+    receiptType: '',
+    updatedDate: new Date(),
+  };
+  
+  posStore.receiptDialog = false;
+
+  recive.value = 0;
+  change.value = 0;
+  step.value = 1;
+  posStore.receipt.paymentMethod = '';
+}
+
+function removePromotion(promotion: Promotion) {
+  posStore.removePromotion(promotion);
+}
+
+watch(() => selectedCustomer.value, () => {
+  if (selectedCustomer.value === '' || selectedCustomer.value === null) {
+    posStore.receipt.customer = null;
+    return;
+  }
+  findCustomer();
+});
+
+function findCustomer() {
+  console.log('Selected customer:', selectedCustomer.value);
+  const customer = customerStore.customers.find(c => c.customerPhone === selectedCustomer.value);
+  console.log('Customer found:', customer);
+
+  if (customer) {
+    posStore.receipt.customer = customer;
+  } else {
+    Swal.fire({
+      icon: 'error',
+      title: 'ไม่พบลูกค้า',
+      text: 'ไม่พบลูกค้าที่มีหมายเลขโทรศัพท์นี้',
+    });
+  }
+}
+
+const selectReceipt = (receipt: Receipt) => {
+  receipt.receiptItems = receipt.receiptItems.map(item => ({
+    ...item,
+    quantity: parseInt(item.quantity.toString(), 10),
+  }));
+
+  posStore.receipt = receipt;
+  posStore.selectedItems = receipt.receiptItems;
+  posStore.ReceiptDialogPos = false;
+
+  console.log('Selected Receipt:', receipt);
+};
+</script>
+
+
 <template>
   <ReceiptDetailsDialogPos />
 
@@ -264,224 +484,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
-import { ref, computed, watch, onMounted } from 'vue';
-import { usePosStore } from '@/stores/pos.store';
-import { useCustomerStore } from '@/stores/customer.store';
-import Swal from 'sweetalert2';
-import AddCustomerDialog from '../customer/AddCustomerDialog.vue';
-import type { Receipt, ReceiptItem } from '../../types/receipt.type';
-import type { Promotion } from '../../types/promotion.type';
-import { useUserStore } from '@/stores/user.store';
-import { useReceiptStore } from '@/stores/receipt.store';
-import ReceiptDetailsDialogPos from '../receipts/ReceiptDialogPos.vue';
 
-const step = ref(1);
-const posStore = usePosStore();
-const customerStore = useCustomerStore();
-const userStore = useUserStore();
-const selectedItems = computed(() => posStore.selectedItems);
-const selectedCustomer = ref('');
-const recive = ref(0);
-const change = ref(0);
-const receiptStore = useReceiptStore();
-
-onMounted(async () => {
-  await receiptStore.getRecieptIn30Min();
-});
-
-function nextStep() {
-  if (selectedItems.value.length === 0) {
-    Swal.fire({
-      icon: 'error',
-      title: 'ข้อมูลไม่สมบูรณ์',
-      text: 'กรุณาเพิ่มรายการอย่างน้อยหนึ่งรายการในใบเสร็จ',
-    });
-    return;
-  }
-  if (posStore.receipt.paymentMethod === '' && step.value === 2) {
-    Swal.fire({
-      icon: 'error',
-      title: 'ข้อมูลไม่สมบูรณ์',
-      text: 'กรุณาเลือกวิธีการชำระเงิน',
-    });
-    return;
-  }
-  step.value++;
-  console.log('Next Step:', step.value);
-}
-
-function prevStep() {
-  step.value--;
-  console.log('Previous Step:', step.value);
-}
-
-function removeItem(index: number) {
-  posStore.removeItem(index);
-}
-
-function calculateChange() {
-  if (posStore.receipt.paymentMethod === 'cash') {
-    change.value = recive.value - posStore.receipt.receiptNetPrice;
-  }
-}
-
-function openReceiptDialog() {
-  posStore.ReceiptDialogPos = true;
-  console.log(" openReceiptDialog ", posStore.ReceiptDialogPos);
-}
-
-function selectPaymentMethod(method: string) {
-  console.log(`Selected payment method: ${method}`);
-  posStore.receipt.paymentMethod = method;
-  if (method === 'cash') {
-    calculateChange();
-  } else {
-    change.value = 0;
-  }
-}
-
-watch(() => recive.value, () => {
-  calculateChange();
-});
-
-function increaseQuantity(item: ReceiptItem) {
-  console.log('increase quantity', item);
-  if (item.product?.category.haveTopping) {
-    if (item.productTypeToppings.length > 0) {
-      posStore.addToReceipt(item.product, item.productType, item.productTypeToppings, 1, item.sweetnessLevel);
-    } else {
-      posStore.addToReceipt(item.product, item.productType, [], 1, item.sweetnessLevel);
-    }
-  } else {
-    posStore.addToReceipt(item.product, {}, [], 1, null);
-  }
-}
-
-function decreaseQuantity(index: number) {
-  const item = selectedItems.value[index];
-  if (item.quantity === 1) {
-    removeItem(index);
-  } else {
-    posStore.spliceData(index);
-  }
-}
-
-async function save() {
-  if (selectedItems.value.length === 0) {
-    Swal.fire({
-      icon: 'error',
-      title: 'ข้อมูลไม่สมบูรณ์',
-      text: 'กรุณาเพิ่มรายการอย่างน้อยหนึ่งรายการในใบเสร็จ',
-    });
-    return;
-  }
-  if (posStore.receipt.paymentMethod === '') {
-    Swal.fire({
-      icon: 'error',
-      title: 'ข้อมูลไม่สมบูรณ์',
-      text: 'กรุณาเลือกวิธีการชำระเงิน',
-    });
-    return;
-  }
-  if (posStore.receipt.paymentMethod === 'cash' && recive.value < posStore.receipt.receiptNetPrice) {
-    Swal.fire({
-      icon: 'error',
-      title: 'ข้อมูลไม่สมบูรณ์',
-      text: 'กรุณาป้อนจำนวนเงินสดที่ได้รับที่ถูกต้อง',
-    });
-    return;
-  }
-  if (posStore.receipt.receiptId) {
-    posStore.updateReceipt(posStore.receipt.receiptId, posStore.receipt);
-  } else {
-    posStore.createReceipt();
-  }
-  posStore.selectedItems = [];
-  posStore.receipt.receiptTotalPrice = 0;
-  posStore.receipt.receiptTotalDiscount = 0;
-  posStore.receipt.receiptNetPrice = 0;
-  posStore.receipt.receiptPromotions = [];
-  posStore.receiptDialog = true;
-  recive.value = 0;
-  change.value = 0;
-  step.value = 1;
-  posStore.receipt.paymentMethod = '';
-  posStore.receipt.customer = null;
-  posStore.receipt.receiptId = null;
-  posStore.receipt.receiptStatus = 'รอชำระเงิน';
-  selectedCustomer.value = '';
-}
-
-function openCreateCustomerDialog() {
-  customerStore.openDialogRegisterCustomer = true;
-}
-
-function cancelReceipt() {
-  posStore.selectedItems = [];
-  posStore.receipt = {
-    receiptTotalPrice: 0,
-    receiptTotalDiscount: 0,
-    receiptNetPrice: 0,
-    receiptPromotions: [],
-    receiptItems: [],
-    receiptStatus: 'รอชำระเงิน',
-    paymentMethod: '',
-    createdDate: new Date(),
-    queueNumber: posStore.queueNumber,
-    receiptType: '',
-    updatedDate: new Date(),
-  };
-  
-  posStore.receiptDialog = false;
-
-  recive.value = 0;
-  change.value = 0;
-  step.value = 1;
-  posStore.receipt.paymentMethod = '';
-}
-
-function removePromotion(promotion: Promotion) {
-  posStore.removePromotion(promotion);
-}
-
-watch(() => selectedCustomer.value, () => {
-  if (selectedCustomer.value === '' || selectedCustomer.value === null) {
-    posStore.receipt.customer = null;
-    return;
-  }
-  findCustomer();
-});
-
-function findCustomer() {
-  console.log('Selected customer:', selectedCustomer.value);
-  const customer = customerStore.customers.find(c => c.customerPhone === selectedCustomer.value);
-  console.log('Customer found:', customer);
-
-  if (customer) {
-    posStore.receipt.customer = customer;
-  } else {
-    Swal.fire({
-      icon: 'error',
-      title: 'ไม่พบลูกค้า',
-      text: 'ไม่พบลูกค้าที่มีหมายเลขโทรศัพท์นี้',
-    });
-  }
-}
-
-const selectReceipt = (receipt: Receipt) => {
-  receipt.receiptItems = receipt.receiptItems.map(item => ({
-    ...item,
-    quantity: parseInt(item.quantity.toString(), 10),
-  }));
-
-  posStore.receipt = receipt;
-  posStore.selectedItems = receipt.receiptItems;
-  posStore.ReceiptDialogPos = false;
-
-  console.log('Selected Receipt:', receipt);
-};
-</script>
 
 <style scoped>
 .selected-item {

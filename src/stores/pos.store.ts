@@ -534,7 +534,13 @@ export const usePosStore = defineStore("pos", () => {
       (item) => item.promotion.promotionId === promotion.promotionId
     );
     if (index !== -1) {
+      console.log("Promotion removed", receipt.value.receiptPromotions);
+      if(receipt.value.receiptPromotions[index].promotion.promotionType === "usePoints"){
+        receipt.value.customer!.customerNumberOfStamp +=
+        promotion.conditionQuantity!;
+      }
       receipt.value.receiptPromotions.splice(index, 1);
+
     }
     // calculate total discount
     receipt.value.receiptTotalDiscount = receipt.value.receiptPromotions.reduce(
