@@ -24,6 +24,7 @@ export const usePosStore = defineStore("pos", () => {
   const totalPrice = ref<number>(0);
   const netPrice = ref<number>(0);
   const selectUsePointDialog = ref(false);
+  const countingPromotion = ref<number>(0);
   const receipt = ref<Receipt>({
     receiptType: "",
     receiptTotalDiscount: 0,
@@ -374,37 +375,64 @@ export const usePosStore = defineStore("pos", () => {
           });
           return;
         }
-      }
-      console.log("reciptItem", reciptItem);
-      if (reciptItem?.quantity == 1) {
-        if (reciptItem?.receiptSubTotal! < promotion.discountValue!) {
-          newDiscount = reciptItem?.receiptSubTotal!;
+        console.log("reciptItem", reciptItem);
+        if (reciptItem?.quantity == 1) {
+          if (reciptItem?.receiptSubTotal! < promotion.discountValue!) {
+            newDiscount = reciptItem?.receiptSubTotal!;
+          } else {
+            newDiscount = promotion.discountValue!;
+          }
         } else {
-          newDiscount = promotion.discountValue!;
+          const receiptSubTotal =
+            reciptItem?.receiptSubTotal! / reciptItem?.quantity!;
+          if (receiptSubTotal < promotion.discountValue!) {
+            newDiscount = receiptSubTotal;
+          } else {
+            newDiscount = promotion.discountValue!;
+          }
         }
-      } else {
-        const receiptSubTotal =
-          reciptItem?.receiptSubTotal! / reciptItem?.quantity!;
-        if (receiptSubTotal < promotion.discountValue!) {
-          newDiscount = receiptSubTotal;
-        } else {
-          newDiscount = promotion.discountValue!;
+        // split item out of posStore.selectedItemsUsePromotion find by deteail
+        const index = selectedItemsUsePromotion.value.findIndex(
+          (item) =>
+            item.product?.productId === reciptItem?.product?.productId &&
+            item.receiptSubTotal === reciptItem?.receiptSubTotal &&
+            item.sweetnessLevel === reciptItem?.sweetnessLevel &&
+            item.productTypeToppings === reciptItem?.productTypeToppings &&
+            item.productType === reciptItem?.productType
+        );
+        if (index !== -1) {
+          if (selectedItemsUsePromotion.value[index].quantity == 1) {
+            selectedItemsUsePromotion.value.splice(index, 1);
+          } else {
+            selectedItemsUsePromotion.value[index].quantity -= 1;
+          }
         }
       }
-      // split item out of posStore.selectedItemsUsePromotion find by deteail
-      const index = selectedItemsUsePromotion.value.findIndex(
-        (item) =>
-          item.product?.productId === reciptItem?.product?.productId &&
-          item.receiptSubTotal === reciptItem?.receiptSubTotal &&
-          item.sweetnessLevel === reciptItem?.sweetnessLevel &&
-          item.productTypeToppings === reciptItem?.productTypeToppings &&
-          item.productType === reciptItem?.productType
-      );
-      if (index !== -1) {
-        if (selectedItemsUsePromotion.value[index].quantity == 1) {
-          selectedItemsUsePromotion.value.splice(index, 1);
-        } else {
-          selectedItemsUsePromotion.value[index].quantity -= 1;
+
+      // discoutnPrice call  countingPromotion more that 3 time noti evey time
+      if (promotion.promotionType === "discountPrice") {
+        countingPromotion.value += 1;
+        if (countingPromotion.value > 3) {
+          // คุณได้ใช้โปรโมชั่นนี้มากกว่า 3 ครั้งต้องการลดเพิ่มหรือไม่
+          Swal.fire({
+            icon: "warning",
+            title: "คุณได้ใช้โปรโมชั่นนี้มากกว่า 3 ครั้ง",
+            text: "ต้องการลดเพิ่มหรือไม่",
+            showCancelButton: true,
+            confirmButtonText: "ใช่",
+            cancelButtonText: "ไม่ใช่",
+          }).then((result) => {
+            
+            
+            if (result.isConfirmed==true) {
+              console.log('Successfully confirmed');
+              newDiscount = promotion.discountValue!;
+            }else{
+              return;
+            }
+          });
+        }else{
+          newDiscount = promotion.discountValue!;
         }
       }
     }
