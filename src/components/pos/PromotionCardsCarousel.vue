@@ -57,6 +57,8 @@ function applyPromotion(promotion: Promotion) {
       posStore.selectedItemsUsePromotion = posStore.selectedItems.filter(item => item.product?.category.haveTopping);
     }
     if (posStore.selectedItems.length == 1) {
+      posStore.selectedItemsUsePromotion = posStore.selectedItems.filter(item => item.product?.category.haveTopping);
+
       if (posStore.selectedItemsUsePromotion[0].product?.category.haveTopping) {
         posStore.applyPromotion(promotion, posStore.selectedItemsUsePromotion[0]);
       } else {
