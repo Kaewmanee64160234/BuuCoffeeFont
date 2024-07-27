@@ -53,7 +53,7 @@ function applyPromotion(promotion: Promotion) {
   }
 
   if (promotion.promotionType === "usePoints") {
-    if (posStore.selectedItemsUsePromotion.length == 0 && posStore.receipt.receiptPromotions.length == 0) {
+    if (posStore.selectedItemsUsePromotion.length == 0 && posStore.selectedItems.length > 1) {
       posStore.selectedItemsUsePromotion = posStore.selectedItems.filter(item => item.product?.category.haveTopping);
     }
     if (posStore.selectedItems.length == 1) {
