@@ -70,7 +70,8 @@ watch(paginate, async (newPage, oldPage) => {
           <h3>รายการวัตถุดิบ</h3>
           </v-col>
           <v-col cols="3">
-            <v-text-field label="ค้นหารายการวัตถุดิบ" append-inner-icon="mdi-magnify" hide-details dense v-model="ingredientStore.keyword"></v-text-field>
+            <v-text-field label="ค้นหารายการวัตถุดิบ" append-inner-icon="mdi-magnify" dense hide-details variant="solo"
+            outlined v-model="ingredientStore.keyword"></v-text-field>
           </v-col>
         </v-row>
         <v-row>
@@ -182,5 +183,10 @@ th, td {
   padding-top: 12px !important; 
   padding-bottom: 12px !important; 
   text-align: center !important; 
+}
+.flex-container {
+  display: flex;
+  flex-direction: column;
+  height: 95vh;
 }
 </style>

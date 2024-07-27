@@ -107,6 +107,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
   const store = ref<string>("");
   const discount = ref<number>(0);
   const total = ref<number>(0);
+  const importStoreType = ref<string>("");
 
   function Addingredient(item: Ingredient) {
     const exists = ingredientList.value.some(
@@ -168,6 +169,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
       store: store.value,
       discount: discount.value,
       total: total.value,
+      importStoreType:importStoreType.value,
     };
 
     console.log("Sending data to API:", importingredient);
@@ -268,6 +270,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
     store,
     discount,
     total,
+    importStoreType,
     importingredients,
     ingredientCheckList,
     ingredientlow,

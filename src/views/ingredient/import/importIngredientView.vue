@@ -1,5 +1,6 @@
 <template>
   <v-container fluid>
+    <v-card class="flex-container">
     <v-card style="height: 100vh; width: 100vw; overflow-y: auto;">
       <v-card-title>
         <v-row>
@@ -7,14 +8,8 @@
         </v-row>
         <v-row>
           <v-col cols="3">
-            <v-text-field
-              label="ค้นหาวัตถุดิบ"
-              append-inner-icon="mdi-magnify"
-              hide-details
-              dense
-              v-model="searchQuery"
-              @input="onSearch"
-            ></v-text-field>
+            <v-text-field label="ค้นหาวัตถุดิบ" append-inner-icon="mdi-magnify" dense hide-details variant="solo" v-model="searchQuery"
+              @input="onSearch"></v-text-field>
           </v-col>
           <v-col cols="auto">
             <v-btn color="success" :to="{ name: 'ingredients' }">รายการวัตถุดิบ</v-btn>
@@ -22,6 +17,7 @@
           <v-col cols="auto">
             <v-btn color="warning" :to="{ name: 'importingredientsHistory' }">ประวัตินำเข้าวัตถุดิบ</v-btn>
           </v-col>
+          
         </v-row>
         <v-spacer></v-spacer>
       </v-card-title>
@@ -29,12 +25,8 @@
         <v-col cols="6" class="d-flex flex-column">
           <v-container>
             <v-row>
-              <v-col
-                cols="3"
-                style="text-align: center; padding: 8px;"
-                v-for="(item, index) in ingredientStore.ingredients"
-                :key="index"
-              >
+              <v-col cols="3" style="text-align: center; padding: 8px;"
+                v-for="(item, index) in ingredientStore.ingredients" :key="index">
                 <v-card width="100%" @click="ingredientStore.Addingredient(item)" style="height: 200px;">
                   <v-img :src="`http://localhost:3000/ingredients/${item.ingredientId}/image`" height="100"></v-img>
                   <v-card-title style="font-size: 14px;">{{ item.ingredientName }}</v-card-title>
@@ -75,52 +67,51 @@
               </tbody>
             </v-table>
           </v-card>
+
           <v-row>
-            <v-spacer></v-spacer>
             <v-col cols="6">
               <v-row>
-                <v-col>ชื่อร้านค้า</v-col>
-                <v-col>
-                  <v-text-field
-                    ref="storeField"
-                    label="กรุณากรอกชื่อร้านค้า"
-                    hide-details
-                    dense
-                    v-model="ingredientStore.store"
-                    :rules="[rules.required, rules.name]"
-                  ></v-text-field>
+                <v-col cols="12">ชื่อร้านค้า</v-col>
+                <v-col cols="12">
+                  <v-text-field ref="storeField" label="กรุณากรอกชื่อร้านค้า" v-model="ingredientStore.store"
+                    :rules="[rules.required, rules.name]" dense hide-details variant="solo">
+                  </v-text-field>
                 </v-col>
               </v-row>
               <v-row>
-                <v-col>ส่วนลด</v-col>
-                <v-col>
-                  <v-text-field
-                    ref="discountField"
-                    label="กรุณากรอกส่วนลด"
-                    hide-details
-                    dense
-                    v-model="ingredientStore.discount"
-                    :rules="[rules.required, rules.number]"
-                  ></v-text-field>
+                <v-col cols="12">ส่วนลด</v-col>
+                <v-col cols="12">
+                  <v-text-field ref="discountField" label="กรุณากรอกส่วนลด" v-model="ingredientStore.discount"
+                    :rules="[rules.required, rules.number]" dense hide-details variant="solo"></v-text-field>
                 </v-col>
+
               </v-row>
             </v-col>
             <v-col cols="6">
               <v-row>
-                <v-col>ราคารวมใบเสร็จ</v-col>
-                <v-col>
-                  <v-text-field
-                    ref="totalField"
-                    label="กรุณากรอกราคารวมใบเสร็จ"
-                    hide-details
-                    dense
-                    v-model="ingredientStore.total"
-                    :rules="[rules.required, rules.number]"
-                  ></v-text-field>
+                <v-col cols="12">ราคารวมใบเสร็จ</v-col>
+                <v-col cols="12">
+                  <v-text-field ref="totalField" label="กรุณากรอกราคารวมใบเสร็จ" 
+                    v-model="ingredientStore.total" :rules="[rules.required, rules.number]" dense hide-details variant="solo"></v-text-field>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12">หมายเหตุ</v-col>
+                <v-col cols="12">
+                  <v-text-field ref="discountField" label="กรุณาระบุหมายเหตุ **ถ้ามี" dense hide-details variant="solo"></v-text-field>
                 </v-col>
               </v-row>
             </v-col>
           </v-row>
+          <v-row>
+            <v-col>
+              <v-radio-group v-model="ingredientStore.importStoreType" row :rules="[rules.required]">
+                <v-radio label="ร้านกาแฟ" value="ร้านกาแฟ"></v-radio>
+                <v-radio label="ร้านข้าว" value="ร้านข้าว"></v-radio>
+              </v-radio-group>
+            </v-col>
+          </v-row>
+
           <v-row>
             <v-col>
               <v-btn @click="saveAndClearForm" color="orange">
@@ -131,6 +122,7 @@
           </v-row>
         </v-col>
       </v-row>
+    </v-card>
     </v-card>
   </v-container>
 </template>
@@ -185,15 +177,15 @@ const confirmSave = () => {
     reverseButtons: true
   }).then((result) => {
     if (result.isConfirmed) {
-      saveData(); 
-      return true; 
+      saveData();
+      return true;
     }
-    return false; 
+    return false;
   });
 };
 
 const saveData = () => {
-  ingredientStore.saveImportData(); 
+  ingredientStore.saveImportData();
   Swal.fire({
     title: 'บันทึกข้อมูลสำเร็จ!',
     icon: 'success',
@@ -209,11 +201,11 @@ const saveAndClearForm = async () => {
 };
 
 const resetForm = () => {
-  ingredientStore.ingredientList = []; 
-  ingredientStore.store = ""; 
-  ingredientStore.discount = 0; 
+  ingredientStore.ingredientList = [];
+  ingredientStore.store = "";
+  ingredientStore.discount = 0;
   ingredientStore.total = 0;
-  
+
   // Clear each field's validation and reset value
   if (storeField.value) {
     storeField.value.$el.querySelector('input').value = "";
@@ -266,10 +258,11 @@ const resetForm = () => {
   background-color: #c9302c;
 }
 
-th, td {
-  padding-top: 12px !important; 
-  padding-bottom: 12px !important; 
-  text-align: center !important; 
+th,
+td {
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
+  text-align: center !important;
 }
 
 th {
