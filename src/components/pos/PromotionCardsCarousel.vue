@@ -6,7 +6,6 @@ import type { Promotion } from '@/types/promotion.type';
 import Swal from 'sweetalert2';
 import { useUserStore } from '@/stores/user.store';
 
-
 const posStore = usePosStore();
 const promotionStore = usePromotionStore();
 const userStore = useUserStore();
@@ -54,7 +53,7 @@ function applyPromotion(promotion: Promotion) {
   }
 
   if (promotion.promotionType === "usePoints") {
-    if ( posStore.selectedItemsUsePromotion.length == 0 && posStore.receipt.receiptPromotions.length ==0 ) {
+    if (posStore.selectedItemsUsePromotion.length == 0 && posStore.receipt.receiptPromotions.length == 0) {
       posStore.selectedItemsUsePromotion = posStore.selectedItems.filter(item => item.product?.category.haveTopping);
     }
     if (posStore.selectedItems.length == 1) {
@@ -62,10 +61,8 @@ function applyPromotion(promotion: Promotion) {
         posStore.applyPromotion(promotion, posStore.selectedItemsUsePromotion[0]);
       } else {
         posStore.applyPromotion(promotion);
-
       }
     } else {
-      // find have product have topping in selected items
       const itemsWithToppings = posStore.selectedItems.filter(item => item.product?.category.haveTopping);
       if (itemsWithToppings.length === 0) {
         Swal.fire({
@@ -79,12 +76,9 @@ function applyPromotion(promotion: Promotion) {
       posStore.selectUsePointDialog = true;
       promotionStore.promotion = promotion;
     }
-
   } else {
     posStore.applyPromotion(promotion);
-
   }
-
 }
 
 function removePromotion(promotion: Promotion) {
@@ -110,54 +104,53 @@ function getButtonClass(promotion: Promotion) {
 }
 </script>
 
+
 <template>
-  <v-carousel hide-delimiter-background hide-delimiters height="180"
-    style="background-color: #80715E; border-radius: 20px;">
-    <template v-if="userStore.currentUser.userRole == 'พนักงานขายข้าว'">
-      <v-carousel-item v-for="(chunk, index) in promotionChunks" :key="index">
-        <div class="promotion-group">
-          <div class="promotion-container">
-            <v-card v-for="promotion in chunk" :key="promotion.promotionId" class="promotion-card"
-              :class="{ 'applied-promotion': isPromotionApplied(promotion) }" @click="togglePromotion(promotion)">
-              <v-card-title class="text-center wrap-text">{{ promotion.promotionName }}</v-card-title>
-              <v-card-actions class="justify-center">
-                <v-btn v-if="!promotion.promotionCanUseManyTimes" :class="getButtonClass(promotion)"
-                  class="btn-apply-promotion" @click.stop="togglePromotion(promotion)">
-                  {{ isPromotionApplied(promotion) ? 'ยกเลิก' : 'ใช้โปรโมชั่นนี้' }}
-                </v-btn>
-                <!-- if usemanytime ==true -->
-                <v-btn v-else class="btn-apply-promotion" @click.stop="applyPromotion(promotion)">
-                  ใช้โปรโมชั่นนี้
-                </v-btn>
-              </v-card-actions>
-            </v-card>
+  <v-container>
+    <v-carousel hide-delimiter-background hide-delimiters height="180" style="background-color: #80715E; border-radius: 20px;">
+      <template v-if="userStore.currentUser.userRole == 'พนักงานขายข้าว'">
+        <v-carousel-item v-for="(chunk, index) in promotionChunks" :key="chunk[index]">
+    
+
+          <div class="promotion-group">
+            <div class="promotion-container">
+              <v-card v-for="promotion in chunk" :key="promotion.promotionId" class="promotion-card" :class="{ 'applied-promotion': isPromotionApplied(promotion) }" @click="togglePromotion(promotion)">
+                <v-card-title class="text-center wrap-text">{{ promotion.promotionName }}</v-card-title>
+                <v-card-actions class="justify-center">
+                  <v-btn v-if="!promotion.promotionCanUseManyTimes" :class="getButtonClass(promotion)" class="btn-apply-promotion" @click.stop="togglePromotion(promotion)">
+                    {{ isPromotionApplied(promotion) ? 'ยกเลิก' : 'ใช้โปรโมชั่นนี้' }}
+                  </v-btn>
+                  <v-btn v-else class="btn-apply-promotion" @click.stop="applyPromotion(promotion)">
+                    ใช้โปรโมชั่นนี้
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </div>
           </div>
-        </div>
-      </v-carousel-item>
-    </template>
-    <template v-else>
-      <v-carousel-item v-for="(chunk, index) in promotionChunks" :key="index">
-        <div class="promotion-group">
-          <div class="promotion-container">
-            <v-card v-for="promotion in chunk" :key="promotion.promotionId" class="promotion-card"
-              :class="{ 'applied-promotion': isPromotionApplied(promotion) }" @click="togglePromotion(promotion)">
-              <v-card-title class="text-center wrap-text">{{ promotion.promotionName }}</v-card-title>
-              <v-card-actions class="justify-center">
-                <v-btn v-if="!promotion.promotionCanUseManyTimes" :class="getButtonClass(promotion)"
-                  class="btn-apply-promotion" @click.stop="togglePromotion(promotion)">
-                  {{ isPromotionApplied(promotion) ? 'ยกเลิก' : 'ใช้โปรโมชั่นนี้' }}
-                </v-btn>
-                <!-- if usemanytime ==true -->
-                <v-btn v-else class="btn-apply-promotion" @click.stop="applyPromotion(promotion)">
-                  ใช้โปรโมชั่นนี้
-                </v-btn>
-              </v-card-actions>
-            </v-card>
+        </v-carousel-item>
+      </template>
+      <template v-else>
+
+        <v-carousel-item v-for="(chunk, index) in promotionChunks" :key="chunk[index]">
+          <div class="promotion-group">
+            <div class="promotion-container">
+              <v-card v-for="promotion in chunk" :key="promotion.promotionId" class="promotion-card" :class="{ 'applied-promotion': isPromotionApplied(promotion) }" @click="togglePromotion(promotion)">
+                <v-card-title class="text-center wrap-text">{{ promotion.promotionName }}</v-card-title>
+                <v-card-actions class="justify-center">
+                  <v-btn v-if="!promotion.promotionCanUseManyTimes" :class="getButtonClass(promotion)" class="btn-apply-promotion" @click.stop="togglePromotion(promotion)">
+                    {{ isPromotionApplied(promotion) ? 'ยกเลิก' : 'ใช้โปรโมชั่นนี้' }}
+                  </v-btn>
+                  <v-btn v-else class="btn-apply-promotion" @click.stop="applyPromotion(promotion)">
+                    ใช้โปรโมชั่นนี้
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </div>
           </div>
-        </div>
-      </v-carousel-item>
-    </template>
-  </v-carousel>
+        </v-carousel-item>
+      </template>
+    </v-carousel>
+  </v-container>
 </template>
 
 <style scoped>
@@ -175,12 +168,10 @@ function getButtonClass(promotion: Promotion) {
   align-items: center;
   gap: 10px;
   height: 100%;
-  /* padding-left: 5%; */
 }
 
 .promotion-card {
   width: 160px;
-  /* Increased width */
   height: 120px;
   display: flex;
   flex-direction: column;
