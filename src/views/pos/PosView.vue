@@ -30,7 +30,16 @@ const barcode = ref('');
 
 onMounted(async () => {
   promotionStore.promotions = [];
-  await productStore.getAllProducts();
+  if (userStore.currentUser?.userRole == "พนักงานขายข้าว") {
+    await productStore.getProductByStoreType("ร้านข้าว");
+  }
+  else if (userStore.currentUser?.userRole == "พนักงานขายกาแฟ") {
+    await productStore.getProductByStoreType("ร้านกาแฟ");
+  }
+  else {
+    await productStore.getAllProducts();
+  }
+
   await categoryStore.getAllCategories();
   await toppingStore.getAllToppings();
   await customerStore.getAllCustomers();
@@ -134,8 +143,8 @@ const addToCart = (product: Product) => {
                     <v-icon>{{ posStore.hideNavigation ? 'mdi-fullscreen' : 'mdi-fullscreen-exit' }}</v-icon>
                   </v-btn>
                 </template>
-                <span>{{posStore.hideNavigation ? 'Full Screen' : 'Exit Full Screen' }}</span>
-              </v-tooltip> 
+                <span>{{ posStore.hideNavigation ? 'Full Screen' : 'Exit Full Screen' }}</span>
+              </v-tooltip>
             </v-col>
           </v-row>
           <v-row class="full-width-row" style="overflow: hidden;">

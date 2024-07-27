@@ -262,6 +262,18 @@ export const useProductStore = defineStore("product", () => {
     }
   };
 
+  // getProductByStoreType
+  const getProductByStoreType = async (storeType: string) => {
+    try {
+      const response = await productService.getProductByStoreType(storeType);
+      if (response.status === 200) {
+        products.value = response.data;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   // updateImageProduct
 
   const updateImageProduct = async (productId: number, formData: FormData) => {
@@ -321,6 +333,7 @@ export const useProductStore = defineStore("product", () => {
     productTypePriceBlend,
     barcode,
     storeName,
-    countingPoint
+    countingPoint,
+    getProductByStoreType
   };
 });

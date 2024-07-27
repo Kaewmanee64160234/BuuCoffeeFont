@@ -74,6 +74,11 @@ function updateImageProduct(productId: number, formData: FormData) {
   });
 }
 
+// getProductByStoreType
+function getProductByStoreType(storeType: string) {
+  return http.get(`/products/store-type/${storeType}`);
+}
+
 //  getProductPaginate by add query page and size
 function getProductPaginate(page: number, size: number,search : string) {
     return http.get(`/products/paginate`, {
@@ -96,5 +101,6 @@ export default {
   getProductsByCategory,
   getImageProduct,
   updateImageProduct,
-  getProductPaginate
+  getProductPaginate,
+  getProductByStoreType
 };

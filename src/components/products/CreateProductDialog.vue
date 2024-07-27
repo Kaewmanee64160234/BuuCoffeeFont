@@ -214,8 +214,9 @@ const searchQuery = ref('');
 // Add validation rules
 const nameRules = [
   (v: string) => !!v || 'ชื่อสินค้าจำเป็นต้องระบุ',
-  (value: string) => /^[\u0E00-\u0E7Fa-zA-Z]+$/.test(value) || 'กรุณากรอกชื่อสินค้าเป็นตัวอักษรเท่านั้น',
+  (value: string) => /^[\u0E00-\u0E7Fa-zA-Z0-9]+$/.test(value) || 'กรุณากรอกชื่อสินค้าเป็นตัวอักษรหรือตัวเลขเท่านั้น',
 ];
+
 
 const priceRules = [
   (v: number) => !!v || 'ราคาสินค้าจำเป็นต้องระบุ',
