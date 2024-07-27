@@ -30,21 +30,30 @@
         <v-table class="text-center mt-5">
           <thead>
             <tr>
-              <th style="text-align: center;font-weight: bold;"></th>
-              <th style="text-align: center;font-weight: bold;">ชื่อประเภทสินค้า</th>
-              <th style="text-align: center;font-weight: bold;">ประเภทสินค้านี้สามารถใส่ท็อปปิ้งได้</th>
-              <th style="text-align: center;font-weight: bold;">การกระทำ</th>
+              <th style="text-align: center; font-weight: bold;"></th>
+              <th style="text-align: center; font-weight: bold;">ชื่อประเภทสินค้า</th>
+              <th style="text-align: center; font-weight: bold;">ประเภทสินค้านี้สามารถใส่ท็อปปิ้งได้</th>
+              <th style="text-align: center; font-weight: bold;">การกระทำ</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(category,index) in categoryStore.categoriesForCreate" :key="index" style="text-align: center;">
-              <td>{{ index+1 }}</td>
+            <tr v-for="(category, index) in categoryStore.categoriesForCreate" :key="index" style="text-align: center;">
+              <td>{{ index + 1 }}</td>
               <td>{{ category.categoryName }}</td>
               <td>{{ category.haveTopping ? 'ได้' : 'ไม่ได้' }}</td>
               <td>
-                <v-btn color="#FFDD83" icon="mdi-pencil" class="mr-2" @click="openUpdateDialog(category)">
+                <v-btn 
+                  color="#FFDD83" 
+                  icon="mdi-pencil" 
+                  class="mr-2" 
+                  :disabled="category.categoryName === 'กาแฟ' || category.categoryName === 'กับข้าว'"
+                  @click="openUpdateDialog(category)">
                 </v-btn>
-                <v-btn color="#F55050" icon="mdi-delete" @click="deleteCategory(category.categoryId)">
+                <v-btn 
+                  color="#F55050" 
+                  icon="mdi-delete" 
+                  :disabled="category.categoryName === 'กาแฟ' || category.categoryName === 'กับข้าว'"
+                  @click="deleteCategory(category.categoryId)">
                 </v-btn>
               </td>
             </tr>
@@ -61,6 +70,7 @@
     <UpdateCategoryDialog />
   </v-container>
 </template>
+
 
 <script lang="ts" setup>
 import { useCategoryStore } from '@/stores/category.store';
