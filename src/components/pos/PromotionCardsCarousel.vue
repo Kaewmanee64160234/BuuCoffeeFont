@@ -75,8 +75,7 @@ function applyPromotion(promotion: Promotion) {
         });
         return;
       }
-      posStore.selectUsePointDialog = true;
-      promotionStore.promotion = promotion;
+
     }
   } else {
     posStore.applyPromotion(promotion);
