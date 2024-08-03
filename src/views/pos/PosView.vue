@@ -152,7 +152,7 @@ const removeFromQueue = (index: number) => {
   <v-container fluid class="queue-container" style="height: 100%; overflow-y: auto;">
     <h2 class="pa-2">Queue</h2>
     <v-row>
-      <v-col cols="12">
+      <v-col v-if="posStore.queueReceipt.length>0" cols="12">
         <v-card
           v-for="(receipt, index) in posStore.queueReceipt"
           :key="index"
@@ -170,6 +170,11 @@ const removeFromQueue = (index: number) => {
             </v-btn>
           </v-card-title>
           <v-card-subtitle class="queue-details">รายละเอียด</v-card-subtitle>
+        </v-card>
+      </v-col>
+      <v-col v-else cols="12">
+        <v-card class="queue-card" elevation="3">
+          <v-card-title class="text-center">ไม่มีคิว</v-card-title>
         </v-card>
       </v-col>
     </v-row>
