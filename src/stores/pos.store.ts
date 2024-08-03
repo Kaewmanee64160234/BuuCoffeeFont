@@ -18,6 +18,7 @@ export const usePosStore = defineStore("pos", () => {
   const selectedItems = ref<ReceiptItem[]>([]);
   const selectedItemsUsePromotion = ref<ReceiptItem[]>([]);
   const receiptPromotions = ref<ReceiptPromotion[]>([]);
+  const queueReceipt = ref<Receipt[]>([]);
   const customerPhone = ref<string>("");
   const customerPoints = ref<number>(0);
   const totalDiscount = ref<number>(0);
@@ -297,6 +298,7 @@ export const usePosStore = defineStore("pos", () => {
     if (res.status === 201) {
       console.log("Receipt created successfully", res.data);
       currentReceipt.value = res.data;
+      queueReceipt.value.push(currentReceipt.value!);
       await customerStore.getAllCustomers();
     }
     await receiptStore.getRecieptIn30Min();
@@ -616,5 +618,6 @@ export const usePosStore = defineStore("pos", () => {
     hideNavigation,
     selectUsePointDialog,
     selectedItemsUsePromotion,
+    queueReceipt
   };
 });
