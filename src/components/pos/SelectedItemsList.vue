@@ -428,9 +428,9 @@ const selectReceipt = (receipt: Receipt) => {
               <v-col cols="12" md="6" class="d-flex align-center justify-end">
                 <v-btn v-if="userStore.currentUser?.userRole !== 'พนักงานขายข้าว'" class="mr-3" icon="mdi-account-plus"
                   color="#ff9800" @click="openCreateCustomerDialog()"
-                  style="border-radius: 8px; background-color: #fff;"></v-btn>
+                  style="border-radius: 8px; background-color: #FF9642;"></v-btn>
                 <v-btn class="mb-2" color="#ff9800" @click="openReceiptDialog()"
-                  style="border-radius: 8px; background-color: #fff;">
+                  style="border-radius: 8px; background-color: #FF9642;">
                   ประวัติการสั่งซื้อ
                 </v-btn>
               </v-col>

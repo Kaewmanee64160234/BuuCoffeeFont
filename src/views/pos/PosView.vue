@@ -29,15 +29,14 @@ const productFilters = ref<Product[]>([]);
 const searchQuery = ref('');
 const barcode = ref('');
 
+// Load products, categories, promotions, and customers on mount
 onMounted(async () => {
   promotionStore.promotions = [];
-  if (userStore.currentUser?.userRole == "พนักงานขายข้าว") {
+  if (userStore.currentUser?.userRole === "พนักงานขายข้าว") {
     await productStore.getProductByStoreType("ร้านข้าว");
-  }
-  else if (userStore.currentUser?.userRole == "พนักงานขายกาแฟ") {
+  } else if (userStore.currentUser?.userRole === "พนักงานขายกาแฟ") {
     await productStore.getProductByStoreType("ร้านกาแฟ");
-  }
-  else {
+  } else {
     await productStore.getAllProducts();
   }
 
@@ -46,13 +45,13 @@ onMounted(async () => {
   await customerStore.getAllCustomers();
   userStore.getCurrentUser();
 
-  if (userStore.currentUser?.userRole == "พนักงานขายข้าว") {
+  if (userStore.currentUser?.userRole === "พนักงานขายข้าว") {
     promotionStore.getPromotionByType("ร้านข้าว");
     selectedCategory.value = "กับข้าว";
     categoryStore.categoriesForCreate = categoryStore.categoriesForCreate.filter(category => !category.haveTopping);
     productFilters.value = productStore.products.filter(product => !product.category.haveTopping);
     promotionStore.promotions = promotionStore.promotions.filter(promotion => promotion.promotionForStore === "ร้านข้าว");
-  } else if (userStore.currentUser?.userRole == "พนักงานขายกาแฟ") {
+  } else if (userStore.currentUser?.userRole === "พนักงานขายกาแฟ") {
     promotionStore.getPromotionByType("ร้านกาแฟ");
     selectedCategory.value = "กาแฟ";
     const cateIndex = categoryStore.categoriesForCreate.findIndex(category => category.categoryName === "กับข้าว");
@@ -67,6 +66,7 @@ onMounted(async () => {
 
 });
 
+// Watchers for selectedCategory and searchQuery
 watch(selectedCategory, (newCategory) => {
   if (newCategory) {
     productFilters.value = productStore.products.filter(product => product.category.categoryName.toLowerCase() === newCategory.toLowerCase());
@@ -81,14 +81,12 @@ watch(searchQuery, (newQuery) => {
   }
 });
 
+// Toggles the hideNavigation property in the posStore
 const toggleNavigationDrawer = () => {
   posStore.toggleNavigation();
 };
 
-const marginLeft = computed(() => {
-  return posStore.hideNavigation ? '0' : '3%';
-});
-
+// Handles barcode input for searching products
 const handleBarcodeInput = async () => {
   if (barcode.value) {
     const foundProduct = productStore.products.find(product => product.barcode === barcode.value);
@@ -111,23 +109,33 @@ const handleBarcodeInput = async () => {
   }
 };
 
+// Adds a product to the cart
 const addToCart = (product: Product) => {
-  if (product.category.haveTopping == false) {
+  if (product.category.haveTopping === false) {
     posStore.addToReceipt(product, null, [], 1, null);
-
   }
 };
 
-// toggleQueue
-const showQueue = ref(true);
-const toggleQueue = () => {
-  showQueue.value = !showQueue.value;
-};
-// selectReceipt
+// Select a receipt to view its details
 const selectReceipt = (receipt: Recipe) => {
   posStore.currentReceipt = receipt;
   posStore.receiptDialog = true;
 };
+
+// Computed property to determine margin based on navigation state
+const marginLeft = computed(() => {
+  return posStore.hideNavigation ? '0' : '3%';
+});
+
+// Computed property to determine the column size for the main interface
+const mainInterfaceCols = computed(() => {
+  return posStore.hideNavigation ? 5 : 7; // Adjust the column size based on hideNavigation state
+});
+
+// Computed property to determine if the queue column should be shown
+const showQueue = computed(() => {
+  return posStore.hideNavigation; // Show the queue only when hideNavigation is true
+});
 </script>
 
 <template>
@@ -138,23 +146,17 @@ const selectReceipt = (receipt: Recipe) => {
         cols="2"
         class="queue-column"
         style="padding: 0;"
-        v-if="posStore.hideNavigation" 
+        v-if="showQueue" 
       >
         <v-container fluid class="queue-container" style="height: 100%; overflow-y: auto;">
-          <v-row>
-            <v-col cols="12" class="d-flex justify-center align-center">
-              <v-btn icon @click="toggleNavigationDrawer" style="margin-top: 10px;">
-                <v-icon>{{ posStore.hideNavigation  ? 'mdi-arrow-right' : 'mdi-arrow-left' }}</v-icon>
-              </v-btn>
-            </v-col>
-          </v-row>
+          <h2 class="pa-2" >Queue</h2>
           <v-row>
             <v-col cols="12">
               <v-card
                 v-for="(receipt, index) in posStore.queueReceipt"
                 :key="index"
                 class="queue-card"
-                @click="selectReceipt(receipt)"
+                @click="selectReceipt(receipt!)"
               >
                 <v-card-title>
                   #{{ receipt.queueNumber }} {{ receipt.customer?.customerName || 'Guest' }}
@@ -168,7 +170,7 @@ const selectReceipt = (receipt: Recipe) => {
 
       <!-- Main Interface Column -->
       <v-col
-        :cols="posStore.hideNavigation ? 5: 7"
+        :cols="mainInterfaceCols"
         class="d-flex flex-column align-center"
         style="background-color: #f7f7f7; height: 100%; overflow: hidden;"
       >
@@ -272,6 +274,7 @@ const selectReceipt = (receipt: Recipe) => {
     <receipt-dialog />
   </v-app>
 </template>
+
 
 <style scoped>
 .full-width-container,
