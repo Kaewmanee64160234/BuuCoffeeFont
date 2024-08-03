@@ -136,45 +136,51 @@ const mainInterfaceCols = computed(() => {
 const showQueue = computed(() => {
   return posStore.hideNavigation; // Show the queue only when hideNavigation is true
 });
+
+// removeFromQueue
+const removeFromQueue = (index: number) => {
+  posStore.queueReceipt.splice(index, 1);
+};
+
 </script>
 
 <template>
   <v-app style="width: 100vw; height: 100vh; overflow: hidden;">
     <v-row :style="{ height: '100%' }">
       <!-- Left Column (Queue) -->
-      <v-col
-        cols="2"
-        class="queue-column"
-        style="padding: 0;"
-        v-if="showQueue" 
-      >
-        <v-container fluid class="queue-container" style="height: 100%; overflow-y: auto;">
-          <h2 class="pa-2" >Queue</h2>
-          <v-row>
-            <v-col cols="12">
-              <v-card
-                v-for="(receipt, index) in posStore.queueReceipt"
-                :key="index"
-                class="queue-card"
-                @click="selectReceipt(receipt!)"
-              >
-                <v-card-title>
-                  #{{ receipt.queueNumber }} {{ receipt.customer?.customerName || 'Guest' }}
-                </v-card-title>
-                <v-card-subtitle>รายละเอียด</v-card-subtitle>
-              </v-card>
-            </v-col>
-          </v-row>
-        </v-container>
+      <v-col cols="2" class="queue-column" style="padding: 0;" v-if="showQueue">
+  <v-container fluid class="queue-container" style="height: 100%; overflow-y: auto;">
+    <h2 class="pa-2">Queue</h2>
+    <v-row>
+      <v-col cols="12">
+        <v-card
+          v-for="(receipt, index) in posStore.queueReceipt"
+          :key="index"
+          class="queue-card"
+          @click="selectReceipt(receipt!)"
+          elevation="3"
+        >
+          <v-card-title class="d-flex justify-space-between align-center">
+            <div class="queue-title">
+              <span class="queue-number">#{{ receipt.queueNumber }}</span>
+              <span class="customer-name">{{ receipt.customer?.customerName || 'Guest' }}</span>
+            </div>
+            <v-btn icon @click.stop="removeFromQueue(index)" class="delete-button">
+              <v-icon color="red">mdi-delete</v-icon>
+            </v-btn>
+          </v-card-title>
+          <v-card-subtitle class="queue-details">รายละเอียด</v-card-subtitle>
+        </v-card>
       </v-col>
+    </v-row>
+  </v-container>
+</v-col>
+
 
       <!-- Main Interface Column -->
-      <v-col
-        :cols="mainInterfaceCols"
-        class="d-flex flex-column align-center"
-        style="background-color: #f7f7f7; height: 100%; overflow: hidden;"
-      >
-        <v-container fluid class="full-width-container" style="height: 100%; overflow: hidden;">
+      <v-col :cols="mainInterfaceCols" class="d-flex flex-column align-center "
+        style="background-color: #f7f7f7; height: 100%; overflow: hidden;">
+        <v-container fluid class="full-width-container" style="height: 100%; overflow: hidden; margin-left: 6%;">
           <!-- Promotion Carousel and Dialogs -->
           <v-row class="full-width-row" style="overflow: hidden;">
             <v-col cols="12" class="d-flex justify-center align-center" style="overflow: hidden;">
@@ -186,21 +192,15 @@ const showQueue = computed(() => {
           <!-- Barcode Input and Fullscreen Button -->
           <v-row class="full-width-row" style="overflow: hidden; margin-bottom: 10px;">
             <v-col cols="12" md="6">
-              <v-text-field
-                v-model="barcode"
-                append-icon="mdi-barcode"
-                label="สแกนบาร์โค้ด"
-                variant="solo"
-                dense
-                hide-details
-                @change="handleBarcodeInput"
-                style="background-color: #f1f1f1; border-radius: 8px;"
-              ></v-text-field>
+              <v-text-field v-model="barcode" append-icon="mdi-barcode" label="สแกนบาร์โค้ด" variant="solo" dense
+                hide-details @change="handleBarcodeInput"
+                style="background-color: #f1f1f1; border-radius: 8px;"></v-text-field>
             </v-col>
             <v-col cols="12" md="6" class="d-flex justify-end align-center">
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
-                  <v-btn icon v-bind="attrs" v-on="on" @click="toggleNavigationDrawer" style="background-color: #fff; border-radius: 50%; margin-left: 10px;">
+                  <v-btn icon v-bind="attrs" v-on="on" @click="toggleNavigationDrawer"
+                    style="background-color: #fff; border-radius: 50%; margin-left: 10px;">
                     <v-icon>{{ posStore.hideNavigation ? 'mdi-fullscreen' : 'mdi-fullscreen-exit' }}</v-icon>
                   </v-btn>
                 </template>
@@ -212,18 +212,10 @@ const showQueue = computed(() => {
           <!-- Category Tabs -->
           <v-row class="full-width-row" style="overflow: hidden; margin-bottom: 10px;">
             <v-col cols="12">
-              <v-tabs
-                v-model="selectedCategory"
-                align-tabs="start"
-                color="brown"
-                class="full-width-tabs"
-                background-color="#fff"
-              >
-                <v-tab
-                  v-for="category in categoryStore.categoriesForCreate"
-                  :key="category.categoryId"
-                  :value="category.categoryName"
-                >
+              <v-tabs v-model="selectedCategory" align-tabs="start" color="brown" class="full-width-tabs"
+                background-color="#fff">
+                <v-tab v-for="category in categoryStore.categoriesForCreate" :key="category.categoryId"
+                  :value="category.categoryName">
                   {{ category.categoryName }}
                 </v-tab>
               </v-tabs>
@@ -236,15 +228,8 @@ const showQueue = computed(() => {
               <v-tab-item>
                 <v-container fluid class="full-width-container">
                   <v-row class="full-width-row">
-                    <v-col
-                      v-for="product in productFilters"
-                      :key="product.productId"
-                      cols="12"
-                      sm="6"
-                      md="4"
-                      lg="3"
-                      class="d-flex"
-                    >
+                    <v-col v-for="product in productFilters" :key="product.productId" cols="12" sm="6" md="4" lg="3"
+                      class="d-flex">
                       <product-card :product="product" class="product-card"></product-card>
                     </v-col>
                   </v-row>
@@ -259,11 +244,7 @@ const showQueue = computed(() => {
       </v-col>
 
       <!-- Selected Items List -->
-      <v-col
-        cols="5"
-        class="d-flex flex-column"
-        style="height: 100%; padding-top: 20px;"
-      >
+      <v-col cols="5" class="d-flex flex-column" style="height: 100%; padding-top: 20px;">
         <v-sheet style="height: 100%;">
           <selected-items-list></selected-items-list>
         </v-sheet>
@@ -305,8 +286,8 @@ const showQueue = computed(() => {
   border-radius: 10px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   margin: 10px;
-  transition: transform 0.3s ease-in-out;
-  background-color: white;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  background-color: #fff;
 }
 
 .product-card:hover {
@@ -353,16 +334,53 @@ const showQueue = computed(() => {
   width: 100%; /* Ensures all queue cards have the same width */
   cursor: pointer;
   transition: background-color 0.3s, transform 0.3s;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  background-color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
   border-radius: 8px;
-  padding: 10px;
-  margin-bottom: 10px;
+  padding: 15px;
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .queue-card:hover {
-  background-color: #ff9800;
+  background-color: #f6f6f6;
   transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.queue-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  color: #333;
+}
+
+.queue-number {
+  font-size: 16px;
+}
+
+.customer-name {
+  font-size: 14px;
+  color: #666;
+}
+
+.queue-details {
+  color: #888;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.delete-button {
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.delete-button:hover {
+  background-color: #ffebeb;
+  transform: rotate(20deg);
+  color: #ff5252;
 }
 
 /* Add scrollbar styles */
@@ -410,4 +428,5 @@ const showQueue = computed(() => {
 .product-list-container::-ms-scrollbar-thumb:hover {
   background: #555;
 }
+
 </style>
