@@ -562,7 +562,7 @@ const selectReceipt = (receipt: Receipt) => {
 }
 
 .summary-section-25 {
-  height: 25%;
+  height: 40%;
   margin-top: 20px;
 }
 

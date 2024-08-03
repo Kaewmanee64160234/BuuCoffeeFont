@@ -52,34 +52,8 @@ function applyPromotion(promotion: Promotion) {
     return;
   }
 
-  if (promotion.promotionType === "usePoints") {
-    if (posStore.selectedItemsUsePromotion.length == 0 && posStore.selectedItems.length > 1) {
-      posStore.selectedItemsUsePromotion = posStore.selectedItems.filter(item => item.product?.category.haveTopping);
-    }
-    if (posStore.selectedItems.length == 1) {
-      posStore.selectedItemsUsePromotion = posStore.selectedItems.filter(item => item.product?.category.haveTopping);
-
-      if (posStore.selectedItemsUsePromotion[0].product?.category.haveTopping) {
-        posStore.applyPromotion(promotion, posStore.selectedItemsUsePromotion[0]);
-      } else {
-        posStore.applyPromotion(promotion);
-      }
-    } else {
-      const itemsWithToppings = posStore.selectedItems.filter(item => item.product?.category.haveTopping);
-      if (itemsWithToppings.length === 0) {
-        Swal.fire({
-          icon: 'error',
-          title: 'ไม่มีรายการ',
-          text: 'คุณไม่สามารถใช้โปรโมชั่นได้เนื่องจากไม่มีรายการที่มีท็อปปิ้ง',
-          confirmButtonText: 'ตกลง'
-        });
-        return;
-      }
-
-    }
-  } else {
     posStore.applyPromotion(promotion);
-  }
+  
 }
 
 function removePromotion(promotion: Promotion) {
