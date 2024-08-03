@@ -124,7 +124,7 @@ const toggleQueue = () => {
   showQueue.value = !showQueue.value;
 };
 // selectReceipt
-const selectReceipt = (receipt:Recipe) => {
+const selectReceipt = (receipt: Recipe) => {
   posStore.currentReceipt = receipt;
   posStore.receiptDialog = true;
 };
@@ -134,12 +134,17 @@ const selectReceipt = (receipt:Recipe) => {
   <v-app style="width: 100vw; height: 100vh; overflow: hidden;">
     <v-row :style="{ height: '100%' }">
       <!-- Left Column (Queue) -->
-      <v-col cols="2" class="queue-column" style="padding: 0;">
+      <v-col
+        cols="2"
+        class="queue-column"
+        style="padding: 0;"
+        v-if="posStore.hideNavigation" 
+      >
         <v-container fluid class="queue-container" style="height: 100%; overflow-y: auto;">
           <v-row>
             <v-col cols="12" class="d-flex justify-center align-center">
-              <v-btn icon @click="toggleQueue" style="margin-top: 10px;">
-                <v-icon>{{ showQueue ? 'mdi-arrow-left' : 'mdi-arrow-right' }}</v-icon>
+              <v-btn icon @click="toggleNavigationDrawer" style="margin-top: 10px;">
+                <v-icon>{{ posStore.hideNavigation  ? 'mdi-arrow-right' : 'mdi-arrow-left' }}</v-icon>
               </v-btn>
             </v-col>
           </v-row>
@@ -162,7 +167,11 @@ const selectReceipt = (receipt:Recipe) => {
       </v-col>
 
       <!-- Main Interface Column -->
-      <v-col cols="6" class="d-flex flex-column align-center" style="background-color: #f7f7f7; height: 100%; overflow: hidden;">
+      <v-col
+        :cols="posStore.hideNavigation ? 5: 7"
+        class="d-flex flex-column align-center"
+        style="background-color: #f7f7f7; height: 100%; overflow: hidden;"
+      >
         <v-container fluid class="full-width-container" style="height: 100%; overflow: hidden;">
           <!-- Promotion Carousel and Dialogs -->
           <v-row class="full-width-row" style="overflow: hidden;">
@@ -179,11 +188,11 @@ const selectReceipt = (receipt:Recipe) => {
                 v-model="barcode"
                 append-icon="mdi-barcode"
                 label="สแกนบาร์โค้ด"
-                variant="outlined"
+                variant="solo"
                 dense
                 hide-details
                 @change="handleBarcodeInput"
-                style="background-color: #fff; border-radius: 8px;"
+                style="background-color: #f1f1f1; border-radius: 8px;"
               ></v-text-field>
             </v-col>
             <v-col cols="12" md="6" class="d-flex justify-end align-center">
@@ -201,8 +210,18 @@ const selectReceipt = (receipt:Recipe) => {
           <!-- Category Tabs -->
           <v-row class="full-width-row" style="overflow: hidden; margin-bottom: 10px;">
             <v-col cols="12">
-              <v-tabs v-model="selectedCategory" align-tabs="start" color="brown" class="full-width-tabs" background-color="#fff">
-                <v-tab v-for="category in categoryStore.categoriesForCreate" :key="category.categoryId" :value="category.categoryName">
+              <v-tabs
+                v-model="selectedCategory"
+                align-tabs="start"
+                color="brown"
+                class="full-width-tabs"
+                background-color="#fff"
+              >
+                <v-tab
+                  v-for="category in categoryStore.categoriesForCreate"
+                  :key="category.categoryId"
+                  :value="category.categoryName"
+                >
                   {{ category.categoryName }}
                 </v-tab>
               </v-tabs>
@@ -215,7 +234,15 @@ const selectReceipt = (receipt:Recipe) => {
               <v-tab-item>
                 <v-container fluid class="full-width-container">
                   <v-row class="full-width-row">
-                    <v-col v-for="product in productFilters" :key="product.productId" cols="12" sm="6" md="4" lg="3" class="d-flex">
+                    <v-col
+                      v-for="product in productFilters"
+                      :key="product.productId"
+                      cols="12"
+                      sm="6"
+                      md="4"
+                      lg="3"
+                      class="d-flex"
+                    >
                       <product-card :product="product" class="product-card"></product-card>
                     </v-col>
                   </v-row>
@@ -230,15 +257,19 @@ const selectReceipt = (receipt:Recipe) => {
       </v-col>
 
       <!-- Selected Items List -->
-      <v-col cols="4" class="d-flex flex-column" style="  height: 100%; padding-top: 20px;">
-        <v-sheet style="height: 100%; ">
-          <selected-items-list ></selected-items-list>
+      <v-col
+        cols="5"
+        class="d-flex flex-column"
+        style="height: 100%; padding-top: 20px;"
+      >
+        <v-sheet style="height: 100%;">
+          <selected-items-list></selected-items-list>
         </v-sheet>
       </v-col>
     </v-row>
 
     <!-- Receipt Dialog -->
-    <receipt-dialog/>
+    <receipt-dialog />
   </v-app>
 </template>
 
