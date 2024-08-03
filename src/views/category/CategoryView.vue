@@ -42,7 +42,6 @@
                   <v-btn color="#F55050" icon="mdi-delete" @click="deleteCategory(category.categoryId)">
                   </v-btn>
                 </template>
-
               </td>
             </tr>
           </tbody>
