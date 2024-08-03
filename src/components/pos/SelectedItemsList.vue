@@ -166,7 +166,7 @@ function cancelReceipt() {
     receiptType: '',
     updatedDate: new Date(),
   };
-  
+
   posStore.receiptDialog = false;
 
   recive.value = 0;
@@ -220,93 +220,110 @@ const selectReceipt = (receipt: Receipt) => {
 
 <template>
   <ReceiptDetailsDialogPos />
-
   <div class="h-screen app">
     <AddCustomerDialog />
 
     <v-window v-model="step" transition="fade" class="h-screen">
+      <!-- Order Details View -->
       <v-window-item :value="1" class="full-height">
         <div class="content-container">
-          <div>
-            <div class="d-flex justify-space-between" style="padding-right: 60px;">
+          <div class="header">
+            <div class="d-flex justify-space-between align-center" style="padding-right: 60px;">
               <h3>รายละเอียดการสั่งซื้อ</h3>
-              <h3>#{{ posStore.currentReceipt?.queueNumber === null ? posStore.currentReceipt?.queueNumber + 1 :
-                posStore.queueNumber }}</h3>
+              <h3>
+                #{{ posStore.currentReceipt?.queueNumber === null ? posStore.currentReceipt?.queueNumber + 1 :
+                  posStore.queueNumber }}
+              </h3>
             </div>
-            <div class="pa-3">
-              <div v-if="userStore.currentUser?.userRole !== 'พนักงานขายข้าว'">
-                <p class="d-flex justify-space-between pr-10 my-2">
-                  <span style="text-align: start;"> สมาชิก</span>
-                  <span style="text-align: end;color: black;">{{ posStore.receipt.customer?.customerName == null ?
-                    'ไม่มี' : posStore.receipt.customer?.customerName }}</span>
-                </p>
-              </div>
-              <div v-if="userStore.currentUser?.userRole !== 'พนักงานขายข้าว'">
-                <p class="d-flex justify-space-between pr-10 my-2">
-                  <span style="text-align: start;"> แต้มสะสม</span>
-                  <span style="text-align: end;">{{ posStore.receipt.customer == null ? '0' :
-                    posStore.receipt.customer?.customerNumberOfStamp }} Point</span>
-                </p>
-              </div>
-              <p v-if="userStore.currentUser?.userRole !== 'พนักงานขายข้าว'">เบอร์โทรลูกค้า</p>
+
+            <v-divider></v-divider>
+
+            <!-- Customer Info -->
+            <div v-if="userStore.currentUser?.userRole !== 'พนักงานขายข้าว'" class="customer-info pa-3">
+              <p class="d-flex justify-space-between pr-10 my-2">
+                <span>สมาชิก</span>
+                <span class="info-value">
+                  {{ posStore.receipt.customer?.customerName == null ? 'ไม่มี' : posStore.receipt.customer?.customerName
+                  }}
+                </span>
+              </p>
+              <p class="d-flex justify-space-between pr-10 my-2">
+                <span>แต้มสะสม</span>
+                <span class="info-value">
+                  {{ posStore.receipt.customer == null ? '0' : posStore.receipt.customer?.customerNumberOfStamp }} Point
+                </span>
+              </p>
+              <p>เบอร์โทรลูกค้า</p>
             </div>
+
+            <!-- Customer Actions -->
             <v-row class="d-flex align-center justify-start mt-4">
-              <v-col v-if="userStore.currentUser?.userRole !== 'พนักงานขายข้าว'" cols="12" md="6"
-                class="d-flex align-center justify-start">
+              <v-col v-if="userStore.currentUser?.userRole !== 'พนักงานขายข้าว'" cols="12" md="6">
                 <v-autocomplete v-model="selectedCustomer" :items="customerStore.customers.map(c => c.customerPhone)"
-                  item-text="phone" item-value="phone" label="เบอร์โทรลูกค้า" variant="solo"
-                  append-inner-icon="mdi-magnify"></v-autocomplete>
+                  item-text="phone" item-value="phone" label="เบอร์โทรลูกค้า" variant="solo" dense
+                  append-inner-icon="mdi-magnify" style="border-radius: 8px; background-color: #fff;"></v-autocomplete>
               </v-col>
-              <v-col cols="12" md="5" class="d-flex align-center justify-start">
+              <v-col cols="12" md="6" class="d-flex align-center justify-end">
                 <v-btn v-if="userStore.currentUser?.userRole !== 'พนักงานขายข้าว'" class="mr-3" icon="mdi-account-plus"
-                  color="#ff9800" @click="openCreateCustomerDialog()"></v-btn>
-                <v-btn class="mb-2" color="#ff9800" @click="openReceiptDialog()">ประวัติการสั่งซื้อ</v-btn>
+                  color="#ff9800" @click="openCreateCustomerDialog()"
+                  style="border-radius: 8px; background-color: #fff;"></v-btn>
+                <v-btn class="mb-2" color="#ff9800" @click="openReceiptDialog()"
+                  style="border-radius: 8px; background-color: #fff;">
+                  ประวัติการสั่งซื้อ
+                </v-btn>
               </v-col>
             </v-row>
-            <v-divider></v-divider>
-            <div class="d-flex justify-end pr-6">
-              <v-btn color="red" variant="text" @click="cancelReceipt">ยกเลิกรายการ</v-btn>
+
+            <v-divider class="my-2"></v-divider>
+            <h3>สรุปรายการ</h3>
+
+            <!-- Promotions Section -->
+            <div class="promotions-section">
+              <promotion-cards-carousel></promotion-cards-carousel>
+              <PromotionUsePointDialog />
             </div>
+
+            <!-- Selected Items List -->
             <div
               :class="userStore.currentUser?.userRole === 'พนักงานขายข้าว' ? 'selected-items-list-50' : 'selected-items-list-40'">
-              <v-list class="full-width" style="overflow-y: auto;">
+              <v-list class="full-width" style="height: 20vh;">
                 <v-list-item-group>
                   <div v-for="(item, index) in selectedItems" :key="index" class="selected-item full-width my-2">
                     <v-list-item :prepend-avatar="`http://localhost:3000/products/${item.product?.productId}/image`"
                       class="full-width">
-                      <v-row style="padding: 0;">
-                        <v-col cols="6" style="color: black;font-size: 16px;">
-                          <div class="product-name">{{ item.product?.productName }}</div>
+                      <v-row no-gutters>
+                        <v-col cols="6" class="product-name" style="color: black;">
+                          {{ item.product?.productName }}
                         </v-col>
-                        <v-col cols="6" class="text-right pr-8" style="color: black;font-size: 16px;">
+                        <v-col cols="6" class="text-right pr-8" style="color: black;">
                           <p>{{ item.receiptSubTotal.toFixed(2) }}</p>
                         </v-col>
                       </v-row>
-                      <v-row style="padding: 0;">
-                        <v-col cols="7" style="color: gray;font-size: 12px; padding-top: 0;">
-                          <div v-if="item.product?.category.haveTopping"
-                            style="font-weight: lighter;color: gray;font-size: 10px;">
+                      <v-row no-gutters>
+                        <v-col cols="7" style="color: gray;">
+                          <div v-if="item.product?.category.haveTopping" class="product-details">
                             {{ item.productType?.productTypeName }} +{{ item.productType?.productTypePrice }} | ความหวาน
                             {{ item.sweetnessLevel }}%
                           </div>
                           <div v-else>
-                            <div style="font-weight: lighter;color: gray;font-size: 15px;">
-                              {{ item.product?.productName }} ( {{ item.product?.category.categoryName }} ) {{
-                              item.product?.productPrice }}.-
+                            <div class="product-details">
+                              {{ item.product?.productName }} ({{ item.product?.category.categoryName }}) {{
+                                item.product?.productPrice }}.-
                             </div>
                           </div>
                           <div v-if="item.productTypeToppings && item.productTypeToppings.length > 0">
-                            <ul>
+                            <ul class="toppings-list">
                               <li v-for="topping in item.productTypeToppings" :key="topping?.topping?.toppingId"
-                                style="font-weight: lighter;color: gray;font-size: 11px;">
-                                x{{ topping?.quantity }} {{ topping?.topping?.toppingName }}<span v-if="topping?.topping?.toppingName && topping.topping.toppingName.length > 3">
+                                class="topping-item">
+                                x{{ topping?.quantity }} {{ topping?.topping?.toppingName }}
+                                <span v-if="topping?.topping?.toppingName && topping.topping.toppingName.length > 3">
                                   : {{ topping?.topping?.toppingPrice }}.-
                                 </span>
                               </li>
                             </ul>
                           </div>
                         </v-col>
-                        <v-col cols="5" style="padding-top: 0;">
+                        <v-col cols="5">
                           <v-btn size="xs-small" color="#C5C5C5" icon @click="decreaseQuantity(index)">
                             <v-icon>mdi-minus</v-icon>
                           </v-btn>
@@ -324,14 +341,17 @@ const selectReceipt = (receipt: Receipt) => {
                 </v-list-item-group>
               </v-list>
             </div>
+
+            <!-- Order Summary -->
             <div
               :class="userStore.currentUser?.userRole === 'พนักงานขายข้าว' ? 'summary-section-30' : 'summary-section-25'"
               style="width: 100%;">
               <v-divider></v-divider>
               <h3>สรุปรายการ</h3>
               <v-card-subtitle>โปรโมชั่น:</v-card-subtitle>
-              <div :class="userStore.currentUser?.userRole === 'พนักงานขายข้าว' ? 'promotion-30' : 'promotion-20'">
-                <div class="sub-promotion">
+              <div :class="userStore.currentUser?.userRole === 'พนักงานขายข้าว' ? 'promotion-30' : 'promotion-20'"
+                style="height: 10vh;">
+                <div class="sub-promotion" style="height: 100%; overflow-y: auto;">
                   <div v-for="(promotion) in posStore.receipt.receiptPromotions" :key="promotion.receiptPromotionId"
                     style="text-align: end; width: 100%; padding-right: 40px;">
                     <div style="width: 100%;">
@@ -358,124 +378,139 @@ const selectReceipt = (receipt: Receipt) => {
           <div class="footer-buttons">
             <v-row class="d-flex justify-center pr-6" style="width: 100%;">
               <v-btn style="padding-right: 20px; width: 80%; margin-right: 10px;" color="#FF9642" rounded
-                @click="nextStep">ชำระเงิน</v-btn>
+                @click="nextStep">
+                ชำระเงิน
+              </v-btn>
             </v-row>
           </div>
         </div>
       </v-window-item>
+
+      <!-- Payment Method View -->
       <v-window-item :value="2" class="full-height">
         <div class="content-container">
           <div class="title-detail">
-            <div class="d-flex justify-space-between" style="padding-right: 60px;">
+            <div class="d-flex justify-space-between align-center" style="padding-right: 60px;">
               <h3>รายละเอียดการสั่งซื้อ</h3>
-              <h3>#{{ posStore.currentReceipt?.queueNumber === null ? posStore.currentReceipt?.queueNumber + 1 :
-                posStore.queueNumber }}</h3>
+              <h3>
+                #{{ posStore.currentReceipt?.queueNumber === null ? posStore.currentReceipt?.queueNumber + 1 :
+                  posStore.queueNumber }}
+              </h3>
             </div>
-            <div class="pa-3">
-              <div v-if="userStore.currentUser?.userRole !== 'พนักงานขายข้าว'">
-                <p class="d-flex justify-space-between pr-10 my-2">
-                  <span style="text-align: start;"> สมาชิก</span>
-                  <span style="text-align: end;color: black;">{{ posStore.receipt.customer?.customerName == null ?
-                    'ไม่มี' : posStore.receipt.customer?.customerName }}</span>
-                </p>
-              </div>
-              <div v-if="userStore.currentUser?.userRole !== 'พนักงานขายข้าว'">
-                <p class="d-flex justify-space-between pr-10 my-2">
-                  <span style="text-align: start;"> แต้มสะสม</span>
-                  <span style="text-align: end;">{{ posStore.receipt.customer == null ? '0' :
-                    posStore.receipt.customer?.customerNumberOfStamp }} Point</span>
-                </p>
-              </div>
-              <p v-if="userStore.currentUser?.userRole !== 'พนักงานขายข้าว'">เบอร์โทรลูกค้า</p>
+
+            <v-divider></v-divider>
+
+            <!-- Customer Info -->
+            <div v-if="userStore.currentUser?.userRole !== 'พนักงานขายข้าว'" class="customer-info pa-3">
+              <p class="d-flex justify-space-between pr-10 my-2">
+                <span>สมาชิก</span>
+                <span class="info-value">
+                  {{ posStore.receipt.customer?.customerName == null ? 'ไม่มี' : posStore.receipt.customer?.customerName
+                  }}
+                </span>
+              </p>
+              <p class="d-flex justify-space-between pr-10 my-2">
+                <span>แต้มสะสม</span>
+                <span class="info-value">
+                  {{ posStore.receipt.customer == null ? '0' : posStore.receipt.customer?.customerNumberOfStamp }} Point
+                </span>
+              </p>
+              <p>เบอร์โทรลูกค้า</p>
             </div>
+
+            <!-- Customer Actions -->
             <v-row class="d-flex align-center justify-start mt-4">
-              <v-col v-if="userStore.currentUser?.userRole !== 'พนักงานขายข้าว'" cols="12" md="6"
-                class="d-flex align-center justify-start">
+              <v-col v-if="userStore.currentUser?.userRole !== 'พนักงานขายข้าว'" cols="12" md="6">
                 <v-autocomplete v-model="selectedCustomer" :items="customerStore.customers.map(c => c.customerPhone)"
-                  item-text="phone" item-value="phone" label="เบอร์โทรลูกค้า" variant="solo"
-                  append-inner-icon="mdi-magnify"></v-autocomplete>
+                  item-text="phone" item-value="phone" label="เบอร์โทรลูกค้า" variant="solo" dense
+                  append-inner-icon="mdi-magnify" style="border-radius: 8px; background-color: #fff;"></v-autocomplete>
               </v-col>
-              <v-col cols="12" md="5" class="d-flex align-center justify-start">
+              <v-col cols="12" md="6" class="d-flex align-center justify-end">
                 <v-btn v-if="userStore.currentUser?.userRole !== 'พนักงานขายข้าว'" class="mr-3" icon="mdi-account-plus"
-                  color="#ff9800" @click="openCreateCustomerDialog()"></v-btn>
-                <v-btn class="mb-2" color="#ff9800" @click="openReceiptDialog()">ประวัติการสั่งซื้อ</v-btn>
+                  color="#ff9800" @click="openCreateCustomerDialog()"
+                  style="border-radius: 8px; background-color: #fff;"></v-btn>
+                <v-btn class="mb-2" color="#ff9800" @click="openReceiptDialog()"
+                  style="border-radius: 8px; background-color: #fff;">
+                  ประวัติการสั่งซื้อ
+                </v-btn>
               </v-col>
             </v-row>
-            <v-divider></v-divider>
+
+            <v-divider class="my-4"></v-divider>
           </div>
+
+          <!-- Payment Method Selection -->
+          <!-- Payment Method Selection -->
           <div class="payment-method">
-            <v-row class="pa-3">
-              <h3>เลือกวิธีชำระเงิน</h3>
-              <div class="mt-2">
+            <h3>เลือกวิธีชำระเงิน</h3>
+            <v-row class="pa-3 justify-center">
+              <div class="payment-buttons-container mt-4">
                 <v-btn :class="{ 'selected': posStore.receipt.paymentMethod === 'cash' }" class="payment-button"
-                  variant="outlined" style="color: black;" @click="selectPaymentMethod('cash')">
+                  variant="solo" @click="selectPaymentMethod('cash')">
                   เงินสด
                 </v-btn>
                 <v-btn :class="{ 'selected': posStore.receipt.paymentMethod === 'qrcode' }" class="payment-button"
-                  variant="outlined" style="color: black;" @click="selectPaymentMethod('qrcode')">
+                  variant="solo" @click="selectPaymentMethod('qrcode')">
                   แสกนจ่าย
                 </v-btn>
               </div>
             </v-row>
           </div>
+
+
+
           <v-divider></v-divider>
+
+          <!-- Summary Section -->
           <div class="summary-section-2" style="width: 100%;padding: 20px;">
-            <div>
-              <h3>สรุปรายการ</h3>
-              <div class="ma-2">
-                <div>
-                  <p class="d-flex justify-space-between pr-6">
-                    <span style="text-align: start;"> สมาชิก:</span>
-                    <span style="text-align: end;">{{ posStore.receipt.customer?.customerName == null ? 'ไม่มี' :
-                      posStore.receipt.customer?.customerName }}</span>
-                  </p>
-                </div>
-                <!-- ทั้งหมด -->
-                <div>
-                  <p class="d-flex justify-space-between pr-6 my-2">
-                    <span style="text-align: start;"> ทั้งหมด:</span>
-                    <span style="text-align: end;">{{ posStore.receipt.receiptTotalPrice.toFixed(2) }}</span>
-                  </p>
-                  <!-- รับมา -->
-                  <div v-if="posStore.receipt.paymentMethod == 'cash'">
-                    <p class="d-flex justify-space-between align-center pr-6 my-2">
-                      <span style="text-align: start;"> รับมา:</span>
-                      <span style="text-align: start;width: 50%;">
-                        <v-responsive class="mx-auto" style="height: 10;">
-                          <v-text-field v-model="recive" type="number" variant="solo" name="จำนวนเงิน" label="จำนวนเงิน"
-                            id="id"></v-text-field>
-                        </v-responsive>
-                      </span>
-                    </p>
-                  </div>
-                  <!-- ทอน -->
-                  <div>
-                    <p class="d-flex justify-space-between pr-6 my-2">
-                      <span style="text-align: start;"> ทอน:</span>
-                      <span style="text-align: end;"
-                        :class="recive < 0 || recive < posStore.receipt.receiptNetPrice ? 'red--text' : 'black'">{{
-                          parseFloat(change.toFixed(2)) < 0 ? 'จำนวนเงินไม่พอ' : change.toFixed(2) }}</span>
-                    </p>
-                  </div>
-                  <v-divider></v-divider>
-                  <v-row class="pt-4">
-                    <v-col>
-                      <h3>ราคาสุทธิ</h3>
-                    </v-col>
-                    <v-col style="text-align: end; color: #FF9642;padding-right: 65px;">
-                      <h3>{{ posStore.receipt.receiptNetPrice }}</h3>
-                    </v-col>
-                  </v-row>
-                </div>
+            <div class="ma-2">
+              <p class="d-flex justify-space-between pr-6">
+                <span>สมาชิก:</span>
+                <span class="info-value">{{ posStore.receipt.customer?.customerName == null ? 'ไม่มี' :
+                  posStore.receipt.customer?.customerName }}</span>
+              </p>
+
+              <!-- Total Amount -->
+              <p class="d-flex justify-space-between pr-6 my-2">
+                <span>ทั้งหมด:</span>
+                <span class="info-value">{{ posStore.receipt.receiptTotalPrice.toFixed(2) }}</span>
+              </p>
+
+              <div v-if="posStore.receipt.paymentMethod == 'cash'">
+                <p class="d-flex justify-space-between align-center pr-6 my-2">
+                  <span style="width: 50%;">รับมา:</span>
+                  <v-text-field v-model="recive" type="number" variant="solo"  label="จำนวนเงิน"
+               style="width: 50%;" ></v-text-field>
+                </p>
               </div>
+
+              <!-- Change Amount -->
+              <p class="d-flex justify-space-between pr-6 my-2">
+                <span>ทอน:</span>
+                <span :class="recive < 0 || recive < posStore.receipt.receiptNetPrice ? 'red--text' : 'black'"
+                  class="info-value">
+                  {{ parseFloat(change.toFixed(2)) < 0 ? 'จำนวนเงินไม่พอ' : change.toFixed(2) }} </span>
+              </p>
+
+              <v-divider></v-divider>
+
+              <!-- Net Price -->
+              <v-row class="pt-4">
+                <v-col>
+                  <h3>ราคาสุทธิ</h3>
+                </v-col>
+                <v-col class="text-end" style="color: #FF9642;padding-right: 65px;">
+                  <h3>{{ posStore.receipt.receiptNetPrice }}</h3>
+                </v-col>
+              </v-row>
             </div>
           </div>
+
           <div class="footer-buttons">
             <v-row class="d-flex justify-center pr-6" style="width: 100%;">
-              <v-btn style="padding-right: 20px; width: 40%; margin-right: 10px;" color="secondary" rounded
+              <v-btn style="width: 40%; margin-right: 10px;" color="secondary" rounded
                 @click="prevStep">ย้อนกลับ</v-btn>
-              <v-btn style="padding-right: 20px; width: 40%; margin-right: 10px;" color="#FF9642" rounded
-                @click="save">บันทึก</v-btn>
+              <v-btn style="width: 40%;" color="#FF9642" rounded @click="save">บันทึก</v-btn>
             </v-row>
           </div>
         </div>
@@ -487,32 +522,39 @@ const selectReceipt = (receipt: Receipt) => {
 
 
 <style scoped>
-.selected-item {
+.app {
+  height: 100vh;
   display: flex;
-  align-items: center;
+  flex-direction: column;
 }
 
-.product-name {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.full-height {
+  height: 100%;
 }
 
-.title-detail {
-  max-height: 40%;
+
+
+.header {
+  margin-bottom: 20px;
+}
+
+.customer-info {
+  background-color: #f5f5f5;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.info-value {
+  text-align: end;
+  color: #333;
 }
 
 .payment-method {
-  padding-top: 20px;
-  padding-bottom: 20px;
-  max-height: 30%;
+  height: 30%;
 }
 
-.summary-section-2 {
-  height: 50%;
-}
-
-.quantity-controls {
+.selected-item {
   display: flex;
   align-items: center;
 }
@@ -521,96 +563,123 @@ const selectReceipt = (receipt: Receipt) => {
   width: 100%;
 }
 
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s;
+.product-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: bold;
 }
 
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
+.product-details {
+  font-size: 14px;
+  color: gray;
+  font-weight: lighter;
 }
 
-.v-app {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
+.toppings-list {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 5px;
 }
 
-.selected-items-list-40 {
-  max-height: 40%;
-  height: 150px;
-  overflow-y: auto;
+.topping-item {
+  font-size: 12px;
+  color: gray;
 }
 
+.selected-items-list-40,
 .selected-items-list-50 {
-  max-height: 60%;
-  height: 250px;
   overflow-y: auto;
+  max-height: 40%;
+  margin-bottom: 20px;
 }
 
-.promotion-20 {
-  max-height: 20%;
-  height: 70px;
+.promotions-section {
   overflow-y: auto;
+  max-height: 40vh;
+  /* Ensure promotions fit within the view */
+  margin-bottom: 20px;
+  padding-right: 15px;
+  /* Avoid clipping of scroll bar */
 }
 
-.promotion-30 {
-  max-height: 30%;
-  height: 150px;
-  overflow-y: auto;
-}
-
-.summary-section-25 {
-  height: 40%;
-  margin-top: 20px;
-}
-
+.summary-section-25,
 .summary-section-30 {
   height: 30%;
   margin-top: 20px;
+  /* background-color: #f5f5f5; */
+  padding: 10px;
+  border-radius: 8px;
+  /* box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); */
 }
 
 .red--text {
   color: red;
 }
 
+.payment-buttons-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  /* Space between buttons */
+}
+
 .payment-button {
-  margin: 10px 10px;
+  margin: 10px;
   width: 150px;
-  height: 60px;
-  border: 2px solid orange;
+  height: 70px;
   border-radius: 10px;
+  border: 2px solid #ff9800;
   color: black;
+  transition: background-color 0.3s;
 }
 
 .payment-button.selected {
-  background-color: #ff990047;
-  color: black;
-}
-
-.pa-3 {
-  padding: 1.5rem;
-}
-
-.pr-10 {
-  padding-right: 10rem;
-}
-
-.my-2 {
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.content-container {
-  display: flex;
-  flex-direction: column;
-  height: calc(100vh - 56px);
+  background-color: #ff9800;
+  color: white;
 }
 
 .footer-buttons {
   margin-top: auto;
   padding: 10px;
   width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+@media (max-width: 768px) {
+  .content-container {
+    padding: 10px;
+  }
+
+  .payment-button {
+    width: 100px;
+    height: 40px;
+  }
+
+  .selected-items-list-40,
+  .selected-items-list-50 {
+    max-height: 35%;
+  }
+
+  .promotions-section {
+    max-height: 30vh;
+  }
+
+  .summary-section-25,
+  .summary-section-30 {
+    height: 35%;
+  }
+
+  .footer-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .footer-buttons>v-btn {
+    width: 90%;
+    margin-bottom: 10px;
+  }
 }
 </style>

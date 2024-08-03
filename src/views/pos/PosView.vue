@@ -15,8 +15,7 @@ import { usePosStore } from '@/stores/pos.store';
 import type { Product } from '@/types/product.type';
 import Swal from 'sweetalert2';
 import PromotionUsePointDialog from '@/components/pos/PromotionUsePointDialog.vue';
-import type QueueCardsCarousel from '@/components/pos/QueueCardsCarousel.vue';
-import type { Receipt } from '@/types/receipt.type';
+import type { Recipe } from '@/types/recipe.type';
 
 const productStore = useProductStore();
 const categoryStore = useCategoryStore();
@@ -29,7 +28,7 @@ const selectedCategory = ref('');
 const productFilters = ref<Product[]>([]);
 const searchQuery = ref('');
 const barcode = ref('');
-const receiptsWithRemoveIcon = ref(new Set<number>()); // Keep track of which receipts should show the remove icon
+
 onMounted(async () => {
   promotionStore.promotions = [];
   if (userStore.currentUser?.userRole == "พนักงานขายข้าว") {
@@ -67,36 +66,6 @@ onMounted(async () => {
   }
 
 });
-// openReceiptDialog
-function openReceiptDialog(receipt: Receipt) {
-  posStore.currentReceipt = receipt;
-  posStore.receiptDialog = true;
-}
-
-
-function showRemoveIcon(receiptId: number) {
-  // Add receiptId to the set to show remove icon
-  if (receiptsWithRemoveIcon.value.has(receiptId)) {
-    receiptsWithRemoveIcon.value.delete(receiptId);
-  } else {
-    receiptsWithRemoveIcon.value.add(receiptId);
-  }
-}
-
-function removeReceipt(receipt: any) {
-  const receiptIndex = posStore.queueReceipt.findIndex((r) => r.receiptId === receipt.receiptId);
-  if (receiptIndex !== -1) {
-    posStore.queueReceipt.splice(receiptIndex, 1); // Removes the receipt from the queue
-    Swal.fire('Removed!', 'The receipt has been removed from the queue.', 'success');
-    receiptsWithRemoveIcon.value.delete(receipt.receiptId);
-  }
-}
-
-// Watch for changes in the receipt queue and handle updates
-watch(() => posStore.queueReceipt, (newQueue) => {
-  console.log('Receipt queue updated:', newQueue);
-});
-
 
 watch(selectedCategory, (newCategory) => {
   if (newCategory) {
@@ -148,14 +117,54 @@ const addToCart = (product: Product) => {
 
   }
 };
+
+// toggleQueue
+const showQueue = ref(true);
+const toggleQueue = () => {
+  showQueue.value = !showQueue.value;
+};
+// selectReceipt
+const selectReceipt = (receipt:Recipe) => {
+  posStore.currentReceipt = receipt;
+  posStore.receiptDialog = true;
+};
 </script>
+
 <template>
   <v-app style="width: 100vw; height: 100vh; overflow: hidden;">
-    <v-row class="full-width-row" :style="{ marginLeft: marginLeft, height: '100%' }">
-      <v-col cols="7" class="d-flex flex-column align-center"
-        style="background-color: #C1B6A9; height: 100%; overflow: hidden;">
+    <v-row :style="{ height: '100%' }">
+      <!-- Left Column (Queue) -->
+      <v-col cols="2" class="queue-column" style="padding: 0;">
+        <v-container fluid class="queue-container" style="height: 100%; overflow-y: auto;">
+          <v-row>
+            <v-col cols="12" class="d-flex justify-center align-center">
+              <v-btn icon @click="toggleQueue" style="margin-top: 10px;">
+                <v-icon>{{ showQueue ? 'mdi-arrow-left' : 'mdi-arrow-right' }}</v-icon>
+              </v-btn>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12">
+              <v-card
+                v-for="(receipt, index) in posStore.queueReceipt"
+                :key="index"
+                class="queue-card"
+                @click="selectReceipt(receipt)"
+              >
+                <v-card-title>
+                  #{{ receipt.queueNumber }} {{ receipt.customer?.customerName || 'Guest' }}
+                </v-card-title>
+                <v-card-subtitle>รายละเอียด</v-card-subtitle>
+              </v-card>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-col>
+
+      <!-- Main Interface Column -->
+      <v-col cols="6" class="d-flex flex-column align-center" style="background-color: #f7f7f7; height: 100%; overflow: hidden;">
         <v-container fluid class="full-width-container" style="height: 100%; overflow: hidden;">
-          <!-- Promotion Carousel -->
+          <!-- Promotion Carousel and Dialogs -->
           <v-row class="full-width-row" style="overflow: hidden;">
             <v-col cols="12" class="d-flex justify-center align-center" style="overflow: hidden;">
               <promotion-cards-carousel></promotion-cards-carousel>
@@ -163,41 +172,37 @@ const addToCart = (product: Product) => {
             </v-col>
           </v-row>
 
-          <!-- Barcode Input and Receipt Tags in Same Row -->
-          <v-row class="full-width-row align-center" style="overflow: hidden;">
-            <!-- Barcode Input -->
-            <v-col cols="12" md="6" class="d-flex align-center">
-              <v-text-field v-model="barcode" append-icon="mdi-barcode" label="สแกนบาร์โค้ด" variant="solo" single-line
-                hide-details @change="handleBarcodeInput"></v-text-field>
+          <!-- Barcode Input and Fullscreen Button -->
+          <v-row class="full-width-row" style="overflow: hidden; margin-bottom: 10px;">
+            <v-col cols="12" md="6">
+              <v-text-field
+                v-model="barcode"
+                append-icon="mdi-barcode"
+                label="สแกนบาร์โค้ด"
+                variant="outlined"
+                dense
+                hide-details
+                @change="handleBarcodeInput"
+                style="background-color: #fff; border-radius: 8px;"
+              ></v-text-field>
             </v-col>
-
-            <!-- Receipt Queue -->
-            <v-col cols="12" md="6" class="d-flex flex-column align-start">
-              <!-- Queue Header -->
-              <h3 class="queue-header">Queue</h3>
-
-              <!-- Receipt Tags with Horizontal Scroll -->
-              <v-row class="receipt-tags" style="overflow-x: auto; max-height: 50px; width: 100%;">
-                <v-chip v-for="(receipt, index) in posStore.queueReceipt" :key="index" class="receipt-chip"
-                  color="primary" @click="openReceiptDialog(receipt)" @dblclick="showRemoveIcon(receipt.receiptId!)">
-                  #{{ receipt.queueNumber }} {{ receipt.customer?.customerName || 'Guest' }}
-                  <v-icon class="remove-icon" @click.stop="removeReceipt(receipt)">
-                    mdi-close-circle
-                  </v-icon>
-                </v-chip>
-              </v-row>
-
-
-
+            <v-col cols="12" md="6" class="d-flex justify-end align-center">
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn icon v-bind="attrs" v-on="on" @click="toggleNavigationDrawer" style="background-color: #fff; border-radius: 50%; margin-left: 10px;">
+                    <v-icon>{{ posStore.hideNavigation ? 'mdi-fullscreen' : 'mdi-fullscreen-exit' }}</v-icon>
+                  </v-btn>
+                </template>
+                <span>{{ posStore.hideNavigation ? 'Full Screen' : 'Exit Full Screen' }}</span>
+              </v-tooltip>
             </v-col>
           </v-row>
 
-          <!-- Product Tabs -->
-          <v-row class="full-width-row" style="overflow: hidden;">
+          <!-- Category Tabs -->
+          <v-row class="full-width-row" style="overflow: hidden; margin-bottom: 10px;">
             <v-col cols="12">
-              <v-tabs v-model="selectedCategory" align-tabs="start" color="brown" class="full-width-tabs">
-                <v-tab v-for="category in categoryStore.categoriesForCreate" :key="category.categoryId"
-                  :value="category.categoryName">
+              <v-tabs v-model="selectedCategory" align-tabs="start" color="brown" class="full-width-tabs" background-color="#fff">
+                <v-tab v-for="category in categoryStore.categoriesForCreate" :key="category.categoryId" :value="category.categoryName">
                   {{ category.categoryName }}
                 </v-tab>
               </v-tabs>
@@ -210,8 +215,7 @@ const addToCart = (product: Product) => {
               <v-tab-item>
                 <v-container fluid class="full-width-container">
                   <v-row class="full-width-row">
-                    <v-col v-for="product in productFilters" :key="product.productId" cols="12" sm="6" md="4" lg="3"
-                      class="d-flex">
+                    <v-col v-for="product in productFilters" :key="product.productId" cols="12" sm="6" md="4" lg="3" class="d-flex">
                       <product-card :product="product" class="product-card"></product-card>
                     </v-col>
                   </v-row>
@@ -226,105 +230,37 @@ const addToCart = (product: Product) => {
       </v-col>
 
       <!-- Selected Items List -->
-      <v-col cols="5" class="d-flex flex-column" style="margin: 0; padding: 10px; height: 100%; overflow: hidden;">
-        <v-sheet style="height: 100%; display: flex; flex-direction: column;">
-          <selected-items-list style="flex: 1;"></selected-items-list>
+      <v-col cols="4" class="d-flex flex-column" style="  height: 100%; padding-top: 20px;">
+        <v-sheet style="height: 100%; ">
+          <selected-items-list ></selected-items-list>
         </v-sheet>
       </v-col>
     </v-row>
 
     <!-- Receipt Dialog -->
-    <receipt-dialog />
+    <receipt-dialog/>
   </v-app>
 </template>
 
 <style scoped>
-/* Ensure full-width layout for containers and rows */
 .full-width-container,
 .full-width-row {
   width: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden;
 }
 
 .full-width-tabs {
   width: 100%;
 }
 
-/* Flex container for product list with scroll */
 .product-list-container {
-  flex: 1;
-  overflow-y: auto;
   height: calc(100vh - 250px); /* Adjust based on the height of other elements */
+  overflow-y: auto;
   scrollbar-width: thin; /* Firefox */
   scrollbar-color: #888 #f1f1f1; /* Customize scrollbar colors */
 }
 
-.queue-header {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-left: 10px;
-  color: #444; /* Subtle color for better readability */
-}
-
-.receipt-tags {
-  margin-top: 10px;
-  padding: 0 10px;
-  display: flex;
-  flex-direction: row; /* Align items in a single row */
-  flex-wrap: nowrap; /* Prevent chips from wrapping to a new line */
-  gap: 10px;
-  max-height: 50px; /* Limit height to a single line */
-  overflow-x: auto; /* Enable horizontal scrolling */
-  overflow-y: hidden; /* Disable vertical overflow */
-  scrollbar-width: thin; /* Firefox scrollbar styling */
-  scrollbar-color: #c1b6a9 #e0e0e0;
-}
-
-.receipt-tags::-webkit-scrollbar {
-  height: 8px; /* Horizontal scrollbar height */
-}
-
-.receipt-tags::-webkit-scrollbar-thumb {
-  background-color: #c1b6a9;
-  border-radius: 10px;
-}
-
-.receipt-tags::-webkit-scrollbar-track {
-  background-color: #e0e0e0;
-}
-
-.receipt-chip {
-  font-weight: bold;
-  color: white;
-  background-color: #3f51b5; /* Primary color for chips */
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.3s ease-in-out;
-  display: flex;
-  align-items: center;
-  padding: 0 12px;
-  height: 32px;
-  border-radius: 16px; /* Ensure round edges */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-}
-
-.receipt-chip:hover {
-  background-color: #ff9800; /* Highlight color on hover */
-  transform: translateY(-2px);
-}
-
-.remove-icon {
-  margin-left: 5px;
-  cursor: pointer;
-  color: red;
-}
-
-.v-btn {
-  margin: 5px;
-}
-
-/* Product card styling */
 .product-card {
   width: 100%;
   display: flex;
@@ -336,7 +272,7 @@ const addToCart = (product: Product) => {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   margin: 10px;
   transition: transform 0.3s ease-in-out;
-  background-color: white; /* Consistent background */
+  background-color: white;
 }
 
 .product-card:hover {
@@ -355,7 +291,47 @@ const addToCart = (product: Product) => {
   text-align: center;
 }
 
-/* Webkit-based browsers (Chrome, Safari) scrollbar styles */
+.queue-column {
+  width: 100%;
+  max-width: 240px; /* Maximum width for queue column */
+  transition: all 0.3s ease;
+  overflow-y: auto;
+  padding: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f1f1f1;
+}
+
+.queue-container::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.queue-container::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 6px;
+}
+
+.queue-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.queue-card {
+  width: 100%; /* Ensures all queue cards have the same width */
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.queue-card:hover {
+  background-color: #ff9800;
+  transform: translateY(-2px);
+}
+
+/* Add scrollbar styles */
 .product-list-container::-webkit-scrollbar {
   width: 12px;
   height: 12px;
@@ -373,6 +349,12 @@ const addToCart = (product: Product) => {
 
 .product-list-container::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+
+/* Firefox */
+.product-list-container {
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f1f1f1;
 }
 
 /* Edge, IE 10+ */
@@ -395,4 +377,3 @@ const addToCart = (product: Product) => {
   background: #555;
 }
 </style>
-
