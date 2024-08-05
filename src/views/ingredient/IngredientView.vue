@@ -74,7 +74,15 @@ watch(paginate, async (newPage, oldPage) => {
             outlined v-model="ingredientStore.keyword"></v-text-field>
           </v-col>
         </v-row>
+
         <v-row>
+          <v-col>
+            <v-btn color="success" class="button-full-width" @click="ingredientStore.dialog = true">
+              <v-icon left>mdi-check</v-icon>
+              เพิ่มวัตถุดิบ
+            </v-btn>
+          </v-col>
+          
           <v-col>
             <v-menu v-model="menu1" offset-y>
               <template v-slot:activator="{ props }">
@@ -93,6 +101,7 @@ watch(paginate, async (newPage, oldPage) => {
               </v-list>
             </v-menu>
           </v-col>
+
           <v-col>
             <v-menu v-model="menu2" offset-y>
               <template v-slot:activator="{ props }">
@@ -111,12 +120,8 @@ watch(paginate, async (newPage, oldPage) => {
               </v-list>
             </v-menu>
           </v-col>
-          <v-col>
-            <v-btn color="success" class="button-full-width" @click="ingredientStore.dialog = true">
-              <v-icon left>mdi-check</v-icon>
-              เพิ่มวัตถุดิบ
-            </v-btn>
-          </v-col>
+
+          
         </v-row>
       </v-card-title>
 

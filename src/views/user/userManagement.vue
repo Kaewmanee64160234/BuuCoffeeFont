@@ -46,7 +46,7 @@ const filteredUsers = computed(() => {
           <h3>จัดการผู้ใช้งาน</h3>
           </v-col>
    
-          <v-row style="margin-left: 5%; margin-bottom:2%">
+          <v-row style="margin-left: 0.5%; margin-bottom:2%; margin-top:1%">
             <v-col class="pa-2 mr-8" cols="3">
               <v-text-field
                 v-model="userStore.searchQuery"
