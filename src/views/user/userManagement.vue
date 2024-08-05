@@ -42,12 +42,12 @@ const filteredUsers = computed(() => {
     <v-card class="flex-container">
       <v-card-title>
         <v-row>
-          <v-col cols="9" style="padding: 20px;">
+          <v-col cols="12" style="padding: 20px;">
           <h3>จัดการผู้ใช้งาน</h3>
           </v-col>
    
-          <v-row style="margin-left: 6%;">
-            <v-col class="pa-2 ma-2" cols="3">
+          <v-row style="margin-left: 5%; margin-bottom:2%">
+            <v-col class="pa-2 mr-8" cols="3">
               <v-text-field
                 v-model="userStore.searchQuery"
                 label="ค้นหาผู้ใช้งาน"
@@ -72,7 +72,7 @@ const filteredUsers = computed(() => {
         <v-spacer> </v-spacer>
       </v-card-title>
 
-      <v-table class="text-center" style="margin-left: 5%; margin-top: 3%;">
+      <v-table class="text-center" style="margin-left: 5%;">
           <thead>
             <tr>
               <th class="text-center"></th>
