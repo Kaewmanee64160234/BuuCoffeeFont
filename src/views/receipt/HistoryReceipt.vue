@@ -93,8 +93,18 @@ function formatDateThai(dateString: string): string {
   const day = date.getDate();
   const month = months[date.getMonth()];
   const year = date.getFullYear() + 543;
-  return `${day} ${month} พ.ศ.${year}`;
+
+  // Add time formatting
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+
+  // Format time to ensure two-digit minutes
+  const formattedTime = `เวลา ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} น.`;
+
+  return `${formattedTime} ในวันที่ ${day} ${month} พ.ศ.${year}`;
 }
+
+
 const formatReceiptsForExcel = (receipts: Receipt[]) => {
   return receipts.flatMap(receipt => {
     return receipt.receiptItems.map(item => ({
