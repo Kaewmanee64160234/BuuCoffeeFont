@@ -103,7 +103,7 @@ const deleteCustomer = async (customerId: number) => {
         <v-spacer></v-spacer>
       </v-card-title>
 
-        <v-table class="text-center" style="margin-left: 5%;">
+        <v-table class="mx-auto" style="width: 97%">
           <thead>
             <tr>
               <th class="text-center"></th>

@@ -82,7 +82,7 @@ watch(paginate, async (newPage, oldPage) => {
               เพิ่มวัตถุดิบ
             </v-btn>
           </v-col>
-          
+
           <v-col>
             <v-menu v-model="menu1" offset-y>
               <template v-slot:activator="{ props }">
@@ -125,7 +125,7 @@ watch(paginate, async (newPage, oldPage) => {
         </v-row>
       </v-card-title>
 
-      <v-table class="text-center mt-5">
+      <v-table class="mx-auto" style="width: 97%">
         <thead>
           <tr>
             <th></th>

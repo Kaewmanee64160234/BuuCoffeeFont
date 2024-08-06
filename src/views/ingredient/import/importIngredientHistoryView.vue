@@ -53,7 +53,7 @@ const formatDate = (date: any) => {
                 </v-row>
             </v-card-title>
 
-            <v-table class="text-center mt-5">
+            <v-table class="mx-auto" style="width: 97%">
                 <thead>
     <tr>
         <th class="column-header">ลำดับ</th>

@@ -185,7 +185,7 @@ const statusText = (status: string) => {
             <h3>ประวัติการขาย</h3>
           </v-col>
           <v-row>
-            <v-col cols="12" md="4">
+            <v-col cols="12" md="4" style="margin-left: 1%;">
               <v-text-field v-model="startDate" label="Start Date" type="date" outlined dense hide-details
                 variant="solo"></v-text-field>
             </v-col>
@@ -193,14 +193,14 @@ const statusText = (status: string) => {
               <v-text-field v-model="endDate" label="End Date" type="date" outlined dense hide-details
                 variant="solo"></v-text-field>
             </v-col>
-            <v-col cols="12" md="4">
+            <v-col cols="12" md="3">
               <v-radio-group v-model="receiptType" row>
                 <v-radio label="ร้านข้าว" value="ร้านข้าว"></v-radio>
                 <v-radio label="ร้านกาแฟ" value="ร้านกาแฟ"></v-radio>
               </v-radio-group>
             </v-col>
           </v-row>
-          <v-row class="mt-4" justify="end">
+          <v-row class="mt-4 mr-2" justify="end">
             <v-btn @click="fetchData" color="primary" class="mr-2">
               โหลดข้อมูล
             </v-btn>
@@ -213,7 +213,7 @@ const statusText = (status: string) => {
         <v-spacer></v-spacer>
       </v-card-title>
 
-      <v-table class="text-center table-container">
+      <v-table class="mx-auto" style="width: 97%">
         <thead>
           <tr>
             <th class="text-center"></th>

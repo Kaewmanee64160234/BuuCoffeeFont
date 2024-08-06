@@ -3,7 +3,7 @@
     <v-card>
       <v-card-title>
         <v-row style="padding: 20px;">
-          <h3>ประเภทสินค้า</h3>
+          <h3>หมวดหมู่</h3>
         </v-row>
         <v-row>
           <v-col cols="12" md="3">
@@ -12,7 +12,7 @@
           </v-col>
           <v-spacer></v-spacer>
           <v-col cols="12" md="3" class="d-flex justify-center align-center">
-            <v-btn @click="openCreateDialog" style="background-color: #8ad879; color: white" block>
+            <v-btn @click="openCreateDialog" color="success">
               <v-icon left>mdi-plus</v-icon>
               เพิ่มหมวดหมู่
             </v-btn>
@@ -25,8 +25,8 @@
           <thead>
             <tr>
               <th style="text-align: center; font-weight: bold;"></th>
-              <th style="text-align: center; font-weight: bold;">ชื่อประเภทสินค้า</th>
-              <th style="text-align: center; font-weight: bold;">ประเภทสินค้านี้สามารถใส่ท็อปปิ้งได้</th>
+              <th style="text-align: center; font-weight: bold;">ชื่อหมวดหมู่</th>
+              <th style="text-align: center; font-weight: bold;">หมวดหมู่นี้สามารถใส่ท็อปปิ้งได้</th>
               <th style="text-align: center; font-weight: bold;">การกระทำ</th>
             </tr>
           </thead>
