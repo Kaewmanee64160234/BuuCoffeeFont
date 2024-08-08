@@ -17,11 +17,23 @@ const navigateTo = (routeName: string) => {
     router.push({ name: routeName });
 };
 const formatDate = (date: any) => {
-    if (!date) return ''; // กรณีไม่มีข้อมูลวันที่
+  if (!date) return ''; // กรณีไม่มีข้อมูลวันที่
 
-    const jsDate = new Date(date.toString()); // แปลงข้อมูลวันที่เป็น string เป็นวัตถุ Date
-    const formattedDate = jsDate.toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' }); // กำหนดรูปแบบวันที่และเวลาตามที่ต้องการ
-    return formattedDate;
+  const jsDate = new Date(date.toString()); // แปลงข้อมูลวันที่เป็น string เป็นวัตถุ Date
+  const formattedDate = jsDate.toLocaleDateString('th-TH', { 
+    day: '2-digit', 
+    month: '2-digit', 
+    year: 'numeric', 
+    timeZone: 'Asia/Bangkok' 
+  }); // กำหนดรูปแบบวันที่ตามที่ต้องการ
+  
+  const formattedTime = jsDate.toLocaleTimeString('th-TH', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Asia/Bangkok'
+  }); // กำหนดรูปแบบเวลาตามที่ต้องการ
+  
+  return `${formattedDate} เวลา ${formattedTime}`; // รวมวันที่และเวลาเข้าด้วยกัน
 };
 </script>
 

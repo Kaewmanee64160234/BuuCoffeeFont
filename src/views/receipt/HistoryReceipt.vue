@@ -84,25 +84,25 @@ const filteredReceipts = computed(() => {
 });
 
 
-function formatDateThai(dateString: string): string {
-  const date = new Date(dateString);
-  const months = [
-    'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
-    'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
-  ];
-  const day = date.getDate();
-  const month = months[date.getMonth()];
-  const year = date.getFullYear() + 543;
+const formatDate = (date: any) => {
+  if (!date) return ''; // กรณีไม่มีข้อมูลวันที่
 
-  // Add time formatting
-  const hours = date.getHours();
-  const minutes = date.getMinutes();
-
-  // Format time to ensure two-digit minutes
-  const formattedTime = `เวลา ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} น.`;
-
-  return `${formattedTime} ในวันที่ ${day} ${month} พ.ศ.${year}`;
-}
+  const jsDate = new Date(date.toString()); // แปลงข้อมูลวันที่เป็น string เป็นวัตถุ Date
+  const formattedDate = jsDate.toLocaleDateString('th-TH', { 
+    day: '2-digit', 
+    month: '2-digit', 
+    year: 'numeric', 
+    timeZone: 'Asia/Bangkok' 
+  }); // กำหนดรูปแบบวันที่ตามที่ต้องการ
+  
+  const formattedTime = jsDate.toLocaleTimeString('th-TH', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Asia/Bangkok'
+  }); // กำหนดรูปแบบเวลาตามที่ต้องการ
+  
+  return `${formattedDate} เวลา ${formattedTime}`; // รวมวันที่และเวลาเข้าด้วยกัน
+};
 
 
 const formatReceiptsForExcel = (receipts: Receipt[]) => {
@@ -233,7 +233,7 @@ const statusText = (status: string) => {
         <tbody>
           <tr v-for="(receipt, index) in filteredReceipts" :key="receipt.receiptId">
             <td class="text-center">{{ index + 1 }}</td>
-            <td class="text-center">{{ formatDateThai(receipt.createdDate + '') }}</td>
+            <td class="text-center">{{ formatDate(receipt.createdDate + '') }}</td>
             <td class="text-center">
               <span :class="statusClass(receipt.receiptStatus)">
                 {{ statusText(receipt.receiptStatus) }}
