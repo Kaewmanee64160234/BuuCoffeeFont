@@ -11,6 +11,8 @@ const router = useRouter();
 const menu1 = ref(false);
 const menu2 = ref(false);
 const paginate = ref(true);
+const page = computed(() => ingredientStore.page);
+const take = computed(() => ingredientStore.take);
 
 onMounted(async () => {
   await ingredientStore.getAllIngredients();
@@ -58,6 +60,8 @@ watch(paginate, async (newPage, oldPage) => {
     await ingredientStore.getAllIngredients();
   }
 });
+
+
 </script>
 
 <template>
@@ -141,7 +145,7 @@ watch(paginate, async (newPage, oldPage) => {
         </thead>
         <tbody>
           <tr v-for="(item, index) in ingredientStore.ingredients" :key="index">
-            <td>{{ index + 1 }}</td>
+            <td>{{ (page - 1) * take + index + 1 }}</td>
             <td>
               <v-img :src="`http://localhost:3000/ingredients/${item.ingredientId}/image`" height="100"></v-img>
             </td>
