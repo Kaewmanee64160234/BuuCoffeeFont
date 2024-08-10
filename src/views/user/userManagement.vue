@@ -6,7 +6,6 @@ import EditUserDialog from '@/components/user/EditUserDialog.vue';
 import type { User } from '@/types/user.type';
 
 const userStore = useUserStore();
-const addUserDialog = ref(false);
 
 onMounted(async () => {
   await userStore.getAllUsers();
@@ -35,8 +34,8 @@ const filteredUsers = computed(() => {
 </script>
 
 <template>
-  <AddUserDialog v-model:dialog="addUserDialog"></AddUserDialog>
-  <EditUserDialog v-model:dialog="userStore.updateUserDialog" :user="userStore.user"></EditUserDialog>
+  <AddUserDialog ></AddUserDialog>
+  <EditUserDialog ></EditUserDialog>
 
   <v-container>
     <v-card class="flex-container">
@@ -60,7 +59,7 @@ const filteredUsers = computed(() => {
             
             <v-spacer></v-spacer>
             <v-col cols="auto" class="mr-14">
-              <v-btn color="success" @click="addUserDialog = true">
+              <v-btn color="success" @click="userStore.createUserDialog=true">
                 <v-icon left>mdi-plus</v-icon>
                 เพิ่มผู้ใช้งาน
               </v-btn>

@@ -4,9 +4,7 @@ import { useUserStore } from '@/stores/user.store';
 import type { VForm } from 'vuetify/components';
 import Swal from 'sweetalert2';
 
-const props = defineProps<{ dialog: boolean }>();
 const form = ref<VForm | null>(null);
-const dialog = ref(false);
 
 const userName = ref('');
 const userPassword = ref('');
@@ -24,12 +22,7 @@ const rules = {
   userStatus: (value: string) => /^[A-Za-zก-ฮะ-ๅๆ็่-๋์่-๋\s]+$/.test(value) || 'กรุณากรอกสถานะผู้ใช้งานเป็นตัวอักษรเท่านั้น',
 };
 
-watch(() => props.dialog, (newVal) => {
-  dialog.value = newVal;
-  if (newVal) {
-    resetForm();
-  }
-});
+
 
 function resetForm() {
   userName.value = '';
@@ -51,6 +44,9 @@ async function saveUser() {
       userRole: userRole.value,
       userStatus: userStatus.value
     });
+    userStore.user = null;
+    resetForm();
+
     showSuccessDialog('ผู้ใช้งานรายนี้ถูกสร้างเรียบร้อยแล้ว!');
     closeDialog();
     await userStore.getAllUsers();
@@ -67,11 +63,12 @@ const showSuccessDialog = (message: string) => {
 };
 
 function closeDialog() {
-  dialog.value = false;  // Close the dialog
   userStore.createUserDialog = false;  // Ensure the dialog state is reset in the store
+  resetForm();
+
 }
 
-watch(dialog, (newVal) => {
+watch(userStore.createUserDialog , (newVal) => {
   if (!newVal) {
     resetForm();
   }
@@ -79,7 +76,7 @@ watch(dialog, (newVal) => {
 </script>
 
 <template>
-  <v-dialog v-model="dialog" max-width="800px">
+  <v-dialog v-model="userStore.createUserDialog" max-width="800px">
     <v-card>
       <v-card-title>
         <span class="text-h5">เพิ่มผู้ใช้งาน</span>
