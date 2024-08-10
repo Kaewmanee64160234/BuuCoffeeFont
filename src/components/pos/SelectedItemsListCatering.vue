@@ -2,10 +2,8 @@
 import { ref, computed, watch, onMounted } from 'vue';
 import { usePosStore } from '@/stores/pos.store';
 import Swal from 'sweetalert2';
-import AddCustomerDialog from '../customer/AddCustomerDialog.vue';
-import type { Receipt, ReceiptItem } from '../../types/receipt.type';
+import type {  ReceiptItem } from '../../types/receipt.type';
 import { useReceiptStore } from '@/stores/receipt.store';
-import ReceiptDetailsDialogPos from '../receipts/ReceiptDialogPos.vue';
 import { useIngredientStore } from '@/stores/Ingredient.store'; // Assuming you have an ingredient store
 
 const step = ref(1);
@@ -88,7 +86,7 @@ watch(() => recive.value, () => {
 });
 
 function increaseQuantity(item: ReceiptItem) {
-  posStore.addToReceipt(item.product, item.productType, item.productTypeToppings, 1, item.sweetnessLevel);
+  posStore.addToReceipt(item.product!, item.productType!, item.productTypeToppings, 1, item.sweetnessLevel);
 }
 
 function decreaseQuantity(index: number) {
@@ -148,9 +146,7 @@ async function save() {
 
 
 <template>
-  <ReceiptDetailsDialogPos />
   <div class="h-screen app">
-    <AddCustomerDialog />
 
     <v-window v-model="step" transition="fade" class="h-screen">
       <!-- Order Details View -->
@@ -161,48 +157,24 @@ async function save() {
               <h3>รายละเอียดการสั่งซื้อ</h3>
             </div>
 
-            <v-divider></v-divider>
+            <v-divider class="my-2"></v-divider>
 
             <!-- Product Summary -->
             <h3>สรุปรายการสินค้าในร้าน</h3>
-            <div class="selected-items-list-50">
+            <div class="selected-items-list">
               <v-list class="full-width">
                 <v-list-item-group>
-                  <div v-for="(item, index) in selectedItems" :key="index" class="selected-item full-width my-2">
+                  <div v-for="(item, index) in selectedItems" :key="index" class="selected-item my-2">
                     <v-list-item :prepend-avatar="`http://localhost:3000/products/${item.product?.productId}/image`"
                       class="full-width">
-                      <v-row no-gutters>
-                        <v-col cols="6" class="product-name" style="color: black;">
+                      <v-row no-gutters align="center">
+                        <v-col cols="5" class="product-name">
                           {{ item.product?.productName }}
                         </v-col>
-                        <v-col cols="6" class="text-right pr-8" style="color: black;">
+                        <v-col cols="2" class="text-right pr-2" style="color: black;">
                           <p>{{ item.receiptSubTotal }}</p>
                         </v-col>
-                      </v-row>
-                      <v-row no-gutters>
-                        <v-col cols="7" style="color: gray;">
-                          <div v-if="item.product?.category.haveTopping" class="product-details">
-                            {{ item.productType?.productTypeName }} +{{ item.productType?.productTypePrice }} | ความหวาน
-                            {{ item.sweetnessLevel }}%
-                          </div>
-                          <div v-else>
-                            <div class="product-details">
-                              {{ item.product?.productName }} ({{ item.product?.category.categoryName }}) {{
-                              item.product?.productPrice }}.-
-                            </div>
-                          </div>
-                          <div v-if="item.productTypeToppings && item.productTypeToppings.length > 0">
-                            <ul class="toppings-list">
-                              <li v-for="topping in item.productTypeToppings" :key="topping?.topping?.toppingId"
-                                class="topping-item">
-                                x{{ topping?.quantity }} {{ topping?.topping?.toppingName }}
-                                <span v-if="topping?.topping?.toppingName && topping.topping.toppingName.length > 3">:
-                                  {{ topping?.topping?.toppingPrice }}.-</span>
-                              </li>
-                            </ul>
-                          </div>
-                        </v-col>
-                        <v-col cols="5">
+                        <v-col cols="3" class="text-right pr-2">
                           <v-btn size="xs-small" color="#C5C5C5" icon @click="decreaseQuantity(index)">
                             <v-icon>mdi-minus</v-icon>
                           </v-btn>
@@ -210,9 +182,27 @@ async function save() {
                           <v-btn size="xs-small" color="#FF9642" icon @click="increaseQuantity(item)">
                             <v-icon>mdi-plus</v-icon>
                           </v-btn>
+                        </v-col>
+                        <v-col cols="2" class="text-right">
                           <v-btn icon variant="text" @click="removeItem(index)">
                             <v-icon color="red">mdi-delete</v-icon>
                           </v-btn>
+                        </v-col>
+                      </v-row>
+                      <v-row no-gutters v-if="item.product?.category.haveTopping">
+                        <v-col cols="12" class="product-details">
+                          {{ item.productType?.productTypeName }} +{{ item.productType?.productTypePrice }} | ความหวาน
+                          {{ item.sweetnessLevel }}%
+                        </v-col>
+                        <v-col cols="12" v-if="item.productTypeToppings && item.productTypeToppings.length > 0">
+                          <ul class="toppings-list">
+                            <li v-for="topping in item.productTypeToppings" :key="topping?.topping?.toppingId"
+                              class="topping-item">
+                              x{{ topping?.quantity }} {{ topping?.topping?.toppingName }}
+                              <span v-if="topping?.topping?.toppingName && topping.topping.toppingName.length > 3">:
+                                {{ topping?.topping?.toppingPrice }}.-</span>
+                            </li>
+                          </ul>
                         </v-col>
                       </v-row>
                     </v-list-item>
@@ -220,29 +210,26 @@ async function save() {
                 </v-list-item-group>
               </v-list>
             </div>
+            <v-divider></v-divider>
 
             <!-- Ingredient Summary -->
-            <h3>สรุปรายการวัตถุดิบ</h3>
-            <div class="ingredient-list-50">
+            <h3 class="mt-4">สรุปรายการวัตถุดิบ</h3>
+            <div class="ingredient-list" >
               <v-list class="full-width">
                 <v-list-item-group>
                   <div v-for="(ingredient, index) in ingredientStore.ingredientList" :key="index"
-                    class="selected-item full-width my-2">
+                    class="selected-item my-2">
                     <v-list-item :prepend-avatar="`http://localhost:3000/ingredients/${ingredient.ingredientId}/image`"
                       class="full-width">
-                      <v-row no-gutters>
-                        <v-col cols="6" class="product-name" style="color: black;">
+                      <v-row no-gutters align="center">
+                        <v-col cols="5" class="product-name">
                           {{ ingredient.ingredient.ingredientName }}
                         </v-col>
-                        <v-col cols="6" class="text-right pr-8" style="color: black;">
-                          <p>{{ ingredient.ingredient!.ingredientPrice}}</p>
+                        <v-col cols="2" class="text-right pr-2" style="color: black;">
+                          <p>{{ ingredient.ingredient.ingredientPrice }}</p>
                         </v-col>
-                      </v-row>
-                      <v-row no-gutters>
-                        <v-col cols="12" style="color: gray;">
-                          <div class="ingredient-details">
-                            {{ ingredient.ingredient.ingredientSupplier }} | {{ ingredient.totalunit }} units
-                          </div>
+                        <v-col cols="5" class="ingredient-details">
+                          {{ ingredient.ingredient.ingredientSupplier }} | {{ ingredient.totalunit }} units
                         </v-col>
                       </v-row>
                     </v-list-item>
@@ -252,33 +239,10 @@ async function save() {
             </div>
 
             <!-- Order Summary -->
-            <div class="summary-section-30" style="width: 100%;">
+            <div class="summary-section" style="width: 100%;">
               <v-divider></v-divider>
-              <h3>สรุปรายการ</h3>
-              <v-card-subtitle>โปรโมชั่น:</v-card-subtitle>
-              <div class="promotion-30">
-                <div class="sub-promotion">
-                  <div v-for="(promotion) in posStore.receipt.receiptPromotions" :key="promotion.receiptPromotionId"
-                    style="text-align: end; width: 100%; padding-right: 40px;">
-                    <div style="width: 100%;">
-                      <span class="pa-2">{{ promotion.promotion.promotionName }}:</span>
-                      <span class="red--text">{{ promotion.discount }} $</span>
-                      <v-btn size="small" icon variant="text" @click="removePromotion(promotion.promotion)">
-                        <v-icon color="red">mdi-delete</v-icon>
-                      </v-btn>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <v-divider></v-divider>
-              <v-row class="py-3">
-                <v-col>
-                  <h3>ราคาสุทธิ</h3>
-                </v-col>
-                <v-col style="text-align: end; color: #FF9642;padding-right: 65px;">
-                  <h3>{{ posStore.receipt.receiptNetPrice }}</h3>
-                </v-col>
-              </v-row>
+            
+            
             </div>
           </div>
           <div class="footer-buttons">
@@ -302,7 +266,7 @@ async function save() {
             <v-divider></v-divider>
 
             <!-- Summary Section -->
-            <div class="summary-section-2">
+            <div class="summary-section">
               <div class="ma-2">
                 <!-- Total Amount -->
                 <p class="d-flex justify-space-between pr-6 my-2">
@@ -353,7 +317,6 @@ async function save() {
   </div>
 </template>
 
-
 <style scoped>
 .app {
   height: 100vh;
@@ -403,22 +366,29 @@ async function save() {
   color: gray;
 }
 
-.selected-items-list-50,
-.ingredient-list-50 {
+.selected-items-list,
+.ingredient-list {
   overflow-y: auto;
-  max-height: 40%;
+  max-height: 40vh;
   margin-bottom: 20px;
 }
 
-.promotions-section {
+.promotion-section {
   overflow-y: auto;
-  max-height: 40vh;
+  max-height: 20vh;
   margin-bottom: 20px;
   padding-right: 15px;
 }
 
-.summary-section-30,
-.summary-section-2 {
+.promotion-item {
+  text-align: end;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.summary-section {
   height: 30%;
   margin-top: 20px;
   padding: 10px;
@@ -442,18 +412,17 @@ async function save() {
     padding: 10px;
   }
 
-  .selected-items-list-50,
-  .ingredient-list-50 {
-    max-height: 35%;
+  .selected-items-list,
+  .ingredient-list {
+    max-height: 30%;
   }
 
-  .promotions-section {
-    max-height: 30vh;
+  .promotion-section {
+    max-height: 15vh;
   }
 
-  .summary-section-30,
-  .summary-section-2 {
-    height: 35%;
+  .summary-section {
+    height: 30%;
   }
 
   .footer-buttons {
