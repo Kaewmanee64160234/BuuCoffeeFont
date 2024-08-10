@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import { ref, onMounted, watch } from 'vue';
 import ProductCard from '@/components/pos/ProductCard.vue';
-import SelectedItemsList from '@/components/pos/SelectedItemsList.vue';
-import DrinkSelectionDialog from '@/components/pos/DrinkSelectionDialog.vue';
+import SelectedItemsListCatering from '@/components/pos/SelectedItemsListCatering.vue';
 import ReceiptDialog from '@/components/pos/ReceiptDialog.vue';
 import { useProductStore } from '@/stores/product.store';
 import { useCategoryStore } from '@/stores/category.store';
@@ -185,15 +184,14 @@ const addToCart = (product: Product) => {
                         </v-tabs-items>
                     </v-row>
 
-                    <!-- Drink Selection Dialog -->
-                    <drink-selection-dialog></drink-selection-dialog>
+                  
                 </v-container>
             </v-col>
 
             <!-- Selected Items List -->
             <v-col cols="5" class="d-flex flex-column" style="height: 100%; padding-top: 20px;">
                 <v-sheet style="height: 100%;">
-                    <selected-items-list></selected-items-list>
+                    <selected-items-list-catering></selected-items-list-catering>
                 </v-sheet>
             </v-col>
         </v-row>
