@@ -39,7 +39,13 @@ async function saveCustomer() {
         createMemberDate: new Date(),
       });
       await customerStore.getAllCustomers(); // Refresh customer list
+
+      // Clear form data and close dialog
+      customerName.value = '';
+      customerPhone.value = '';
+      form.value!.resetValidation(); // Reset form validation state
       close();
+
       Swal.fire({
         title: 'สำเร็จ!',
         text: 'ลูกค้าได้ถูกบันทึกแล้ว',
@@ -57,6 +63,7 @@ async function saveCustomer() {
     }
   }
 }
+
 </script>
 
 <template>

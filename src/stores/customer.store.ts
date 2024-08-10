@@ -51,7 +51,7 @@ export const useCustomerStore = defineStore('customer', () => {
   };
 
 
-  const updateCustomer = async (id: number, updatedCustomer: Customer) => {
+  const updateCustomer = async (id: number, updatedCustomer: any) => {
     try {
       const response = await customerService.updateCustomer(id, updatedCustomer);
       if (response.status === 200) {

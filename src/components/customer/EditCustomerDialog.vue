@@ -28,25 +28,23 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, ref, watch } from 'vue';
+import {  ref, watch } from 'vue';
 import { useCustomerStore } from '@/stores/customer.store';
 import type { VForm } from 'vuetify/components';
-import type { Customer } from '@/types/customer.type';
 import Swal from 'sweetalert2';
 
-const props = defineProps<{ dialog: boolean, customer: Customer | null }>();
 const form = ref<VForm | null>(null);
-const dialog = ref(props.dialog);
-const customerStore = useCustomerStore();
+  const customerStore = useCustomerStore();
+const dialog = ref(customerStore.updateCustomerDialog);
 
-const customerName = ref(props.customer?.customerName || '');
-const customerPhone = ref(props.customer?.customerPhone || '');
+const customerName = ref(customerStore.customer?.customerName || '');
+const customerPhone = ref(customerStore.customer?.customerPhone || '');
 
-watch(() => props.dialog, (newVal) => {
+watch(() => customerStore.updateCustomerDialog, (newVal) => {
   dialog.value = newVal;
 });
 
-watch(() => props.customer, (newVal) => {
+watch(() => customerStore.customer, (newVal) => {
   customerName.value = newVal?.customerName || '';
   customerPhone.value = newVal?.customerPhone || '';
 });
@@ -55,17 +53,23 @@ async function saveCustomer() {
   const { valid } = await form.value!.validate();
   if (valid) {
     const updatedCustomer = {
-      customerId: props.customer?.customerId || 0,
+      customerId: customerStore.customer?.customerId || 0,
       customerName: customerName.value,
       customerPhone: customerPhone.value,
     };
 
     try {
-      const response = await customerStore.updateCustomer(updatedCustomer.customerId, updatedCustomer);
+      const response = await customerStore.updateCustomer(updatedCustomer.customerId, updatedCustomer!);
       if (response) {
+        // Reset form and clear data after successful update
+        customerName.value = '';
+        customerPhone.value = '';
+        form.value!.resetValidation(); // Reset form validation state
         dialog.value = false;
         customerStore.updateCustomerDialog = false;
-        await customerStore.getAllCustomers();
+        customerStore.customer = null;
+        await customerStore.getAllCustomers(); // Refresh customer list
+
         Swal.fire({
           title: 'สำเร็จ!',
           text: 'ข้อมูลลูกค้าได้รับการแก้ไขเรียบร้อยแล้ว!',
@@ -89,7 +93,11 @@ async function saveCustomer() {
 function closeDialog() {
   dialog.value = false;
   customerStore.updateCustomerDialog = false;
+  customerName.value = '';
+  customerPhone.value = '';
+  form.value!.resetValidation(); // Reset form validation state
 }
+
 </script>
 
 <style scoped>

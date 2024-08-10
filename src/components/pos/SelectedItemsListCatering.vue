@@ -276,7 +276,7 @@ async function save() {
 
                 <div>
                   <p class="d-flex justify-space-between align-center pr-6 my-2">
-                    <span style="width: 50%;">รับมา:</span>
+                    <span style="width: 50%;">จำนวนที่ทำการเบิก:</span>
                     <v-text-field v-model="recive" type="number" variant="solo" label="จำนวนเงิน"
                       style="width: 50%;"></v-text-field>
                   </p>
@@ -284,7 +284,7 @@ async function save() {
 
                 <!-- Change Amount -->
                 <p class="d-flex justify-space-between pr-6 my-2">
-                  <span>ทอน:</span>
+                  <span>คงเหลือจากการเบิก:</span>
                   <span :class="recive < 0 || recive < posStore.receipt.receiptNetPrice ? 'red--text' : 'black'"
                     class="info-value">
                     {{ parseFloat(change.toFixed(2)) < 0 ? 'จำนวนเงินไม่พอ' : change.toFixed(2) }} </span>
@@ -316,6 +316,7 @@ async function save() {
     </v-window>
   </div>
 </template>
+
 
 <style scoped>
 .app {

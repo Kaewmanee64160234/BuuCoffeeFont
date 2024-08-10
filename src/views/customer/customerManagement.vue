@@ -68,7 +68,7 @@ const deleteCustomer = async (customerId: number) => {
 
 <template>
   <AddCustomerDialog v-model:dialog="addCustomerDialog"></AddCustomerDialog>
-  <EditCustomerDialog v-model:dialog="customerStore.updateCustomerDialog" :customer="customerStore.customer"></EditCustomerDialog>
+  <EditCustomerDialog ></EditCustomerDialog>
 
   <v-container>
     <v-card class="flex-container">
