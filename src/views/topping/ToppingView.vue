@@ -2,11 +2,12 @@
   <v-container>
     <v-card>
       <v-card-title>
-        <v-row>
-          <v-col cols="9" style="padding: 20px;">
+        <v-row style="padding: 20px;">
           <h3>ท้อปปิ้ง</h3>
-          </v-col>
-          <v-col cols="3">
+          </v-row>
+        <v-row>
+          
+          <v-col cols="12" md="3">
             <v-text-field 
               v-model="toppingStore.searchQuery" 
               label="ค้นหาท็อบปิ้ง" 
@@ -17,7 +18,8 @@
               @input="toppingStore.getToppingsPaginate"
             ></v-text-field>
           </v-col>
-          <v-col>
+          <v-spacer></v-spacer>
+          <v-col cols="12" md="3" class="d-flex justify-center align-center">
             <v-btn @click="openCreateDialog" color="success">
               <v-icon left>mdi-plus</v-icon>
               เพิ่มท็อปปิ้งใหม่

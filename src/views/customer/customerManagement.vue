@@ -74,12 +74,12 @@ const deleteCustomer = async (customerId: number) => {
     <v-card class="flex-container">
       <v-card-title>
         <v-row>
-          <v-col cols="9" style="padding: 20px;">
+          <v-col cols="12" style="padding: 20px;">
             <h3>จัดการลูกค้า</h3>
           </v-col>
           
-          <v-row style="margin-left: 6%;">
-            <v-col class="pa-2 ma-2" cols="3">
+          <v-row style="margin-left: 0.5%; margin-bottom:2%;margin-top:1%">
+            <v-col class="pa-2 mr-8" cols="3">
               <v-text-field
                 v-model="customerStore.searchQuery"
                 label="ค้นหาลูกค้า"
@@ -103,7 +103,7 @@ const deleteCustomer = async (customerId: number) => {
         <v-spacer></v-spacer>
       </v-card-title>
 
-        <v-table class="text-center" style="margin-left: 5%; margin-top: 3%;">
+        <v-table class="mx-auto" style="width: 97%">
           <thead>
             <tr>
               <th class="text-center"></th>

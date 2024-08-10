@@ -150,22 +150,26 @@ const deleteProduct = async (productId: number) => {
             ></v-text-field>
           </v-col>
           <v-spacer></v-spacer>
-          <v-col cols="12" md="3" class="d-flex justify-center align-center">
-            <v-btn @click="openCreateDialog" style="background-color: #8ad879; color: white" block>
-              <v-icon left>mdi-plus</v-icon>
-              เพิ่มสินค้า
-            </v-btn>
-          </v-col>
-          <v-col cols="12" md="3">
-            <v-select 
-              v-model="productStore.selectedCategory" 
-              label="เลือกหมวดหมู่"
-              :items="categoryStore.categories.map(category => category.categoryName)" 
-              dense 
-              hide-details
-              variant="solo"
-            ></v-select>
-          </v-col>
+          
+          <v-row align="center" justify="start">
+            <v-col cols="auto">
+              <v-btn @click="openCreateDialog" color="success">
+                <v-icon left>mdi-plus</v-icon>
+                เพิ่มสินค้า
+              </v-btn>
+            </v-col>
+            <v-col class="mt-4 mr-2">
+              <v-select 
+                v-model="productStore.selectedCategory" 
+                label="เลือกหมวดหมู่"
+                :items="categoryStore.categories.map(category => category.categoryName)" 
+                dense 
+                hide-details
+                variant="solo"
+                class="mb-8"
+              ></v-select>
+            </v-col>
+          </v-row>
         </v-row>
         <v-spacer></v-spacer>
       </v-card-title>
