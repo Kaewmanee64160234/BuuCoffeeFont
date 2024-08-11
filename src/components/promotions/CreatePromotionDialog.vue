@@ -83,19 +83,19 @@ const promotionStore = usePromotionStore();
 const productStore = useProductStore();
 
 const step = ref(1);
-const promotionName = ref('');
-const discountValue = ref<number | null>(null);
+const promotionName = ref('โปรโมชั่นใหม่'); // Default value
+const discountValue = ref<number | null>(10); // Default value for discount
 const buyProductId = ref<number | null>(null);
 const freeProductId = ref<number | null>(null);
 const pointsRequired = ref<number | null>(null);
 const discountPercentage = ref<number | null>(null);
 const minimumPrice = ref<number | null>(null);
-const startDate = ref<string | null>(null);
-const endDate = ref<string | null>(null);
-const description = ref('');
+const startDate = ref<string | null>(new Date().toISOString().substr(0, 10)); // Default to today's date
+const endDate = ref<string | null>(new Date().toISOString().substr(0, 10));
+const description = ref('รายละเอียดโปรโมชั่น'); // Default value
 const noEndDate = ref(false);
 const promotionCanUseManyTimes = ref(false);
-const promotionStore_ = ref('');
+const promotionStore_ = ref('ร้านกาแฟ'); // Default store
 const promotionTypeName = ref('');
 const promotionTypeValue = ref('');
 
@@ -125,7 +125,7 @@ const closeDialog = () => {
   pointsRequired.value = null;
   discountPercentage.value = null;
   minimumPrice.value = null;
-  startDate.value = null;
+  startDate.value = new Date().toISOString().substr(0, 10); // Reset to today's date
   endDate.value = null;
   description.value = '';
   noEndDate.value = false;
@@ -133,10 +133,24 @@ const closeDialog = () => {
   promotionStore.promotion = null;
   promotionStore.createPromotionDialog = false;
   promotionCanUseManyTimes.value = false;
+
+  // Reset validation for all forms
+  const forms = document.querySelectorAll('form');
+  forms.forEach(form => form.reset());
 };
 
 const createPromotion = async () => {
   if (!promotionName.value || !promotionTypeValue.value || !startDate.value || (!noEndDate.value && !endDate.value)) {
+    promotionStore.createPromotionDialog = false;
+    Swal.fire({
+      title: 'ข้อมูลไม่ครบถ้วน',
+      text: 'กรุณากรอกข้อมูลให้ครบถ้วน',
+      icon: 'error',
+      confirmButtonText: 'ตกลง',
+    }).then(() => {
+      promotionStore.createPromotionDialog = true;
+      step.value = 1;
+    });
     return;
   }
 
@@ -146,7 +160,7 @@ const createPromotion = async () => {
     startDate: new Date(startDate.value),
     endDate: noEndDate.value ? null : new Date(endDate.value),
     discountValue: promotionTypeValue.value === 'discountPrice' || promotionTypeValue.value === 'usePoints' || promotionTypeValue.value === 'discountPercentage' ? discountValue.value : null,
-    conditionQuantity: promotionTypeValue.value === 'discountPrice' || promotionTypeValue.value === 'usePoints' ? pointsRequired.value : null,
+    conditionQuantity: promotionTypeValue.value === 'usePoints' ? pointsRequired.value : null,
     buyProductId: promotionTypeValue.value === 'buy1get1' ? productStore.products.find(product => product.productName === buyProductId.value)?.productId : null, 
     freeProductId: promotionTypeValue.value === 'buy1get1' ? productStore.products.find(product => product.productName === freeProductId.value)?.productId : null,
 
@@ -156,15 +170,10 @@ const createPromotion = async () => {
     noEndDate: noEndDate.value,
     promotionForStore: promotionStore_.value,
     promotionCanUseManyTimes: promotionCanUseManyTimes.value,
-
   };
 
-  if(promotionTypeValue.value === 'usePoints' && !pointsRequired.value){
-    newPromotion.conditionValue1 = discountValue.value;
-   
-  }
-
   await promotionStore.createPromotion(newPromotion);
+
   Swal.fire({
     title: 'สำเร็จ',
     text: 'โปรโมชั่นถูกสร้างเรียบร้อยแล้ว',
@@ -173,10 +182,12 @@ const createPromotion = async () => {
     customClass: {
       confirmButton: 'swal-button'
     }
+  }).then(() => {
+    closeDialog(); // Close the dialog after the SweetAlert is dismissed
   });
-  closeDialog();
 };
 </script>
+
 
 <style scoped>
 .swal-button {
