@@ -43,6 +43,7 @@ onMounted(async () => {
   await categoryStore.getAllCategories();
   await toppingStore.getAllToppings();
   await customerStore.getAllCustomers();
+
   userStore.getCurrentUser();
 
   if (userStore.currentUser?.userRole === "พนักงานขายข้าว") {

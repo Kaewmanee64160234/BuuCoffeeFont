@@ -33,6 +33,7 @@ export interface Receipt {
   receiptItems: ReceiptItem[];
   promotion?: Promotion;
   paymentMethod?: string;
+  receiptNumber?: number;
   receiptPromotions:ReceiptPromotion[];
   createdDate: Date;
   updatedDate: Date;
