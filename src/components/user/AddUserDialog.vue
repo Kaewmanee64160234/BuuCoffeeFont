@@ -88,6 +88,8 @@ async function saveUser() {
         userRole: userRole.value,
         userStatus: userStatus.value
       });
+      userStore.user = null;
+      resetForm();
       showSuccessDialog('ผู้ใช้งานรายนี้ถูกสร้างเรียบร้อยแล้ว!');
       
       // ปิด dialog หลังจากที่บันทึกเสร็จสิ้น
@@ -121,15 +123,12 @@ function closeDialog() {
   resetForm();  // รีเซ็ตฟอร์มให้พร้อมสำหรับการใช้งานครั้งถัดไป
 }
 
-watch(() => props.dialog, (newVal) => {
-  if (!newVal) {
-    resetForm();
-  }
-});
+
 </script>
 
 <template>
-  <v-dialog :model-value="props.dialog" @update:model-value="value => emit('update:dialog', value)" max-width="800px">
+
+  <v-dialog v-model="userStore.createUserDialog" max-width="800px">
     <v-card>
       <v-card-title>
         <span class="text-h5">เพิ่มผู้ใช้งาน</span>

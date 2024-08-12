@@ -7,7 +7,6 @@ import type { User } from '@/types/user.type';
 import { watch } from 'vue';
 
 const userStore = useUserStore();
-const addUserDialog = ref(false);
 
 watch(() => userStore.searchQuery, async (newQuery) => {
   await userStore.getAllUsers();
@@ -42,6 +41,7 @@ const filteredUsers = computed(() => {
 <template>
   <AddUserDialog v-model:dialog="userStore.createUserDialog"></AddUserDialog>
   <EditUserDialog v-model:dialog="userStore.updateUserDialog" :user="userStore.user"></EditUserDialog>
+
 
   <v-container>
     <v-card class="flex-container">

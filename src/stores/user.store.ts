@@ -16,7 +16,8 @@ export const useUserStore = defineStore("user", () => {
   const user = ref<User | null>(null);
   const searchQuery = ref<string>("");
   const updateUserDialog = ref(false);
-  const createUserDialog = ref(false); // เพิ่มตัวแปรนี้เพื่อจัดการ dialog ของการสร้างผู้ใช้ใหม่
+
+  const createUserDialog = ref(false);
   // const userRole = ref("พนักงานขายข้าว");
   const userRole = ref("พนักงานขายกาแฟ");
   function setUser(user: User) {

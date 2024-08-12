@@ -22,6 +22,7 @@ const receiptStore = useReceiptStore();
 
 onMounted(async () => {
   await receiptStore.getRecieptIn30Min();
+  await loadQueueListFromLocalStorage();
 });
 
 function nextStep() {
@@ -131,6 +132,8 @@ async function save() {
   } else {
     posStore.createReceipt();
   }
+
+  // Save the current state of the queue after updating/creating the receipt
   posStore.selectedItems = [];
   posStore.receipt.receiptTotalPrice = 0;
   posStore.receipt.receiptTotalDiscount = 0;
@@ -150,7 +153,17 @@ async function save() {
 function openCreateCustomerDialog() {
   customerStore.openDialogRegisterCustomer = true;
 }
-
+const loadQueueListFromLocalStorage = () => {
+  const storedQueueList = localStorage.getItem('queueReceipt');
+  console.log(storedQueueList);
+  
+  if (storedQueueList) {
+    posStore.queueReceipt = JSON.parse(storedQueueList);
+  } else {
+    posStore.queueReceipt = []; // Initialize if not found
+    posStore.saveQueueListToLocalStorage(); // Save initial empty list
+  }
+};
 function cancelReceipt() {
   posStore.selectedItems = [];
   posStore.receipt = {
@@ -275,7 +288,17 @@ const selectReceipt = (receipt: Receipt) => {
             </v-row>
 
             <v-divider class="my-2"></v-divider>
-            <h3>สรุปรายการ</h3>
+            <div>
+              <v-row>
+                <v-col cols="12" md="6">
+                  <h3>สรุปรายการ</h3>
+
+                </v-col>
+                <v-col cols="12" md="6" class="text-end ">
+                  <p @click="cancelReceipt()" style="color: red;" class="pr-5 ">ยกเลิกรายการ</p>
+                </v-col>
+              </v-row>
+            </div>
 
             <!-- Promotions Section -->
             <div class="promotions-section">
@@ -479,8 +502,8 @@ const selectReceipt = (receipt: Receipt) => {
               <div v-if="posStore.receipt.paymentMethod == 'cash'">
                 <p class="d-flex justify-space-between align-center pr-6 my-2">
                   <span style="width: 50%;">รับมา:</span>
-                  <v-text-field v-model="recive" type="number" variant="solo"  label="จำนวนเงิน"
-               style="width: 50%;" ></v-text-field>
+                  <v-text-field v-model="recive" type="number" variant="solo" label="จำนวนเงิน"
+                    style="width: 50%;"></v-text-field>
                 </p>
               </div>
 

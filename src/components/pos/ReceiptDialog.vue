@@ -4,11 +4,11 @@
       <v-card-text ref="receiptContent">
         <div class="receipt-content" id="printableArea">
           <div class="receipt-header text-center">
-            <h4 class="header-text">Buu Library</h4>
+            <h4 class="header-text">Café@Library</h4>
             <div class="dashed-line"></div>
             <div class="d-flex justify-space-between">
               <p style="text-align: start">Queue: {{ posStore.currentReceipt?.queueNumber }}</p>
-              <p style="text-align: start">#{{ posStore.currentReceipt?.receiptId }}</p>
+              <p style="text-align: start">#{{ posStore.currentReceipt?.receiptNumber }}</p>
             </div>
             <p style="text-align: start">Staff: {{ posStore.currentReceipt?.user?.userName }}</p>
             <p style="text-align: start">
@@ -89,7 +89,6 @@
   </v-dialog>
 </template>
 
-
 <script lang="ts" setup>
 import { usePosStore } from '@/stores/pos.store';
 import { ref, computed } from 'vue';
@@ -107,9 +106,14 @@ const printReceipt = () => {
   const originalContents = document.body.innerHTML;
 
   document.body.innerHTML = printContents;
+  document.body.style.zoom = "0.7"; // Set zoom to 70% for the print
+
   window.print();
+
   document.body.innerHTML = originalContents;
   window.location.reload();
+
+
 };
 
 const formattedDate = computed(() => {
@@ -203,6 +207,7 @@ const formattedTime = computed(() => {
   width: 45%;
 }
 
+/* Adjust the print size */
 @media print {
   body * {
     visibility: hidden;
@@ -218,6 +223,8 @@ const formattedTime = computed(() => {
     left: 0;
     top: 0;
     width: 100%;
+    transform: scale(0.7); /* Scale the content to 70% */
+    transform-origin: top left;
   }
 }
 </style>

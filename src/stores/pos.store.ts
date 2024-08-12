@@ -60,37 +60,46 @@ export const usePosStore = defineStore("pos", () => {
   // Load queue number from local storage
   const loadQueueNumber = () => {
     const storedQueueData = localStorage.getItem("queueData");
-    const currentDate = new Date().toDateString();
+    const currentDate = new Date();
+    const currentDay = currentDate.getDate();
+    const currentMonth = currentDate.getMonth() + 1; // JavaScript months are 0-based, so add 1
+    const currentDateString = currentDate.toDateString();
+
     if (storedQueueData) {
       const { date, number } = JSON.parse(storedQueueData);
-      if (date === currentDate) {
+
+      // Reset the queue number to 1 on October 1st
+      if (currentMonth === 8 && currentDay === 12) {
+        queueNumber.value = 1;
+        localStorage.setItem(
+          "queueData",
+          JSON.stringify({ date: currentDateString, number: queueNumber.value })
+        );
+      } else if (date === currentDateString) {
         queueNumber.value = number;
       } else {
         queueNumber.value = 1;
         localStorage.setItem(
           "queueData",
-          JSON.stringify({ date: currentDate, number: queueNumber.value })
+          JSON.stringify({ date: currentDateString, number: queueNumber.value })
         );
       }
     } else {
       localStorage.setItem(
         "queueData",
-        JSON.stringify({ date: currentDate, number: queueNumber.value })
+        JSON.stringify({ date: currentDateString, number: queueNumber.value })
       );
     }
   };
 
   // Save queue number to local storage
   const saveQueueNumber = () => {
-    const currentDate = new Date().toDateString();
+    const currentDateString = new Date().toDateString();
     localStorage.setItem(
       "queueData",
-      JSON.stringify({ date: currentDate, number: queueNumber.value })
+      JSON.stringify({ date: currentDateString, number: queueNumber.value })
     );
   };
-
-  // Initialize queue number on store creation
-  loadQueueNumber();
 
   // toggleNavigation
   const toggleNavigation = () => {
@@ -299,6 +308,7 @@ export const usePosStore = defineStore("pos", () => {
       console.log("Receipt created successfully", res.data);
       currentReceipt.value = res.data;
       queueReceipt.value.push(currentReceipt.value!);
+      saveQueueListToLocalStorage();
       await customerStore.getAllCustomers();
     }
     await receiptStore.getRecieptIn30Min();
@@ -375,7 +385,7 @@ export const usePosStore = defineStore("pos", () => {
           } else {
             applyDiscount(promotion, receipt.value.receiptNetPrice);
           }
-        }else{
+        } else {
           Swal.fire({
             icon: "error",
             title: "ส่วนลดไม่ถูกต้อง",
@@ -591,6 +601,13 @@ export const usePosStore = defineStore("pos", () => {
     await receiptStore.getRecieptIn30Min();
   };
 
+  function saveQueueListToLocalStorage() {
+    localStorage.setItem('queueReceipt', JSON.stringify(queueReceipt.value));
+  }
+
+  
+  
+
   return {
     selectedItems,
     receiptPromotions,
@@ -618,6 +635,8 @@ export const usePosStore = defineStore("pos", () => {
     hideNavigation,
     selectUsePointDialog,
     selectedItemsUsePromotion,
-    queueReceipt
+    queueReceipt,
+    loadQueueNumber,
+    saveQueueListToLocalStorage
   };
 });
