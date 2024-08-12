@@ -7,6 +7,7 @@ function getAllIngredients(params: any) {
   return http.get("/ingredients", { params: params });
 }
 
+
 function getAllHistoryImportIngredients() {
   return http.get("/importingredients");
 }
