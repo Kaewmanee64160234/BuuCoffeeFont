@@ -76,10 +76,16 @@ watch(paginate, async (newPage, oldPage) => {
         </v-row>
         <v-row>
           <v-col>
+            <v-btn color="success" class="button-full-width" @click="ingredientStore.dialog = true">
+              <v-icon left>mdi-plus</v-icon>
+              เพิ่มวัตถุดิบ
+            </v-btn>
+          </v-col>
+          <v-col>
             <v-menu v-model="menu1" offset-y>
               <template v-slot:activator="{ props }">
                 <v-btn color="success" class="button-full-width" v-bind="props">
-                  <v-icon left>mdi-plus</v-icon>
+                  <v-icon left>mdi-swap-vertical-bold</v-icon>
                   นำเข้าวัตถุดิบ
                 </v-btn>
               </template>
@@ -97,8 +103,8 @@ watch(paginate, async (newPage, oldPage) => {
             <v-menu v-model="menu2" offset-y>
               <template v-slot:activator="{ props }">
                 <v-btn color="success" class="button-full-width" v-bind="props">
-                  <v-icon left>mdi-plus</v-icon>
-                  เช็ควัตถุดิบ 
+                  <v-icon left>mdi-swap-vertical-bold</v-icon>
+                  เช็ควัตถุดิบ และ วัตถุดิบหมดอายุ
                 </v-btn>
               </template>
               <v-list>
@@ -111,12 +117,6 @@ watch(paginate, async (newPage, oldPage) => {
               </v-list>
             </v-menu>
           </v-col>
-          <v-col>
-            <v-btn color="success" class="button-full-width" @click="ingredientStore.dialog = true">
-              <v-icon left>mdi-check</v-icon>
-              เพิ่มวัตถุดิบ
-            </v-btn>
-          </v-col>
         </v-row>
       </v-card-title>
 
@@ -127,11 +127,11 @@ watch(paginate, async (newPage, oldPage) => {
             <th>รูปภาพ</th>
             <th>ชื่อวัตถุดิบ</th>
             <th>ผู้จัดจำหน่าย</th>
-            <th>จำนวนเหลือในคลัง</th>
+            <th>จำนวนคงเหลือ</th>
             <th>จำนวนต่อหน่วย</th>
-            <th>จำนวนขั้นต่ำ</th>
+            <th>จุดสั่งซื้อขั้นต่ำ</th>
             <th>หน่วยที่ถูกใช้ไป</th>
-            <th>Operations</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>

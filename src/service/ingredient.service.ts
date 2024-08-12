@@ -3,8 +3,11 @@ import http from "./axios";
 function getIngredientlow() {
   return http.get("/ingredients/low-stock");
 }
+function getIngredients() {
+  return http.get("/ingredients", );
+}
 function getAllIngredients(params: any) {
-  return http.get("/ingredients", { params: params });
+  return http.get("/ingredients/all", { params: params });
 }
 
 function getAllHistoryImportIngredients() {
@@ -28,15 +31,18 @@ function createImportIngredients(ingredient: {
   return http.post("/importingredients", ingredient);
 }
 function createCheckIngredients(ingredient: {
-  checkingredientitem: {
+  checkingredientitems: {
     ingredientId: number;
     UsedQuantity: number;
   }[];
   userId: number;
-  date: Date;
+  date: string;
+  checkDescription: string;
+  actionType: string;
 }) {
   return http.post("/checkingredients", ingredient);
 }
+
 
 async function saveIngredient(ingredient: Ingredient & { imageFile: File }) {
   console.log("Image file', " + JSON.stringify(ingredient));
@@ -95,6 +101,7 @@ export default {
   getAllHistoryImportIngredients,
   saveIngredient,
   updateIngredient,
+  getIngredients,
   deleteIngredient,
   searchIngredientsByName,
   getIngredientlow,
