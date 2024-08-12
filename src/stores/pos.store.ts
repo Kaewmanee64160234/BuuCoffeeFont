@@ -308,6 +308,7 @@ export const usePosStore = defineStore("pos", () => {
       console.log("Receipt created successfully", res.data);
       currentReceipt.value = res.data;
       queueReceipt.value.push(currentReceipt.value!);
+      saveQueueListToLocalStorage();
       await customerStore.getAllCustomers();
     }
     await receiptStore.getRecieptIn30Min();
@@ -600,6 +601,13 @@ export const usePosStore = defineStore("pos", () => {
     await receiptStore.getRecieptIn30Min();
   };
 
+  function saveQueueListToLocalStorage() {
+    localStorage.setItem('queueReceipt', JSON.stringify(queueReceipt.value));
+  }
+
+  
+  
+
   return {
     selectedItems,
     receiptPromotions,
@@ -629,5 +637,6 @@ export const usePosStore = defineStore("pos", () => {
     selectedItemsUsePromotion,
     queueReceipt,
     loadQueueNumber,
+    saveQueueListToLocalStorage
   };
 });

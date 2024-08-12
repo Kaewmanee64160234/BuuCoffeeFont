@@ -65,7 +65,42 @@ onMounted(async () => {
     productFilters.value = productStore.products.filter(product => product.category.categoryName.toLowerCase() === selectedCategory.value.toLowerCase());
   }
 
+  // Load queue list from local storage
+  loadQueueListFromLocalStorage();
+  loadFullscreenStateFromLocalStorage();
+
 });
+
+// Load queue list from local storage
+const loadQueueListFromLocalStorage = () => {
+  const storedQueueList = localStorage.getItem('queueReceipt');
+  console.log(storedQueueList);
+  
+  if (storedQueueList) {
+    posStore.queueReceipt = JSON.parse(storedQueueList);
+  } else {
+    posStore.queueReceipt = []; // Initialize if not found
+    posStore.saveQueueListToLocalStorage(); // Save initial empty list
+  }
+};
+const loadFullscreenStateFromLocalStorage = () => {
+  const storedFullscreenState = localStorage.getItem('fullscreenState');
+  if (storedFullscreenState !== null) {
+    posStore.hideNavigation = JSON.parse(storedFullscreenState);
+  }
+};
+
+const saveFullscreenStateToLocalStorage = () => {
+  localStorage.setItem('fullscreenState', JSON.stringify(posStore.hideNavigation));
+};
+
+
+
+// Remove an item from the queue
+const removeFromQueue = (index: number) => {
+  posStore.queueReceipt.splice(index, 1);
+  posStore.saveQueueListToLocalStorage(); // Save updated list to local storage
+};
 
 // Watchers for selectedCategory and searchQuery
 watch(selectedCategory, (newCategory) => {
@@ -85,6 +120,7 @@ watch(searchQuery, (newQuery) => {
 // Toggles the hideNavigation property in the posStore
 const toggleNavigationDrawer = () => {
   posStore.toggleNavigation();
+  saveFullscreenStateToLocalStorage();
 };
 
 // Handles barcode input for searching products
@@ -138,12 +174,8 @@ const showQueue = computed(() => {
   return posStore.hideNavigation; // Show the queue only when hideNavigation is true
 });
 
-// removeFromQueue
-const removeFromQueue = (index: number) => {
-  posStore.queueReceipt.splice(index, 1);
-};
-
 </script>
+
 
 <template>
   <v-app style="width: 100vw; height: 100vh; overflow: hidden;">
