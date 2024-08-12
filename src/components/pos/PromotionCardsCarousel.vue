@@ -5,10 +5,12 @@ import { usePromotionStore } from '@/stores/promotion.store';
 import type { Promotion } from '@/types/promotion.type';
 import Swal from 'sweetalert2';
 import { useUserStore } from '@/stores/user.store';
+import type { ReceiptItem } from '@/types/receipt.type';
 
 const posStore = usePosStore();
 const promotionStore = usePromotionStore();
 const userStore = useUserStore();
+const coutingCup = ref(0);
 
 const promotionChunks = ref<Promotion[][]>([]);
 
@@ -51,36 +53,28 @@ function applyPromotion(promotion: Promotion) {
     });
     return;
   }
-
-  if (promotion.promotionType === "usePoints") {
-    if (posStore.selectedItemsUsePromotion.length == 0 && posStore.selectedItems.length > 1) {
-      posStore.selectedItemsUsePromotion = posStore.selectedItems.filter(item => item.product?.category.haveTopping);
-    }
-    if (posStore.selectedItems.length == 1) {
-      posStore.selectedItemsUsePromotion = posStore.selectedItems.filter(item => item.product?.category.haveTopping);
-
-      if (posStore.selectedItemsUsePromotion[0].product?.category.haveTopping) {
-        posStore.applyPromotion(promotion, posStore.selectedItemsUsePromotion[0]);
-      } else {
-        posStore.applyPromotion(promotion);
+  if (promotion.promotionName == "นำแก้วมา 🌏") {
+    const numberOfCups = posStore.selectedItems.reduce((acc, item) => {
+      if (item.product?.category.haveTopping) {
+        return acc + item.quantity;
       }
-    } else {
-      const itemsWithToppings = posStore.selectedItems.filter(item => item.product?.category.haveTopping);
-      if (itemsWithToppings.length === 0) {
-        Swal.fire({
-          icon: 'error',
-          title: 'ไม่มีรายการ',
-          text: 'คุณไม่สามารถใช้โปรโมชั่นได้เนื่องจากไม่มีรายการที่มีท็อปปิ้ง',
-          confirmButtonText: 'ตกลง'
-        });
-        return;
-      }
-      posStore.selectUsePointDialog = true;
-      promotionStore.promotion = promotion;
+      return acc; 
+    }, 0);
+
+    coutingCup.value += 1;
+    if (coutingCup.value > numberOfCups) {
+      Swal.fire({
+        icon: 'error',
+        title: 'ไม่สามารถใช้โปรโมชั่นได้',
+        text: 'คุณใช้โปรโมชั่นนี้ไปแล้ว',
+        confirmButtonText: 'ตกลง'
+      });
+      return;
     }
-  } else {
-    posStore.applyPromotion(promotion);
   }
+
+  posStore.applyPromotion(promotion);
+
 }
 
 function removePromotion(promotion: Promotion) {
@@ -109,17 +103,20 @@ function getButtonClass(promotion: Promotion) {
 
 <template>
   <v-container>
-    <v-carousel hide-delimiter-background hide-delimiters height="180" style="background-color: #80715E; border-radius: 20px;">
+    <v-carousel hide-delimiter-background hide-delimiters height="180"
+      style="background-color: #80715E; border-radius: 20px;">
       <template v-if="userStore.currentUser.userRole == 'พนักงานขายข้าว'">
         <v-carousel-item v-for="(chunk, index) in promotionChunks" :key="chunk[index]">
-    
+
 
           <div class="promotion-group">
             <div class="promotion-container">
-              <v-card v-for="promotion in chunk" :key="promotion.promotionId" class="promotion-card" :class="{ 'applied-promotion': isPromotionApplied(promotion) }" @click="togglePromotion(promotion)">
+              <v-card v-for="promotion in chunk" :key="promotion.promotionId" class="promotion-card"
+                :class="{ 'applied-promotion': isPromotionApplied(promotion) }" @click="togglePromotion(promotion)">
                 <v-card-title class="text-center wrap-text">{{ promotion.promotionName }}</v-card-title>
                 <v-card-actions class="justify-center">
-                  <v-btn v-if="!promotion.promotionCanUseManyTimes" :class="getButtonClass(promotion)" class="btn-apply-promotion" @click.stop="togglePromotion(promotion)">
+                  <v-btn v-if="!promotion.promotionCanUseManyTimes" :class="getButtonClass(promotion)"
+                    class="btn-apply-promotion" @click.stop="togglePromotion(promotion)">
                     {{ isPromotionApplied(promotion) ? 'ยกเลิก' : 'ใช้โปรโมชั่นนี้' }}
                   </v-btn>
                   <v-btn v-else class="btn-apply-promotion" @click.stop="applyPromotion(promotion)">
@@ -136,10 +133,12 @@ function getButtonClass(promotion: Promotion) {
         <v-carousel-item v-for="(chunk, index) in promotionChunks" :key="chunk[index]">
           <div class="promotion-group">
             <div class="promotion-container">
-              <v-card v-for="promotion in chunk" :key="promotion.promotionId" class="promotion-card" :class="{ 'applied-promotion': isPromotionApplied(promotion) }" @click="togglePromotion(promotion)">
+              <v-card v-for="promotion in chunk" :key="promotion.promotionId" class="promotion-card"
+                :class="{ 'applied-promotion': isPromotionApplied(promotion) }" @click="togglePromotion(promotion)">
                 <v-card-title class="text-center wrap-text">{{ promotion.promotionName }}</v-card-title>
                 <v-card-actions class="justify-center">
-                  <v-btn v-if="!promotion.promotionCanUseManyTimes" :class="getButtonClass(promotion)" class="btn-apply-promotion" @click.stop="togglePromotion(promotion)">
+                  <v-btn v-if="!promotion.promotionCanUseManyTimes" :class="getButtonClass(promotion)"
+                    class="btn-apply-promotion" @click.stop="togglePromotion(promotion)">
                     {{ isPromotionApplied(promotion) ? 'ยกเลิก' : 'ใช้โปรโมชั่นนี้' }}
                   </v-btn>
                   <v-btn v-else class="btn-apply-promotion" @click.stop="applyPromotion(promotion)">

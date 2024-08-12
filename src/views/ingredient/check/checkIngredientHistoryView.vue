@@ -54,7 +54,7 @@ const showDetail = (items) => {
                 </v-row>
             </v-card-title>
 
-            <v-table class="text-center mt-5">
+            <v-table class="mx-auto" style="width: 97%">
                 <thead>
                     <tr>
                         <th></th>

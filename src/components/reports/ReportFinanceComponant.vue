@@ -279,7 +279,7 @@ watch(
   <CreateHistoryDialogCashier />
   <v-container>
     <v-carousel hide-delimiter-background hide-delimiters height="300"
-      style="background-color: #C7AE8D; border-radius: 20px;">
+      style="background-color: #C7AE8D; border-radius: 20px; height: auto;">
       <!-- ยอดขายวันนี้ร้านกาแฟ -->
       <v-carousel-item>
         <v-card-title class="text-center">
@@ -301,7 +301,7 @@ watch(
                   <v-card-title class="d-flex justify-space-between align-center">
                     เงินในลิ้นชัก
                     <v-btn icon>
-                      <v-icon @click="openHistoryDialog">mdi-eye</v-icon>
+                      <v-icon  @click="openHistoryDialog">mdi-eye</v-icon>
                     </v-btn>
                   </v-card-title>
                   <template
@@ -315,12 +315,12 @@ watch(
                     </v-card-subtitle>
                   </template>
                   <template v-else>
-                    <v-btn @click="openCreateDialog">กรอกจำนวนเงินวันนี้</v-btn>
+                    <v-btn class="ml-4 mb-3" @click="openCreateDialog">กรอกจำนวนเงินวันนี้</v-btn>
                   </template>
                 </v-card>
               </v-col>
               <v-col cols="12" md="6" class="px-2">
-                <v-card>
+                <v-card style="height: 100%">
                   <v-card-title class="d-flex justify-space-between align-center">
                     รายได้
                   </v-card-title>
@@ -328,7 +328,7 @@ watch(
                 </v-card>
               </v-col>
               <v-col cols="12" md="6" class="px-2">
-                <v-card>
+                <v-card class="mb-3">
                   <v-card-title class="d-flex justify-space-between align-center">
                     จำนวนรายการ
                   </v-card-title>
@@ -392,7 +392,7 @@ watch(
       </v-row>
     </v-col>
   </v-row>
-</v-carousel-item>
+    </v-carousel-item>
 
       <!-- กำไร & ต้นทุนร้านกาแฟทั้งหมด -->
       <v-carousel-item>
@@ -450,14 +450,14 @@ watch(
         </v-row>
       </v-carousel-item>
     </v-carousel>
-    <v-row>--</v-row>
-    <v-row>
-      <v-text-field label="เริ่มวันที่" v-model="dateRange.startDate" type="date" dense hide-details variant="solo"/>
-      <v-text-field label="ถึงวันที่" v-model="dateRange.endDate" type="date" dense hide-details variant="solo"/>
-      <v-select label="กรองตาม" :items="['day', 'month', 'year']" v-model="groupBy" dense hide-details variant="solo"/>
+    <!-- <v-row>--</v-row> -->
+    <v-row class="mt-4">
+      <v-text-field label="เริ่มวันที่" v-model="dateRange.startDate" type="date" dense hide-details variant="solo" class="mr-4"/>
+      <v-text-field label="ถึงวันที่" v-model="dateRange.endDate" type="date" dense hide-details variant="solo" class="mr-4"/>
+      <v-select label="กรองตาม" :items="['day', 'month', 'year']" v-model="groupBy" dense hide-details variant="solo" class="mr-4"/>
 
     </v-row>
-    <v-row>
+    <v-row >
       <v-col cols="6" md="6">
         <apexchart type="line" :options="lineChartOptions" :series="lineChartSeries"></apexchart>
       </v-col>

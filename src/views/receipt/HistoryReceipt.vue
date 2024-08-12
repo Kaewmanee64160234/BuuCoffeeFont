@@ -84,17 +84,27 @@ const filteredReceipts = computed(() => {
 });
 
 
-function formatDateThai(dateString: string): string {
-  const date = new Date(dateString);
-  const months = [
-    'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
-    'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
-  ];
-  const day = date.getDate();
-  const month = months[date.getMonth()];
-  const year = date.getFullYear() + 543;
-  return `${day} ${month} พ.ศ.${year}`;
-}
+const formatDate = (date: any) => {
+  if (!date) return ''; // กรณีไม่มีข้อมูลวันที่
+
+  const jsDate = new Date(date.toString()); // แปลงข้อมูลวันที่เป็น string เป็นวัตถุ Date
+  const formattedDate = jsDate.toLocaleDateString('th-TH', { 
+    day: '2-digit', 
+    month: '2-digit', 
+    year: 'numeric', 
+    timeZone: 'Asia/Bangkok' 
+  }); // กำหนดรูปแบบวันที่ตามที่ต้องการ
+  
+  const formattedTime = jsDate.toLocaleTimeString('th-TH', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Asia/Bangkok'
+  }); // กำหนดรูปแบบเวลาตามที่ต้องการ
+  
+  return `${formattedDate} เวลา ${formattedTime}`; // รวมวันที่และเวลาเข้าด้วยกัน
+};
+
+
 const formatReceiptsForExcel = (receipts: Receipt[]) => {
   return receipts.flatMap(receipt => {
     return receipt.receiptItems.map(item => ({
@@ -175,7 +185,7 @@ const statusText = (status: string) => {
             <h3>ประวัติการขาย</h3>
           </v-col>
           <v-row>
-            <v-col cols="12" md="4">
+            <v-col cols="12" md="4" style="margin-left: 1%;">
               <v-text-field v-model="startDate" label="Start Date" type="date" outlined dense hide-details
                 variant="solo"></v-text-field>
             </v-col>
@@ -183,14 +193,14 @@ const statusText = (status: string) => {
               <v-text-field v-model="endDate" label="End Date" type="date" outlined dense hide-details
                 variant="solo"></v-text-field>
             </v-col>
-            <v-col cols="12" md="4">
+            <v-col cols="12" md="3">
               <v-radio-group v-model="receiptType" row>
                 <v-radio label="ร้านข้าว" value="ร้านข้าว"></v-radio>
                 <v-radio label="ร้านกาแฟ" value="ร้านกาแฟ"></v-radio>
               </v-radio-group>
             </v-col>
           </v-row>
-          <v-row class="mt-4" justify="end">
+          <v-row class="mt-4 mr-2" justify="end">
             <v-btn @click="fetchData" color="primary" class="mr-2">
               โหลดข้อมูล
             </v-btn>
@@ -203,7 +213,7 @@ const statusText = (status: string) => {
         <v-spacer></v-spacer>
       </v-card-title>
 
-      <v-table class="text-center table-container">
+      <v-table class="mx-auto" style="width: 97%">
         <thead>
           <tr>
             <th class="text-center"></th>
@@ -223,7 +233,7 @@ const statusText = (status: string) => {
         <tbody>
           <tr v-for="(receipt, index) in filteredReceipts" :key="receipt.receiptId">
             <td class="text-center">{{ index + 1 }}</td>
-            <td class="text-center">{{ formatDateThai(receipt.createdDate + '') }}</td>
+            <td class="text-center">{{ formatDate(receipt.createdDate + '') }}</td>
             <td class="text-center">
               <span :class="statusClass(receipt.receiptStatus)">
                 {{ statusText(receipt.receiptStatus) }}

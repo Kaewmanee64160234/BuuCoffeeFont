@@ -1,26 +1,26 @@
 <template>
-  <v-dialog v-model="ingredientStore.dialogimportkitem" max-width="800px">
+  <v-dialog v-model="ingredientStore.dialogimportkitem" max-width="50%">
     <v-card>
 
       <v-card-title>รายละเอียดการนำเข้าวัตถุดิบ</v-card-title>
-      <v-table class="text-center mt-5">
-  <thead>
-    <tr>
-      <th class="column-header"></th>
-      <th class="column-header">ชื่อวัตถุดิบ</th>
-      <th class="column-header">จำนวน</th>
-      <th class="column-header">ราคาต่อหน่วย</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr v-for="(item, index) in ingredientStore.selectedItems" :key="item.importIngredientsItemID">
-      <th class="column-header">{{ index + 1 }}</th>
-      <td>{{ item.ingredient.ingredientName }}</td>
-      <td>{{ item.Quantity }}</td>
-      <td>{{ item.pricePerUnit }}</td>
-    </tr>
-  </tbody>
-</v-table>
+      <v-table class="text-center mt-5" dense>
+        <thead>
+          <tr>
+            <th class="column-header text-center"></th>
+            <th class="column-header text-center">ชื่อวัตถุดิบ</th>
+            <th class="column-header text-center">จำนวน</th>
+            <th class="column-header text-center">ราคาต่อหน่วย</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(item, index) in ingredientStore.selectedItems" :key="item.importIngredientsItemID">
+            <td class="column-data text-center">{{ index + 1 }}</td>
+            <td class="column-data text-center">{{ item.ingredient.ingredientName }}</td>
+            <td class="column-data text-center">{{ item.Quantity }}</td>
+            <td class="column-data text-center">{{ item.pricePerUnit }}</td>
+          </tr>
+        </tbody>
+      </v-table>
       <v-card-text>
       </v-card-text>
       <v-card-actions>
@@ -39,9 +39,19 @@ const ingredientStore = useHistoryIngredientImportStore();
 <style scoped>
   .v-table {
     table-layout: fixed;
-    width: 100%;
+    width: auto;
   }
   .v-table th, .v-table td {
-    width: 25%; 
+    text-align: center;
+    padding: 8px;
+  }
+  .column-data {
+    width: fit-content;
+    text-align: center;
+  }
+  .column-header {
+    width: fit-content;
+    font-weight: bold;
+    text-align: center;
   }
 </style>

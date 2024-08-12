@@ -113,6 +113,13 @@ const router = createRouter({
       name: "loginPage",
       component: () => import("../views/LoginView.vue"),
     },
+    // PosCateringView
+    {
+      path:'/pos-catering',
+      name:'posCatering',
+      component: () => import("../views/pos/PosCateringView.vue"),
+
+    },
     {
       path: "/:catchAll(.*)",
       name: "NotFound",

@@ -8,7 +8,7 @@
             <div class="dashed-line"></div>
             <div class="d-flex justify-space-between">
               <p style="text-align: start">Queue: {{ posStore.currentReceipt?.queueNumber }}</p>
-              <p style="text-align: start">#{{ posStore.currentReceipt?.receiptId }}</p>
+              <p style="text-align: start">#{{ posStore.currentReceipt?.receiptNumber }}</p>
             </div>
             <p style="text-align: start">Staff: {{ posStore.currentReceipt?.user?.userName }}</p>
             <p style="text-align: start">
@@ -88,7 +88,6 @@
     </v-card>
   </v-dialog>
 </template>
-
 
 <script lang="ts" setup>
 import { usePosStore } from '@/stores/pos.store';

@@ -16,6 +16,7 @@ export const useUserStore = defineStore("user", () => {
   const user = ref<User | null>(null);
   const searchQuery = ref<string>("");
   const updateUserDialog = ref(false);
+  const createUserDialog = ref(false);
   // const userRole = ref("พนักงานขายข้าว");
   const userRole = ref("พนักงานขายกาแฟ");
   function setUser(user: User) {
@@ -128,6 +129,7 @@ export const useUserStore = defineStore("user", () => {
     setUser, 
     getUser,
     userRole,
-    getCurrentUser
+    getCurrentUser,
+    createUserDialog
   };
 });

@@ -19,7 +19,7 @@
           </v-col>
           <v-spacer></v-spacer>
           <v-col cols="12" md="3" class="d-flex justify-center align-center">
-            <v-btn @click="openCreateDialog" style="background-color: #8ad879; color: white" block>
+            <v-btn @click="openCreateDialog" color="success">
               <v-icon left>mdi-plus</v-icon>
               เพิ่มโปรโมชั่น
             </v-btn>

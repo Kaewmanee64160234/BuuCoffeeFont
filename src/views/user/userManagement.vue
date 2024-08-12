@@ -6,7 +6,6 @@ import EditUserDialog from '@/components/user/EditUserDialog.vue';
 import type { User } from '@/types/user.type';
 
 const userStore = useUserStore();
-const addUserDialog = ref(false);
 
 onMounted(async () => {
   await userStore.getAllUsers();
@@ -35,19 +34,19 @@ const filteredUsers = computed(() => {
 </script>
 
 <template>
-  <AddUserDialog v-model:dialog="addUserDialog"></AddUserDialog>
-  <EditUserDialog v-model:dialog="userStore.updateUserDialog" :user="userStore.user"></EditUserDialog>
+  <AddUserDialog ></AddUserDialog>
+  <EditUserDialog ></EditUserDialog>
 
   <v-container>
     <v-card class="flex-container">
       <v-card-title>
         <v-row>
-          <v-col cols="9" style="padding: 20px;">
+          <v-col cols="12" style="padding: 20px;">
           <h3>จัดการผู้ใช้งาน</h3>
           </v-col>
    
-          <v-row style="margin-left: 6%;">
-            <v-col class="pa-2 ma-2" cols="3">
+          <v-row style="margin-left: 0.5%; margin-bottom:2%; margin-top:1%">
+            <v-col class="pa-2 mr-8" cols="3">
               <v-text-field
                 v-model="userStore.searchQuery"
                 label="ค้นหาผู้ใช้งาน"
@@ -59,8 +58,8 @@ const filteredUsers = computed(() => {
             </v-col>
             
             <v-spacer></v-spacer>
-            <v-col class="mt-4" cols="3" width="30%">
-              <v-btn color="success" @click="addUserDialog = true">
+            <v-col cols="auto" class="mr-14">
+              <v-btn color="success" @click="userStore.createUserDialog=true">
                 <v-icon left>mdi-plus</v-icon>
                 เพิ่มผู้ใช้งาน
               </v-btn>
@@ -72,7 +71,7 @@ const filteredUsers = computed(() => {
         <v-spacer> </v-spacer>
       </v-card-title>
 
-      <v-table class="text-center" style="margin-left: 5%; margin-top: 3%;">
+      <v-table class="mx-auto" style="width: 97%">
           <thead>
             <tr>
               <th class="text-center"></th>

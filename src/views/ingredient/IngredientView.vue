@@ -11,6 +11,8 @@ const router = useRouter();
 const menu1 = ref(false);
 const menu2 = ref(false);
 const paginate = ref(true);
+const page = computed(() => ingredientStore.page);
+const take = computed(() => ingredientStore.take);
 
 onMounted(async () => {
   await ingredientStore.getAllIngredients();
@@ -58,6 +60,8 @@ watch(paginate, async (newPage, oldPage) => {
     await ingredientStore.getAllIngredients();
   }
 });
+
+
 </script>
 
 <template>
@@ -74,13 +78,17 @@ watch(paginate, async (newPage, oldPage) => {
             outlined v-model="ingredientStore.keyword"></v-text-field>
           </v-col>
         </v-row>
+
         <v-row>
           <v-col>
             <v-btn color="success" class="button-full-width" @click="ingredientStore.dialog = true">
+
               <v-icon left>mdi-plus</v-icon>
               เพิ่มวัตถุดิบ
             </v-btn>
           </v-col>
+
+
           <v-col>
             <v-menu v-model="menu1" offset-y>
               <template v-slot:activator="{ props }">
@@ -99,6 +107,7 @@ watch(paginate, async (newPage, oldPage) => {
               </v-list>
             </v-menu>
           </v-col>
+
           <v-col>
             <v-menu v-model="menu2" offset-y>
               <template v-slot:activator="{ props }">
@@ -120,7 +129,7 @@ watch(paginate, async (newPage, oldPage) => {
         </v-row>
       </v-card-title>
 
-      <v-table class="text-center mt-5">
+      <v-table class="mx-auto" style="width: 97%">
         <thead>
           <tr>
             <th></th>
@@ -136,7 +145,7 @@ watch(paginate, async (newPage, oldPage) => {
         </thead>
         <tbody>
           <tr v-for="(item, index) in ingredientStore.ingredients" :key="index">
-            <td>{{ index + 1 }}</td>
+            <td>{{ (page - 1) * take + index + 1 }}</td>
             <td>
               <v-img :src="`http://localhost:3000/ingredients/${item.ingredientId}/image`" height="100"></v-img>
             </td>

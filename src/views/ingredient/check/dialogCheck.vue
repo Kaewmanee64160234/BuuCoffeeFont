@@ -1,19 +1,19 @@
 <template>
-  <v-dialog v-model="ingredientStore.dialogCheckItem" max-width="800px">
+  <v-dialog v-model="ingredientStore.dialogCheckItem" max-width="50%">
     <v-card>
       <v-card-title>Check Ingredient Details</v-card-title>
       <v-table class="text-center mt-5">
   <thead>
     <tr>
-      <th class="column-header"></th>
-      <th class="column-header">ชื่อวัตถุดิบ</th>
-      <th class="column-header">จำนวน</th>
-      <th class="column-header">หน่วย</th>
+      <th class="column-header text-center"></th>
+      <th class="column-header text-center">ชื่อวัตถุดิบ</th>
+      <th class="column-header text-center">จำนวน</th>
+      <th class="column-header text-center">หน่วย</th>
     </tr>
   </thead>
   <tbody>
     <tr v-for="(item, index) in ingredientStore.selectedItems" :key="item.CheckIngredientsItemID">
-      <th class="column-header">{{ index + 1 }}</th>
+      <th class="column-header text-center">{{ index + 1 }}</th>
       <td>{{ item.ingredient.ingredientName }}</td>
       <td>{{ item.UsedQuantity }}</td>
       <td>{{ item.ingredient.ingredientUnit  }}</td>

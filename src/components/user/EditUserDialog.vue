@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" max-width="800px">
+  <v-dialog v-model="userStore.updateUserDialog" max-width="800px">
     <v-card>
       <v-card-title>
         <span class="text-h5">แก้ไขผู้ใช้งาน</span>
@@ -57,35 +57,30 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { useUserStore } from '@/stores/user.store';
 import type { VForm } from 'vuetify/components';
-import type { User } from '@/types/user.type';
 import Swal from 'sweetalert2';
 
-const props = defineProps<{ dialog: boolean, user: User | null }>();
 const form = ref<VForm | null>(null);
-const dialog = ref(props.dialog);
-const userStore = useUserStore();
+  const userStore = useUserStore();
+
 const show = ref(false);
 
-const userName = ref(props.user?.userName || '');
-const userPassword = ref(props.user?.userPassword || '');
-const userEmail = ref(props.user?.userEmail || '');
-const userRole = ref(props.user?.userRole || '');
-const userStatus = ref(props.user?.userStatus || '');
+const userName = ref(userStore.user?.userName || '');
+const userPassword = ref(userStore.user?.userPassword || '');
+const userEmail = ref(userStore.user?.userEmail || '');
+const userRole = ref(userStore.user?.userRole || '');
+const userStatus = ref(userStore.user?.userStatus || '');
 
 // Validation rules
-const statusRules = [
-  (v: string) => !!v || 'สถานะผู้ใช้งานจำเป็นต้องระบุ',
-  (v: string) => /^[A-Za-zก-ฮะ-ๅๆ็่-๋์่-๋\s]+$/.test(v) || 'กรุณากรอกสถานะผู้ใช้งานเป็นตัวอักษรเท่านั้น'
-];
+// const statusRules = [
+//   (v: string) => !!v || 'สถานะผู้ใช้งานจำเป็นต้องระบุ',
+//   (v: string) => /^[A-Za-zก-ฮะ-ๅๆ็่-๋์่-๋\s]+$/.test(v) || 'กรุณากรอกสถานะผู้ใช้งานเป็นตัวอักษรเท่านั้น'
+// ];
 
-watch(() => props.dialog, (newVal) => {
-  dialog.value = newVal;
-});
 
-watch(() => props.user, (newVal) => {
+watch(() => userStore.user, (newVal) => {
   userName.value = newVal?.userName || '';
   userPassword.value = newVal?.userPassword || '';
   userEmail.value = newVal?.userEmail || '';
@@ -97,13 +92,15 @@ async function saveUser() {
   const { valid } = await form.value!.validate();
   if (valid) {
     const updatedUser = {
-      userId: props.user?.userId || 0,
+      userId: userStore.user?.userId || 0,
       userName: userName.value,
       userPassword: userPassword.value,
       userEmail: userEmail.value,
       userRole: userRole.value,
       userStatus: userStatus.value,
     };
+
+    userStore.user = null;
 
     try {
       const response = await userStore.updateUser(updatedUser.userId, updatedUser);
@@ -114,7 +111,7 @@ async function saveUser() {
           icon: 'success',
           confirmButtonText: 'ตกลง'
         });
-        dialog.value = false;
+   
         userStore.updateUserDialog = false;
         await userStore.getAllUsers();
       }
@@ -131,7 +128,6 @@ async function saveUser() {
 }
 
 function closeDialog() {
-  dialog.value = false;
   userStore.updateUserDialog = false;
 }
 </script>
