@@ -275,7 +275,17 @@ const selectReceipt = (receipt: Receipt) => {
             </v-row>
 
             <v-divider class="my-2"></v-divider>
-            <h3>สรุปรายการ</h3>
+            <div>
+              <v-row>
+                <v-col cols="12" md="6">
+                  <h3>สรุปรายการ</h3>
+
+                </v-col>
+                <v-col cols="12" md="6" class="text-end ">
+                  <p @click="cancelReceipt()" style="color: red;" class="pr-5 ">ยกเลิกรายการ</p>
+                </v-col>
+              </v-row>
+            </div>
 
             <!-- Promotions Section -->
             <div class="promotions-section">
@@ -479,8 +489,8 @@ const selectReceipt = (receipt: Receipt) => {
               <div v-if="posStore.receipt.paymentMethod == 'cash'">
                 <p class="d-flex justify-space-between align-center pr-6 my-2">
                   <span style="width: 50%;">รับมา:</span>
-                  <v-text-field v-model="recive" type="number" variant="solo"  label="จำนวนเงิน"
-               style="width: 50%;" ></v-text-field>
+                  <v-text-field v-model="recive" type="number" variant="solo" label="จำนวนเงิน"
+                    style="width: 50%;"></v-text-field>
                 </p>
               </div>
 
