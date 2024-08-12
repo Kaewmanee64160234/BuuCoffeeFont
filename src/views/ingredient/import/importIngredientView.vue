@@ -143,7 +143,6 @@
 
   </v-container>
 </template>
-
 <script lang="ts" setup>
 import { ref, watch, onMounted } from "vue";
 import { useIngredientStore } from "@/stores/Ingredient.store";

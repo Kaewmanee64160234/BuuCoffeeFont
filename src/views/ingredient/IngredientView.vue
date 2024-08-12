@@ -52,16 +52,11 @@ const navigateTo = (routeName: string) => {
   router.push({ name: routeName });
 };
 
-watch(paginate, async (newPage, oldPage) => {
-  if (paginate.value) {
-    // ingredientStore.cat = "";
-    await ingredientStore.getAllIngredients();
-  } else {
+watch(paginate, async (newValue, oldValue) => {
+  if (newValue !== oldValue) {
     await ingredientStore.getAllIngredients();
   }
-});
-
-
+})
 </script>
 
 <template>
