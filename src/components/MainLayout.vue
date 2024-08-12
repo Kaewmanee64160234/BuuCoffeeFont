@@ -7,7 +7,7 @@
       permanent
       app
     >
-      <v-list-item class="drawer-header">
+      <v-list-item class="drawer-header justify-end">
         <template v-slot:append>
           <v-btn
             icon="mdi-chevron-left"
@@ -16,7 +16,7 @@
           ></v-btn>
         </template>
       </v-list-item>
-      <v-list-item-title v-if="!rail" class="username">ยินดีต้อนรับ คุณ {{ userStore.currentUser.userName }}</v-list-item-title>
+      <v-list-item-title v-if="!rail" class="username ml-2">ยินดีต้อนรับ คุณ {{ userStore.currentUser.userName }}</v-list-item-title>
       <v-list density="compact" nav>
         <v-subheader v-if="!rail">การขาย</v-subheader>
         <v-list-item to="/report">
@@ -161,17 +161,35 @@ const logout = () => {
 </script>
 
 <style scoped>
+/* Default styles */
 .v-navigation-drawer {
   width: 250px;
-  background-color: #f2e4d8; 
+  background-color: #f2e4d8;
+  transition: width 0.3s ease, left 0.3s ease; /* Add smooth transition */
 }
 
 .v-navigation-drawer.rail {
   width: 56px;
 }
 
+.v-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 56px;
+  padding-left: 16px;
+}
+
 .v-list-item-title {
   font-weight: bold;
+  margin-left: 16px;
+  white-space: nowrap; /* Prevent text from wrapping */
+  overflow: hidden; /* Hide overflow text */
+  text-overflow: ellipsis; /* Add ellipsis (...) if text overflows */
+}
+
+.v-navigation-drawer.rail .v-list-item-title {
+  display: none; /* Hide text when drawer is in rail mode */
 }
 
 .v-app-bar {
@@ -192,14 +210,11 @@ const logout = () => {
 .nav-icon {
   width: 24px;
   height: 24px;
-  margin-right: 16px;
 }
 
 .v-list-item.rail .nav-icon {
-  width: 24px; 
-  height: 24px;
   margin-right: 0;
-  margin-left: 8px; 
+  margin-left: 8px;
 }
 
 .drawer-header {
@@ -207,18 +222,105 @@ const logout = () => {
   align-items: center;
   justify-content: center;
   height: 56px;
+  padding: 16px;
 }
 
-.v-list-item.rail .nav-icon {
-  margin-right: 0;
-  margin-left: 8px; 
+.toggle-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background-color: #f2e4d8;
+  border-radius: 50%;
+  cursor: pointer;
 }
 
-.v-subheader {
-  font-size: 14px;
-  font-weight: bold;
-  color: #6d4c41;
-  padding: 8px 16px;
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .v-navigation-drawer {
+    width: 200px;
+  }
+
+  .v-main {
+    margin-left: 200px;
+  }
+
+  .v-navigation-drawer.rail {
+    width: 48px;
+  }
+
+  .v-main.main-rail {
+    margin-left: 48px;
+  }
+}
+
+@media (max-width: 768px) {
+  .v-navigation-drawer {
+    width: 150px;
+  }
+
+  .v-main {
+    margin-left: 150px;
+  }
+
+  .v-navigation-drawer.rail {
+    width: 40px;
+  }
+
+  .v-main.main-rail {
+    margin-left: 40px;
+  }
+
+  .nav-icon {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .v-navigation-drawer {
+    width: 100px;
+  }
+
+  .v-main {
+    margin-left: 100px;
+  }
+
+  .v-navigation-drawer.rail {
+    width: 32px;
+  }
+
+  .v-main.main-rail {
+    margin-left: 32px;
+  }
+
+  .nav-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .v-navigation-drawer {
+    position: absolute;
+    left: -100%;
+    transition: left 0.3s ease;
+  }
+
+  .v-navigation-drawer.open {
+    left: 0;
+  }
+
+  .v-main {
+    margin-left: 0;
+  }
 }
 </style>
+
+
+
+
 
