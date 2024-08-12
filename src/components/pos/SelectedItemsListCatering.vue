@@ -99,6 +99,9 @@ function decreaseQuantity(index: number) {
 }
 
 async function save() {
+  posStore.receipt.paymentMethod = 'cash';
+  posStore.receipt.receiptType = 'เลี้ยงรับรอง';
+
   if (selectedItems.value.length === 0) {
     Swal.fire({
       icon: 'error',
@@ -116,12 +119,8 @@ async function save() {
     return;
   }
   if (posStore.receipt.paymentMethod === 'cash' && recive.value < posStore.receipt.receiptNetPrice) {
-    Swal.fire({
-      icon: 'error',
-      title: 'ข้อมูลไม่สมบูรณ์',
-      text: 'กรุณาป้อนจำนวนเงินสดที่ได้รับที่ถูกต้อง',
-    });
-    return;
+    posStore.receipt.receiptNetPrice = 0;
+
   }
   if (posStore.receipt.receiptId) {
     posStore.updateReceipt(posStore.receipt.receiptId, posStore.receipt);
