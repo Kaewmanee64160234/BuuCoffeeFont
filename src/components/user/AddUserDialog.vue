@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-import { defineProps, ref, watch } from 'vue';
+import { defineProps, ref, watch, defineEmits  } from 'vue';
 import { useUserStore } from '@/stores/user.store';
 import type { VForm } from 'vuetify/components';
 import Swal from 'sweetalert2';
 
 const props = defineProps<{ dialog: boolean }>();
+const emit = defineEmits(['update:dialog']);
 const form = ref<VForm | null>(null);
-const dialog = ref(false);
 
 const userName = ref('');
 const userPassword = ref('');
@@ -18,14 +18,50 @@ const show = ref(false);
 
 const rules = {
   required: (value: any) => !!value || 'กรุณากรอกข้อมูล',
-  email: (value: string) => /.+@.+\..+/.test(value) || 'กรุณากรอกอีเมลให้ถูกต้อง',
-  password: (value: string) => value.length >= 4 && /[A-Za-z].*[0-9]|[0-9].*[A-Za-z]/.test(value) || 'รหัสผ่านต้องมีอักขระและมีความยาวมากกว่า 4 ตัว',
+  email: (value: string) => {
+  const isValidEmail = /.+@.+\..+/.test(value);
+  const hasThaiCharacters = /[ก-ฮ]/.test(value);
+
+  if (!isValidEmail) {
+    return 'กรุณากรอกอีเมลให้ถูกต้อง';
+  }
+
+  if (hasThaiCharacters) {
+    return 'อีเมลต้องไม่เป็นภาษาไทย';
+  }
+
+  return true;
+},
+
   userName: (value: string) => /^[A-Za-zก-ฮะ-ๅๆ็่-๋์่-๋\s]+$/.test(value) || 'กรุณากรอกชื่อเป็นตัวอักษรเท่านั้น',
   userStatus: (value: string) => /^[A-Za-zก-ฮะ-ๅๆ็่-๋์่-๋\s]+$/.test(value) || 'กรุณากรอกสถานะผู้ใช้งานเป็นตัวอักษรเท่านั้น',
-};
+  password: (value: string) => {
+  const isValidLength = value.length >= 4;
+  const hasEnglishLetter = /[A-Za-z]/.test(value);
+  const hasNumber = /[0-9]/.test(value);
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
+  const hasThaiChar = /[ก-ฮ]/.test(value);
 
+  if (!isValidLength) {
+    return 'รหัสผ่านต้องมีความยาวมากกว่า 4 ตัว';
+  }
+  if (!hasEnglishLetter) {
+    return 'รหัสผ่านต้องประกอบด้วยอักขระและเป็นภาษาอังกฤษ';
+  }
+  if (!hasNumber) {
+    return 'รหัสผ่านต้องประกอบด้วยตัวเลข';
+  }
+  if (!hasSpecialChar) {
+    return 'รหัสผ่านต้องประกอบด้วยอักขระพิเศษ';
+  }
+  if (hasThaiChar) {
+    return 'รหัสผ่านต้องเป็นภาษาอังกฤษเท่านั้น';
+  }
+  return true;
+},
+};
+// Watch the dialog prop to reset the form when dialog opens
 watch(() => props.dialog, (newVal) => {
-  dialog.value = newVal;
   if (newVal) {
     resetForm();
   }
@@ -37,25 +73,35 @@ function resetForm() {
   userEmail.value = '';
   userRole.value = '';
   userStatus.value = '';
-  form.value?.resetValidation();
+  form.value?.resetValidation(); // รีเซ็ตการตรวจสอบ validation
 }
 
 async function saveUser() {
   const { valid } = await form.value!.validate();
   if (valid) {
-    await userStore.createUser({
-      userId: 0,
-      userName: userName.value,
-      userPassword: userPassword.value,
-      userEmail: userEmail.value,
-      userRole: userRole.value,
-      userStatus: userStatus.value
-    });
-    showSuccessDialog('ผู้ใช้งานรายนี้ถูกสร้างเรียบร้อยแล้ว!');
-    closeDialog();
-    await userStore.getAllUsers();
+    try {
+      await userStore.createUser({
+        userId: 0,
+        userName: userName.value,
+        userPassword: userPassword.value,
+        userEmail: userEmail.value,
+        userRole: userRole.value,
+        userStatus: userStatus.value
+      });
+      showSuccessDialog('ผู้ใช้งานรายนี้ถูกสร้างเรียบร้อยแล้ว!');
+      
+      // ปิด dialog หลังจากที่บันทึกเสร็จสิ้น
+      closeDialog();
+
+      // อัพเดตข้อมูลผู้ใช้งานทั้งหมด
+      await userStore.getAllUsers();
+    } catch (error) {
+      console.error('Error creating user:', error);
+      showErrorDialog('เกิดข้อผิดพลาดขณะสร้างผู้ใช้งาน');
+    }
   }
 }
+
 
 const showSuccessDialog = (message: string) => {
   Swal.fire({
@@ -66,12 +112,16 @@ const showSuccessDialog = (message: string) => {
   });
 };
 
+// watch(() => userStore.createUserDialog, (newVal) => {
+//   dialog.value = newVal;
+// });
+
 function closeDialog() {
-  dialog.value = false;  // Close the dialog
-  userStore.createUserDialog = false;  // Ensure the dialog state is reset in the store
+  emit('update:dialog', false);  // ปิด dialog โดยส่งค่าใหม่กลับไปยัง parent
+  resetForm();  // รีเซ็ตฟอร์มให้พร้อมสำหรับการใช้งานครั้งถัดไป
 }
 
-watch(dialog, (newVal) => {
+watch(() => props.dialog, (newVal) => {
   if (!newVal) {
     resetForm();
   }
@@ -79,7 +129,7 @@ watch(dialog, (newVal) => {
 </script>
 
 <template>
-  <v-dialog v-model="dialog" max-width="800px">
+  <v-dialog :model-value="props.dialog" @update:model-value="value => emit('update:dialog', value)" max-width="800px">
     <v-card>
       <v-card-title>
         <span class="text-h5">เพิ่มผู้ใช้งาน</span>

@@ -4,9 +4,14 @@ import { computed, onMounted, ref } from 'vue';
 import AddUserDialog from '@/components/user/AddUserDialog.vue';
 import EditUserDialog from '@/components/user/EditUserDialog.vue';
 import type { User } from '@/types/user.type';
+import { watch } from 'vue';
 
 const userStore = useUserStore();
 const addUserDialog = ref(false);
+
+watch(() => userStore.searchQuery, async (newQuery) => {
+  await userStore.getAllUsers();
+});
 
 onMounted(async () => {
   await userStore.getAllUsers();
@@ -35,7 +40,7 @@ const filteredUsers = computed(() => {
 </script>
 
 <template>
-  <AddUserDialog v-model:dialog="addUserDialog"></AddUserDialog>
+  <AddUserDialog v-model:dialog="userStore.createUserDialog"></AddUserDialog>
   <EditUserDialog v-model:dialog="userStore.updateUserDialog" :user="userStore.user"></EditUserDialog>
 
   <v-container>
@@ -60,7 +65,7 @@ const filteredUsers = computed(() => {
             
             <v-spacer></v-spacer>
             <v-col cols="auto" class="mr-14">
-              <v-btn color="success" @click="addUserDialog = true">
+              <v-btn color="success" @click="userStore.createUserDialog = true">
                 <v-icon left>mdi-plus</v-icon>
                 เพิ่มผู้ใช้งาน
               </v-btn>
