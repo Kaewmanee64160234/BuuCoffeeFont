@@ -8,6 +8,7 @@ export interface Importingredient {
   total?: number;
   user?: number;
   importStoreType?: string;
+  importDescription?: string;
   importingredientitem: Importingredientitem[];
 }
 
