@@ -25,7 +25,7 @@ onMounted(async () => {
     if (newCategory === 'Products') {
       ingredientFilters.value = posStore.selectedItems;
     } else if (newCategory === 'Ingredients') {
-      ingredientFilters.value = ingredientStore.ingredients; // Assuming ingredients are stored here
+      ingredientFilters.value = ingredientStore.all_ingredients; // Assuming ingredients are stored here
     }
   });
 });

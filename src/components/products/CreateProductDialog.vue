@@ -248,8 +248,8 @@ const computedSteps = computed(() => {
 });
 
 const filteredIngredients = computed(() => {
-  if (!searchQuery.value) return ingredientStore.ingredients;
-  return ingredientStore.ingredients.filter((ingredient) =>
+  if (!searchQuery.value) return ingredientStore.all_ingredients;
+  return ingredientStore.all_ingredients.filter((ingredient) =>
     ingredient.ingredientName.toLowerCase().includes(searchQuery.value.toLowerCase())
   );
 });
@@ -267,7 +267,7 @@ watch(() => selectedCategory.value, (newVal) => {
 
 onMounted(async () => {
   await categoryStore.getAllCategories();
-  await ingredientStore.getAllIngredients();
+  await ingredientStore.getIngredients();
 });
 
 const handleProductTypeChange = (type: string, isChecked: boolean) => {
@@ -404,7 +404,7 @@ const submitForm = async () => {
         productTypePrice: getProductType('ร้อน').productTypePrice,
         recipes: selectedIngredientsHot.value.map((ingredientId) => {
           return {
-            ingredient: ingredientStore.ingredients.find(i => i.ingredientId === ingredientId)!,
+            ingredient: ingredientStore.all_ingredients.find(i => i.ingredientId === ingredientId)!,
             quantity: ingredientQuantitiesHot.value[ingredientId]
           };
         })
@@ -416,7 +416,7 @@ const submitForm = async () => {
         productTypePrice: getProductType('เย็น').productTypePrice,
         recipes: selectedIngredientsCold.value.map((ingredientId) => {
           return {
-            ingredient: ingredientStore.ingredients.find(i => i.ingredientId === ingredientId)!,
+            ingredient: ingredientStore.all_ingredients.find(i => i.ingredientId === ingredientId)!,
             quantity: ingredientQuantitiesCold.value[ingredientId]
           };
         })
@@ -428,7 +428,7 @@ const submitForm = async () => {
         productTypePrice: getProductType('ปั่น').productTypePrice,
         recipes: selectedIngredientsBlend.value.map((ingredientId) => {
           return {
-            ingredient: ingredientStore.ingredients.find(i => i.ingredientId === ingredientId)!,
+            ingredient: ingredientStore.all_ingredients.find(i => i.ingredientId === ingredientId)!,
             quantity: ingredientQuantitiesBlend.value[ingredientId]
           };
         })

@@ -201,8 +201,8 @@ const e1 = ref(1);
 const searchQuery = ref('');
 
 const filteredIngredients = computed(() => {
-  if (!searchQuery.value) return ingredientStore.ingredients;
-  return ingredientStore.ingredients.filter((ingredient) =>
+  if (!searchQuery.value) return ingredientStore.all_ingredients;
+  return ingredientStore.all_ingredients.filter((ingredient) =>
     ingredient.ingredientName.toLowerCase().includes(searchQuery.value.toLowerCase())
   );
 });
@@ -220,7 +220,7 @@ watch(() => productStore.editedProduct.category?.categoryName, (newVal) => {
 
 onMounted(async () => {
   await categoryStore.getAllCategories();
-  await ingredientStore.getAllIngredients();
+  await ingredientStore.getIngredients();
 
   // Auto add steps if ingredients are present
   if (productStore.selectedIngredientsHot.length > 0) {
@@ -360,7 +360,7 @@ const submitForm = async () => {
         productTypePrice: productStore.productTypePriceHot || 0,
         recipes: productStore.selectedIngredientsHot.map((ingredientId) => {
           return {
-            ingredient: ingredientStore.ingredients.find(i => i.ingredientId === ingredientId)!,
+            ingredient: ingredientStore.all_ingredients.find(i => i.ingredientId === ingredientId)!,
             quantity: productStore.ingredientQuantitiesHot[ingredientId]
           };
         })
@@ -373,7 +373,7 @@ const submitForm = async () => {
         productTypePrice: productStore.productTypePriceCold || 0,
         recipes: productStore.selectedIngredientsCold.map((ingredientId) => {
           return {
-            ingredient: ingredientStore.ingredients.find(i => i.ingredientId === ingredientId)!,
+            ingredient: ingredientStore.all_ingredients.find(i => i.ingredientId === ingredientId)!,
             quantity: productStore.ingredientQuantitiesCold[ingredientId]
           };
         })
@@ -386,7 +386,7 @@ const submitForm = async () => {
         productTypePrice: productStore.productTypePriceBlend || 0,
         recipes: productStore.selectedIngredientsBlend.map((ingredientId) => {
           return {
-            ingredient: ingredientStore.ingredients.find(i => i.ingredientId === ingredientId)!,
+            ingredient: ingredientStore.all_ingredients.find(i => i.ingredientId === ingredientId)!,
             quantity: productStore.ingredientQuantitiesBlend[ingredientId]
           };
         })

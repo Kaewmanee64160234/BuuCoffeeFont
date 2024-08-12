@@ -30,7 +30,7 @@ onMounted(async () => {
     ingredientFilters.value = []
     await productStore.getAllProducts();
     await categoryStore.getAllCategories();
-    await ingredientStore.getAllIngredients();
+    await ingredientStore.getIngredients();
     filterProducts();
 });
 
@@ -46,7 +46,7 @@ watch(searchQuery, () => {
 
 const filterProducts = () => {
     if (selectedCategory.value === 'Ingredients') {
-        ingredientFilters.value = ingredientStore.ingredients.filter(ingredient =>
+        ingredientFilters.value = ingredientStore.all_ingredients.filter(ingredient =>
             ingredient.ingredientName?.toLowerCase().includes(searchQuery.value.toLowerCase())
         );
         productFilters.value = [];
