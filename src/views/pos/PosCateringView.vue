@@ -28,34 +28,23 @@ const searchQuery = ref('');
 onMounted(async () => {
     productFilters.value = []
     ingredientFilters.value = []
-    productFilters.value = []
     await productStore.getAllProducts();
     await categoryStore.getAllCategories();
     await ingredientStore.getAllIngredients();
-    console.log(productStore.products.length);
-
     filterProducts();
-
 });
 
 // Watch selectedCategory to filter products or show ingredients
 watch(selectedCategory, () => {
-    productFilters.value = []
-    ingredientFilters.value = []
     filterProducts();
-    console.log(productFilters.value.length);
-
 });
 
 // Watch searchQuery to filter products or ingredients within the selected category
 watch(searchQuery, () => {
-    productFilters.value = []
-    ingredientFilters.value = []
     filterProducts();
 });
 
 const filterProducts = () => {
-
     if (selectedCategory.value === 'Ingredients') {
         ingredientFilters.value = ingredientStore.ingredients.filter(ingredient =>
             ingredient.ingredientName?.toLowerCase().includes(searchQuery.value.toLowerCase())
@@ -90,8 +79,16 @@ const addToCart = (product: Product) => {
             <!-- Main Interface Column -->
             <v-col cols="7" class="d-flex flex-column align-center"
                 style="background-color: #f7f7f7; height: 100%; overflow: hidden;">
-                <v-container fluid class="full-width-container"
-                    style="height: 100%; overflow: hidden; margin-left: 6%;">
+                <v-container fluid class="full-width-container" style="height: 100%; overflow: hidden; margin-left: 6%;">
+
+                    <!-- Search Bar -->
+                    <v-row class="full-width-row" style="margin-bottom: 10px;">
+                        <v-col cols="12">
+                            <v-text-field v-model="searchQuery" append-icon="mdi-magnify" label="ค้นหา"
+                                variant="solo" dense hide-details
+                                style="background-color: #f1f1f1; border-radius: 8px;"></v-text-field>
+                        </v-col>
+                    </v-row>
 
                     <!-- Category Tabs -->
                     <v-row class="full-width-row" style="overflow: hidden; margin-bottom: 10px;">
@@ -133,19 +130,17 @@ const addToCart = (product: Product) => {
                             </v-tab-item>
 
                             <!-- Products Tab -->
-                                <v-tabs-items v-model="selectedCategory" style="width: 100%;">
-                                    <v-tab-item>
-                                        <v-container fluid class="full-width-container">
-                                            <v-row class="full-width-row">
-                                                <v-col v-for="product in productFilters" :key="product.productId"
-                                                    cols="12" sm="6" md="4" lg="3" class="d-flex">
-                                                    <product-card :product="product"
-                                                        class="product-card"></product-card>
-                                                </v-col>
-                                            </v-row>
-                                        </v-container>
-                                    </v-tab-item>
-                                </v-tabs-items>
+                            <v-tab-item value="Products">
+                                <v-container fluid class="full-width-container">
+                                    <v-row class="full-width-row">
+                                        <v-col v-for="product in productFilters" :key="product.productId"
+                                            cols="12" sm="6" md="4" lg="3" class="d-flex">
+                                            <product-card :product="product"
+                                                class="product-card"></product-card>
+                                        </v-col>
+                                    </v-row>
+                                </v-container>
+                            </v-tab-item>
 
                         </v-tabs-items>
                     </v-row>
