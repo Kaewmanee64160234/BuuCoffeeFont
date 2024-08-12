@@ -22,6 +22,7 @@ const receiptStore = useReceiptStore();
 
 onMounted(async () => {
   await receiptStore.getRecieptIn30Min();
+  await loadQueueListFromLocalStorage();
 });
 
 function nextStep() {
@@ -131,6 +132,8 @@ async function save() {
   } else {
     posStore.createReceipt();
   }
+
+  // Save the current state of the queue after updating/creating the receipt
   posStore.selectedItems = [];
   posStore.receipt.receiptTotalPrice = 0;
   posStore.receipt.receiptTotalDiscount = 0;
@@ -150,7 +153,17 @@ async function save() {
 function openCreateCustomerDialog() {
   customerStore.openDialogRegisterCustomer = true;
 }
-
+const loadQueueListFromLocalStorage = () => {
+  const storedQueueList = localStorage.getItem('queueReceipt');
+  console.log(storedQueueList);
+  
+  if (storedQueueList) {
+    posStore.queueReceipt = JSON.parse(storedQueueList);
+  } else {
+    posStore.queueReceipt = []; // Initialize if not found
+    posStore.saveQueueListToLocalStorage(); // Save initial empty list
+  }
+};
 function cancelReceipt() {
   posStore.selectedItems = [];
   posStore.receipt = {
