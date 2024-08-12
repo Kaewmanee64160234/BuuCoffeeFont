@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import { ref, onMounted, watch } from 'vue';
 import ProductCard from '@/components/pos/ProductCard.vue';
-import SelectedItemsListCatering from '@/components/pos/SelectedItemsListCatering.vue';
+import SelectedItemsList from '@/components/pos/SelectedItemsList.vue';
+import DrinkSelectionDialog from '@/components/pos/DrinkSelectionDialog.vue';
 import ReceiptDialog from '@/components/pos/ReceiptDialog.vue';
 import { useProductStore } from '@/stores/product.store';
 import { useCategoryStore } from '@/stores/category.store';
@@ -9,8 +10,8 @@ import { useToppingStore } from '@/stores/topping.store';
 import { useUserStore } from '@/stores/user.store';
 import { usePosStore } from '@/stores/pos.store';
 import { useIngredientStore } from '@/stores/Ingredient.store';
-import type { Product } from '@/types/product.type';
 import Swal from 'sweetalert2';
+import type { Product } from '@/types/product.type';
 
 const productStore = useProductStore();
 const categoryStore = useCategoryStore();
@@ -18,91 +19,59 @@ const toppingStore = useToppingStore();
 const userStore = useUserStore();
 const posStore = usePosStore();
 const ingredientStore = useIngredientStore();
-const selectedCategory = ref('Products');
+const selectedCategory = ref<string>(categoryStore.categoriesForCreate[0]?.categoryName || '');
 const productFilters = ref<Product[]>([]);
 const ingredientFilters = ref<any[]>([]);
 const searchQuery = ref('');
-const barcode = ref('');
 
 // Load products, categories, and ingredients on mount
 onMounted(async () => {
+    productFilters.value = []
+    ingredientFilters.value = []
     await productStore.getAllProducts();
     await categoryStore.getAllCategories();
-    await ingredientStore.getAllIngredients();
-
-    selectedCategory.value = 'Products';
-    productFilters.value = productStore.products.filter(product => !product.category.haveTopping);
-    ingredientFilters.value = [];
+    await ingredientStore.getIngredients();
+    filterProducts();
 });
 
 // Watch selectedCategory to filter products or show ingredients
-watch(selectedCategory, (newCategory) => {
-    if (newCategory === 'Products') {
-        productFilters.value = productStore.products.filter(product => !product.category.haveTopping);
-        ingredientFilters.value = [];
-    } else if (newCategory === 'Ingredients') {
-        ingredientFilters.value = ingredientStore.ingredients;
-        productFilters.value = [];
-    }
+watch(selectedCategory, () => {
+    filterProducts();
 });
 
 // Watch searchQuery to filter products or ingredients within the selected category
-watch(searchQuery, (newQuery) => {
-    if (newQuery === '') {
-        if (selectedCategory.value === 'Products') {
-            productFilters.value = productStore.products.filter(product => !product.category.haveTopping);
-            ingredientFilters.value = [];
-        } else if (selectedCategory.value === 'Ingredients') {
-            ingredientFilters.value = ingredientStore.ingredients;
-            productFilters.value = [];
-        }
-    } else {
-        if (selectedCategory.value === 'Products') {
-            productFilters.value = productStore.products.filter(product =>
-                product.productName.toLowerCase().includes(newQuery.toLowerCase()) &&
-                !product.category.haveTopping
-            );
-            ingredientFilters.value = [];
-
-        } else if (selectedCategory.value === 'Ingredients') {
-            ingredientFilters.value = ingredientStore.ingredients.filter(ingredient =>
-                ingredient.ingredientName!.toLowerCase().includes(newQuery.toLowerCase())
-            );
-            productFilters.value = [];
-        }
-    }
+watch(searchQuery, () => {
+    filterProducts();
 });
 
-// Handle barcode input for product searching
-const handleBarcodeInput = async () => {
-    if (barcode.value) {
-        const foundProduct = productStore.products.find(product => product.barcode === barcode.value);
-        if (foundProduct) {
-            productStore.selectedProduct = foundProduct; // Set the selected product
-            if (foundProduct.category.haveTopping) {
-                posStore.selectedProduct = foundProduct;
-                posStore.toppingDialog = true;
-            } else {
-                addToCart(foundProduct);
-            }
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'ไม่พบสินค้า',
-                text: 'ไม่พบสินค้าที่มีบาร์โค้ดนี้',
-            });
-        }
-        barcode.value = '';
+const filterProducts = () => {
+    if (selectedCategory.value === 'Ingredients') {
+        ingredientFilters.value = ingredientStore.all_ingredients.filter(ingredient =>
+            ingredient.ingredientName?.toLowerCase().includes(searchQuery.value.toLowerCase())
+        );
+        productFilters.value = [];
+    } else {
+        productFilters.value = productStore.products
+            .filter(product =>
+                product.category.categoryName === selectedCategory.value &&
+                product.productName.toLowerCase().includes(searchQuery.value.toLowerCase())
+            )
+            .reduce((uniqueProducts, currentProduct) => {
+                if (!uniqueProducts.some(product => product.productId === currentProduct.productId)) {
+                    uniqueProducts.push(currentProduct);
+                }
+                return uniqueProducts;
+            }, [] as Product[]);
+        ingredientFilters.value = [];
     }
 };
 
 // Add a product to the cart
 const addToCart = (product: Product) => {
-    if (product.category.haveTopping === false) {
-        posStore.addToReceipt(product, null, [], 1, null);
-    }
+    posStore.addToReceipt(product, null, [], 1, null);
 };
 </script>
+
 
 <template>
     <v-app style="width: 100vw; height: 100vh; overflow: hidden;">
@@ -110,28 +79,14 @@ const addToCart = (product: Product) => {
             <!-- Main Interface Column -->
             <v-col cols="7" class="d-flex flex-column align-center"
                 style="background-color: #f7f7f7; height: 100%; overflow: hidden;">
-            
+                <v-container fluid class="full-width-container" style="height: 100%; overflow: hidden; margin-left: 6%;">
 
-                <v-container fluid class="full-width-container"
-                    style="height: 100%; overflow: hidden; margin-left: 6%;">
-                    <!-- Barcode Input and Fullscreen Button -->
-                    <v-row class="full-width-row" style="overflow: hidden; margin-bottom: 10px;">
-                        <v-col cols="12" md="6">
-                            <v-text-field v-model="barcode" append-icon="mdi-barcode" label="สแกนบาร์โค้ด"
-                                variant="solo" dense hide-details @change="handleBarcodeInput"
+                    <!-- Search Bar -->
+                    <v-row class="full-width-row" style="margin-bottom: 10px;">
+                        <v-col cols="12">
+                            <v-text-field v-model="searchQuery" append-icon="mdi-magnify" label="ค้นหา"
+                                variant="solo" dense hide-details
                                 style="background-color: #f1f1f1; border-radius: 8px;"></v-text-field>
-                        </v-col>
-                        <v-col cols="12" md="6" class="d-flex justify-end align-center">
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-btn icon v-bind="attrs" v-on="on" @click="toggleNavigationDrawer"
-                                        style="background-color: #fff; border-radius: 50%; margin-left: 10px;">
-                                        <v-icon>{{ posStore.hideNavigation ? 'mdi-fullscreen' : 'mdi-fullscreen-exit'
-                                            }}</v-icon>
-                                    </v-btn>
-                                </template>
-                                <span>{{ posStore.hideNavigation ? 'Full Screen' : 'Exit Full Screen' }}</span>
-                            </v-tooltip>
                         </v-col>
                     </v-row>
 
@@ -140,8 +95,11 @@ const addToCart = (product: Product) => {
                         <v-col cols="12">
                             <v-tabs v-model="selectedCategory" align-tabs="start" color="brown" class="full-width-tabs"
                                 background-color="#fff">
-                                <v-tab value="Products">Products</v-tab>
                                 <v-tab value="Ingredients">Ingredients</v-tab>
+                                <v-tab v-for="category in categoryStore.categoriesForCreate" :key="category.categoryId"
+                                    :value="category.categoryName">
+                                    {{ category.categoryName }}
+                                </v-tab>
                             </v-tabs>
                         </v-col>
                     </v-row>
@@ -149,17 +107,6 @@ const addToCart = (product: Product) => {
                     <!-- Product/Ingredient List -->
                     <v-row class="full-width-row product-list-container" style="flex: 1; overflow-y: auto;">
                         <v-tabs-items v-model="selectedCategory" style="width: 100%;">
-                            <!-- Products Tab -->
-                            <v-tab-item value="Products">
-                                <v-container fluid class="full-width-container">
-                                    <v-row class="full-width-row">
-                                        <v-col v-for="product in productFilters" :key="product.productId" cols="12"
-                                            sm="6" md="4" lg="3" class="d-flex">
-                                            <product-card :product="product" class="product-card"></product-card>
-                                        </v-col>
-                                    </v-row>
-                                </v-container>
-                            </v-tab-item>
 
                             <!-- Ingredients Tab -->
                             <v-tab-item value="Ingredients">
@@ -181,17 +128,32 @@ const addToCart = (product: Product) => {
                                     </v-row>
                                 </v-container>
                             </v-tab-item>
+
+                            <!-- Products Tab -->
+                            <v-tab-item value="Products">
+                                <v-container fluid class="full-width-container">
+                                    <v-row class="full-width-row">
+                                        <v-col v-for="product in productFilters" :key="product.productId"
+                                            cols="12" sm="6" md="4" lg="3" class="d-flex">
+                                            <product-card :product="product"
+                                                class="product-card"></product-card>
+                                        </v-col>
+                                    </v-row>
+                                </v-container>
+                            </v-tab-item>
+
                         </v-tabs-items>
                     </v-row>
 
-                  
+                    <!-- Drink Selection Dialog -->
+                    <drink-selection-dialog></drink-selection-dialog>
                 </v-container>
             </v-col>
 
             <!-- Selected Items List -->
             <v-col cols="5" class="d-flex flex-column" style="height: 100%; padding-top: 20px;">
                 <v-sheet style="height: 100%;">
-                    <selected-items-list-catering></selected-items-list-catering>
+                    <selected-items-list></selected-items-list>
                 </v-sheet>
             </v-col>
         </v-row>
@@ -200,6 +162,8 @@ const addToCart = (product: Product) => {
         <receipt-dialog />
     </v-app>
 </template>
+
+
 
 
 <style scoped>
