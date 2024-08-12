@@ -5,16 +5,20 @@ import ingredientService from "@/service/ingredient.service";
 import type { Importingredient } from "@/types/importIngredient.type";
 import { useLoadingStore } from "./loading";
 import { useMessageStore } from "./message";
+import type { Importingredientitem } from "@/types/importIngredientItem.type";
 
 export const useIngredientStore = defineStore("ingredient", () => {
   const loadingStore = useLoadingStore();
   const messageStore = useMessageStore();
   const ingredient = ref<Ingredient | null>(null);
   const ingredients = ref<Ingredient[]>([]);
+  const all_ingredients = ref<Ingredient[]>([]);
   const ingredientlow = ref<Ingredient[]>([]);
   const importingredients = ref<Importingredient[]>([]);
   const search = ref<string>("");
-  const dialog = ref(false); // สถานะของ Dialog
+  const selectedAction = ref<string>('');
+  const checkDescription = ref<string>('');
+  const dialog = ref(false);
   const dialogImportItem = ref(false);
   const editedIngredient = ref<Ingredient & { file: File }>({
     ingredientName: '',
@@ -69,7 +73,16 @@ export const useIngredientStore = defineStore("ingredient", () => {
       page.value = 1;
     }
   });
-
+  async function getIngredients(){
+    try {
+      const response = await ingredientService.getIngredients();
+      if (response.status === 200) {
+        all_ingredients.value = response.data;
+      }
+    } catch (error) {
+      console.error('Error fetching ingredients:', error);
+    }
+  }
   async function getAllIngredients() {
     try {
       const res = await ingredientService.getAllIngredients({
@@ -99,7 +112,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
   }
 
   const ingredientList = ref<
-    { ingredient: Ingredient; count: number; totalunit: number }[]
+    { ingredient: Ingredient; count: number; totalunit: number ; unitprice: number}[]
   >([]);
   const ingredientCheckList = ref<
     { ingredientcheck: Ingredient; count: number }[]
@@ -107,14 +120,24 @@ export const useIngredientStore = defineStore("ingredient", () => {
   const store = ref<string>("");
   const discount = ref<number>(0);
   const total = ref<number>(0);
-  const importStoreType = ref<string>("");
+  const importStoreType = ref<string>("ร้านกาแฟ");
 
+  function AddRiceIngredient(item: { ingredientName: string}) {
+    const newImportIngredientItem: any = {
+      name: item.ingredientName,
+      pricePerUnit: 0,  
+      unitPrice: 0,     
+      Quantity: 0,      
+    };
+    ingredientList.value.push(newImportIngredientItem);
+  }
+  
   function Addingredient(item: Ingredient) {
     const exists = ingredientList.value.some(
       (ingredient) => ingredient.ingredient.ingredientId === item.ingredientId
     );
     if (!exists) {
-      ingredientList.value.push({ ingredient: item, count: 1, totalunit: 0 });
+      ingredientList.value.push({ ingredient: item, count: 1, totalunit: 0 ,unitprice:0 });
     }
   }
   function Addingredienttotable(item: Ingredient) {
@@ -129,6 +152,9 @@ export const useIngredientStore = defineStore("ingredient", () => {
 
   function removeIngredient(index: number) {
     ingredientList.value.splice(index, 1);
+  }
+  function removeCheckIngredient(index: number) {
+    ingredientCheckList.value.splice(index, 1);
   }
   async function getIngredientlow() {
     try {
@@ -183,27 +209,29 @@ export const useIngredientStore = defineStore("ingredient", () => {
       console.error("Error saving import data:");
     }
   }
-  // async function saveCheckData() {
-  //   const ingredientList = ingredientCheckList.value.map((item) => ({
-  //     ingredientId: item.ingredientcheck.ingredientId!,
-  //     UsedQuantity: item.count,
-  //   }));
+  async function saveCheckData() {
+    const ingredientList = ingredientCheckList.value.map((item) => ({
+      ingredientId: item.ingredientcheck.ingredientId!,
+      UsedQuantity: item.count,
+    }));
 
-  //   const checkIngredientsPayload = {
-  //     checkingredientitem: ingredientList, 
-  //     userId: 1,
-  //     date: new Date(),
-  //   };
+    const checkIngredientsPayload = {
+      checkingredientitems: ingredientList,
+      userId: 1,
+      date: new Date().toISOString(),
+      checkDescription: checkDescription.value,
+      actionType: selectedAction.value,
+    };
 
-  //   console.log('Sending data to API:', checkIngredientsPayload);
+    console.log('Sending data to API:', checkIngredientsPayload);
 
-  //   try {
-  //     const response = await ingredientService.createCheckIngredients(checkIngredientsPayload);
-  //     console.log('API response:', response);
-  //   } catch (error) {
-  //     console.error('Error saving check data:', error);
-  //   }
-  // }
+    try {
+      const response = await ingredientService.createCheckIngredients(checkIngredientsPayload);
+      console.log('API response:', response);
+    } catch (error) {
+      console.error('Error saving check data:', error);
+    }
+  }
   async function saveIngredient() {
     loadingStore.isLoading = true;
     
@@ -253,7 +281,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
   };
   return {
     ingredient,
-    // saveCheckData,
+    all_ingredients,
     ingredients,
     search,
     dialog,
@@ -266,6 +294,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
     lastPage,
     editedIngredient,
     setEditedIngredient,
+    removeCheckIngredient,
     ingredientList,
     store,
     discount,
@@ -274,7 +303,10 @@ export const useIngredientStore = defineStore("ingredient", () => {
     importingredients,
     ingredientCheckList,
     ingredientlow,
+    AddRiceIngredient,
     getAllIngredients,
+    checkDescription,
+    selectedAction,
     Addingredient,
     saveImportData,
     removeIngredient,
@@ -284,5 +316,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
     deleteIngredient,
     searchIngredients,
     getIngredientlow,
+    getIngredients,
+    saveCheckData,
   };
 });

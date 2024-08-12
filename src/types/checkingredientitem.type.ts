@@ -11,6 +11,8 @@ export interface  Checkingredientitem {
   export interface  Checkingredient {
   CheckID: number;
   date: Date;
+  actionType: String;
+  checkDescription: String;
   user: User;
   checkingredientitem: Checkingredientitem[];
 }
