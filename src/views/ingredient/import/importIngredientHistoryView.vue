@@ -3,15 +3,14 @@ import { useHistoryIngredientImportStore } from '@/stores/historyIngredientimpor
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router'
 import dialogCheckItem from './dialogImport.vue';
+import type { Importingredient } from '@/types/importIngredient.type';
+const historyImportDialog = ref(false);
 const ingredientStore = useHistoryIngredientImportStore();
 const router = useRouter();
+const selectedImport = ref<Importingredient | null>(null);
 onMounted(async () => {
     await ingredientStore.getAllHistoryImportIngredients();
 });
-const showDetail = (items) => {
-  ingredientStore.selectedItems = items;
-  ingredientStore.dialogimportkitem = true;
-};
 
 const navigateTo = (routeName: string) => {
     router.push({ name: routeName });
@@ -39,10 +38,14 @@ const formatDate = (dateString: string) => {
   
 //   return `${formattedDate} เวลา ${formattedTime}`; // รวมวันที่และเวลาเข้าด้วยกัน
 // };
+const openHistoryCheckDialog = (importingredient: Importingredient) => {
+    ingredientStore.importingredient = importingredient;
+    ingredientStore.dialoImportItem = true;
+};
 </script>
 
 <template>
-<dialogCheckItem/>
+<dialogCheckItem v-model:dialog="historyImportDialog" :importingredient="selectedImport" />
     <v-container>
         <v-card>
             <v-card-title>
@@ -72,13 +75,13 @@ const formatDate = (dateString: string) => {
             <v-table class="mx-auto" style="width: 97%">
                 <thead>
     <tr>
-        <th class="column-header">ลำดับ</th>
-        <th class="column-header">วันที่</th>
-        <th class="column-header">ซัพพาย</th>
-        <th class="column-header">ราคารวม</th>
-        <th class="column-header">ส่วนลด</th>
-        <th class="column-header">ผู้รับผิดชอบ</th>
-        <th class="column-header">การกระทำ</th>
+        <th style="text-align: center;font-weight: bold;"></th>
+        <th style="text-align: center;font-weight: bold;">วันที่</th>
+        <th style="text-align: center;font-weight: bold;">ซัพพาย</th>
+        <th style="text-align: center;font-weight: bold;">ราคารวม</th>
+        <th style="text-align: center;font-weight: bold;">ส่วนลด</th>
+        <th style="text-align: center;font-weight: bold;">รูปแบบ</th>
+        <th style="text-align: center;font-weight: bold;">การกระทำ</th>
     </tr>
 </thead>
 <tbody>
@@ -88,9 +91,9 @@ const formatDate = (dateString: string) => {
         <td>{{ item.store }}</td>
         <td>{{ item.total }}</td>
         <td>{{ item.discount }}</td>
-        <td>{{ item.user.userName }}</td>
+        <td>{{ item.importStoreType }}</td>
         <td>
-            <v-btn color="#FFDD83" class="mr-2" icon="mdi-pencil" @click="showDetail(item.importingredientitem)">ดู</v-btn>
+            <v-btn color="#FFDD83" class="mr-2" icon="mdi-pencil" @click="openHistoryCheckDialog(item)">ดู</v-btn>
 
             <!--  -->
         </td>

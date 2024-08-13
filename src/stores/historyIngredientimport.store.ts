@@ -6,7 +6,8 @@ export const useHistoryIngredientImportStore = defineStore(
   "historyIngredientImport",
   () => {
     const importIngredientsHistory = ref<Importingredient[]>([]);
-    const dialogimportkitem = ref(false);
+    const dialoImportItem = ref(false);
+    const importingredient = ref<Importingredient | null>(null);
     const selectedItems = ref([]);
 
     const getAllHistoryImportIngredients = async () => {
@@ -19,12 +20,23 @@ export const useHistoryIngredientImportStore = defineStore(
           console.error(error);
       }
   };
-  
+  const getHistoryImportById = async (id: number) => {
+    try {
+      const response = await ingredientService.getHistoryImportById(id);
+      if (response.status === 200) {
+        importingredient.value = response.data;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return {
       importIngredientsHistory,
-      dialogimportkitem,
+      dialoImportItem,
+      importingredient,
       getAllHistoryImportIngredients,
+      getHistoryImportById,
       selectedItems,
   };
 });

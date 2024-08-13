@@ -100,6 +100,9 @@ function searchIngredientsByName(name: string) {
 function getHistoryCheckById(id: number) {
   return http.get(`/checkingredients/${id}`);
 }
+function getHistoryImportById(id: number) {
+  return http.get(`/importingredients/${id}`);
+}
 
 
 export default {
@@ -107,6 +110,7 @@ export default {
   createImportIngredients,
   createCheckIngredients,
   getHistoryCheckById,
+  getHistoryImportById,
   getAllHistoryImportIngredients,
   saveIngredient,
   updateIngredient,

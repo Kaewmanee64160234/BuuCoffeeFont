@@ -33,23 +33,23 @@ function exportToExcel(checkingredient: Checkingredient) {
         userName: checkingredient.user.userName,
     };
 
-    
+
     const tableData = checkingredient.checkingredientitem.map(item => ({
         ingredientName: item.ingredient.ingredientName,
         ingredientSupplier: item.ingredient.ingredientSupplier,
         UsedQuantity: item.UsedQuantity
     }));
 
-    
+
     const wb = XLSX.utils.book_new();
     const ws1 = XLSX.utils.json_to_sheet([basicData], { header: Object.keys(basicData) });
     const ws2 = XLSX.utils.json_to_sheet(tableData, { header: Object.keys(tableData[0]) });
 
-    
+
     XLSX.utils.book_append_sheet(wb, ws1, 'Summary');
     XLSX.utils.book_append_sheet(wb, ws2, 'Details');
 
-    
+
     XLSX.writeFile(wb, `check_ingredient_${new Date().toISOString()}.xlsx`);
 }
 </script>
@@ -88,7 +88,6 @@ function exportToExcel(checkingredient: Checkingredient) {
                     <tr>
                         <th></th>
                         <th>วันที่</th>
-                        <th>ผู้รับผิดชอบ</th>
                         <th>รูปแบบ</th>
                         <th>การกระทำ</th>
 
@@ -101,10 +100,11 @@ function exportToExcel(checkingredient: Checkingredient) {
                     <tr v-for="(item, index) in ingredientStore.CheckIngredientsHistory" :key="index">
                         <td>{{ index + 1 }}</td>
                         <td>{{ formatDate(item.date) }}</td>
-                        <td>{{ item.user.userName }}</td>
-                        <td :style="{ color: item.actionType === 'issuing' ? 'red' : (item.actionType === 'check' ? '#CCCC00' : 'green') }">
-  {{ item.actionType === 'issuing' ? 'นำวัตถุดิบออก' : (item.actionType === 'check' ? 'เช็ควัตถุดิบ' : 'เลี้ยงรับรอง') }}
-</td>
+                        <td
+                            :style="{ color: item.actionType === 'issuing' ? 'red' : (item.actionType === 'check' ? '#CCCC00' : 'green') }">
+                            {{ item.actionType === 'issuing' ? 'นำวัตถุดิบออก' : (item.actionType === 'check' ?
+                            'เช็ควัตถุดิบ' : 'เลี้ยงรับรอง') }}
+                        </td>
 
 
                         <td>
@@ -126,13 +126,12 @@ function exportToExcel(checkingredient: Checkingredient) {
 </template>
 
 <style scoped>
-
 .red-text {
-  color: red;
+    color: red;
 }
 
 .yellow-text {
-  color: #0d78f3; 
+    color: #0d78f3;
 }
 
 
