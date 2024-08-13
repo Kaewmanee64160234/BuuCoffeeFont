@@ -103,7 +103,7 @@ function exportToExcel(checkingredient: Checkingredient) {
                         <td
                             :style="{ color: item.actionType === 'issuing' ? 'red' : (item.actionType === 'check' ? '#CCCC00' : 'green') }">
                             {{ item.actionType === 'issuing' ? 'นำวัตถุดิบออก' : (item.actionType === 'check' ?
-                            'เช็ควัตถุดิบ' : 'เลี้ยงรับรอง') }}
+                                'เช็ควัตถุดิบ' : 'เลี้ยงรับรอง') }}
                         </td>
 
 

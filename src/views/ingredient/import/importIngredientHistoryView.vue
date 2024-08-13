@@ -4,6 +4,7 @@ import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router'
 import dialogCheckItem from './dialogImport.vue';
 import type { Importingredient } from '@/types/importIngredient.type';
+import * as XLSX from 'xlsx';
 const historyImportDialog = ref(false);
 const ingredientStore = useHistoryIngredientImportStore();
 const router = useRouter();
@@ -42,6 +43,30 @@ const openHistoryCheckDialog = (importingredient: Importingredient) => {
     ingredientStore.importingredient = importingredient;
     ingredientStore.dialoImportItem = true;
 };
+function exportToExcel(importingredient: Importingredient) {
+    const basicData = {
+        วันที่: importingredient.date,
+        ประเภทร้านค้า: importingredient.importStoreType,
+        คำอธิบาย: importingredient.importDescription,
+        ผู้รับผิดชอบ: importingredient.user.userName,
+    };
+
+
+    const tableData = importingredient.importingredientitem.map((item, index) => ({
+    ลำดับ: index + 1,
+    ชื่อวัตถุดิบ: item.ingredient?.ingredientName,
+    ซัพพาย: item.ingredient?.ingredientSupplier,
+    จำนวน: item.Quantity,
+    ราคาต่อขิ้น: item.unitPrice,
+    ราคารวม: item.pricePerUnit,
+}));
+    const wb = XLSX.utils.book_new();
+    const ws1 = XLSX.utils.json_to_sheet([basicData], { header: Object.keys(basicData) });
+    const ws2 = XLSX.utils.json_to_sheet(tableData, { header: Object.keys(tableData[0]) });
+    XLSX.utils.book_append_sheet(wb, ws1, 'Summary');
+    XLSX.utils.book_append_sheet(wb, ws2, 'Details');
+    XLSX.writeFile(wb, `Import_ingredient_${new Date().toISOString()}.xlsx`);
+}
 </script>
 
 <template>
@@ -93,9 +118,11 @@ const openHistoryCheckDialog = (importingredient: Importingredient) => {
         <td>{{ item.discount }}</td>
         <td>{{ item.importStoreType }}</td>
         <td>
-            <v-btn color="#FFDD83" class="mr-2" icon="mdi-pencil" @click="openHistoryCheckDialog(item)">ดู</v-btn>
-
-            <!--  -->
+            <v-btn color="#ed8731" class="mr-2" icon="mdi-pencil" @click="openHistoryCheckDialog(item)"><v-icon color="white"
+                style="font-size: 20px;">mdi-eye-circle</v-icon></v-btn>
+                <v-btn color="#4CAF50" icon @click="exportToExcel(item)">
+                                <v-icon color="white" style="font-size: 20px;">mdi-file-excel</v-icon>
+                            </v-btn>
         </td>
     </tr>
 </tbody>
