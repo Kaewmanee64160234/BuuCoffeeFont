@@ -6,7 +6,7 @@ function closeDialog() {
   ingredientStore.dialogCheckItem = false;
 }
 const formatDate = (dateString: string) => {
-  const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZone: 'UTC' };
+  const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', timeZone: 'UTC' };
   return new Date(dateString).toLocaleDateString('th-TH', options);
 };
 </script>
@@ -26,7 +26,7 @@ const formatDate = (dateString: string) => {
             <v-icon color="primary" left style="font-size: 20px;">mdi-clipboard-text</v-icon>
             <strong style="font-size: 16px;"> รูปแบบ : </strong>
             <span style="font-size: 14px;">
-              {{ ingredientStore.checkingredient?.actionType === 'issuing' ? 'นำวัตถุดิบออก' : 'เช็ควัตถุดิบ' }}
+              {{ ingredientStore.checkingredient?.actionType === 'issuing' ? 'นำวัตถุดิบออก' : ( ingredientStore.checkingredient?.actionType === 'check' ? 'เช็ควัตถุดิบ' : 'เลี้ยงรับรอง') }}
             </span>
           </v-col>
 

@@ -227,7 +227,7 @@ const statusText = (status: string) => {
 
             <th class="text-center">รูปแบบการจ่ายเงิน</th>
             <th class="text-center">พนักงาน</th>
-            <th class="text-center">Operations</th>
+            <th class="text-center">การกระทำ</th>
           </tr>
         </thead>
         <tbody>

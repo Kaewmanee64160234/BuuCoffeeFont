@@ -14,7 +14,7 @@ onMounted(async () => {
 });
 
 const formatDate = (dateString: string) => {
-    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZone: 'UTC' };
+    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', timeZone: 'UTC' };
     return new Date(dateString).toLocaleDateString('th-TH', options);
 };
 
@@ -26,7 +26,6 @@ const openHistoryCheckDialog = (checkingredient: Checkingredient) => {
     ingredientStore.dialogCheckItem = true;
 };
 function exportToExcel(checkingredient: Checkingredient) {
-    const formattedDate = formatDate(checkingredient.date);
     const basicData = {
         date: checkingredient.date,
         actionType: checkingredient.actionType,
@@ -90,7 +89,8 @@ function exportToExcel(checkingredient: Checkingredient) {
                         <th></th>
                         <th>วันที่</th>
                         <th>ผู้รับผิดชอบ</th>
-                        <th>แอคชั่น</th>
+                        <th>รูปแบบ</th>
+                        <th>การกระทำ</th>
 
                     </tr>
                 </thead>
@@ -102,6 +102,11 @@ function exportToExcel(checkingredient: Checkingredient) {
                         <td>{{ index + 1 }}</td>
                         <td>{{ formatDate(item.date) }}</td>
                         <td>{{ item.user.userName }}</td>
+                        <td :style="{ color: item.actionType === 'issuing' ? 'red' : (item.actionType === 'check' ? '#CCCC00' : 'green') }">
+  {{ item.actionType === 'issuing' ? 'นำวัตถุดิบออก' : (item.actionType === 'check' ? 'เช็ควัตถุดิบ' : 'เลี้ยงรับรอง') }}
+</td>
+
+
                         <td>
                             <v-btn color="#ed8731 " class="mr-2" icon="mdi-pencil"
                                 @click="openHistoryCheckDialog(item)"><v-icon color="white"
@@ -121,10 +126,13 @@ function exportToExcel(checkingredient: Checkingredient) {
 </template>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
-* {
-    font-family: 'Kanit', sans-serif;
+.red-text {
+  color: red;
+}
+
+.yellow-text {
+  color: #0d78f3; 
 }
 
 

@@ -128,14 +128,14 @@ watch(paginate, async (newValue, oldValue) => {
         <thead>
           <tr>
             <th></th>
-            <th>รูปภาพ</th>
-            <th>ชื่อวัตถุดิบ</th>
-            <th>ผู้จัดจำหน่าย</th>
-            <th>จำนวนคงเหลือ</th>
-            <th>จำนวนต่อหน่วย</th>
-            <th>จุดสั่งซื้อขั้นต่ำ</th>
-            <th>หน่วยที่ถูกใช้ไป</th>
-            <th></th>
+            <th style="text-align: center;font-weight: bold;">รูปภาพ</th>
+            <th style="text-align: center;font-weight: bold;">ชื่อวัตถุดิบ</th>
+            <th style="text-align: center;font-weight: bold;">ผู้จัดจำหน่าย</th>
+            <th style="text-align: center;font-weight: bold;">จำนวนคงเหลือ</th>
+            <th style="text-align: center;font-weight: bold;">จำนวนต่อหน่วย</th>
+            <th style="text-align: center;font-weight: bold;">จุดสั่งซื้อขั้นต่ำ</th>
+            <th style="text-align: center;font-weight: bold;">หน่วยที่ถูกใช้ไป</th>
+            <th style="text-align: center;font-weight: bold;">การกระทำ</th>
           </tr>
         </thead>
         <tbody>

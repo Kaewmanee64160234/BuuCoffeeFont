@@ -85,7 +85,7 @@ const filteredUsers = computed(() => {
               <th class="text-center">อีเมล</th>
               <th class="text-center">สถานะผู้ใช้งาน</th>
               <th class="text-center">ตำแหน่งผู้ใช้งาน</th>
-              <th class="text-center">Operations</th>
+              <th class="text-center">การกระทำ</th>
             </tr>
           </thead>
           <tbody>

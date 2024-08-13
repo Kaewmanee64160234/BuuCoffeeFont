@@ -66,8 +66,8 @@ const saveCheckData = async () => {
       </v-row>
       <v-row>
         <v-col cols="3">
-          <v-text-field label="ค้นหาวัตถุดิบ" append-inner-icon="mdi-magnify" hide-details dense
-            v-model="ingredientStore.search" variant="solo"></v-text-field>
+          <v-text-field label="ค้นหาวัตถุดิบ" append-inner-icon="mdi-magnify"  dense hide-details variant="solo" outlined
+            v-model="ingredientStore.search"></v-text-field>
         </v-col>
         <v-col cols="auto">
           <v-btn color="success" :to="{ name: 'ingredients' }">

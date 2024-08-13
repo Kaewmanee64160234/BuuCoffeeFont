@@ -16,25 +16,29 @@ const showDetail = (items) => {
 const navigateTo = (routeName: string) => {
     router.push({ name: routeName });
 };
-const formatDate = (date: any) => {
-  if (!date) return ''; // กรณีไม่มีข้อมูลวันที่
-
-  const jsDate = new Date(date.toString()); // แปลงข้อมูลวันที่เป็น string เป็นวัตถุ Date
-  const formattedDate = jsDate.toLocaleDateString('th-TH', { 
-    day: '2-digit', 
-    month: '2-digit', 
-    year: 'numeric', 
-    timeZone: 'Asia/Bangkok' 
-  }); // กำหนดรูปแบบวันที่ตามที่ต้องการ
-  
-  const formattedTime = jsDate.toLocaleTimeString('th-TH', {
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone: 'Asia/Bangkok'
-  }); // กำหนดรูปแบบเวลาตามที่ต้องการ
-  
-  return `${formattedDate} เวลา ${formattedTime}`; // รวมวันที่และเวลาเข้าด้วยกัน
+const formatDate = (dateString: string) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', timeZone: 'UTC' };
+    return new Date(dateString).toLocaleDateString('th-TH', options);
 };
+// const formatDate = (date: any) => {
+//   if (!date) return ''; // กรณีไม่มีข้อมูลวันที่
+
+//   const jsDate = new Date(date.toString()); // แปลงข้อมูลวันที่เป็น string เป็นวัตถุ Date
+//   const formattedDate = jsDate.toLocaleDateString('th-TH', { 
+//     day: '2-digit', 
+//     month: '2-digit', 
+//     year: 'numeric', 
+//     timeZone: 'Asia/Bangkok' 
+//   }); // กำหนดรูปแบบวันที่ตามที่ต้องการ
+  
+//   const formattedTime = jsDate.toLocaleTimeString('th-TH', {
+//     hour: '2-digit',
+//     minute: '2-digit',
+//     timeZone: 'Asia/Bangkok'
+//   }); // กำหนดรูปแบบเวลาตามที่ต้องการ
+  
+//   return `${formattedDate} เวลา ${formattedTime}`; // รวมวันที่และเวลาเข้าด้วยกัน
+// };
 </script>
 
 <template>
@@ -74,7 +78,7 @@ const formatDate = (date: any) => {
         <th class="column-header">ราคารวม</th>
         <th class="column-header">ส่วนลด</th>
         <th class="column-header">ผู้รับผิดชอบ</th>
-        <th class="column-header">แอคชั่น</th>
+        <th class="column-header">การกระทำ</th>
     </tr>
 </thead>
 <tbody>
