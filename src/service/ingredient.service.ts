@@ -21,12 +21,16 @@ function createImportIngredients(ingredient: {
     ingredientId: number;
     pricePerUnit: number;
     Quantity: number;
+    unitPrice	: number;
+    name:string;
   }[];
   userId: number;
   date: Date;
   store: string;
   discount: number;
   total: number;
+  importDescription: string;
+  importStoreType: string;
 }) {
   return http.post("/importingredients", ingredient);
 }
@@ -92,12 +96,16 @@ function deleteIngredient(id: number) {
 function searchIngredientsByName(name: string) {
   return http.get("/ingredients/search", { params: { name } });
 }
+function getHistoryCheckById(id: number) {
+  return http.get(`/checkingredients/${id}`);
+}
 
 
 export default {
   getAllIngredients,
   createImportIngredients,
   createCheckIngredients,
+  getHistoryCheckById,
   getAllHistoryImportIngredients,
   saveIngredient,
   updateIngredient,

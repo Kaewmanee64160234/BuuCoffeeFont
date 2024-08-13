@@ -88,21 +88,23 @@ const saveCheckData = async () => {
     <v-row>
       <v-col cols="6" class="d-flex flex-column">
         <v-container>
-
           <v-row>
-            <v-col cols="3" style="text-align: center; padding: 8px"
-              v-for="(item, index) in ingredientStore.all_ingredients" :key="index">
-              <v-card width="100%" @click="ingredientStore.Addingredienttotable(item)" style="height: 200px">
-                <v-img :src="`http://localhost:3000/ingredients/${item.ingredientId}/image`" height="100"></v-img>
-                <v-card-title style="font-size: 14px">{{
-                  item.ingredientName
-                }}</v-card-title>
-                <v-card-subtitle style="font-size: 12px">{{
-                  item.ingredientSupplier
-                }}</v-card-subtitle>
-              </v-card>
-            </v-col>
-          </v-row>
+  <v-col cols="3" style="text-align: center; padding: 8px"
+    v-for="(item, index) in ingredientStore.all_ingredients" :key="index">
+    <v-card
+      width="100%"
+      :class="{ 'disabled-card': item.ingredientQuantityInStock <= 0 }"
+      :style="{ height: '200px', cursor: item.ingredientQuantityInStock <= 0 ? 'not-allowed' : 'pointer' }"
+      @click="item.ingredientQuantityInStock > 0 && ingredientStore.Addingredienttotable(item)"
+      :ripple="item.ingredientQuantityInStock > 0">
+      <v-img :src="`http://localhost:3000/ingredients/${item.ingredientId}/image`" height="100"></v-img>
+      <v-card-title style="font-size: 14px">{{ item.ingredientName }}</v-card-title>
+      <v-card-subtitle style="font-size: 12px">{{ item.ingredientSupplier }}</v-card-subtitle>
+    </v-card>
+  </v-col>
+</v-row>
+
+
         </v-container>
       </v-col>
       <v-col cols="6" class="d-flex flex-column">
@@ -141,8 +143,8 @@ const saveCheckData = async () => {
             <v-row>
               <v-col cols="12">หมายเหตุ</v-col>
               <v-col cols="12">
-                <v-text-field  v-model="ingredientStore.checkDescription"  label="กรุณาระบุหมายเหตุ **ถ้ามี" dense hide-details
-                  variant="solo"></v-text-field>
+                <v-text-field v-model="ingredientStore.checkDescription" label="กรุณาระบุหมายเหตุ **ถ้ามี" dense
+                  hide-details variant="solo"></v-text-field>
               </v-col>
             </v-row>
           </v-col>
@@ -150,11 +152,11 @@ const saveCheckData = async () => {
             <v-row>
               <v-col cols="12">รูปแบบ</v-col>
               <v-col cols="12" v-if="isVisible">
-                <v-select ref="actionTypeField" v-model="ingredientStore.selectedAction" 
-                label="กรุณาระบุการดำเนินการ" :items="[
-                  'check',
-                  'issuing'
-                ]" dense hide-details variant="solo"></v-select>
+                <v-select ref="actionTypeField" v-model="ingredientStore.selectedAction" label="กรุณาระบุการดำเนินการ"
+                  :items="[
+                    'check',
+                    'issuing'
+                  ]" dense hide-details variant="solo"></v-select>
 
               </v-col>
 
@@ -178,6 +180,10 @@ const saveCheckData = async () => {
   </v-container>
 </template>
 <style scoped>
+.disabled-card {
+  opacity: 0.5;
+}
+
 .button-full-width {
   width: 100%;
 }
