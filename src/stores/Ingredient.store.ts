@@ -78,6 +78,8 @@ export const useIngredientStore = defineStore("ingredient", () => {
       const response = await ingredientService.getIngredients();
       if (response.status === 200) {
         all_ingredients.value = response.data;
+
+        
       }
     } catch (error) {
       console.error('Error fetching ingredients:', error);

@@ -16,6 +16,7 @@ export const useUserStore = defineStore("user", () => {
   const user = ref<User | null>(null);
   const searchQuery = ref<string>("");
   const updateUserDialog = ref(false);
+
   const createUserDialog = ref(false);
   // const userRole = ref("พนักงานขายข้าว");
   const userRole = ref("พนักงานขายกาแฟ");
@@ -24,6 +25,7 @@ export const useUserStore = defineStore("user", () => {
     localStorage.setItem('user', JSON.stringify(user));
   }
 
+  
   function getUser() {
     const userString = localStorage.getItem('user');
     if (userString) {
@@ -61,6 +63,8 @@ export const useUserStore = defineStore("user", () => {
       if (response.status === 201) {
         users.value.push(response.data);
         await getAllUsers(); // Ensure that all users are fetched again
+        // Reset user form or clear the current user after creation
+        user.value = null;
       }
     } catch (error) {
       console.error("Error creating user:", error);
@@ -76,6 +80,8 @@ export const useUserStore = defineStore("user", () => {
         if (index !== -1) {
           users.value[index] = updatedUser;
         }
+        // Reset user after update
+        user.value = null;
         return updatedUser;
       }
     } catch (error) {
@@ -114,6 +120,11 @@ export const useUserStore = defineStore("user", () => {
 
   };
 
+  const resetUserForm = () => {
+    user.value = null;
+    userRole.value = "พนักงานขายกาแฟ"; // ค่าเริ่มต้นของ userRole
+  };
+
   return {
     users,
     user,
@@ -124,12 +135,13 @@ export const useUserStore = defineStore("user", () => {
     deleteUser,
     searchQuery,
     updateUserDialog,
+    createUserDialog,
     setUserForEdit,
     currentUser,
     setUser, 
     getUser,
     userRole,
     getCurrentUser,
-    createUserDialog
+    resetUserForm
   };
 });

@@ -4,11 +4,12 @@ function getIngredientlow() {
   return http.get("/ingredients/low-stock");
 }
 function getIngredients() {
-  return http.get("/ingredients", );
+  return http.get("/ingredients" );
 }
 function getAllIngredients(params: any) {
   return http.get("/ingredients/all", { params: params });
 }
+
 
 function getAllHistoryImportIngredients() {
   return http.get("/importingredients");
