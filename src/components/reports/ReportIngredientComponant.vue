@@ -1,14 +1,13 @@
 <script lang="ts" setup>
-import { onMounted ,ref,computed ,watch} from 'vue';
+import { onMounted, ref, computed, watch } from 'vue';
 import ApexCharts from 'apexcharts';
 import { useIngredientStore } from '@/stores/Ingredient.store';
-import { useRouter } from 'vue-router'; 
 import { useProductUsageStore } from '@/stores/report/productUsage.store';
 
 const chartSeries = ref([
   {
     name: 'Quantity',
-    data: [] 
+    data: []
   }
 ]);
 
@@ -36,7 +35,7 @@ const chartOptions = ref({
     }
   },
   xaxis: {
-    categories: chartCategories.value, 
+    categories: chartCategories.value,
     title: {
       text: 'Ingredients'
     }
@@ -49,7 +48,7 @@ const chartOptions = ref({
   fill: {
     opacity: 1
   },
-  colors: ['#00E396'], 
+  colors: ['#00E396'],
   title: {
     text: 'วัตถุดิบ 5 อันดับยอดนิยม',
     align: 'center',
@@ -59,6 +58,7 @@ const chartOptions = ref({
     }
   }
 });
+
 const productUsageStore = useProductUsageStore();
 const ingredientStore = useIngredientStore();
 const startDate = ref('2024-07-19');
@@ -82,14 +82,16 @@ const lineChartOptions = {
     }
   }
 };
+
 const updateChartData = async () => {
   await productUsageStore.loadIngredientsUsage(startDate.value, endDate.value);
-  const ingredients = productUsageStore.ingredientsUsage; // Assuming this is the data structure
+  const ingredients = productUsageStore.ingredientsUsage;
   const sortedIngredients = ingredients.sort((a, b) => b.quantity - a.quantity).slice(0, 5);
 
   chartCategories.value = sortedIngredients.map(item => item.ingredientName);
   chartSeries.value[0].data = sortedIngredients.map(item => item.quantity);
 };
+
 watch([startDate, endDate], () => {
   if (startDate.value && endDate.value) {
     updateChartData();
@@ -105,57 +107,61 @@ onMounted(async () => {
   }
 });
 
-
-
 const ingredientsUsage = computed(() => productUsageStore.ingredientsUsage);
 const sortedIngredients = computed(() => {
   return ingredientStore.ingredientlow.slice().sort((a, b) => a.ingredientQuantityInStock - b.ingredientQuantityInStock);
 });
 </script>
-<template>
-     <div class="section">
-      <h2>วัตถุดิบเหลือน้อย</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>ลำดับ</th>
-            <th>ชื่อ</th>
-            <th>ผู้จัดหา</th>
-            <th>จำนวน</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(item, index) in sortedIngredients" :key="index" :class="{'negative-quantity': item.ingredientQuantityInStock < 0}">
-            <td>{{ index + 1 }}</td>
-            <td>{{ item.ingredientName }}</td>
-            <td>{{ item.ingredientSupplier }}</td>
-            <td>
-              {{ item.ingredientQuantityInStock }}
-              <span v-if="item.ingredientQuantityInStock < 0" class="reminder" style="color: red;"><v-icon left>mdi-alert</v-icon>
-  "อย่าลืม import สินค้าเข้า"
-</span>
 
-            </td>
-          </tr>
-        </tbody>
-        <tbody v-if="!sortedIngredients.length">
-          <tr>
-            <td colspan="4" class="text-center">No data</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-      <v-carousel hide-delimiter-background hide-delimiters style="border-radius: 20px;">
+<template>
+  <v-container fluid>
+    <v-row class="mb-4">
+      <v-col cols="12">
+        <div class="section">
+          <h2>วัตถุดิบเหลือน้อย</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>ลำดับ</th>
+                <th>ชื่อ</th>
+                <th>ผู้จัดหา</th>
+                <th>จำนวน</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in sortedIngredients" :key="index" :class="{'negative-quantity': item.ingredientQuantityInStock < 0}">
+                <td>{{ index + 1 }}</td>
+                <td>{{ item.ingredientName }}</td>
+                <td>{{ item.ingredientSupplier }}</td>
+                <td>
+                  {{ item.ingredientQuantityInStock }}
+                  <span v-if="item.ingredientQuantityInStock < 0" class="reminder" style="color: red;">
+                    <v-icon left>mdi-alert</v-icon> "อย่าลืม import สินค้าเข้า"
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+            <tbody v-if="!sortedIngredients.length">
+              <tr>
+                <td colspan="4" class="text-center">No data</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </v-col>
+    </v-row>
+    
+    <v-carousel hide-delimiter-background hide-delimiters style="border-radius: 20px;">
       <!-- Slide 1: Import Data -->
       <v-carousel-item>
         <div class="section">
           <h2>นำเข้าวัตถุดิบ</h2>
           <div class="total-import">ยอดรวมนำเข้าวัตถุดิบ: 30,000</div>
           <v-row>
-            <v-col>
+            <v-col cols="12" md="6">
               <div id="lineChart"></div>
             </v-col>
-            <v-col>
+            <v-col cols="12" md="6">
               <table>
                 <thead>
                   <tr>
@@ -191,15 +197,17 @@ const sortedIngredients = computed(() => {
       <v-carousel-item>
         <div class="section">
           <h2>การใช้งานวัตถุดิบ</h2>
-          <div class="date-picker">
-            <input v-model="startDate" type="date" placeholder="Start Date" />
-            <input v-model="endDate" type="date" placeholder="End Date" />
-          </div>
-          <div class="content-container">
-            <div class="chart-container">
+          <v-row>
+            <v-col cols="12" md="6">
+              <input v-model="startDate" type="date" placeholder="Start Date" class="w-full mb-4" />
+              <input v-model="endDate" type="date" placeholder="End Date" class="w-full mb-4" />
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12" md="6">
               <apexchart type="bar" :options="chartOptions" :series="chartSeries" height="400"></apexchart>
-            </div>
-            <div class="table-container">
+            </v-col>
+            <v-col cols="12" md="6">
               <table>
                 <thead>
                   <tr>
@@ -221,15 +229,13 @@ const sortedIngredients = computed(() => {
                   </tr>
                 </tbody>
               </table>
-            </div>
-          </div>
+            </v-col>
+          </v-row>
         </div>
       </v-carousel-item>
     </v-carousel>
-
-    <div class="container">
-    </div>
-  </template>
+  </v-container>
+</template>
   
 
   

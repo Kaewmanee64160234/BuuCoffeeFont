@@ -237,4 +237,22 @@ watch([startDateforpromo, endDateforpromo], async () => {
 .promotion-card {
   margin: 20px;
 }
+
+@media (max-width: 600px) {
+  .promotion-card {
+    margin: 10px;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  .v-data-table {
+    font-size: 0.8rem;
+  }
+
+  .v-carousel-item {
+    padding: 16px;
+  }
+}
 </style>
