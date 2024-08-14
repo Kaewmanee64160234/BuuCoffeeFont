@@ -4,18 +4,20 @@ import { computed, onMounted, ref } from 'vue';
 import type { Receipt } from '@/types/receipt.type';
 import { useReceiptsStore } from '@/stores/report/receiptsStore';
 import * as XLSX from 'xlsx';
-import HistoryReceiptDialog from '@/components/receipts/HistoryReceiptDialog.vue';
 import HistoryReceiptDialogCatering from '@/components/receipts/HistoryReceiptDialogCatering.vue';
 import { useCheckIngredientStore } from '@/stores/historyIngredientCheck.store';
+import { usePosStore } from '@/stores/pos.store';
 
 const receiptsStore = useReceiptsStore();
 const startDate = ref('');
 const endDate = ref('');
-const receiptType = ref<string>('ร้านจัดเลี้ยง'); // Set default to 'ร้านจัดเลี้ยง'
+const receiptType = ref<string>('ร้านจัดเลี้ยง');
 const receiptStore = useReceiptStore();
-const historyReceiptDialog = ref(false);
 const ingredientStore = useCheckIngredientStore();
-const selectedReceipt = ref<Receipt | null>(null);
+
+const historyReceiptDialog = ref(false);
+const editDialog = ref(false); // New ref for edit dialog
+const posStore = usePosStore();
 
 const fetchData = async () => {
   await receiptsStore.fetchReceipts(startDate.value, endDate.value, receiptType.value);
@@ -72,6 +74,11 @@ const openHistoryReceiptDialog = async (receipt: Receipt) => {
   receiptStore.historyReceiptDialogCatering = true;
 };
 
+const openEditDialog = (receipt: Receipt) => {
+  posStore.receipt = { ...receipt };
+  editDialog.value = true;
+};
+
 const handleSearchKeydown = (event: KeyboardEvent) => {
   if (event.key === 'Enter') {
     // Optionally, you could trigger search here if needed
@@ -98,7 +105,6 @@ const filteredReceipts = computed(() => {
     )
     .sort((a, b) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime());
 });
-
 
 const formatDate = (date: any) => {
   if (!date) return ''; // Handle case where date is not provided
@@ -151,7 +157,7 @@ const statusClass = (status: string) => {
   return {
     'text-success': status === 'paid',
     'text-danger': status === 'cancel',
-    'text-warning': status === 'unpaid', // Add this line for 'unpaid' status
+    'text-warning': status === 'unpaid',
   };
 };
 
@@ -161,41 +167,75 @@ const statusText = (status: string) => {
       return 'สำเร็จ';
     case 'cancel':
       return 'ยกเลิก';
-    case 'unpaid': // Add this case for 'unpaid' status
+    case 'unpaid':
       return 'รอการดำเนินการ';
     default:
       return status;
   }
 };
 
+// Update change amount based on receive and net price
+const updateChange = () => {
+  if (posStore.receipt) {
+    posStore.receipt.change = posStore.receipt.receive - posStore.receipt.receiptNetPrice;
+  }
+};
+
+// Save the changes made in the edit dialog
+const saveChanges = async () => {
+  if (posStore.receipt) {
+    // Call the update function in your store or API to save the changes
+    await posStore.updateReceiptCatering(posStore.receipt.receiptId, posStore.receipt);
+
+    // Close the dialog and refresh the data
+    closeEditDialog();
+    await receiptStore.getAllReceipts();
+  }
+};
+
+const closeEditDialog = () => {
+  editDialog.value = false;
+  posStore.receipt = null;
+};
 
 </script>
 
-<style scoped>
-.flex-container {
-  display: flex;
-  flex-direction: column;
-  height: 95vh;
-}
-
-.text-success {
-  color: #4caf50;
-}
-
-.text-danger {
-  color: #f44336;
-}
-
-.table-container {
-  max-height: 70vh; 
-  overflow-y: auto;
-  margin-left: 2%;
-  margin-top: 3%;
-}
-</style>
-
 <template>
   <HistoryReceiptDialogCatering v-model:dialog="historyReceiptDialog" />
+
+  <!-- Edit Receipt Dialog -->
+  <v-dialog v-model="editDialog" max-width="500px">
+    <v-card>
+      <v-card-title>
+        <span>แก้ไขใบเสร็จ</span>
+      </v-card-title>
+      <v-card-text>
+        <v-container>
+          <v-text-field
+            v-model="posStore.receipt.receive"
+            label="จำนวนเงินที่ได้รับ"
+            type="number"
+            @input="updateChange"
+            outlined
+            dense
+          />
+          <v-text-field
+            v-model="posStore.receipt.change"
+            label="เงินทอน"
+            type="number"
+            readonly
+            outlined
+            dense
+          />
+        </v-container>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="primary" @click="saveChanges">บันทึก</v-btn>
+        <v-btn color="secondary" @click="closeEditDialog">ยกเลิก</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 
   <v-container>
     <v-card class="flex-container">
@@ -206,12 +246,26 @@ const statusText = (status: string) => {
           </v-col>
           <v-row>
             <v-col cols="12" md="4" style="margin-left: 1%;">
-              <v-text-field v-model="startDate" label="Start Date" type="date" outlined dense hide-details
-                variant="solo"></v-text-field>
+              <v-text-field
+                v-model="startDate"
+                label="Start Date"
+                type="date"
+                outlined
+                dense
+                hide-details
+                variant="solo"
+              ></v-text-field>
             </v-col>
             <v-col cols="12" md="4">
-              <v-text-field v-model="endDate" label="End Date" type="date" outlined dense hide-details
-                variant="solo"></v-text-field>
+              <v-text-field
+                v-model="endDate"
+                label="End Date"
+                type="date"
+                outlined
+                dense
+                hide-details
+                variant="solo"
+              ></v-text-field>
             </v-col>
           </v-row>
           <v-row class="mt-4 mr-2" justify="end">
@@ -222,7 +276,6 @@ const statusText = (status: string) => {
               Export to Excel
             </v-btn>
           </v-row>
-
         </v-row>
         <v-spacer></v-spacer>
       </v-card-title>
@@ -258,13 +311,17 @@ const statusText = (status: string) => {
               <span v-if="receipt.receiptPromotions && receipt.receiptPromotions.length > 0">
                 มีการใช้โปรโมชั่น
               </span>
-              <span v-else>
-                -
-              </span>
+              <span v-else>-</span>
             </td>
             <td class="text-center">{{ receipt.paymentMethod || '-' }}</td>
             <td class="text-center">{{ receipt.user?.userName }}</td>
             <td class="text-center">
+              <v-btn
+                v-if="receipt.receiptStatus !== 'paid'"
+                color="#FFDD83"
+                icon="mdi-pencil"
+                @click="openEditDialog(receipt)"
+              ></v-btn>
               <v-btn color="#FFDD83" icon="mdi-eye" @click="openHistoryReceiptDialog(receipt)"></v-btn>
             </td>
           </tr>
@@ -272,9 +329,32 @@ const statusText = (status: string) => {
             <td colspan="10" class="text-center">No data</td>
           </tr>
         </tbody>
-
       </v-table>
     </v-card>
-
   </v-container>
 </template>
+
+
+
+<style scoped>
+.flex-container {
+  display: flex;
+  flex-direction: column;
+  height: 95vh;
+}
+
+.text-success {
+  color: #4caf50;
+}
+
+.text-danger {
+  color: #f44336;
+}
+
+.table-container {
+  max-height: 70vh; 
+  overflow-y: auto;
+  margin-left: 2%;
+  margin-top: 3%;
+}
+</style>
