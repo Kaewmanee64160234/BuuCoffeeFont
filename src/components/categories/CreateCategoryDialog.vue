@@ -2,7 +2,7 @@
   <v-dialog v-model="categoryStore.createCategoryDialog" persistent max-width="600px" @click:outside="resetForm">
     <v-card>
       <v-card-title>
-        <span class="headline">สร้างหมวดหมู่</span>
+       <v-icon color="black" left style="font-size: 22px;">mdi-plus-circle</v-icon><span class="headline"> สร้างหมวดหมู่</span>
       </v-card-title>
       <v-card-text>
         <v-container>
@@ -16,7 +16,7 @@
           <v-form ref="form" v-model="valid">
             <v-row>
               <v-col cols="12">
-                <v-text-field variant="solo" v-model="categoryName" label="ชื่อหมวดหมู่" :rules="[rules.required, rules.categoryName]" required></v-text-field>
+                <v-text-field variant="solo" v-model="categoryName" label="ชื่อหมวดหมู่" :rules="[rules.required, rules.categoryName]"  :error-messages="!categoryName ? ['กรุณากรอกชื่อหมวดหมู่'] : []" required></v-text-field>
               </v-col>
               <v-col cols="12">
                 <v-checkbox v-model="haveTopping" label="มีท็อปปิ้ง"></v-checkbox>
