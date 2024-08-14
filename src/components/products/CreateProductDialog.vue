@@ -37,23 +37,23 @@
                         accept="image/*" variant="solo" @change="handleImageUpload" />
                     </v-col>
                     <v-col cols="12" sm="6">
-                      <v-text-field variant="solo" v-model="productName" label="ชื่อสินค้า" :rules="nameRules" required />
+                      <v-text-field variant="solo" v-model="productName" label="ชื่อสินค้า" :rules="nameRules"  :error-messages="!productName ? ['กรุณากรอกชื่อสินค้า'] : []" required />
                     </v-col>
                     <v-col cols="12" sm="6">
-                      <v-text-field variant="solo" v-model="productPrice" label="ราคา" type="number" :rules="priceRules" required />
+                      <v-text-field variant="solo" v-model="productPrice" label="ราคา" type="number" :rules="priceRules"  :error-messages="!productPrice ? ['กรุณากรอกราคาเริ่มต้น'] : []"  required />
                     </v-col>
                     <v-col cols="12" sm="6">
 
                       <v-select v-model="selectedCategory"
                         :items="categoryStore.categoriesForCreate.map(category => category.categoryName)"
-                        label="เลือกหมวดหมู่" dense variant="solo" @change="checkCategory" />
+                        label="เลือกหมวดหมู่" dense variant="solo" @change="checkCategory" :error-messages="!selectedCategory ? ['กรุณาเลือก'] : []"  />
                     </v-col>
 
                     <v-col cols="12" sm="6">
                       <v-text-field variant="solo" v-model="barcode" label="บาร์โค้ด" />
                     </v-col>
                     <v-col cols="12" sm="6">
-                      <v-select variant="solo" v-model="storeName" :items="storeNames" label="เลือกชื่อร้าน" dense />
+                      <v-select variant="solo" v-model="storeName" :items="storeNames" label="เลือกชื่อร้าน" dense :error-messages="!storeName ? ['กรุณาเลือก'] : []" />
                     </v-col>
                     <v-col cols="12" sm="6">
                       <v-checkbox v-model="productStore.product.countingPoint" label="นับแต้ม" />
@@ -80,6 +80,14 @@
                 <v-form ref="form" v-model="valid">
                   <v-container>
                     <v-row>
+                      <v-row >
+              <v-col cols="12">
+                <v-alert type="info" border="left" color="blue" elevation="2" icon="mdi-information">
+  เป็นราคาที่คิดเพิ่มราคาเริ่มต้น
+</v-alert>
+
+              </v-col>
+            </v-row>
                       <v-col cols="12">
                         <v-subheader>{{ step.label }}</v-subheader>
 
