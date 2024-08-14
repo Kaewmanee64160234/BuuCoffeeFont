@@ -16,8 +16,6 @@ const customerStore = useCustomerStore();
 const userStore = useUserStore();
 const selectedItems = computed(() => posStore.selectedItems);
 const selectedCustomer = ref('');
-const recive = ref(0);
-const change = ref(0);
 const receiptStore = useReceiptStore();
 const url = import.meta.env.VITE_URL_PORT
 
@@ -59,7 +57,7 @@ function removeItem(index: number) {
 
 function calculateChange() {
   if (posStore.receipt.paymentMethod === 'cash') {
-    change.value = recive.value - posStore.receipt.receiptNetPrice;
+    posStore.receipt.change = posStore.receipt.receive - posStore.receipt.receiptNetPrice;
   }
 }
 
@@ -74,11 +72,11 @@ function selectPaymentMethod(method: string) {
   if (method === 'cash') {
     calculateChange();
   } else {
-    change.value = 0;
+    posStore.receipt.change = 0;
   }
 }
 
-watch(() => recive.value, () => {
+watch(() => posStore.receipt.receive, () => {
   calculateChange();
 });
 
@@ -121,7 +119,7 @@ async function save() {
     });
     return;
   }
-  if (posStore.receipt.paymentMethod === 'cash' && recive.value < posStore.receipt.receiptNetPrice) {
+  if (posStore.receipt.paymentMethod === 'cash' && posStore.receipt.receive < posStore.receipt.receiptNetPrice) {
     Swal.fire({
       icon: 'error',
       title: 'ข้อมูลไม่สมบูรณ์',
@@ -142,8 +140,8 @@ async function save() {
   posStore.receipt.receiptNetPrice = 0;
   posStore.receipt.receiptPromotions = [];
   posStore.receiptDialog = true;
-  recive.value = 0;
-  change.value = 0;
+  posStore.receipt.receive = 0;
+  posStore.receipt.change = 0;
   step.value = 1;
   posStore.receipt.paymentMethod = '';
   posStore.receipt.customer = null;
@@ -184,8 +182,8 @@ function cancelReceipt() {
 
   posStore.receiptDialog = false;
 
-  recive.value = 0;
-  change.value = 0;
+  posStore.receipt.receive = 0;
+  posStore.receipt.change = 0;
   step.value = 1;
   posStore.receipt.paymentMethod = '';
 }
@@ -504,7 +502,7 @@ const selectReceipt = (receipt: Receipt) => {
               <div v-if="posStore.receipt.paymentMethod == 'cash'">
                 <p class="d-flex justify-space-between align-center pr-6 my-2">
                   <span style="width: 50%;">รับมา:</span>
-                  <v-text-field v-model="recive" type="number" variant="solo" label="จำนวนเงิน"
+                  <v-text-field v-model="posStore.receipt.receive" type="number" variant="solo" label="จำนวนเงิน"
                     style="width: 50%;"></v-text-field>
                 </p>
               </div>
@@ -512,9 +510,9 @@ const selectReceipt = (receipt: Receipt) => {
               <!-- Change Amount -->
               <p class="d-flex justify-space-between pr-6 my-2">
                 <span>ทอน:</span>
-                <span :class="recive < 0 || recive < posStore.receipt.receiptNetPrice ? 'red--text' : 'black'"
+                <span :class="posStore.receipt.receive < 0 || posStore.receipt.receive < posStore.receipt.receiptNetPrice ? 'red--text' : 'black'"
                   class="info-value">
-                  {{ parseFloat(change.toFixed(2)) < 0 ? 'จำนวนเงินไม่พอ' : change.toFixed(2) }} </span>
+                  {{ parseFloat(posStore.receipt.change.toFixed(2)) < 0 ? 'จำนวนเงินไม่พอ' : posStore.receipt.change.toFixed(2) }} </span>
               </p>
 
               <v-divider></v-divider>

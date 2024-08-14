@@ -252,6 +252,10 @@ export const useIngredientStore = defineStore("ingredient", () => {
       console.error('Error saving check data:', error);
     }
   }
+
+
+
+
   async function saveIngredient() {
     loadingStore.isLoading = true;
     

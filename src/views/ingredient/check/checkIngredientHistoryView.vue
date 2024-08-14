@@ -14,11 +14,8 @@ onMounted(async () => {
 });
 
 const formatDate = (dateString: string) => {
-<<<<<<< HEAD
-    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZone: 'UTC' };
-=======
+
     const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', timeZone: 'UTC' };
->>>>>>> d7d6bbf2d701166f9f08ed7f343ee52cb290632d
     return new Date(dateString).toLocaleDateString('th-TH', options);
 };
 
@@ -60,11 +57,7 @@ function exportToExcel(checkingredient: Checkingredient) {
 </script>
 
 <template>
-<<<<<<< HEAD
-    <dialogImportItem />
-=======
     <dialogImportItem v-model:dialog="historyCheckDialog" :checkingredient="selectedCheck" />
->>>>>>> d7d6bbf2d701166f9f08ed7f343ee52cb290632d
     <v-container>
         <v-card>
             <v-card-title>

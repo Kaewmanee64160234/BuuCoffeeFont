@@ -36,6 +36,8 @@ export const usePosStore = defineStore("pos", () => {
     receiptPromotions: [],
     receiptTotalPrice: 0,
     paymentMethod: "",
+    change: 0,
+    receive: 0,
     customer: {
       customerId: 0,
       customerName: "",
@@ -281,7 +283,8 @@ export const usePosStore = defineStore("pos", () => {
     let receiptStatus = "";
     if (userStore.currentUser?.userRole == "พนักงานขายกาแฟ") {
       receiptStatus = "ร้านกาแฟ";
-    } else {
+    }
+    else {
       receiptStatus = "ร้านข้าว";
     }
     if (currentReceipt.value?.queueNumber !== undefined) {
@@ -290,6 +293,7 @@ export const usePosStore = defineStore("pos", () => {
       receipt.value.receiptStatus = "paid";
       receipt.value.createdDate = new Date();
       receipt.value.queueNumber = currentReceipt.value?.queueNumber + 1;
+
     } else {
       receipt.value.receiptItems = selectedItems.value;
       receipt.value.receiptType = receiptStatus;
@@ -302,6 +306,39 @@ export const usePosStore = defineStore("pos", () => {
     if (receipt.value.receiptTotalDiscount === 0) {
       receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice;
     }
+
+    const res = await receiptService.createReceipt(receipt.value);
+    if (res.status === 201) {
+      console.log("Receipt created successfully", res.data);
+      currentReceipt.value = res.data;
+      queueReceipt.value.push(currentReceipt.value!);
+      saveQueueListToLocalStorage();
+      await customerStore.getAllCustomers();
+    }
+    await receiptStore.getRecieptIn30Min();
+  };
+  const createReceiptForCatering = async () => {
+    const  receiptStatus = "ร้านจัดเลี้ยง";
+    if (currentReceipt.value?.queueNumber !== undefined) {
+      receipt.value.receiptItems = selectedItems.value;
+      receipt.value.receiptStatus = receiptStatus;
+    
+      receipt.value.receiptStatus = "paid";
+      receipt.value.createdDate = new Date();
+      receipt.value.queueNumber = currentReceipt.value?.queueNumber + 1;
+    } else {
+      receipt.value.receiptItems = selectedItems.value;
+      receipt.value.receiptType = receiptStatus;
+      receipt.value.receiptStatus = "paid";
+      receipt.value.createdDate = new Date();
+      receipt.value.queueNumber = queueNumber.value;
+    }
+    queueNumber.value++;
+    saveQueueNumber();
+    if (receipt.value.receive != 0) {
+      receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice;
+    }
+
 
     const res = await receiptService.createReceipt(receipt.value);
     if (res.status === 201) {
@@ -638,6 +675,7 @@ export const usePosStore = defineStore("pos", () => {
     selectedItemsUsePromotion,
     queueReceipt,
     loadQueueNumber,
-    saveQueueListToLocalStorage
+    saveQueueListToLocalStorage,
+    createReceiptForCatering
   };
 });

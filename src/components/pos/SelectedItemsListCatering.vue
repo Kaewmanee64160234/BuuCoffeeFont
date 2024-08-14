@@ -32,7 +32,7 @@ onMounted(async () => {
 });
 
 function nextStep() {
-  if (selectedItems.value.length === 0) {
+  if (selectedItems.value.length === 0 && ingredientStore.ingredientCheckList.length === 0) {
     Swal.fire({
       icon: 'error',
       title: 'ข้อมูลไม่สมบูรณ์',
@@ -100,49 +100,110 @@ function decreaseIngredientQuantity(index: number) {
 function removeIngredient(index: number) {
   ingredientStore.ingredientCheckList.splice(index, 1);
 }
+const saveCheckData = async () => {
+  ingredientStore.selectedAction = 'export';
+  try {
+    // ส่งช้อมูล
+    await ingredientStore.saveCheckData();
+
+
+
+  } catch (error) {
+    console.error('Error saving check data:', error);
+
+    Swal.fire({
+      title: 'เกิดข้อผิดพลาด!',
+      text: 'เกิดข้อผิดพลาดในการบันทึกข้อมูลของคุณ.',
+      icon: 'error',
+    });
+  }
+};
+
+
 
 async function save() {
   posStore.receipt.paymentMethod = 'cash';
-  posStore.receipt.receiptType = 'เลี้ยงรับรอง';
 
-  if (selectedItems.value.length === 0) {
-    Swal.fire({
-      icon: 'error',
-      title: 'ข้อมูลไม่สมบูรณ์',
-      text: 'กรุณาเพิ่มรายการอย่างน้อยหนึ่งรายการในใบเสร็จ',
-    });
-    return;
-  }
-  if (posStore.receipt.paymentMethod === '') {
-    Swal.fire({
-      icon: 'error',
-      title: 'ข้อมูลไม่สมบูรณ์',
-      text: 'กรุณาเลือกวิธีการชำระเงิน',
-    });
-    return;
-  }
-  if (posStore.receipt.paymentMethod === 'cash' && recive.value < posStore.receipt.receiptNetPrice) {
+  // Check if there are products in the selectedItems list or ingredients in the ingredientCheckList
+  if (selectedItems.value.length > 0 || ingredientStore.ingredientCheckList.length > 0) {
+    // Ensure payment method is selected
+    if (posStore.receipt.paymentMethod === '') {
+      Swal.fire({
+        icon: 'error',
+        title: 'ข้อมูลไม่สมบูรณ์',
+        text: 'กรุณาเลือกวิธีการชำระเงิน',
+      });
+      return;
+    }
+
+    // Ensure received amount is sufficient for cash payments
+    if (posStore.receipt.paymentMethod === 'cash' && recive.value < posStore.receipt.receiptNetPrice && recive.value != 0) {
+      Swal.fire({
+        icon: 'error',
+        title: 'จำนวนเงินไม่เพียงพอ',
+        text: 'กรุณาตรวจสอบจำนวนเงินที่รับมา',
+      });
+      return;
+    }
+
+    let receiptCreated = false;
+    let stockChecked = false;
+
+    if (posStore.receipt.receiptId) {
+      await posStore.updateReceipt(posStore.receipt.receiptId, posStore.receipt);
+      receiptCreated = true;
+    } else {
+      if (selectedItems.value.length > 0) {
+        await posStore.createReceiptForCatering();
+        receiptCreated = true;
+      }
+      if (ingredientStore.ingredientCheckList.length > 0) {
+        await saveCheckData();
+        stockChecked = true;
+      }
+    }
+
+    // Clear the selected items and reset receipt details
+    posStore.selectedItems = [];
+    posStore.receipt.receiptTotalPrice = 0;
+    posStore.receipt.receiptTotalDiscount = 0;
     posStore.receipt.receiptNetPrice = 0;
-  }
-  if (posStore.receipt.receiptId) {
-    posStore.updateReceipt(posStore.receipt.receiptId, posStore.receipt);
+    posStore.receipt.receiptPromotions = [];
+    ingredientStore.ingredientCheckList = [];
+    recive.value = 0;
+    change.value = 0;
+    step.value = 1;
+    posStore.receipt.paymentMethod = '';
+    posStore.receipt.customer = null;
+    posStore.receipt.receiptId = null;
+    posStore.receipt.receiptStatus = 'รอชำระเงิน';
+
+    // Show appropriate dialog based on the actions performed
+    if (receiptCreated && stockChecked) {
+     
+      posStore.receiptDialog = true;  // Show receipt dialog
+    } else if (receiptCreated) {
+      posStore.receiptDialog = true;  // Show receipt dialog
+    
+    } else if (stockChecked) {
+      Swal.fire({
+        icon: 'success',
+        title: 'สำเร็จ',
+        text: 'การตรวจสอบสต็อกวัตถุดิบเสร็จสิ้น',
+      });
+    }
   } else {
-    posStore.createReceipt();
+    // If neither products nor ingredients are selected, show an error
+    Swal.fire({
+      icon: 'error',
+      title: 'ข้อมูลไม่สมบูรณ์',
+      text: 'กรุณาเพิ่มสินค้าหรือวัตถุดิบอย่างน้อยหนึ่งรายการ',
+    });
   }
-  posStore.selectedItems = [];
-  posStore.receipt.receiptTotalPrice = 0;
-  posStore.receipt.receiptTotalDiscount = 0;
-  posStore.receipt.receiptNetPrice = 0;
-  posStore.receipt.receiptPromotions = [];
-  posStore.receiptDialog = true;
-  recive.value = 0;
-  change.value = 0;
-  step.value = 1;
-  posStore.receipt.paymentMethod = '';
-  posStore.receipt.customer = null;
-  posStore.receipt.receiptId = null;
-  posStore.receipt.receiptStatus = 'รอชำระเงิน';
 }
+
+
+
 </script>
 
 
