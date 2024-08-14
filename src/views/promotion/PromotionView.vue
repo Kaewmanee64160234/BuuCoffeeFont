@@ -62,7 +62,8 @@
         <v-pagination
           v-model="promotionStore.currentPage"
           :length="Math.ceil(promotionStore.totalItems / promotionStore.itemsPerPage)"
-          @input="promotionStore.getPromotionsPaginate"
+          @input="promotionStore.getPromotionsPaginate "
+          rounded="circle"
         ></v-pagination>
       </v-card-text>
     </v-card>
