@@ -1,4 +1,3 @@
-
 <script lang="ts" setup>
 import { useCategoryStore } from '@/stores/category.store';
 import { useProductStore } from '@/stores/product.store';
@@ -17,11 +16,9 @@ const paginate = ref(true);
 const ingredientStore = useIngredientStore();
 
 onMounted(async () => {
-  // await productStore.getAllProducts();
   await categoryStore.getAllCategories();
   await ingredientStore.getAllIngredients();
   await productStore.getProductPaginate();
-
 });
 
 const openCreateDialog = () => {
@@ -41,15 +38,14 @@ const loadProductData = () => {
   productStore.productPrice = product.productPrice || 0;
   productStore.selectedCategoryForUpdate = product.category?.categoryName || null;
   productStore.imagePreview = product.productImage ? `${url}/products/${product.productId}/image` : null;
-  productStore.barcode = product.barcode
-  productStore.storeName = product.storeType
-  productStore.countingPoint = product.countingPoint
-  
+  productStore.barcode = product.barcode;
+  productStore.storeName = product.storeType;
+  productStore.countingPoint = product.countingPoint;
 
   if (product.productTypes && Array.isArray(product.productTypes)) {
     product.productTypes.forEach(productType => {
       if (productType.productTypeName === 'ร้อน') {
-      productStore.productTypePriceHot = productType.productTypePrice;
+        productStore.productTypePriceHot = productType.productTypePrice;
         productStore.isHot = true;
         productStore.selectedIngredientsHot = productType.recipes?.map(recipeItem => recipeItem.ingredient.IngredientId) || [];
         productStore.ingredientQuantitiesHot = productType.recipes?.reduce((acc, recipeItem) => {
@@ -97,7 +93,7 @@ const loadProductData = () => {
 const confirmDelete = async (deleteAction: () => Promise<void>) => {
   const result = await Swal.fire({
     title: 'คุณแน่ใจไหม?',
-    text: "คุณจะไม่สามารถย้อนกลัวมาแก้ไขได้อีกแล้วนะ!",
+    text: "คุณจะไม่สามารถย้อนกลับมาแก้ไขได้อีกแล้วนะ!",
     icon: 'warning',
     showCancelButton: true,
     confirmButtonColor: '#3085d6',
@@ -114,7 +110,6 @@ const confirmDelete = async (deleteAction: () => Promise<void>) => {
       icon: 'success',
       confirmButtonText: 'ตกลง'
     });
-    
   }
 };
 
@@ -139,7 +134,7 @@ const deleteProduct = async (productId: number) => {
         <v-row style="padding: 20px;"><h3>สินค้า</h3></v-row>
 
         <v-row>
-          <v-col cols="12" md="3">
+          <v-col cols="12" sm="6" md="3">
             <v-text-field 
               v-model="productStore.searchQuery" 
               label="ค้นหาสินค้า" 
@@ -174,43 +169,44 @@ const deleteProduct = async (productId: number) => {
         <v-spacer></v-spacer>
       </v-card-title>
       <v-card-text>
-        <v-table class="text-center mt-5">
-          <thead>
-            <tr>
-              <th style="text-align: center;font-weight: bold;"></th>
-              <th style="text-align: center;font-weight: bold;">รูปภาพ</th>
-              <th style="text-align: center;font-weight: bold;">ชื่อสินค้า</th>
-              <th style="text-align: center;font-weight: bold;">ประเภทสินค้า</th>
-              <th style="text-align: center;font-weight: bold;">ราคา</th>
-              <th style="text-align: center;font-weight: bold;">การกระทำ</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(item, index) in productStore.products" :key="index" style="text-align: center">
-              <td>{{ index + 1 + (productStore.currentPage - 1) * productStore.itemsPerPage }}</td>
-              <td>
-                <v-avatar size="80">
-                  <v-img :src="`${url}/products/${item.productId}/image`"></v-img>
-                </v-avatar>
-              </td>
-              <td>{{ item.productName }}</td>
-              <td>{{ item.category.categoryName }}</td>
-              <td>{{ item.productPrice }}</td>
-              <td>
-                <v-btn color="#FFDD83" icon="mdi-pencil" class="mr-2" @click="openUpdateDialog(item)">
-                </v-btn>
-                <v-btn color="#F55050" icon="mdi-delete" @click="deleteProduct(item.productId)">
-                </v-btn>
-              </td>
-            </tr>
-          </tbody>
-          <tbody v-if="!productStore.products || productStore.products.length === 0">
-            <tr>
-              <td colspan="6" class="text-center">ไม่มีข้อมูล</td>
-            </tr>
-          </tbody>
-        </v-table>
-      
+        <v-responsive>
+          <v-table class="text-center " style="width: 97%;">
+            <thead>
+              <tr>
+                <th style="text-align: center;"></th>
+                <th style="text-align: center;">รูปภาพ</th>
+                <th style="text-align: center;">ชื่อสินค้า</th>
+                <th style="text-align: center;">ประเภทสินค้า</th>
+                <th style="text-align: center;">ราคา</th>
+                <th style="text-align: center;">การกระทำ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in productStore.products" :key="index" style="text-align: center">
+                <td>{{ index + 1 + (productStore.currentPage - 1) * productStore.itemsPerPage }}</td>
+                <td>
+                  <v-avatar size="80">
+                    <v-img :src="`${url}/products/${item.productId}/image`"></v-img>
+                  </v-avatar>
+                </td>
+                <td>{{ item.productName }}</td>
+                <td>{{ item.category.categoryName }}</td>
+                <td>{{ item.productPrice }}</td>
+                <td>
+                  <v-btn color="#FFDD83" icon="mdi-pencil" class="mr-2" @click="openUpdateDialog(item)">
+                  </v-btn>
+                  <v-btn color="#F55050" icon="mdi-delete" @click="deleteProduct(item.productId)">
+                  </v-btn>
+                </td>
+              </tr>
+            </tbody>
+            <tbody v-if="!productStore.products || productStore.products.length === 0">
+              <tr>
+                <td colspan="6" class="text-center">ไม่มีข้อมูล</td>
+              </tr>
+            </tbody>
+          </v-table>
+        </v-responsive>
 
         <v-pagination justify="center" v-model="productStore.currentPage" :length="Math.ceil(productStore.totalProducts / productStore.itemsPerPage)" 
         rounded="circle"></v-pagination>
@@ -218,3 +214,31 @@ const deleteProduct = async (productId: number) => {
     </v-card>
   </v-container>
 </template>
+
+<style scoped>
+.flex-container {
+  display: flex;
+  flex-direction: column;
+  height: 95vh;
+}
+
+@media (max-width: 768px) {
+  .fit-content {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  v-table {
+    font-size: 0.8rem;
+  }
+
+  v-btn {
+    min-width: 32px;
+    height: 32px;
+  }
+
+  h3 {
+    font-size: 1.2rem;
+  }
+}
+</style>

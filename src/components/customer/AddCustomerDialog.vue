@@ -81,6 +81,7 @@ async function saveCustomer() {
                   v-model="customerName" 
                   label="ชื่อลูกค้า" 
                   :rules="[rules.required, rules.alpha]" 
+                  variant="solo"
                   required
                 ></v-text-field>
               </v-col>
@@ -89,6 +90,7 @@ async function saveCustomer() {
                   v-model="customerPhone" 
                   label="เบอร์โทรศัพท์" 
                   :rules="[rules.required, rules.phoneNumber]" 
+                  variant="solo"
                   required
                 ></v-text-field>
               </v-col>

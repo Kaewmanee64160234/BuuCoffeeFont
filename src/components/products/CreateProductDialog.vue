@@ -30,11 +30,11 @@
                   <v-row>
                     <v-col cols="12" sm="12">
                       <v-img v-if="imagePreview" :src="imagePreview" max-height="100"
-                        style="border-radius: 50%;"></v-img>
+                        style="border-radius: 50%;" ></v-img>
                     </v-col>
                     <v-col cols="12" sm="12">
                       <v-file-input v-model="productImage" label="รูปภาพสินค้า" prepend-icon="mdi-camera"
-                        accept="image/*" @change="handleImageUpload" />
+                        accept="image/*" variant="solo" @change="handleImageUpload" />
                     </v-col>
                     <v-col cols="12" sm="6">
                       <v-text-field variant="solo" v-model="productName" label="ชื่อสินค้า" :rules="nameRules" required />
@@ -46,14 +46,14 @@
 
                       <v-select v-model="selectedCategory"
                         :items="categoryStore.categoriesForCreate.map(category => category.categoryName)"
-                        label="เลือกหมวดหมู่" dense @change="checkCategory" />
+                        label="เลือกหมวดหมู่" dense variant="solo" @change="checkCategory" />
                     </v-col>
 
                     <v-col cols="12" sm="6">
                       <v-text-field variant="solo" v-model="barcode" label="บาร์โค้ด" />
                     </v-col>
                     <v-col cols="12" sm="6">
-                      <v-select v-model="storeName" :items="storeNames" label="เลือกชื่อร้าน" dense />
+                      <v-select variant="solo" v-model="storeName" :items="storeNames" label="เลือกชื่อร้าน" dense />
                     </v-col>
                     <v-col cols="12" sm="6">
                       <v-checkbox v-model="productStore.product.countingPoint" label="นับแต้ม" />

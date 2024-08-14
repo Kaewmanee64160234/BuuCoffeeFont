@@ -143,6 +143,7 @@ function closeDialog() {
                   v-model="userName"
                   label="ชื่อผู้ใช้"
                   :rules="[rules.required, rules.userName]"
+                  variant="solo"
                   required
                 ></v-text-field>
               </v-col>
@@ -154,6 +155,7 @@ function closeDialog() {
                   :rules="[rules.required, rules.password]"
                   required
                   :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
+                  variant="solo"
                   @click:append="show = !show"
                 ></v-text-field>
               </v-col>
@@ -162,6 +164,7 @@ function closeDialog() {
                   v-model="userEmail"
                   label="อีเมล"
                   :rules="[rules.required, rules.email]"
+                  variant="solo"
                   required
                 ></v-text-field>
               </v-col>
@@ -171,6 +174,7 @@ function closeDialog() {
                   label="สถานะผู้ใช้งาน"
                   :items="['ลาออกแล้ว', 'ยังไม่ลาออก']"
                   :rules="[rules.required]"
+                  variant="solo"
                   required
                 ></v-select>
               </v-col>
@@ -180,6 +184,7 @@ function closeDialog() {
                   label="ตำแหน่งงาน"
                   :items="['พนักงานขายกาแฟ', 'พนักงานขายข้าว', 'ผู้จัดการร้าน']"
                   :rules="[rules.required]"
+                  variant="solo"
                   required
                 ></v-select>
               </v-col>

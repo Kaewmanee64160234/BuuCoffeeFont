@@ -13,6 +13,7 @@
                   v-model="toppingStore.topping!.toppingName"
                   label="ชื่อท็อปปิ้ง"
                   :rules="[rules.required, rules.name]"
+                  variant="solo"
                   required
                 ></v-text-field>
               </v-col>
@@ -22,6 +23,7 @@
                   label="ราคาท็อปปิ้ง"
                   type="number"
                   :rules="[rules.required, rules.price]"
+                  variant="solo"
                   required
                 ></v-text-field>
               </v-col>

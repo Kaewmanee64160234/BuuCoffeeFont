@@ -9,10 +9,10 @@
           <v-form ref="form">
             <v-row>
               <v-col cols="12" md="12">
-                <v-text-field v-model="customerName" label="ชื่อลูกค้า" required></v-text-field>
+                <v-text-field v-model="customerName" label="ชื่อลูกค้า" variant="solo" required></v-text-field>
               </v-col>
               <v-col cols="12" md="12">
-                <v-text-field v-model="customerPhone" label="เบอร์โทรศัพท์" required></v-text-field>
+                <v-text-field v-model="customerPhone" label="เบอร์โทรศัพท์" variant="solo" required></v-text-field>
               </v-col>
             </v-row>
           </v-form>
