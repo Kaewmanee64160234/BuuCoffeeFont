@@ -6,7 +6,7 @@
         <!-- First Row: Date and Status -->
         <v-row>
           <v-col cols="6">
-            <span>บันทึกการสั่งซื้อ วันที่ {{ formattedReceiptDate }} เวลา {{ formattedReceiptTime }}</span>
+            <span>บันทึกการรับรองการจัดเลี้ยง วันที่ {{ formattedReceiptDate }} เวลา {{ formattedReceiptTime }}</span>
           </v-col>
           <v-col cols="6" class="text-right">
             <span v-if="receiptStore.receipt?.receiptStatus === 'cancel'">
@@ -54,7 +54,10 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, index) in receiptStore.receipt?.receiptItems" :key="index">
+              <tr v-if="!receiptStore.receipt?.receiptItems?.length">
+                <td colspan="8" class="text-center">ไม่มีข้อมูล</td>
+              </tr>
+              <tr v-else v-for="(item, index) in receiptStore.receipt?.receiptItems" :key="index">
                 <td class="text-center">{{ item.product?.productName || 'ไม่มีข้อมูล' }}</td>
                 <td class="text-center">{{ item.sweetnessLevel ? item.sweetnessLevel + '%' : '0%' }}</td>
                 <td class="text-center">
@@ -86,8 +89,18 @@
           </v-table>
 
           <div class="text-right" style="margin-top: 20px;">
-            <strong>ราคารวมสุทธิ</strong>
-            <span>{{ receiptStore.receipt?.receiptTotalPrice || 0 }} บาท</span>
+            <strong>ราคารวมสุทธิ:</strong>
+            <span>{{ receiptStore.receipt?.receiptNetPrice || 0 }} บาท</span>
+          </div>
+
+          <div class="text-right" style="margin-top: 10px;">
+            <strong>จำนวนเงินที่ได้รับ:</strong>
+            <span>{{ receiptStore.receipt?.receive || 0 }} บาท</span>
+          </div>
+
+          <div class="text-right" style="margin-top: 10px;">
+            <strong>เงินทอน:</strong>
+            <span>{{ receiptStore.receipt?.change || 0 }} บาท</span>
           </div>
 
           <!-- Next Button to show ingredient check -->
@@ -98,14 +111,7 @@
       </v-card-text>
 
       <!-- Step 2: Show Ingredient Check -->
-      <v-card-title v-if="showIngredientStep">
-        <v-row justify="center" align="center">
-          <v-icon color="primary" style="font-size: 30px;">mdi-calendar-month</v-icon>
-          <strong style="font-size: 18px; margin-left: 8px;">
-            รายละเอียดใบเช็ควัตถุดิบ วันที่ {{ formattedReceiptDate }}
-          </strong>
-        </v-row>
-      </v-card-title>
+    
 
       <v-card-text v-if="showIngredientStep">
         <v-card>
@@ -115,7 +121,6 @@
               <strong style="font-size: 18px; margin-left: 8px;">รายละเอียดใบเช็ควัตถุดิบ วันที่ : {{
                 formatDate(ingredientStore.checkingredient?.date) }}</strong>
             </v-row>
-
 
             <v-row>
               <v-col style="padding-top: 4px;">
@@ -146,18 +151,19 @@
 
           <v-divider></v-divider>
 
-
           <v-table class="text-center mt-5">
             <thead>
               <tr>
                 <th class="column-header text-center">ลำดับ</th>
                 <th class="column-header text-center">ชื่อวัตถุดิบ</th>
                 <th class="column-header text-center">จำนวน</th>
-
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, index) in ingredientStore.checkingredient?.checkingredientitem"
+              <tr v-if="!ingredientStore.checkingredient?.checkingredientitem?.length">
+                <td colspan="3" class="text-center">ไม่มีข้อมูล</td>
+              </tr>
+              <tr v-else v-for="(item, index) in ingredientStore.checkingredient?.checkingredientitem"
                 :key="item.CheckIngredientsItemID">
                 <th class="column-header text-center">{{ index + 1 }}</th>
                 <td>{{ item.ingredient.ingredientName }}</td>
@@ -176,6 +182,9 @@
     </v-card>
   </v-dialog>
 </template>
+
+
+
 
 <script lang="ts" setup>
 import { ref, computed, onMounted } from 'vue';

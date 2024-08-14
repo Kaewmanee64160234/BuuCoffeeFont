@@ -195,7 +195,7 @@ const saveChanges = async () => {
 
 const closeEditDialog = () => {
   editDialog.value = false;
-  posStore.receipt = null;
+  // posStore.receipt = null;
 };
 
 </script>
@@ -205,133 +205,162 @@ const closeEditDialog = () => {
 
   <!-- Edit Receipt Dialog -->
   <v-dialog v-model="editDialog" max-width="500px">
-    <v-card>
-      <v-card-title>
-        <span>แก้ไขใบเสร็จ</span>
-      </v-card-title>
-      <v-card-text>
-        <v-container>
-          <v-text-field
-            v-model="posStore.receipt.receive"
-            label="จำนวนเงินที่ได้รับ"
-            type="number"
-            @input="updateChange"
-            outlined
-            dense
-          />
-          <v-text-field
-            v-model="posStore.receipt.change"
-            label="เงินทอน"
-            type="number"
-            readonly
-            outlined
-            dense
-          />
-        </v-container>
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="primary" @click="saveChanges">บันทึก</v-btn>
-        <v-btn color="secondary" @click="closeEditDialog">ยกเลิก</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
-
-  <v-container>
-    <v-card class="flex-container">
-      <v-card-title>
+  <v-card>
+    <v-card-title>
+      <span>แก้ไขใบเสร็จ</span>
+    </v-card-title>
+    <v-card-text>
+      <v-container>
+        <!-- Display the total net price as plain text -->
         <v-row>
-          <v-col cols="9" style="padding: 20px;">
-            <h3>ประวัติการขาย (ร้านจัดเลี้ยง)</h3>
+          <v-col cols="6">
+            <span>ราคารวมสุทธิ:</span>
           </v-col>
-          <v-row>
-            <v-col cols="12" md="4" style="margin-left: 1%;">
-              <v-text-field
-                v-model="startDate"
-                label="Start Date"
-                type="date"
-                outlined
-                dense
-                hide-details
-                variant="solo"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="12" md="4">
-              <v-text-field
-                v-model="endDate"
-                label="End Date"
-                type="date"
-                outlined
-                dense
-                hide-details
-                variant="solo"
-              ></v-text-field>
-            </v-col>
-          </v-row>
-          <v-row class="mt-4 mr-2" justify="end">
-            <v-btn @click="fetchData" color="primary" class="mr-2">
-              โหลดข้อมูล
-            </v-btn>
-            <v-btn @click="exportToExcel" color="success">
-              Export to Excel
-            </v-btn>
-          </v-row>
+          <v-col cols="6" class="text-right">
+            <span>{{ posStore.receipt.receiptNetPrice }} บาท</span>
+          </v-col>
         </v-row>
-        <v-spacer></v-spacer>
-      </v-card-title>
 
-      <v-table class="mx-auto" style="width: 97%">
-        <thead>
-          <tr>
-            <th class="text-center font-weight: bold;"></th>
-            <th class="text-center font-weight: bold;">วันที่ออกใบเสร็จ</th>
-            <th class="text-center font-weight: bold;">สถานะใบเสร็จ</th>
-            <th class="text-center font-weight: bold;">ราคารวมสุทธิ</th>
-            <th class="text-center font-weight: bold;">ส่วนลด</th>
-            <th class="text-center font-weight: bold;">สมาชิก</th>
-            <th class="text-center">โปรโมชั่น</th>
-            <th class="text-center">รูปแบบการจ่ายเงิน</th>
-            <th class="text-center">พนักงาน</th>
-            <th class="text-center">การกระทำ</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(receipt, index) in filteredReceipts" :key="receipt.receiptId">
-            <td class="text-center">{{ index + 1 }}</td>
-            <td class="text-center">{{ formatDate(receipt.createdDate + '') }}</td>
-            <td class="text-center">
-              <span :class="statusClass(receipt.receiptStatus)">
-                {{ statusText(receipt.receiptStatus) }}
-              </span>
-            </td>
-            <td class="text-center">{{ receipt.receiptNetPrice }}</td>
-            <td class="text-center">{{ receipt.receiptTotalDiscount }}</td>
-            <td class="text-center">{{ receipt.customer?.customerName || '-' }}</td>
-            <td class="text-center">
-              <span v-if="receipt.receiptPromotions && receipt.receiptPromotions.length > 0">
-                มีการใช้โปรโมชั่น
-              </span>
-              <span v-else>-</span>
-            </td>
-            <td class="text-center">{{ receipt.paymentMethod || '-' }}</td>
-            <td class="text-center">{{ receipt.user?.userName }}</td>
-            <td class="text-center">
-              <v-btn
-                v-if="receipt.receiptStatus !== 'paid'"
-                color="#FFDD83"
-                icon="mdi-pencil"
-                @click="openEditDialog(receipt)"
-              ></v-btn>
-              <v-btn color="#FFDD83" icon="mdi-eye" @click="openHistoryReceiptDialog(receipt)"></v-btn>
-            </td>
-          </tr>
-          <tr v-if="!filteredReceipts.length">
-            <td colspan="10" class="text-center">No data</td>
-          </tr>
-        </tbody>
-      </v-table>
-    </v-card>
-  </v-container>
+        <!-- Input field for the received amount -->
+        <v-text-field
+          v-model="posStore.receipt.receive"
+          label="จำนวนเงินที่ได้รับ"
+          type="number"
+          @input="updateChange"
+          outlined
+          dense
+          :rules="[v => !!v || 'กรุณากรอกจำนวนเงินที่ได้รับ']"
+        />
+
+        <!-- Display the calculated change as plain text -->
+        <v-row>
+          <v-col cols="6">
+            <span>เงินทอน:</span>
+          </v-col>
+          <v-col cols="6" class="text-right">
+            <span>{{ posStore.receipt.change }} บาท</span>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-card-text>
+    <v-card-actions>
+      <v-spacer></v-spacer>
+      <v-btn 
+        color="primary" 
+        @click="saveChanges" 
+        :disabled="!posStore.receipt.receive"
+      >
+        บันทึก
+      </v-btn>
+      <v-btn color="secondary" @click="closeEditDialog">ยกเลิก</v-btn>
+    </v-card-actions>
+  </v-card>
+</v-dialog>
+
+
+<v-container>
+  <v-card class="flex-container">
+    <v-card-title>
+      <v-row>
+        <v-col cols="9" style="padding: 20px;">
+          <h3>ประวัติการขาย (ร้านจัดเลี้ยง)</h3>
+        </v-col>
+        <v-row>
+          <v-col cols="12" md="4" style="margin-left: 1%;">
+            <v-text-field
+              v-model="startDate"
+              label="Start Date"
+              type="date"
+              outlined
+              dense
+              hide-details
+              variant="solo"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" md="4">
+            <v-text-field
+              v-model="endDate"
+              label="End Date"
+              type="date"
+              outlined
+              dense
+              hide-details
+              variant="solo"
+            ></v-text-field>
+          </v-col>
+        </v-row>
+        <v-row class="mt-4 mr-2" justify="end">
+          <v-btn @click="fetchData" color="primary" class="mr-2">
+            โหลดข้อมูล
+          </v-btn>
+          <v-btn @click="exportToExcel" color="success">
+            Export to Excel
+          </v-btn>
+        </v-row>
+      </v-row>
+      <v-spacer></v-spacer>
+    </v-card-title>
+
+    <v-table class="mx-auto" style="width: 97%">
+      <thead>
+        <tr>
+          <th class="text-center font-weight: bold;">#</th>
+          <th class="text-center font-weight: bold;">วันที่ออกใบเสร็จ</th>
+          <th class="text-center font-weight: bold;">สถานะใบเสร็จ</th>
+          <th class="text-center font-weight: bold;">ราคารวมสุทธิ</th>
+          <th class="text-center font-weight: bold;">ส่วนลด</th>
+          <th class="text-center font-weight: bold;">สมาชิก</th>
+          <th class="text-center">โปรโมชั่น</th>
+          <th class="text-center">รูปแบบการจ่ายเงิน</th>
+          <th class="text-center">พนักงาน</th>
+          <th class="text-center">ดู</th>
+          <th class="text-center">แก้ไข</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(receipt, index) in filteredReceipts" :key="receipt.receiptId">
+          <td class="text-center">{{ index + 1 }}</td>
+          <td class="text-center">{{ formatDate(receipt.createdDate + '') }}</td>
+          <td class="text-center">
+            <span :class="statusClass(receipt.receiptStatus)">
+              {{ statusText(receipt.receiptStatus) }}
+            </span>
+          </td>
+          <td class="text-center">{{ receipt.receiptNetPrice }}</td>
+          <td class="text-center">{{ receipt.receiptTotalDiscount }}</td>
+          <td class="text-center">{{ receipt.customer?.customerName || '-' }}</td>
+          <td class="text-center">
+            <span v-if="receipt.receiptPromotions && receipt.receiptPromotions.length > 0">
+              มีการใช้โปรโมชั่น
+            </span>
+            <span v-else>-</span>
+          </td>
+          <td class="text-center">{{ receipt.paymentMethod || '-' }}</td>
+          <td class="text-center">{{ receipt.user?.userName }}</td>
+          <td class="text-center">
+            <v-btn
+              :disabled="receipt.receiptStatus === 'paid'"
+              color="warning"
+              icon="mdi-pencil"
+              @click="openEditDialog(receipt)"
+            ></v-btn>
+          </td>
+          <td class="text-center">
+            <v-btn
+              color="primary"
+              icon="mdi-eye"
+              @click="openHistoryReceiptDialog(receipt)"
+            ></v-btn>
+          </td>
+        </tr>
+        <tr v-if="!filteredReceipts.length">
+          <td colspan="10" class="text-center">No data</td>
+        </tr>
+      </tbody>
+    </v-table>
+  </v-card>
+</v-container>
+
 </template>
 
 
