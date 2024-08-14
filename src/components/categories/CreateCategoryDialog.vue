@@ -6,6 +6,13 @@
       </v-card-title>
       <v-card-text>
         <v-container>
+          <v-row v-if="!categoryName ">
+              <v-col cols="12">
+                <v-alert type="warning" border="left" color="warning" elevation="2">
+                  กรุณากรอกข้อมูล [ ชื่อหมวดหมู่ ] 
+                </v-alert>
+              </v-col>
+            </v-row>
           <v-form ref="form" v-model="valid">
             <v-row>
               <v-col cols="12">
@@ -100,5 +107,25 @@ const submitForm = async () => {
 <style scoped>
 .swal-button {
   font-size: 16px;
+}
+.v-table-container {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-top: 16px;
+}
+
+.v-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.v-table th,
+.v-table td {
+  width: 25%;
+}
+
+.v-card-title {
+  background-color: #f5f5f5;
+  padding: 16px;
 }
 </style>

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {onMounted } from 'vue';
+import { onMounted } from 'vue';
 import { useReportFinnceStore } from '@/stores/report/finance.store';
 
 const ReportFinnceStore = useReportFinnceStore();
@@ -80,4 +80,26 @@ onMounted(async () => {
 .red-cell {
   color: red;
 }
+
+.v-table-container {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-top: 16px;
+}
+
+.v-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.v-table th,
+.v-table td {
+  width: 25%;
+}
+
+.v-card-title {
+  background-color: #f5f5f5;
+  padding: 16px;
+}
+
 </style>
