@@ -10,9 +10,7 @@ const receiptStore = useReceiptStore();
 const posStore = usePosStore();
 
 
-onMounted(async () => {
-  await receiptStore.getRecieptIn30Min();
-});
+
 
 const cancelReceipt = async (receipt:Receipt) => {
   // dialog close

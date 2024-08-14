@@ -352,7 +352,7 @@ export const usePosStore = defineStore("pos", () => {
       saveQueueListToLocalStorage();
       await customerStore.getAllCustomers();
     }
-    await receiptStore.getRecieptIn30Min();
+    await receiptStore.getRecieptCateringIn24Hours();
   };
 
   const applyPromotion = (promotion: Promotion) => {
@@ -641,6 +641,25 @@ export const usePosStore = defineStore("pos", () => {
     }
     await receiptStore.getRecieptIn30Min();
   };
+  // ipdateReceiptCatering
+  const updateReceiptCatering = async (id: number, receipt: Receipt) => {
+    console.log("updateReceipt", JSON.stringify(receipt));
+    if(receipt.receive != 0){
+      receipt.receiptStatus = "paid";
+   
+
+    }
+
+    // const res = await receiptService.updateReceipt(id, receipt);
+    // if (res.status === 200) {
+    //   // console.log("Receipt updated successfully", res.data);
+    
+    //   currentReceipt.value = res.data;
+    //   await customerStore.getAllCustomers();
+    //   // await receiptStore.getRecieptIn30Min();
+    // }
+    await receiptStore.getRecieptCateringIn24Hours();
+  };
 
   function saveQueueListToLocalStorage() {
     localStorage.setItem("queueReceipt", JSON.stringify(queueReceipt.value));
@@ -677,5 +696,6 @@ export const usePosStore = defineStore("pos", () => {
     loadQueueNumber,
     saveQueueListToLocalStorage,
     createReceiptForCatering,
+    updateReceiptCatering
   };
 });

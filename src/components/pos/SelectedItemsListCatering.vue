@@ -5,12 +5,11 @@ import Swal from 'sweetalert2';
 import type { ReceiptItem } from '../../types/receipt.type';
 import { useReceiptStore } from '@/stores/receipt.store';
 import { useIngredientStore } from '@/stores/Ingredient.store'; // Assuming you have an ingredient store
+import ReceiptDetailsDialogPos from '../receipts/ReceiptDialogPos.vue';
 
 const step = ref(1);
 const posStore = usePosStore();
 const selectedItems = computed(() => posStore.selectedItems);
-const recive = ref(0);
-const change = ref(0);
 const receiptStore = useReceiptStore();
 const ingredientStore = useIngredientStore(); // Assuming this is the correct import for ingredients
 const selectedCategory = ref('Products');
@@ -18,7 +17,7 @@ const ingredientFilters = ref<any[]>([]); // To store filtered ingredients
 const url = import.meta.env.VITE_URL_PORT
 
 onMounted(async () => {
-  await receiptStore.getRecieptIn30Min();
+  await receiptStore.getRecieptCateringIn24Hours();
   await ingredientStore.getAllIngredients(); // Load all ingredients (assuming this method exists)
 
   // Filter ingredients or products based on selectedCategory
@@ -63,11 +62,11 @@ function removeItem(index: number) {
 
 function calculateChange() {
   if (posStore.receipt.paymentMethod === 'cash') {
-    change.value = recive.value - posStore.receipt.receiptNetPrice;
+    posStore.receipt.change = posStore.receipt.receive - posStore.receipt.receiptNetPrice;
   }
 }
 
-watch(() => recive.value, () => {
+watch(() => posStore.receipt.receive, () => {
   calculateChange();
 });
 
@@ -137,7 +136,7 @@ async function save() {
     }
 
     // Ensure received amount is sufficient for cash payments
-    if (posStore.receipt.paymentMethod === 'cash' && recive.value < posStore.receipt.receiptNetPrice && recive.value != 0) {
+    if (posStore.receipt.paymentMethod === 'cash' && posStore.receipt.receive < posStore.receipt.receiptNetPrice && posStore.receipt.receive != 0) {
       Swal.fire({
         icon: 'error',
         title: 'จำนวนเงินไม่เพียงพอ',
@@ -150,7 +149,7 @@ async function save() {
     let stockChecked = false;
 
     if (posStore.receipt.receiptId) {
-      await posStore.updateReceipt(posStore.receipt.receiptId, posStore.receipt);
+      await posStore.updateReceiptCatering(posStore.receipt.receiptId, posStore.receipt);
       receiptCreated = true;
     } else {
       if (selectedItems.value.length > 0) {
@@ -170,8 +169,8 @@ async function save() {
     posStore.receipt.receiptNetPrice = 0;
     posStore.receipt.receiptPromotions = [];
     ingredientStore.ingredientCheckList = [];
-    recive.value = 0;
-    change.value = 0;
+    posStore.receipt.receive = 0;
+    posStore.receipt.change = 0;
     step.value = 1;
     posStore.receipt.paymentMethod = '';
     posStore.receipt.customer = null;
@@ -202,13 +201,18 @@ async function save() {
   }
 }
 
-
-
+function openReceiptDialog() {
+  posStore.ReceiptDialogPos = true;
+  console.log(" openReceiptDialog ", posStore.ReceiptDialogPos);
+}
 </script>
 
 
 
 <template>
+  <ReceiptDetailsDialogPos />
+  
+
   <div class="h-screen app">
 
     <v-window v-model="step" transition="fade" class="h-screen">
@@ -219,6 +223,15 @@ async function save() {
             <div class="d-flex justify-space-between align-center">
               <h3>รายละเอียดการจัดเลี้ยงรับรอง</h3>
             </div>
+            <v-row class="d-flex align-center justify-start mt-4">
+            
+          
+                <v-btn class="mb-2" color="#ff9800" @click="openReceiptDialog()"
+                  style="border-radius: 8px; background-color: #FF9642;">
+                  ประวัติการสั่งซื้อ
+                </v-btn>
+         
+            </v-row>
 
             <v-divider class="my-2"></v-divider>
 
@@ -367,9 +380,9 @@ async function save() {
                 <!-- Change Amount -->
                 <p class="d-flex justify-space-between pr-6 my-2">
                   <span>คงเหลือจากการเบิก:</span>
-                  <span :class="recive < 0 || recive < posStore.receipt.receiptNetPrice ? 'red--text' : 'black'"
+                  <span :class="posStore.receipt.receive < 0 || posStore.receipt.receive < posStore.receipt.receiptNetPrice ? 'red--text' : 'black'"
                     class="info-value">
-                    {{ parseFloat(change.toFixed(2)) < 0 ? 'จำนวนเงินไม่พอ' : change.toFixed(2) }} </span>
+                    {{ parseFloat(posStore.receipt.change.toFixed(2)) < 0 ? 'จำนวนเงินไม่พอ' : posStore.receipt.change.toFixed(2) }} </span>
                 </p>
 
                 <v-divider></v-divider>
