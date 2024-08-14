@@ -8,7 +8,8 @@ export const useCheckIngredientStore = defineStore(
   () => {
     const CheckIngredientsHistory = ref<Checkingredient[]>([]);
     const dialogCheckItem = ref(false);
-    const selectedItems = ref([]);
+    const checkingredient = ref<Checkingredient | null>(null);
+    const actionType = ref<string>('');
 
     const getAllHistortIngredients = async () => {
       try {
@@ -20,11 +21,22 @@ export const useCheckIngredientStore = defineStore(
           console.error(error);
       }
   };
-
+  const getHistoryCheckById = async (id: number) => {
+    try {
+      const response = await ingredientService.getHistoryCheckById(id);
+      if (response.status === 200) {
+        checkingredient.value = response.data;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return {
     CheckIngredientsHistory,
     getAllHistortIngredients,
-    selectedItems,
+    getHistoryCheckById,
+    checkingredient,
     dialogCheckItem,
+    actionType,
   };
 });
