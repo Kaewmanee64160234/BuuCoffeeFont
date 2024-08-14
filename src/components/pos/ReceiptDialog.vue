@@ -65,14 +65,24 @@
               Total:
               <span class="float-right">{{ posStore.currentReceipt?.receiptTotalPrice }} ฿</span>
             </p>
+
             <p class="discount">
               Discount:
               <span class="float-right">{{ posStore.currentReceipt?.receiptTotalDiscount }} ฿</span>
+            </p>
+            <p class="received">
+              Received:
+              <span class="float-right">{{ posStore.currentReceipt?.receive }} ฿</span>
+            </p>
+            <p class="change">
+              Change:
+              <span class="float-right">{{ posStore.currentReceipt?.change}} ฿</span>
             </p>
             <p class="net-total">
               Net Total:
               <span class="float-right">{{ posStore.currentReceipt?.receiptNetPrice }} ฿</span>
             </p>
+           
           </div>
           <div class="dashed-line"></div>
           <div class="receipt-footer text-center">
@@ -88,6 +98,7 @@
     </v-card>
   </v-dialog>
 </template>
+
 
 <script lang="ts" setup>
 import { usePosStore } from '@/stores/pos.store';
@@ -194,7 +205,9 @@ const formattedTime = computed(() => {
 
 .total,
 .discount,
-.net-total {
+.net-total,
+.received,
+.change {
   font-weight: bold;
 }
 

@@ -151,6 +151,13 @@ export const useIngredientStore = defineStore("ingredient", () => {
     if (!exists) {
       ingredientCheckList.value.push({ ingredientcheck: item, count: 1 });
     }
+    if(exists) {
+      const index = ingredientCheckList.value.findIndex(
+        (ingredient) =>
+          ingredient.ingredientcheck.ingredientId === item.ingredientId
+      );
+      ingredientCheckList.value[index].count += 1;
+    }
   }
 
   function removeIngredient(index: number) {
@@ -245,6 +252,10 @@ export const useIngredientStore = defineStore("ingredient", () => {
       console.error('Error saving check data:', error);
     }
   }
+
+
+
+
   async function saveIngredient() {
     loadingStore.isLoading = true;
     

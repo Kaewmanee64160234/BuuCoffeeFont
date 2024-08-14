@@ -14,6 +14,7 @@ onMounted(async () => {
 });
 
 const formatDate = (dateString: string) => {
+
     const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', timeZone: 'UTC' };
     return new Date(dateString).toLocaleDateString('th-TH', options);
 };
@@ -21,6 +22,7 @@ const formatDate = (dateString: string) => {
 const navigateTo = (routeName: string) => {
     router.push({ name: routeName });
 };
+
 const openHistoryCheckDialog = (checkingredient: Checkingredient) => {
     ingredientStore.checkingredient = checkingredient;
     ingredientStore.dialogCheckItem = true;
@@ -100,6 +102,14 @@ function exportToExcel(checkingredient: Checkingredient) {
                     <tr v-for="(item, index) in ingredientStore.CheckIngredientsHistory" :key="index">
                         <td>{{ index + 1 }}</td>
                         <td>{{ formatDate(item.date) }}</td>
+<<<<<<< HEAD
+                        <td>{{ item.user.userName }}</td>
+                        <td>
+                            <v-btn color="#FFDD83" class="mr-2" icon="mdi-pencil"
+                                @click="showDetail(item.checkingredientitem)">ดู</v-btn>
+
+                        </td>
+=======
                         <td
                             :style="{ color: item.actionType === 'issuing' ? 'red' : (item.actionType === 'check' ? '#CCCC00' : 'green') }">
                             {{ item.actionType === 'issuing' ? 'นำวัตถุดิบออก' : (item.actionType === 'check' ?
@@ -118,6 +128,7 @@ function exportToExcel(checkingredient: Checkingredient) {
                             </v-btn>
                         </td>
 
+>>>>>>> d7d6bbf2d701166f9f08ed7f343ee52cb290632d
                     </tr>
                 </tbody>
             </v-table>

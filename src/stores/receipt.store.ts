@@ -77,6 +77,19 @@ export const useReceiptStore = defineStore("receipt", () => {
 
 
   };
+
+  // get recipt Catering in 24 hours
+  const getRecieptCateringIn24Hours = async () => {
+    try {
+      const response = await receiptService.getRecieptCateringIn24Hours();
+      if (response.status === 200) {
+        receipts.value = response.data;
+        console.log("receipts", receipts.value);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 // cancelReceipt
   const cancelReceipt = async (id: number) => {
     try {
@@ -100,6 +113,7 @@ export const useReceiptStore = defineStore("receipt", () => {
     historyReceiptDialog,
     filteredReceipts,
     getRecieptIn30Min,
-    cancelReceipt
+    cancelReceipt,
+    getRecieptCateringIn24Hours
   };
 });

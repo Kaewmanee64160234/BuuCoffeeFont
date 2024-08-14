@@ -197,6 +197,7 @@ const statusText = (status: string) => {
               <v-radio-group v-model="receiptType" row>
                 <v-radio label="ร้านข้าว" value="ร้านข้าว"></v-radio>
                 <v-radio label="ร้านกาแฟ" value="ร้านกาแฟ"></v-radio>
+                <v-radio label="ร้านเลี้ยงรับรอง" value="ร้านเลี้ยงรับรอง"></v-radio>
               </v-radio-group>
             </v-col>
           </v-row>
