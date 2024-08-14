@@ -283,8 +283,7 @@ export const usePosStore = defineStore("pos", () => {
     let receiptStatus = "";
     if (userStore.currentUser?.userRole == "พนักงานขายกาแฟ") {
       receiptStatus = "ร้านกาแฟ";
-    }
-    else {
+    } else {
       receiptStatus = "ร้านข้าว";
     }
     if (currentReceipt.value?.queueNumber !== undefined) {
@@ -293,7 +292,6 @@ export const usePosStore = defineStore("pos", () => {
       receipt.value.receiptStatus = "paid";
       receipt.value.createdDate = new Date();
       receipt.value.queueNumber = currentReceipt.value?.queueNumber + 1;
-
     } else {
       receipt.value.receiptItems = selectedItems.value;
       receipt.value.receiptType = receiptStatus;
@@ -318,18 +316,25 @@ export const usePosStore = defineStore("pos", () => {
     await receiptStore.getRecieptIn30Min();
   };
   const createReceiptForCatering = async () => {
-    const  receiptStatus = "ร้านจัดเลี้ยง";
+    const receiptStatus = "ร้านจัดเลี้ยง";
     if (currentReceipt.value?.queueNumber !== undefined) {
       receipt.value.receiptItems = selectedItems.value;
       receipt.value.receiptStatus = receiptStatus;
-    
-      receipt.value.receiptStatus = "paid";
+      if (receipt.value.receive != 0) {
+        receipt.value.receiptStatus = "paid";
+      } else {
+        receipt.value.receiptStatus = "unpaid";
+      }
       receipt.value.createdDate = new Date();
       receipt.value.queueNumber = currentReceipt.value?.queueNumber + 1;
     } else {
       receipt.value.receiptItems = selectedItems.value;
       receipt.value.receiptType = receiptStatus;
-      receipt.value.receiptStatus = "paid";
+      if (receipt.value.receive != 0) {
+        receipt.value.receiptStatus = "paid";
+      } else {
+        receipt.value.receiptStatus = "unpaid";
+      }
       receipt.value.createdDate = new Date();
       receipt.value.queueNumber = queueNumber.value;
     }
@@ -338,7 +343,6 @@ export const usePosStore = defineStore("pos", () => {
     if (receipt.value.receive != 0) {
       receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice;
     }
-
 
     const res = await receiptService.createReceipt(receipt.value);
     if (res.status === 201) {
@@ -639,12 +643,8 @@ export const usePosStore = defineStore("pos", () => {
   };
 
   function saveQueueListToLocalStorage() {
-    localStorage.setItem('queueReceipt', JSON.stringify(queueReceipt.value));
+    localStorage.setItem("queueReceipt", JSON.stringify(queueReceipt.value));
   }
-
-
-  
-  
 
   return {
     selectedItems,
@@ -676,6 +676,6 @@ export const usePosStore = defineStore("pos", () => {
     queueReceipt,
     loadQueueNumber,
     saveQueueListToLocalStorage,
-    createReceiptForCatering
+    createReceiptForCatering,
   };
 });
