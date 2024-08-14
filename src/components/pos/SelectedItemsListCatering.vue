@@ -2,7 +2,7 @@
 import { ref, computed, watch, onMounted } from 'vue';
 import { usePosStore } from '@/stores/pos.store';
 import Swal from 'sweetalert2';
-import type {  ReceiptItem } from '../../types/receipt.type';
+import type { ReceiptItem } from '../../types/receipt.type';
 import { useReceiptStore } from '@/stores/receipt.store';
 import { useIngredientStore } from '@/stores/Ingredient.store'; // Assuming you have an ingredient store
 
@@ -15,6 +15,7 @@ const receiptStore = useReceiptStore();
 const ingredientStore = useIngredientStore(); // Assuming this is the correct import for ingredients
 const selectedCategory = ref('Products');
 const ingredientFilters = ref<any[]>([]); // To store filtered ingredients
+const url = import.meta.env.VITE_URL_PORT
 
 onMounted(async () => {
   await receiptStore.getRecieptIn30Min();
@@ -66,20 +67,8 @@ function calculateChange() {
   }
 }
 
-function openReceiptDialog() {
-  posStore.ReceiptDialogPos = true;
-  console.log(" openReceiptDialog ", posStore.ReceiptDialogPos);
-}
 
-function selectPaymentMethod(method: string) {
-  console.log(`Selected payment method: ${method}`);
-  posStore.receipt.paymentMethod = method;
-  if (method === 'cash') {
-    calculateChange();
-  } else {
-    change.value = 0;
-  }
-}
+
 
 watch(() => recive.value, () => {
   calculateChange();
@@ -164,7 +153,7 @@ async function save() {
               <v-list class="full-width">
                 <v-list-item-group>
                   <div v-for="(item, index) in selectedItems" :key="index" class="selected-item my-2">
-                    <v-list-item :prepend-avatar="`http://localhost:3000/products/${item.product?.productId}/image`"
+                    <v-list-item :prepend-avatar="`${url}/products/${item.product?.productId}/image`"
                       class="full-width">
                       <v-row no-gutters align="center">
                         <v-col cols="5" class="product-name">
@@ -213,35 +202,53 @@ async function save() {
 
             <!-- Ingredient Summary -->
             <h3 class="mt-4">สรุปรายการวัตถุดิบ</h3>
-            <div class="ingredient-list" >
+            <div class="ingredient-list">
               <v-list class="full-width">
                 <v-list-item-group>
-                  <div v-for="(ingredient, index) in ingredientStore.ingredientList" :key="index"
+                  <div v-for="(ingredient, index) in ingredientStore.ingredientCheckList" :key="index"
                     class="selected-item my-2">
-                    <v-list-item :prepend-avatar="`http://localhost:3000/ingredients/${ingredient.ingredientId}/image`"
+                    <v-list-item :prepend-avatar="`${url}/ingredients/${ingredient.ingredientcheck.ingredientId}/image`"
                       class="full-width">
+
                       <v-row no-gutters align="center">
                         <v-col cols="5" class="product-name">
-                          {{ ingredient.ingredient.ingredientName }}
+                          {{ ingredient.ingredientcheck.ingredientName }}
+                          <span v-if="ingredient.ingredientcheck.ingredientSupplier !== '-'">
+                            ({{ ingredient.ingredientcheck.ingredientSupplier }})
+                          </span>
                         </v-col>
+
                         <v-col cols="2" class="text-right pr-2" style="color: black;">
-                          <p>{{ ingredient.ingredient.ingredientPrice }}</p>
+                          <p>{{ ingredient.ingredientcheck.ingredientPrice }}</p>
                         </v-col>
-                        <v-col cols="5" class="ingredient-details">
-                          {{ ingredient.ingredient.ingredientSupplier }} | {{ ingredient.totalunit }} units
+                        <v-col cols="3" class="text-right pr-2">
+                          <v-btn size="xs-small" color="#C5C5C5" icon @click="decreaseQuantity(index)">
+                            <v-icon>mdi-minus</v-icon>
+                          </v-btn>
+                          <span class="pa-2">{{ ingredient.count }}</span>
+                          <v-btn size="xs-small" color="#FF9642" icon @click="increaseQuantity(index)">
+                            <v-icon>mdi-plus</v-icon>
+                          </v-btn>
+                        </v-col>
+                        <v-col cols="2" class="text-right">
+                          <v-btn icon variant="text" @click="removeItem(index)">
+                            <v-icon color="red">mdi-delete</v-icon>
+                          </v-btn>
                         </v-col>
                       </v-row>
+
                     </v-list-item>
                   </div>
                 </v-list-item-group>
               </v-list>
             </div>
 
+
             <!-- Order Summary -->
             <div class="summary-section" style="width: 100%;">
               <v-divider></v-divider>
-            
-            
+
+
             </div>
           </div>
           <div class="footer-buttons">
@@ -305,7 +312,8 @@ async function save() {
 
             <div class="footer-buttons">
               <v-row class="d-flex justify-center" style="width: 100%;">
-                <v-btn style="width: 40%; margin-right: 10px;" color="secondary" rounded @click="prevStep">ย้อนกลับ</v-btn>
+                <v-btn style="width: 40%; margin-right: 10px;" color="secondary" rounded
+                  @click="prevStep">ย้อนกลับ</v-btn>
                 <v-btn style="width: 40%;" color="#FF9642" rounded @click="save">บันทึก</v-btn>
               </v-row>
             </div>
@@ -369,7 +377,7 @@ async function save() {
 .selected-items-list,
 .ingredient-list {
   overflow-y: auto;
-  max-height: 40vh;
+  height: 35vh;
   margin-bottom: 20px;
 }
 

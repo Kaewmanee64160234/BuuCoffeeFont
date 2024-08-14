@@ -19,6 +19,8 @@ const selectedCustomer = ref('');
 const recive = ref(0);
 const change = ref(0);
 const receiptStore = useReceiptStore();
+const url = import.meta.env.VITE_URL_PORT
+
 
 onMounted(async () => {
   await receiptStore.getRecieptIn30Min();
@@ -312,7 +314,7 @@ const selectReceipt = (receipt: Receipt) => {
               <v-list class="full-width" style="height: 20vh;">
                 <v-list-item-group>
                   <div v-for="(item, index) in selectedItems" :key="index" class="selected-item full-width my-2">
-                    <v-list-item :prepend-avatar="`http://localhost:3000/products/${item.product?.productId}/image`"
+                    <v-list-item :prepend-avatar="`${url}/products/${item.product?.productId}/image`"
                       class="full-width">
                       <v-row no-gutters>
                         <v-col cols="6" class="product-name" style="color: black;">

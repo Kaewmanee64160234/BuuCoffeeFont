@@ -605,6 +605,7 @@ export const usePosStore = defineStore("pos", () => {
     localStorage.setItem('queueReceipt', JSON.stringify(queueReceipt.value));
   }
 
+
   
   
 

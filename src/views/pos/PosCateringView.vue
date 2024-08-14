@@ -12,13 +12,17 @@ import { usePosStore } from '@/stores/pos.store';
 import { useIngredientStore } from '@/stores/Ingredient.store';
 import Swal from 'sweetalert2';
 import type { Product } from '@/types/product.type';
+import SelectedItemsListCatering from '@/components/pos/SelectedItemsListCatering.vue';
 
+// Import components directly
 const productStore = useProductStore();
 const categoryStore = useCategoryStore();
 const toppingStore = useToppingStore();
 const userStore = useUserStore();
 const posStore = usePosStore();
 const ingredientStore = useIngredientStore();
+
+// Define reactive variables
 const selectedCategory = ref<string>(categoryStore.categoriesForCreate[0]?.categoryName || '');
 const productFilters = ref<Product[]>([]);
 const ingredientFilters = ref<any[]>([]);
@@ -26,8 +30,8 @@ const searchQuery = ref('');
 
 // Load products, categories, and ingredients on mount
 onMounted(async () => {
-    productFilters.value = []
-    ingredientFilters.value = []
+    productFilters.value = [];
+    ingredientFilters.value = [];
     await productStore.getAllProducts();
     await categoryStore.getAllCategories();
     await ingredientStore.getIngredients();
@@ -44,6 +48,7 @@ watch(searchQuery, () => {
     filterProducts();
 });
 
+// Filter products or ingredients based on the selected category and search query
 const filterProducts = () => {
     if (selectedCategory.value === 'Ingredients') {
         ingredientFilters.value = ingredientStore.all_ingredients.filter(ingredient =>
@@ -66,103 +71,121 @@ const filterProducts = () => {
     }
 };
 
-// Add a product to the cart
-const addToCart = (product: Product) => {
-    posStore.addToReceipt(product, null, [], 1, null);
+// ingredientList
+
+
+// Add a product or ingredient to the cart
+const addToCart = (item: Product | any) => {
+    if (selectedCategory.value === 'Ingredients') {
+        ingredientStore.Addingredienttotable(item);
+    } else {
+        posStore.addToReceipt(item, null, [], 1, null);
+    }
 };
 </script>
-
-
 <template>
     <v-app style="width: 100vw; height: 100vh; overflow: hidden;">
-        <v-row :style="{ height: '100%' }">
-            <!-- Main Interface Column -->
-            <v-col cols="7" class="d-flex flex-column align-center"
-                style="background-color: #f7f7f7; height: 100%; overflow: hidden;">
-                <v-container fluid class="full-width-container" style="height: 100%; overflow: hidden; margin-left: 6%;">
-
-                    <!-- Search Bar -->
-                    <v-row class="full-width-row" style="margin-bottom: 10px;">
-                        <v-col cols="12">
-                            <v-text-field v-model="searchQuery" append-icon="mdi-magnify" label="ค้นหา"
-                                variant="solo" dense hide-details
-                                style="background-color: #f1f1f1; border-radius: 8px;"></v-text-field>
-                        </v-col>
+      <v-row :style="{ height: '100%' }">
+        <!-- Main Interface Column -->
+        <v-col cols="7" class="d-flex flex-column align-center"
+               style="background-color: #f7f7f7; height: 100%; overflow: hidden;">
+          <v-container fluid class="full-width-container" style="height: 100%; overflow: hidden; margin-left: 6%;">
+  
+            <!-- Search Bar -->
+            <v-row class="full-width-row" style="margin-bottom: 10px;">
+              <v-col cols="12">
+                <v-text-field v-model="searchQuery" append-icon="mdi-magnify" label="ค้นหา"
+                              variant="solo" dense hide-details
+                              style="background-color: #f1f1f1; border-radius: 8px;"></v-text-field>
+              </v-col>
+            </v-row>
+  
+            <!-- Category Tabs -->
+            <v-row class="full-width-row" style="overflow: hidden; margin-bottom: 10px;">
+              <v-col cols="12">
+                <v-tabs v-model="selectedCategory" align-tabs="start" color="brown" class="full-width-tabs"
+                        background-color="#fff">
+                  <v-tab value="Ingredients">Ingredients</v-tab>
+                  <v-tab v-for="category in categoryStore.categoriesForCreate" :key="category.categoryId"
+                         :value="category.categoryName">
+                    {{ category.categoryName }}
+                  </v-tab>
+                </v-tabs>
+              </v-col>
+            </v-row>
+  
+            <!-- Product/Ingredient List -->
+            <v-row class="full-width-row product-list-container" style="flex: 1; overflow-y: auto;">
+              <v-tabs-items v-model="selectedCategory" style="width: 100%;">
+  
+                <!-- Ingredients Tab -->
+                <v-tab-item value="Ingredients">
+                  <v-container>
+                    <v-row>
+                      <v-col cols="3" style="text-align: center; padding: 8px;"
+                             v-for="(item, index) in ingredientFilters" :key="index">
+                        <v-card width="100%" @click="addToCart(item)"
+                                style="height: 200px;">
+                          <v-img
+                              :src="`http://localhost:3000/ingredients/${item.ingredientId}/image`"
+                              height="100"></v-img>
+                          <v-card-title style="font-size: 14px;">{{ item.ingredientName }}</v-card-title>
+                          <v-card-subtitle style="font-size: 12px;">{{ item.ingredientSupplier }}</v-card-subtitle>
+                        </v-card>
+                      </v-col>
                     </v-row>
-
-                    <!-- Category Tabs -->
-                    <v-row class="full-width-row" style="overflow: hidden; margin-bottom: 10px;">
-                        <v-col cols="12">
-                            <v-tabs v-model="selectedCategory" align-tabs="start" color="brown" class="full-width-tabs"
-                                background-color="#fff">
-                                <v-tab value="Ingredients">Ingredients</v-tab>
-                                <v-tab v-for="category in categoryStore.categoriesForCreate" :key="category.categoryId"
-                                    :value="category.categoryName">
-                                    {{ category.categoryName }}
-                                </v-tab>
-                            </v-tabs>
-                        </v-col>
+                  </v-container>
+                </v-tab-item>
+  
+                <!-- Products Tab -->
+                <v-tab-item value="Products">
+                  <v-container fluid class="full-width-container">
+                    <v-row class="full-width-row">
+                      <v-col v-for="product in productFilters" :key="product.productId"
+                             cols="12" sm="6" md="4" lg="3" class="d-flex">
+                        <product-card :product="product"
+                                      class="product-card"></product-card>
+                      </v-col>
                     </v-row>
-
-                    <!-- Product/Ingredient List -->
-                    <v-row class="full-width-row product-list-container" style="flex: 1; overflow-y: auto;">
-                        <v-tabs-items v-model="selectedCategory" style="width: 100%;">
-
-                            <!-- Ingredients Tab -->
-                            <v-tab-item value="Ingredients">
-                                <v-container>
-                                    <v-row>
-                                        <v-col cols="3" style="text-align: center; padding: 8px;"
-                                            v-for="(item, index) in ingredientFilters" :key="index">
-                                            <v-card width="100%" @click="ingredientStore.Addingredient(item)"
-                                                style="height: 200px;">
-                                                <v-img
-                                                    :src="`http://localhost:3000/ingredients/${item.ingredientId}/image`"
-                                                    height="100"></v-img>
-                                                <v-card-title style="font-size: 14px;">{{ item.ingredientName
-                                                    }}</v-card-title>
-                                                <v-card-subtitle style="font-size: 12px;">{{ item.ingredientSupplier
-                                                    }}</v-card-subtitle>
-                                            </v-card>
-                                        </v-col>
-                                    </v-row>
-                                </v-container>
-                            </v-tab-item>
-
-                            <!-- Products Tab -->
-                            <v-tab-item value="Products">
-                                <v-container fluid class="full-width-container">
-                                    <v-row class="full-width-row">
-                                        <v-col v-for="product in productFilters" :key="product.productId"
-                                            cols="12" sm="6" md="4" lg="3" class="d-flex">
-                                            <product-card :product="product"
-                                                class="product-card"></product-card>
-                                        </v-col>
-                                    </v-row>
-                                </v-container>
-                            </v-tab-item>
-
-                        </v-tabs-items>
-                    </v-row>
-
-                    <!-- Drink Selection Dialog -->
-                    <drink-selection-dialog></drink-selection-dialog>
-                </v-container>
-            </v-col>
-
-            <!-- Selected Items List -->
-            <v-col cols="5" class="d-flex flex-column" style="height: 100%; padding-top: 20px;">
-                <v-sheet style="height: 100%;">
-                    <selected-items-list></selected-items-list>
-                </v-sheet>
-            </v-col>
-        </v-row>
-
-        <!-- Receipt Dialog -->
-        <receipt-dialog />
+                  </v-container>
+                </v-tab-item>
+  
+              </v-tabs-items>
+            </v-row>
+  
+            <!-- Drink Selection Dialog -->
+            <drink-selection-dialog></drink-selection-dialog>
+          </v-container>
+        </v-col>
+  
+        <!-- Selected Items List -->
+        <v-col cols="5" class="d-flex flex-column" style="height: 100%; padding-top: 20px;">
+          <v-sheet style="height: 100%;">
+            <SelectedItemsListCatering></SelectedItemsListCatering>
+          </v-sheet>
+        </v-col>
+      </v-row>
+  
+      <!-- Receipt Dialog -->
+      <receipt-dialog />
     </v-app>
-</template>
-
+  </template>
+  
+  
+  <style scoped>
+  .selected-item {
+    display: flex;
+    align-items: center;
+  }
+  
+  .product-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: bold;
+  }
+  </style>
+  
 
 
 

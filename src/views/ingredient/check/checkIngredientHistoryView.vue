@@ -12,8 +12,8 @@ onMounted(async () => {
 });
 
 const formatDate = (dateString: string) => {
-  const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZone: 'UTC' };
-  return new Date(dateString).toLocaleDateString('th-TH', options);
+    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZone: 'UTC' };
+    return new Date(dateString).toLocaleDateString('th-TH', options);
 };
 
 const navigateTo = (routeName: string) => {
@@ -21,13 +21,13 @@ const navigateTo = (routeName: string) => {
 };
 
 const showDetail = (items) => {
-  ingredientStore.selectedItems = items;
-  ingredientStore.dialogCheckItem = true;
+    ingredientStore.selectedItems = items;
+    ingredientStore.dialogCheckItem = true;
 };
 </script>
 
 <template>
-    <dialogImportItem/>
+    <dialogImportItem />
     <v-container>
         <v-card>
             <v-card-title>
@@ -36,7 +36,8 @@ const showDetail = (items) => {
                         ประวัติเช็ควัตถุดิบ
                     </v-col>
                     <v-col cols="3">
-                        <v-text-field label="ค้นหาประวัติการเช็ควัตถุดิบ" append-inner-icon="mdi-magnify" hide-details dense></v-text-field>
+                        <v-text-field label="ค้นหาประวัติการเช็ควัตถุดิบ" append-inner-icon="mdi-magnify" hide-details
+                            dense></v-text-field>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -68,16 +69,17 @@ const showDetail = (items) => {
 
                 </tbody>
                 <tbody>
-    <tr v-for="(item, index) in ingredientStore.CheckIngredientsHistory" :key="index">
-        <td>{{ index + 1 }}</td>
-        <td>{{ formatDate(item.date) }}</td>
-        <td>{{ item.user.userName }}</td>
-        <td>
-            <v-btn color="#FFDD83" class="mr-2" icon="mdi-pencil" @click="showDetail(item.checkingredientitem)">ดู</v-btn>
+                    <tr v-for="(item, index) in ingredientStore.CheckIngredientsHistory" :key="index">
+                        <td>{{ index + 1 }}</td>
+                        <td>{{ formatDate(item.date) }}</td>
+                        <td>{{ item.user.userName }}</td>
+                        <td>
+                            <v-btn color="#FFDD83" class="mr-2" icon="mdi-pencil"
+                                @click="showDetail(item.checkingredientitem)">ดู</v-btn>
 
-        </td>
-    </tr>
-</tbody>
+                        </td>
+                    </tr>
+                </tbody>
             </v-table>
         </v-card>
     </v-container>
@@ -95,9 +97,11 @@ const showDetail = (items) => {
 .button-full-width {
     width: 100%;
 }
-th, td {
-  padding-top: 12px !important; 
-  padding-bottom: 12px !important; 
-  text-align: center !important; 
+
+th,
+td {
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
+    text-align: center !important;
 }
 </style>

@@ -150,6 +150,13 @@ export const useIngredientStore = defineStore("ingredient", () => {
     if (!exists) {
       ingredientCheckList.value.push({ ingredientcheck: item, count: 1 });
     }
+    if(exists) {
+      const index = ingredientCheckList.value.findIndex(
+        (ingredient) =>
+          ingredient.ingredientcheck.ingredientId === item.ingredientId
+      );
+      ingredientCheckList.value[index].count += 1;
+    }
   }
 
   function removeIngredient(index: number) {
