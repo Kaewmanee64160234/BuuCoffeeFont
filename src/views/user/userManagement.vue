@@ -28,31 +28,35 @@ const handleSearchKeydown = (event: KeyboardEvent) => {
 };
 
 const filteredUsers = computed(() => {
-  if (!userStore.searchQuery) {
-    return userStore.users;
-  }
-  return userStore.users.filter(user =>
-    user.userName.toLowerCase().includes(userStore.searchQuery.toLowerCase())
-  );
-});
+  let filtered = userStore.users;
 
+  if (userStore.searchQuery) {
+    filtered = filtered.filter(user =>
+      user.userName.toLowerCase().includes(userStore.searchQuery.toLowerCase())
+    );
+  }
+
+  const start = (userStore.currentPage - 1) * userStore.itemsPerPage;
+  const end = start + userStore.itemsPerPage;
+
+  return filtered.slice(start, end);
+});
 </script>
 
 <template>
   <AddUserDialog v-model:dialog="userStore.createUserDialog"></AddUserDialog>
   <EditUserDialog v-model:dialog="userStore.updateUserDialog" :user="userStore.user"></EditUserDialog>
 
-
   <v-container>
-    <v-card class="flex-container">
+    <v-card class="fit-content">
       <v-card-title>
         <v-row>
           <v-col cols="12" style="padding: 20px;">
-          <h3>จัดการผู้ใช้งาน</h3>
+            <h3>จัดการผู้ใช้งาน</h3>
           </v-col>
    
-          <v-row style="margin-left: 0.5%; margin-bottom:2%; margin-top:1%">
-            <v-col class="pa-2 mr-8" cols="3">
+          <v-row class="mt-4 ml-2 mb-2">
+            <v-col class="pa-2 mr-8" cols="12" sm="6" md="3">
               <v-text-field
                 v-model="userStore.searchQuery"
                 label="ค้นหาผู้ใช้งาน"
@@ -64,7 +68,7 @@ const filteredUsers = computed(() => {
             </v-col>
             
             <v-spacer></v-spacer>
-            <v-col cols="auto" class="mr-14">
+            <v-col class="mt-4" cols="12" sm="6" md="3">
               <v-btn color="success" @click="userStore.createUserDialog = true">
                 <v-icon left>mdi-plus</v-icon>
                 เพิ่มผู้ใช้งาน
@@ -77,7 +81,8 @@ const filteredUsers = computed(() => {
         <v-spacer> </v-spacer>
       </v-card-title>
 
-      <v-table class="mx-auto" style="width: 97%">
+      <v-responsive>
+        <v-table class="mx-auto" style="width: 97%;">
           <thead>
             <tr>
               <th class="text-center"></th>
@@ -90,7 +95,7 @@ const filteredUsers = computed(() => {
           </thead>
           <tbody>
             <tr v-for="(item, index) in filteredUsers" :key="index">
-              <td class="text-center">{{ index + 1 }}</td>
+              <td class="text-center">{{ index + 1 + (userStore.currentPage - 1) * userStore.itemsPerPage }}</td>
               <td class="text-center">{{ item.userName }}</td>
               <td class="text-center">{{ item.userEmail }}</td>
               <td class="text-center">{{ item.userStatus }}</td>
@@ -99,14 +104,19 @@ const filteredUsers = computed(() => {
                 <v-btn color="#FFDD83" icon="mdi-pencil" @click="openEditUserDialog(item)"></v-btn>
               </td>
             </tr>
-          </tbody>
-          <tbody v-if="!filteredUsers.length">
-            <tr>
+            <tr v-if="!filteredUsers.length">
               <td colspan="6" class="text-center">No data</td>
             </tr>
           </tbody>
         </v-table>
-    
+      </v-responsive>
+
+      <v-pagination
+        justify="center"
+        v-model="userStore.currentPage"
+        :length="Math.ceil(userStore.totalUsers / userStore.itemsPerPage)"
+        rounded="circle"
+      ></v-pagination>
     </v-card>
   </v-container>
 </template>
@@ -116,5 +126,25 @@ const filteredUsers = computed(() => {
   display: flex;
   flex-direction: column;
   height: 95vh;
+}
+
+@media (max-width: 768px) {
+  .fit-content {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  v-table {
+    font-size: 0.8rem;
+  }
+
+  v-btn {
+    min-width: 32px;
+    height: 32px;
+  }
+
+  h3 {
+    font-size: 1.2rem;
+  }
 }
 </style>

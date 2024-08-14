@@ -16,16 +16,18 @@ export const useUserStore = defineStore("user", () => {
   const user = ref<User | null>(null);
   const searchQuery = ref<string>("");
   const updateUserDialog = ref(false);
-
   const createUserDialog = ref(false);
-  // const userRole = ref("พนักงานขายข้าว");
   const userRole = ref("พนักงานขายกาแฟ");
+
+  const currentPage = ref(1); // Current page number
+  const itemsPerPage = ref(5); // Number of items per page
+  const totalUsers = ref(0); // Total number of users
+
   function setUser(user: User) {
     currentUser.value = { ...user };
     localStorage.setItem('user', JSON.stringify(user));
   }
 
-  
   function getUser() {
     const userString = localStorage.getItem('user');
     if (userString) {
@@ -34,12 +36,12 @@ export const useUserStore = defineStore("user", () => {
     return currentUser.value;
   }
 
-
   const getAllUsers = async () => {
     try {
       const response = await userService.getAllUsers();
       if (response.status === 200) {
         users.value = response.data;
+        totalUsers.value = users.value.length; // Update total users count
       }
     } catch (error) {
       console.error(error);
@@ -63,7 +65,6 @@ export const useUserStore = defineStore("user", () => {
       if (response.status === 201) {
         users.value.push(response.data);
         await getAllUsers(); // Ensure that all users are fetched again
-        // Reset user form or clear the current user after creation
         user.value = null;
       }
     } catch (error) {
@@ -80,7 +81,6 @@ export const useUserStore = defineStore("user", () => {
         if (index !== -1) {
           users.value[index] = updatedUser;
         }
-        // Reset user after update
         user.value = null;
         return updatedUser;
       }
@@ -95,6 +95,7 @@ export const useUserStore = defineStore("user", () => {
       const response = await userService.deleteUser(id);
       if (response.status === 200) {
         users.value = users.value.filter((user) => user.userId !== id);
+        totalUsers.value = users.value.length; // Update total users count
       }
     } catch (error) {
       console.error(error);
@@ -105,24 +106,20 @@ export const useUserStore = defineStore("user", () => {
     user.value = userToEdit;
   };
 
-  // getCurrentUser
   const getCurrentUser = async () => {
     try {
-    //  get user from local storage
-    const user = localStorage.getItem('user');
-    if (user) {
-      currentUser.value = JSON.parse(user);
-    }
-    }
-    catch (error) {
+      const user = localStorage.getItem('user');
+      if (user) {
+        currentUser.value = JSON.parse(user);
+      }
+    } catch (error) {
       console.error('Error getting current user:', error);
     }
-
   };
 
   const resetUserForm = () => {
     user.value = null;
-    userRole.value = "พนักงานขายกาแฟ"; // ค่าเริ่มต้นของ userRole
+    userRole.value = "พนักงานขายกาแฟ"; // Default role
   };
 
   return {
@@ -142,6 +139,9 @@ export const useUserStore = defineStore("user", () => {
     getUser,
     userRole,
     getCurrentUser,
-    resetUserForm
+    resetUserForm,
+    currentPage,
+    itemsPerPage,
+    totalUsers,
   };
 });
