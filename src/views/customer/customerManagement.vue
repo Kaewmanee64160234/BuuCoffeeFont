@@ -20,12 +20,18 @@ const handleSearchKeydown = (event: KeyboardEvent) => {
 };
 
 const filteredCustomers = computed(() => {
-  if (!customerStore.searchQuery) {
-    return customerStore.customers;
+  let filtered = customerStore.customers;
+
+  if (customerStore.searchQuery) {
+    filtered = filtered.filter(customer =>
+      customer.customerName.toLowerCase().includes(customerStore.searchQuery.toLowerCase())
+    );
   }
-  return customerStore.customers.filter(customer =>
-    customer.customerName.toLowerCase().includes(customerStore.searchQuery.toLowerCase())
-  );
+
+  const start = (customerStore.currentPage - 1) * customerStore.itemsPerPage;
+  const end = start + customerStore.itemsPerPage;
+
+  return filtered.slice(start, end);
 });
 
 const openEditCustomerDialog = (customer: Customer) => {
@@ -68,18 +74,18 @@ const deleteCustomer = async (customerId: number) => {
 
 <template>
   <AddCustomerDialog v-model:dialog="addCustomerDialog"></AddCustomerDialog>
-  <EditCustomerDialog ></EditCustomerDialog>
+  <EditCustomerDialog></EditCustomerDialog>
 
   <v-container>
-    <v-card class="flex-container">
+    <v-card class="fit-content">
       <v-card-title>
         <v-row>
           <v-col cols="12" style="padding: 20px;">
             <h3>จัดการลูกค้า</h3>
           </v-col>
           
-          <v-row style="margin-left: 0.5%; margin-bottom:2%;margin-top:1%">
-            <v-col class="pa-2 mr-8" cols="3">
+          <v-row class="mt-4 ml-2 mb-2">
+            <v-col class="pa-2 mr-8" cols="12" sm="6" md="3">
               <v-text-field
                 v-model="customerStore.searchQuery"
                 label="ค้นหาลูกค้า"
@@ -91,8 +97,8 @@ const deleteCustomer = async (customerId: number) => {
             </v-col>
             
             <v-spacer></v-spacer>
-            <v-col class="mt-4" cols="3" width="30%">
-              <v-btn color="success" @click="openCreateCustomerDialog()">
+            <v-col class="mt-4" cols="12" sm="6" md="3">
+              <v-btn color="success" @click="openCreateCustomerDialog">
                 <v-icon left>mdi-plus</v-icon>
                 เพิ่มลูกค้าใหม่
               </v-btn>
@@ -103,7 +109,8 @@ const deleteCustomer = async (customerId: number) => {
         <v-spacer></v-spacer>
       </v-card-title>
 
-        <v-table class="mx-auto" style="width: 97%">
+      <v-responsive>
+        <v-table class="mx-auto" style="width: 97%;">
           <thead>
             <tr>
               <th class="text-center"></th>
@@ -115,7 +122,7 @@ const deleteCustomer = async (customerId: number) => {
           </thead>
           <tbody>
             <tr v-for="(item, index) in filteredCustomers" :key="index">
-              <td class="text-center">{{ index + 1 }}</td>
+              <td class="text-center">{{ index + 1 + (customerStore.currentPage - 1) * customerStore.itemsPerPage }}</td>
               <td class="text-center">{{ item.customerName }}</td>
               <td class="text-center">{{ item.customerPhone }}</td>
               <td class="text-center">{{ item.customerNumberOfStamp }}</td>
@@ -126,14 +133,19 @@ const deleteCustomer = async (customerId: number) => {
                 </v-btn>
               </td>
             </tr>
-          </tbody>
-          <tbody v-if="!filteredCustomers.length">
-            <tr>
-              <td colspan="6" class="text-center">ไม่มีข้อมูล</td>
+            <tr v-if="!filteredCustomers.length">
+              <td colspan="5" class="text-center">ไม่มีข้อมูล</td>
             </tr>
           </tbody>
         </v-table>
-    
+      </v-responsive>
+
+      <v-pagination
+        justify="center"
+        v-model="customerStore.currentPage"
+        :length="Math.ceil(customerStore.totalCustomers / customerStore.itemsPerPage)"
+        rounded="circle"
+      ></v-pagination>
     </v-card>
   </v-container>
 </template>
@@ -143,5 +155,25 @@ const deleteCustomer = async (customerId: number) => {
   display: flex;
   flex-direction: column;
   height: 95vh;
+}
+
+@media (max-width: 768px) {
+  .fit-content {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  v-table {
+    font-size: 0.8rem;
+  }
+
+  v-btn {
+    min-width: 32px;
+    height: 32px;
+  }
+
+  h3 {
+    font-size: 1.2rem;
+  }
 }
 </style>

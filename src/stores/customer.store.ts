@@ -12,6 +12,9 @@ export const useCustomerStore = defineStore('customer', () => {
   const openCreateCustomerDialog = ref(false);
   const openDialogFindCustomer = ref(false);
   const openDialogRegisterCustomer = ref(false);
+  const currentPage = ref(1); // Current page number
+  const itemsPerPage = ref(5); // Number of items per page
+  const totalCustomers = ref(0); // Total number of customers
   const posStore = usePosStore();
 
   const getAllCustomers = async () => {
@@ -19,6 +22,7 @@ export const useCustomerStore = defineStore('customer', () => {
       const response = await customerService.getAllCustomers();
       if (response.status === 200) {
         customers.value = response.data;
+        totalCustomers.value = customers.value.length; // Update total customers count
       }
     } catch (error) {
       console.error('Error fetching customers:', error);
@@ -50,7 +54,6 @@ export const useCustomerStore = defineStore('customer', () => {
     }
   };
 
-
   const updateCustomer = async (id: number, updatedCustomer: any) => {
     try {
       const response = await customerService.updateCustomer(id, updatedCustomer);
@@ -73,6 +76,7 @@ export const useCustomerStore = defineStore('customer', () => {
       const response = await customerService.deleteCustomer(id);
       if (response.status === 200) {
         customers.value = customers.value.filter(customer => customer.customerId !== id);
+        totalCustomers.value = customers.value.length; // Update total customers count
       }
     } catch (error) {
       console.error('Error deleting customer:', error);
@@ -83,7 +87,6 @@ export const useCustomerStore = defineStore('customer', () => {
     customer.value = customerToEdit;
   };
 
-  // setCustomerInRecipt
   const setCustomerInReceipt = (customer: Customer) => {
     posStore.receipt.customer = customer;
     openDialogFindCustomer.value = false;
@@ -103,6 +106,9 @@ export const useCustomerStore = defineStore('customer', () => {
     openCreateCustomerDialog,
     openDialogFindCustomer,
     setCustomerInReceipt,
-    openDialogRegisterCustomer
+    openDialogRegisterCustomer,
+    currentPage,
+    itemsPerPage,
+    totalCustomers
   };
 });
