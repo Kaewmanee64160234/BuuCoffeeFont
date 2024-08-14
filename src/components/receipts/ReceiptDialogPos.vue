@@ -63,6 +63,8 @@ const selectReceipt = (receipt: Receipt) => {
 
   posStore.receipt = receipt;
   posStore.selectedItems = receipt.receiptItems;
+  posStore.receipt.change = receipt.change;
+  posStore.receipt.receive = receipt.receive;
   posStore.ReceiptDialogPos = false;
   
   console.log('Selected Receipt:', receipt);

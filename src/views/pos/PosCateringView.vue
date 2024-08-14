@@ -71,9 +71,6 @@ const filterProducts = () => {
     }
 };
 
-// ingredientList
-
-
 // Add a product or ingredient to the cart
 const addToCart = (item: Product | any) => {
     if (selectedCategory.value === 'Ingredients') {

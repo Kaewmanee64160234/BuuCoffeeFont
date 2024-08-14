@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+
 import { ref, computed, watch, onMounted } from 'vue';
 import { usePosStore } from '@/stores/pos.store';
 import Swal from 'sweetalert2';
@@ -61,12 +62,16 @@ function removeItem(index: number) {
 }
 
 function calculateChange() {
-  if (posStore.receipt.paymentMethod === 'cash') {
-    posStore.receipt.change = posStore.receipt.receive - posStore.receipt.receiptNetPrice;
-  }
+
+  posStore.receipt.change = posStore.receipt.receive - posStore.receipt.receiptNetPrice;
+
 }
 
 watch(() => posStore.receipt.receive, () => {
+  console.log('Receive:', posStore.receipt.receive);
+  console.log('Change:', posStore.receipt.change);
+
+
   calculateChange();
 });
 
@@ -99,14 +104,12 @@ function decreaseIngredientQuantity(index: number) {
 function removeIngredient(index: number) {
   ingredientStore.ingredientCheckList.splice(index, 1);
 }
+
 const saveCheckData = async () => {
   ingredientStore.selectedAction = 'export';
   try {
     // ส่งช้อมูล
     await ingredientStore.saveCheckData();
-
-
-
   } catch (error) {
     console.error('Error saving check data:', error);
 
@@ -117,8 +120,6 @@ const saveCheckData = async () => {
     });
   }
 };
-
-
 
 async function save() {
   posStore.receipt.paymentMethod = 'cash';
@@ -179,11 +180,9 @@ async function save() {
 
     // Show appropriate dialog based on the actions performed
     if (receiptCreated && stockChecked) {
-     
       posStore.receiptDialog = true;  // Show receipt dialog
     } else if (receiptCreated) {
       posStore.receiptDialog = true;  // Show receipt dialog
-    
     } else if (stockChecked) {
       Swal.fire({
         icon: 'success',
@@ -203,7 +202,7 @@ async function save() {
 
 function openReceiptDialog() {
   posStore.ReceiptDialogPos = true;
-  console.log(" openReceiptDialog ", posStore.ReceiptDialogPos);
+  console.log("openReceiptDialog", posStore.ReceiptDialogPos);
 }
 </script>
 
@@ -211,7 +210,7 @@ function openReceiptDialog() {
 
 <template>
   <ReceiptDetailsDialogPos />
-  
+
 
   <div class="h-screen app">
 
@@ -224,13 +223,13 @@ function openReceiptDialog() {
               <h3>รายละเอียดการจัดเลี้ยงรับรอง</h3>
             </div>
             <v-row class="d-flex align-center justify-start mt-4">
-            
-          
-                <v-btn class="mb-2" color="#ff9800" @click="openReceiptDialog()"
-                  style="border-radius: 8px; background-color: #FF9642;">
-                  ประวัติการสั่งซื้อ
-                </v-btn>
-         
+
+
+              <v-btn class="mb-2" color="#ff9800" @click="openReceiptDialog()"
+                style="border-radius: 8px; background-color: #FF9642;">
+                ประวัติการสั่งซื้อ
+              </v-btn>
+
             </v-row>
 
             <v-divider class="my-2"></v-divider>
@@ -301,7 +300,7 @@ function openReceiptDialog() {
                       <v-row no-gutters align="center">
                         <v-col cols="5" class="product-name">
                           {{ ingredient.ingredientcheck.ingredientName }}
-                          <span v-if="ingredient.ingredientcheck.ingredientSupplier !== '-'">
+                          <span v-if="ingredient.ingredientcheck.ingredientSupplier !== '-' &&  ingredient.ingredientcheck.ingredientSupplier !== '' ">
                             ({{ ingredient.ingredientcheck.ingredientSupplier }})
                           </span>
                         </v-col>
@@ -372,17 +371,19 @@ function openReceiptDialog() {
                 <div>
                   <p class="d-flex justify-space-between align-center pr-6 my-2">
                     <span style="width: 50%;">จำนวนที่ทำการเบิก:</span>
-                    <v-text-field v-model="recive" type="number" variant="solo" label="จำนวนเงิน"
+                    <v-text-field v-model="posStore.receipt.receive" type="number" variant="solo" label="จำนวนเงิน"
                       style="width: 50%;"></v-text-field>
                   </p>
                 </div>
 
                 <!-- Change Amount -->
                 <p class="d-flex justify-space-between pr-6 my-2">
-                  <span>คงเหลือจากการเบิก:</span>
-                  <span :class="posStore.receipt.receive < 0 || posStore.receipt.receive < posStore.receipt.receiptNetPrice ? 'red--text' : 'black'"
+                  <span>ทอน:</span>
+                  <span
+                    :class="posStore.receipt.receive < 0 || posStore.receipt.receive < posStore.receipt.receiptNetPrice ? 'red--text' : 'black'"
                     class="info-value">
-                    {{ parseFloat(posStore.receipt.change.toFixed(2)) < 0 ? 'จำนวนเงินไม่พอ' : posStore.receipt.change.toFixed(2) }} </span>
+                    {{ parseFloat(posStore.receipt.change.toFixed(2)) < 0 ? 'จำนวนเงินไม่พอ' :
+                      posStore.receipt.change.toFixed(2) }} </span>
                 </p>
 
                 <v-divider></v-divider>
@@ -466,7 +467,7 @@ function openReceiptDialog() {
 .selected-items-list,
 .ingredient-list {
   overflow-y: auto;
-  height: 35vh;
+  height: 30vh;
   margin-bottom: 20px;
 }
 

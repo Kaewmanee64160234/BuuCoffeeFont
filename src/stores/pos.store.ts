@@ -320,20 +320,23 @@ export const usePosStore = defineStore("pos", () => {
     if (currentReceipt.value?.queueNumber !== undefined) {
       receipt.value.receiptItems = selectedItems.value;
       receipt.value.receiptStatus = receiptStatus;
-      if (receipt.value.receive != 0) {
+      if (receipt.value.receive > 0) {
         receipt.value.receiptStatus = "paid";
       } else {
         receipt.value.receiptStatus = "unpaid";
+        receipt.value.change = 0;
       }
       receipt.value.createdDate = new Date();
       receipt.value.queueNumber = currentReceipt.value?.queueNumber + 1;
     } else {
       receipt.value.receiptItems = selectedItems.value;
       receipt.value.receiptType = receiptStatus;
-      if (receipt.value.receive != 0) {
+      if (receipt.value.receive > 0) {
         receipt.value.receiptStatus = "paid";
       } else {
         receipt.value.receiptStatus = "unpaid";
+        receipt.value.change = 0;
+
       }
       receipt.value.createdDate = new Date();
       receipt.value.queueNumber = queueNumber.value;
@@ -644,21 +647,18 @@ export const usePosStore = defineStore("pos", () => {
   // ipdateReceiptCatering
   const updateReceiptCatering = async (id: number, receipt: Receipt) => {
     console.log("updateReceipt", JSON.stringify(receipt));
-    if(receipt.receive != 0){
+    if (receipt.receive != 0) {
       receipt.receiptStatus = "paid";
-   
-
     }
 
-    // const res = await receiptService.updateReceipt(id, receipt);
-    // if (res.status === 200) {
-    //   // console.log("Receipt updated successfully", res.data);
-    
-    //   currentReceipt.value = res.data;
-    //   await customerStore.getAllCustomers();
-    //   // await receiptStore.getRecieptIn30Min();
-    // }
-    await receiptStore.getRecieptCateringIn24Hours();
+    const res = await receiptService.updateReceipt(id, receipt);
+    if (res.status === 200) {
+      console.log("Receipt updated successfully", res.data);
+
+      currentReceipt.value = res.data;
+      await customerStore.getAllCustomers();
+      await receiptStore.getRecieptCateringIn24Hours();
+    }
   };
 
   function saveQueueListToLocalStorage() {
@@ -696,6 +696,6 @@ export const usePosStore = defineStore("pos", () => {
     loadQueueNumber,
     saveQueueListToLocalStorage,
     createReceiptForCatering,
-    updateReceiptCatering
+    updateReceiptCatering,
   };
 });

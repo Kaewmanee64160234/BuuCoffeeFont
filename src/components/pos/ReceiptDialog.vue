@@ -72,11 +72,11 @@
             </p>
             <p class="received">
               Received:
-              <span class="float-right">{{ posStore.currentReceipt?.receive.toFixed(2) }} ฿</span>
+              <span class="float-right">{{ posStore.currentReceipt?.receive }} ฿</span>
             </p>
             <p class="change">
               Change:
-              <span class="float-right">{{ posStore.currentReceipt?.change.toFixed(2) }} ฿</span>
+              <span class="float-right">{{ posStore.currentReceipt?.change}} ฿</span>
             </p>
             <p class="net-total">
               Net Total:
