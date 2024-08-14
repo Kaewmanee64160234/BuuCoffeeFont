@@ -2,14 +2,21 @@
   <v-dialog v-model="categoryStore.createCategoryDialog" persistent max-width="600px" @click:outside="resetForm">
     <v-card>
       <v-card-title>
-        <span class="headline">สร้างหมวดหมู่</span>
+       <v-icon color="black" left style="font-size: 22px;">mdi-plus-circle</v-icon><span class="headline"> สร้างหมวดหมู่</span>
       </v-card-title>
       <v-card-text>
         <v-container>
+          <v-row v-if="!categoryName ">
+              <v-col cols="12">
+                <v-alert type="warning" border="left" color="warning" elevation="2">
+                  กรุณากรอกข้อมูล [ ชื่อหมวดหมู่ ] 
+                </v-alert>
+              </v-col>
+            </v-row>
           <v-form ref="form" v-model="valid">
             <v-row>
               <v-col cols="12">
-                <v-text-field variant="solo" v-model="categoryName" label="ชื่อหมวดหมู่" :rules="[rules.required, rules.categoryName]" required></v-text-field>
+                <v-text-field variant="solo" v-model="categoryName" label="ชื่อหมวดหมู่" :rules="[rules.required, rules.categoryName]"  :error-messages="!categoryName ? ['กรุณากรอกชื่อหมวดหมู่'] : []" required></v-text-field>
               </v-col>
               <v-col cols="12">
                 <v-checkbox v-model="haveTopping" label="มีท็อปปิ้ง"></v-checkbox>
@@ -100,5 +107,25 @@ const submitForm = async () => {
 <style scoped>
 .swal-button {
   font-size: 16px;
+}
+.v-table-container {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-top: 16px;
+}
+
+.v-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.v-table th,
+.v-table td {
+  width: 25%;
+}
+
+.v-card-title {
+  background-color: #f5f5f5;
+  padding: 16px;
 }
 </style>

@@ -1,33 +1,62 @@
 <template>
   <v-dialog v-model="toppingStore.createToppingDialog" persistent max-width="600px" @click:outside="resetForm">
     <v-card>
-      <v-card-title>
-        <span class="headline">สร้างท็อปปิ้ง</span>
+      <v-card-title><v-icon color="black" left style="font-size: 22px;">mdi-plus-circle</v-icon>
+        <span class="headline"> สร้างท็อปปิ้ง</span>
       </v-card-title>
       <v-card-text>
         <v-container>
+          <v-row v-if="!toppingName && toppingPrice <= 0">
+              <v-col cols="12">
+                <v-alert type="warning" border="left" color="warning" elevation="2">
+                  กรุณากรอกข้อมูล [ ชื่อท้อปปิ้ง ] และ [ ราคาท็อปปิ้ง ]
+                </v-alert>
+              </v-col>
+            </v-row>
+
+            <v-row v-else-if="toppingName && toppingPrice <= 0">
+              <v-col cols="12">
+                <v-alert type="warning" border="left" color="warning" elevation="2">
+                  กรุณากรอกข้อมูล [ ราคาท็อปปิ้ง ]
+                </v-alert>
+              </v-col>
+            </v-row>
+
+            <v-row v-else-if="!toppingName && toppingPrice > 0">
+              <v-col cols="12">
+                <v-alert type="warning" border="left" color="warning" elevation="2">
+                  กรุณากรอกข้อมูล [ ชื่อท้อปปิ้ง ]
+                </v-alert>
+              </v-col>
+            </v-row>
           <v-form ref="form" v-model="valid">
             <v-row>
               <v-col cols="12">
-                <v-text-field
-                  v-model="toppingName"
-                  label="ชื่อท็อปปิ้ง"
+                <v-text-field 
+                  v-model="toppingName" 
+                  label="ชื่อท็อปปิ้ง" 
                   :rules="[rules.required, rules.name]"
-                  variant="solo"
-                  required
-                ></v-text-field>
+                  variant="solo" 
+                  :error-messages="!toppingName ? ['กรุณากรอกชื่อท็อปปิ้ง'] : []"
+                  required>
+                </v-text-field>
               </v-col>
-              <v-col cols="12">
-                <v-text-field
-                  v-model="toppingPrice"
-                  label="ราคาท็อปปิ้ง"
+              <v-col cols="10">
+                <v-text-field 
+                  v-model="toppingPrice" 
+                  label="ราคาท็อปปิ้ง" 
                   type="number"
-                  :rules="[rules.required, rules.price]"
-                  variant="solo"
-                  required
-                ></v-text-field>
+                  :rules="[rules.required, rules.price]" 
+                  :error-messages="!toppingName ? ['กรุณากรอกราคาท็อปปิ้ง'] : []"
+                  variant="solo" 
+                  required>
+                </v-text-field>
               </v-col>
+              <v-col cols="2" class="d-flex align-center">
+              <span>บาท</span>
+            </v-col>
             </v-row>
+           
           </v-form>
         </v-container>
       </v-card-text>
@@ -41,7 +70,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useToppingStore } from '@/stores/topping.store';
 import type { Topping } from '@/types/topping.type';
 import Swal from 'sweetalert2';
@@ -112,9 +141,32 @@ const submitForm = async () => {
     }
   }
 };
+
 </script>
 
+
 <style scoped>
+.v-table-container {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-top: 16px;
+}
+
+.v-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.v-table th,
+.v-table td {
+  width: 25%;
+}
+
+.v-card-title {
+  background-color: #f5f5f5;
+  padding: 16px;
+}
+
 .swal-button {
   font-size: 16px;
 }
