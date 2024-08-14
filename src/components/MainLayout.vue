@@ -40,6 +40,22 @@
           ประวัติการขาย
         </v-list-item>
 
+        <!-- add subheader about เลี้ยงรับรอง -->
+        <v-subheader v-if="!rail">เลี้ยงรับรอง</v-subheader>
+        <v-list-item to="/pos-catering">
+          <template v-slot:prepend>
+            <img src="../../src/components/img/catering.png" alt="การเลี้ยงรับรอง" class="nav-icon" />
+          </template>
+          การเลี้ยงรับรอง
+        </v-list-item>
+        <!-- ประวัติการเลี้ยงรับรอง -->
+        <v-list-item to="/historyReceiptCatering">
+          <template v-slot:prepend>
+            <img src="../../src/components/img/buffet.png" alt="ประวัติการเลี้ยงรับรอง" class="nav-icon" />
+          </template>
+          ประวัติการเลี้ยงรับรอง
+        </v-list-item>
+
         <v-subheader v-if="!rail">จัดการสินค้าและผู้ใช้งาน</v-subheader>
         <v-list-item to="/productsManagement">
           <template v-slot:prepend>
