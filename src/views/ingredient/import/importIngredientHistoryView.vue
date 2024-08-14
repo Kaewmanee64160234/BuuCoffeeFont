@@ -137,22 +137,87 @@ function exportToExcel(importingredient: Importingredient) {
 </template>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@100;200;300;400;500;600;700;800;900&display=swap');
-
-* {
-    font-family: 'Kanit', sans-serif;
+.button-full-width {
+  width: 100%;
 }
 
+.styled-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 14px;
+}
 
+.styled-input:focus {
+  border-color: #66afe9;
+  outline: none;
+  box-shadow: 0 0 8px rgba(102, 175, 233, 0.6);
+}
 
-.button-full-width {
-    width: 100%;
+.styled-button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  background-color: #d9534f;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.styled-button:hover {
+  background-color: #c9302c;
 }
 
 th,
 td {
-    padding-top: 12px !important;
-    padding-bottom: 12px !important;
-    text-align: center !important;
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
+  text-align: center !important;
+}
+
+th {
+  background-color: #f9f9f9;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: #f2f2f2;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .styled-input, .styled-button {
+    font-size: 12px;
+  }
+
+  th, td {
+    font-size: 12px;
+    padding: 8px !important;
+  }
+
+  .button-full-width {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .styled-input, .styled-button {
+    font-size: 10px;
+  }
+
+  th, td {
+    font-size: 10px;
+    padding: 6px !important;
+  }
+
+  .button-full-width {
+    font-size: 10px;
+  }
+
+  th, td {
+    white-space: nowrap;
+  }
 }
 </style>
+

@@ -183,14 +183,43 @@ watch(paginate, async (newValue, oldValue) => {
 .button-full-width {
   width: 100%;
 }
+
 th, td {
   padding-top: 12px !important; 
   padding-bottom: 12px !important; 
   text-align: center !important; 
 }
+
 .flex-container {
   display: flex;
   flex-direction: column;
   height: 95vh;
 }
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .v-card-title {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .v-col {
+    padding: 10px 0;
+  }
+
+  .button-full-width {
+    margin-bottom: 10px;
+  }
+
+  .v-text-field {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .v-table {
+    overflow-x: auto;
+  }
+}
 </style>
+

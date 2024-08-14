@@ -199,9 +199,7 @@ th {
   position: sticky;
   top: 0;
   background-color: #f9f9f9;
-
   z-index: 3;
-
 }
 
 .v-data-table {
@@ -267,4 +265,94 @@ td {
 .red-button:hover {
   background-color: #d43b3b;
 }
+
+/* Responsive styles */
+@media (max-width: 1024px) {
+  .styled-input {
+    font-size: 14px;
+    padding: 6px;
+  }
+
+  .red-button {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+
+  th,
+  td {
+    font-size: 14px;
+    padding: 6px;
+  }
+}
+
+@media (max-width: 768px) {
+  .styled-input {
+    font-size: 12px;
+    padding: 4px;
+  }
+
+  .red-button {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+
+  th,
+  td {
+    font-size: 12px;
+    padding: 4px;
+  }
+
+  .button-full-width {
+    font-size: 12px;
+  }
+
+  thead, th {
+    font-size: 10px;
+  }
+
+  td {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .styled-input {
+    font-size: 10px;
+    padding: 2px;
+  }
+
+  .red-button {
+    font-size: 10px;
+    padding: 4px 8px;
+  }
+
+  th,
+  td {
+    font-size: 10px;
+    padding: 2px;
+  }
+
+  .button-full-width {
+    font-size: 10px;
+  }
+
+  th,
+  td {
+    white-space: nowrap;
+  }
+  
+  v-container {
+    padding: 0; /* ลด padding ของ container */
+  }
+  
+  v-card {
+    margin: 0; /* ลด margin ของ card */
+  }
+  
+  v-row, v-col {
+    margin: 0;
+    padding: 0;
+  }
+}
 </style>
+

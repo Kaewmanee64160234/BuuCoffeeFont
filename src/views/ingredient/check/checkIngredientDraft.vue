@@ -168,16 +168,13 @@ thead {
   top: 0;
   background-color: #ffffff;
   z-index: 2;
-  /* ปรับค่า Z-index ตามต้องการเพื่อให้หัวตารางแสดงทับส่วนอื่นได้ */
 }
 
 th {
   position: sticky;
   top: 0;
   background-color: #f9f9f9;
-  /* เพิ่มสีพื้นหลังหัวตาราง */
   z-index: 3;
-  /* ปรับค่า Z-index ตามต้องการเพื่อให้หัวตารางแสดงทับส่วนอื่นได้ */
 }
 
 .v-data-table {
@@ -218,42 +215,90 @@ td {
 
 .styled-input {
   border: 2px solid #ccc;
-  /* Adds a border */
   border-radius: 4px;
-  /* Optional: Rounds the corners */
   padding: 8px;
-  /* Adds padding for better appearance */
   font-size: 16px;
-  /* Adjusts the font size */
   width: 100%;
-  /* Ensures the input takes the full width of its container */
   box-sizing: border-box;
-  /* Ensures padding and border are included in the element's total width and height */
 }
 
 .styled-input:focus {
   border-color: #000000;
-  /* Changes the border color when the input is focused */
   outline: none;
-  /* Removes the default outline */
 }
 
 .red-button {
   background-color: #EE4E4E;
-  /* Correct hex color with # prefix */
   color: white;
-  /* Ensures the text is readable */
   border: none;
   padding: 10px 20px;
   cursor: pointer;
   font-size: 16px;
-  /* Adjust the font size */
   border-radius: 4px;
-  /* Optional: Adds rounded corners */
 }
 
 .red-button:hover {
   background-color: #d43b3b;
-  /* Darken the color on hover */
+}
+
+/* Responsive styles */
+@media (max-width: 1024px) {
+  .v-data-table th, .v-data-table td {
+    font-size: 14px;
+    padding: 6px;
+  }
+
+  .styled-input {
+    font-size: 14px;
+  }
+
+  .red-button {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .v-data-table th, .v-data-table td {
+    font-size: 12px;
+    padding: 4px;
+  }
+
+  .styled-input {
+    font-size: 12px;
+    padding: 6px;
+  }
+
+  .red-button {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+
+  th, td {
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .v-data-table th, .v-data-table td {
+    font-size: 10px;
+    padding: 2px;
+  }
+
+  .styled-input {
+    font-size: 10px;
+    padding: 4px;
+  }
+
+  .red-button {
+    font-size: 10px;
+    padding: 4px 8px;
+  }
+
+  v-container, v-card {
+    padding: 0;
+    margin: 0;
+  }
 }
 </style>
+

@@ -2,7 +2,7 @@
   <v-container fluid style="padding-left: 80px;">
     <v-card-title>
       <v-row>
-        <v-col cols="9" style="padding: 20px;">นำเข้าวัตถุดิบ</v-col>
+        <v-col cols="9" style="padding: 10px;">นำเข้าวัตถุดิบ</v-col>
       </v-row>
       <v-row>
         <v-col cols="3">
@@ -17,7 +17,7 @@
         </v-col>
         <v-col cols="auto">
           <v-row align="center">
-            <v-col cols="auto">
+            <v-col cols="auto" style="padding: 5px;">
               <v-radio-group v-model="ingredientStore.importStoreType" row :rules="[rules.required]">
                 <v-radio label="ร้านกาแฟ" value="ร้านกาแฟ"></v-radio>
                 <v-radio label="ร้านข้าว" value="ร้านข้าว"></v-radio>
@@ -59,7 +59,7 @@
           </v-row>
         </v-container>
       </v-col>
-      <v-col cols="6" class="d-flex flex-column">
+      <v-col cols="6" class="d-flex flex-column" style="padding: 2px;">
         <v-card style="height: 400px; overflow-y: auto; width: 100%">
           <v-table style="max-height: 100%; overflow-y: auto">
             <thead>
@@ -263,11 +263,11 @@ watch(() => ingredientStore.importStoreType, (newType) => {
 
 .styled-input {
   width: 100%;
-  padding: 8px;
+  padding: 6px; /* ลดขนาด padding */
   border: 1px solid #ccc;
   border-radius: 4px;
   box-sizing: border-box;
-  font-size: 14px;
+  font-size: 12px; /* ลดขนาด font */
 }
 
 .styled-input:focus {
@@ -277,12 +277,12 @@ watch(() => ingredientStore.importStoreType, (newType) => {
 }
 
 .styled-button {
-  padding: 6px 12px;
+  padding: 4px 8px; /* ลดขนาด padding */
   border: none;
   border-radius: 4px;
   background-color: #d9534f;
   color: white;
-  font-size: 14px;
+  font-size: 12px; /* ลดขนาด font */
   cursor: pointer;
 }
 
@@ -292,9 +292,10 @@ watch(() => ingredientStore.importStoreType, (newType) => {
 
 th,
 td {
-  padding-top: 12px !important;
-  padding-bottom: 12px !important;
+  padding-top: 8px !important; /* ลดขนาด padding */
+  padding-bottom: 8px !important;
   text-align: center !important;
+  font-size: 12px; /* ลดขนาด font */
 }
 
 th {
@@ -304,4 +305,48 @@ th {
 tbody tr:nth-child(odd) {
   background-color: #f2f2f2;
 }
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .styled-input, .styled-button {
+    font-size: 10px;
+  }
+
+  th, td {
+    font-size: 10px;
+    padding: 6px !important;
+  }
+
+  .button-full-width {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .styled-input, .styled-button {
+    font-size: 8px;
+  }
+
+  th, td {
+    font-size: 8px;
+    padding: 4px !important;
+  }
+
+  .button-full-width {
+    font-size: 8px;
+  }
+
+  th, td {
+    white-space: nowrap;
+  }
+  
+  v-container {
+    padding: 0; /* ลด padding ของ container */
+  }
+  
+  v-card {
+    margin: 0; /* ลด margin ของ card */
+  }
+}
 </style>
+
