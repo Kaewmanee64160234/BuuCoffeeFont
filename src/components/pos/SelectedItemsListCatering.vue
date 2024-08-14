@@ -67,9 +67,6 @@ function calculateChange() {
   }
 }
 
-
-
-
 watch(() => recive.value, () => {
   calculateChange();
 });
@@ -85,6 +82,23 @@ function decreaseQuantity(index: number) {
   } else {
     posStore.spliceData(index);
   }
+}
+
+// Functions for ingredient list
+function increaseIngredientQuantity(index: number) {
+  ingredientStore.ingredientCheckList[index].count++;
+}
+
+function decreaseIngredientQuantity(index: number) {
+  if (ingredientStore.ingredientCheckList[index].count === 1) {
+    removeIngredient(index);
+  } else {
+    ingredientStore.ingredientCheckList[index].count--;
+  }
+}
+
+function removeIngredient(index: number) {
+  ingredientStore.ingredientCheckList.splice(index, 1);
 }
 
 async function save() {
@@ -109,7 +123,6 @@ async function save() {
   }
   if (posStore.receipt.paymentMethod === 'cash' && recive.value < posStore.receipt.receiptNetPrice) {
     posStore.receipt.receiptNetPrice = 0;
-
   }
   if (posStore.receipt.receiptId) {
     posStore.updateReceipt(posStore.receipt.receiptId, posStore.receipt);
@@ -133,6 +146,7 @@ async function save() {
 </script>
 
 
+
 <template>
   <div class="h-screen app">
 
@@ -142,13 +156,13 @@ async function save() {
         <div class="content-container">
           <div class="header">
             <div class="d-flex justify-space-between align-center">
-              <h3>รายละเอียดการสั่งซื้อ</h3>
+              <h3>รายละเอียดการจัดเลี้ยงรับรอง</h3>
             </div>
 
             <v-divider class="my-2"></v-divider>
 
             <!-- Product Summary -->
-            <h3>สรุปรายการสินค้าในร้าน</h3>
+            <h3>สรุปรายการสินค้า</h3>
             <div class="selected-items-list">
               <v-list class="full-width">
                 <v-list-item-group>
@@ -222,19 +236,20 @@ async function save() {
                           <p>{{ ingredient.ingredientcheck.ingredientPrice }}</p>
                         </v-col>
                         <v-col cols="3" class="text-right pr-2">
-                          <v-btn size="xs-small" color="#C5C5C5" icon @click="decreaseQuantity(index)">
+                          <v-btn size="xs-small" color="#C5C5C5" icon @click="decreaseIngredientQuantity(index)">
                             <v-icon>mdi-minus</v-icon>
                           </v-btn>
                           <span class="pa-2">{{ ingredient.count }}</span>
-                          <v-btn size="xs-small" color="#FF9642" icon @click="increaseQuantity(index)">
+                          <v-btn size="xs-small" color="#FF9642" icon @click="increaseIngredientQuantity(index)">
                             <v-icon>mdi-plus</v-icon>
                           </v-btn>
                         </v-col>
                         <v-col cols="2" class="text-right">
-                          <v-btn icon variant="text" @click="removeItem(index)">
+                          <v-btn icon variant="text" @click="removeIngredient(index)">
                             <v-icon color="red">mdi-delete</v-icon>
                           </v-btn>
                         </v-col>
+
                       </v-row>
 
                     </v-list-item>
