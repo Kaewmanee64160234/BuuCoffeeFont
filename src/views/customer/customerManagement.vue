@@ -113,11 +113,11 @@ const deleteCustomer = async (customerId: number) => {
         <v-table class="mx-auto" style="width: 97%;">
           <thead>
             <tr>
-              <th class="text-center"></th>
-              <th class="text-center">ชื่อลูกค้า</th>
-              <th class="text-center">เบอร์โทร</th>
-              <th class="text-center">แต้มสะสม</th>
-              <th class="text-center">การกระทำ</th>
+              <th class="text-center font-weight: bold;">รหัสลูกค้า</th>
+              <th class="text-center font-weight: bold;">ชื่อลูกค้า</th>
+              <th class="text-center font-weight: bold;">เบอร์โทร</th>
+              <th class="text-center font-weight: bold;">แต้มสะสม</th>
+              <th class="text-center font-weight: bold;">การกระทำ</th>
             </tr>
           </thead>
           <tbody>

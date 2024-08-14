@@ -79,13 +79,11 @@ function exportToExcel(importingredient: Importingredient) {
                         ประวัตินำเข้าวัตถุดิบ
                     </v-col>
                     <v-col cols="3">
-                        <v-text-field label="Search" append-inner-icon="mdi-magnify" hide-details dense></v-text-field>
+                        <v-text-field label="ค้นหาประวัตินำเข้าวัตถุดิบ" variant="solo" append-inner-icon="mdi-magnify" hide-details dense></v-text-field>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-
-
                         <v-btn color="success" class="button-full-width" :to="{ name: 'importingredients' }">
                             <v-icon left>mdi-plus</v-icon>
                             นำเข้าวัตถุดิบ
@@ -100,7 +98,7 @@ function exportToExcel(importingredient: Importingredient) {
             <v-table class="mx-auto" style="width: 97%">
                 <thead>
     <tr>
-        <th style="text-align: center;font-weight: bold;"></th>
+        <th style="text-align: center;font-weight: bold;">รหัสประวัตินำเข้าวัตถุดิบ</th>
         <th style="text-align: center;font-weight: bold;">วันที่</th>
         <th style="text-align: center;font-weight: bold;">ซัพพาย</th>
         <th style="text-align: center;font-weight: bold;">ราคารวม</th>

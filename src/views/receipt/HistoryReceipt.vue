@@ -216,12 +216,12 @@ const statusText = (status: string) => {
       <v-table class="mx-auto" style="width: 97%">
         <thead>
           <tr>
-            <th class="text-center"></th>
-            <th class="text-center">วันที่ออกใบเสร็จ</th>
-            <th class="text-center">สถานะใบเสร็จ</th>
-            <th class="text-center">ราคารวมสุทธิ</th>
-            <th class="text-center">ส่วนลด</th>
-            <th class="text-center">สมาชิก</th>
+            <th class="text-center font-weight: bold;"></th>
+            <th class="text-center font-weight: bold;">วันที่ออกใบเสร็จ</th>
+            <th class="text-center font-weight: bold;">สถานะใบเสร็จ</th>
+            <th class="text-center font-weight: bold;">ราคารวมสุทธิ</th>
+            <th class="text-center font-weight: bold;">ส่วนลด</th>
+            <th class="text-center font-weight: bold;">สมาชิก</th>
             <!-- <th class="text-center">แต้มสะสม</th> -->
             <th class="text-center">โปรโมชั่น</th>
 

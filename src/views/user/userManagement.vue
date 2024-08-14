@@ -85,12 +85,12 @@ const filteredUsers = computed(() => {
         <v-table class="mx-auto" style="width: 97%;">
           <thead>
             <tr>
-              <th class="text-center"></th>
-              <th class="text-center">ชื่อผู้ใช้</th>
-              <th class="text-center">อีเมล</th>
-              <th class="text-center">สถานะผู้ใช้งาน</th>
-              <th class="text-center">ตำแหน่งผู้ใช้งาน</th>
-              <th class="text-center">การกระทำ</th>
+              <th class="text-center font-weight: bold;">รหัสผู้ใช้งาน</th>
+              <th class="text-center font-weight: bold;">ชื่อผู้ใช้</th>
+              <th class="text-center font-weight: bold;">อีเมล</th>
+              <th class="text-center font-weight: bold;">สถานะผู้ใช้งาน</th>
+              <th class="text-center font-weight: bold;">ตำแหน่งผู้ใช้งาน</th>
+              <th class="text-center font-weight: bold;">การกระทำ</th>
             </tr>
           </thead>
           <tbody>
