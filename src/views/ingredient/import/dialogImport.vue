@@ -47,28 +47,48 @@ const formatDate = (dateString: string) => {
         </v-row>
 
       </v-card-title>
-      <v-table class="text-center mt-5">
-        <thead>
-          <tr>
-            <th class="column-header text-center"></th>
-            <th class="column-header text-center">ชื่อวัตถุดิบ</th>
-            <th class="column-header text-center">จำนวน</th>
-            <th class="column-header text-center">ต้นทุน</th>
-            <th class="column-header text-center">ราคารวม</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(item, index) in ingredientStore.importingredient?.importingredientitem"
-            :key="item.importIngredientsItemID">
-            <td class="column-data text-center">{{ index + 1 }}</td>
-            <td class="column-data text-center">{{ item.ingredient.ingredientName }}</td>
-            <td class="column-data text-center">{{ item.Quantity }} {{ item.ingredient?.ingredientUnit }}</td>
-            <td class="column-data text-center">{{ item.unitPrice }} บาท</td>
-            <td class="column-data text-center">{{ item.pricePerUnit }} บาท</td>
-          </tr>
-        </tbody>
-      </v-table>
       <v-card-text>
+        <div v-if="ingredientStore.importingredient?.importStoreType === 'ร้านกาแฟ'">
+          <v-table class="text-center mt-5">
+            <thead>
+              <tr>
+                <th class="column-header text-center">ลำดับ</th>
+                <th class="column-header text-center">ชื่อวัตถุดิบ</th>
+                <th class="column-header text-center">จำนวน</th>
+                <th class="column-header text-center">ต้นทุน</th>
+                <th class="column-header text-center">ราคารวม</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in ingredientStore.importingredient?.importingredientitem"
+                :key="item.importIngredientsItemID">
+                <td class="column-data text-center">{{ index + 1 }}</td>
+                <td class="column-data text-center">{{ item.ingredient.ingredientName }}</td>
+                <td class="column-data text-center">{{ item.Quantity }} {{ item.ingredient?.ingredientUnit }}</td>
+                <td class="column-data text-center">{{ item.unitPrice }} บาท</td>
+                <td class="column-data text-center">{{ item.pricePerUnit }} บาท</td>
+              </tr>
+            </tbody>
+          </v-table>
+        </div>
+
+        <div v-else-if="ingredientStore.importingredient?.importStoreType === 'ร้านข้าว'">
+          <v-table class="text-center mt-5">
+            <thead>
+              <tr>
+                <th class="column-header text-center">ลำดับ</th>
+                <th class="column-header text-center">ชื่อวัตถุดิบ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in ingredientStore.importingredient?.importingredientitem"
+                :key="item.importIngredientsItemID">
+                <td class="column-data text-center">{{ index + 1 }}</td>
+                <td class="column-data text-center">{{ item.name }}</td>
+              </tr>
+            </tbody>
+          </v-table>
+        </div>
       </v-card-text>
       <v-card-actions>
         <v-btn color="primary" @click="closeDialog">ปิด</v-btn>
