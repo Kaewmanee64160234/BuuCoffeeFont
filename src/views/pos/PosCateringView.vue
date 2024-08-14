@@ -102,7 +102,7 @@ const addToCart = (item: Product | any) => {
               <v-col cols="12">
                 <v-tabs v-model="selectedCategory" align-tabs="start" color="brown" class="full-width-tabs"
                         background-color="#fff">
-                  <v-tab value="Ingredients">Ingredients</v-tab>
+                  <v-tab value="Ingredients">วัตถุดิบ</v-tab>
                   <v-tab v-for="category in categoryStore.categoriesForCreate" :key="category.categoryId"
                          :value="category.categoryName">
                     {{ category.categoryName }}
