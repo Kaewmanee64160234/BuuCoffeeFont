@@ -5,27 +5,27 @@
         <v-col cols="9" style="padding: 20px;">นำเข้าวัตถุดิบ</v-col>
       </v-row>
       <v-row>
-  <v-col cols="3">
-    <v-text-field label="ค้นหาวัตถุดิบ" append-inner-icon="mdi-magnify" dense hide-details variant="solo"
-      v-model="searchQuery" @input="onSearch"></v-text-field>
-  </v-col>
-  <v-col cols="auto">
-    <v-btn color="success" :to="{ name: 'ingredients' }">รายการวัตถุดิบ</v-btn>
-  </v-col>
-  <v-col cols="auto">
-    <v-btn color="warning" :to="{ name: 'importingredientsHistory' }">ประวัตินำเข้าวัตถุดิบ</v-btn>
-  </v-col>
-  <v-col cols="auto">
-    <v-row align="center">
-      <v-col cols="auto">
-        <v-radio-group v-model="ingredientStore.importStoreType" row :rules="[rules.required]">
-          <v-radio label="ร้านกาแฟ" value="ร้านกาแฟ"></v-radio>
-          <v-radio label="ร้านข้าว" value="ร้านข้าว"></v-radio>
-        </v-radio-group>
-      </v-col>
-    </v-row>
-  </v-col>
-</v-row>
+        <v-col cols="3">
+          <v-text-field label="ค้นหาวัตถุดิบ" append-inner-icon="mdi-magnify" dense hide-details variant="solo"
+            v-model="searchQuery" @input="onSearch"></v-text-field>
+        </v-col>
+        <v-col cols="auto">
+          <v-btn color="success" :to="{ name: 'ingredients' }">รายการวัตถุดิบ</v-btn>
+        </v-col>
+        <v-col cols="auto">
+          <v-btn color="warning" :to="{ name: 'importingredientsHistory' }">ประวัตินำเข้าวัตถุดิบ</v-btn>
+        </v-col>
+        <v-col cols="auto">
+          <v-row align="center">
+            <v-col cols="auto">
+              <v-radio-group v-model="ingredientStore.importStoreType" row :rules="[rules.required]">
+                <v-radio label="ร้านกาแฟ" value="ร้านกาแฟ"></v-radio>
+                <v-radio label="ร้านข้าว" value="ร้านข้าว"></v-radio>
+              </v-radio-group>
+            </v-col>
+          </v-row>
+        </v-col>
+      </v-row>
 
       <v-spacer></v-spacer>
     </v-card-title>
@@ -50,8 +50,10 @@
             </template>
             <template v-else-if="ingredientStore.importStoreType === 'ร้านข้าว'">
               <v-col cols="12" style="text-align: center; padding: 8px">
-                <v-text-field v-model="newIngredientName" label="ชื่อวัตถุดิบ" required></v-text-field>
-                <v-btn @click="ingredientStore.AddRiceIngredient">เพิ่มวัตถุดิบ</v-btn>
+                <v-text-field v-model="newIngredientName" label="ชื่อวัตถุดิบ" required
+                  @keyup.enter="ingredientStore.AddRiceIngredient({ ingredientName: newIngredientName })"></v-text-field>
+                <v-btn
+                  @click="ingredientStore.AddRiceIngredient({ ingredientName: newIngredientName })">เพิ่มวัตถุดิบ</v-btn>
               </v-col>
             </template>
           </v-row>
@@ -64,26 +66,27 @@
               <tr>
                 <th>ลำดับ</th>
                 <th>ชื่อสินค้า</th>
-                <th>แบรนด์</th>
-                <th>จำนวน</th>
-                <th>ราคาต้นทุน</th>
-                <th>ราคารวม</th>
+                <th v-if="ingredientStore.importStoreType === 'ร้านกาแฟ'">แบรนด์</th>
+                <th v-if="ingredientStore.importStoreType === 'ร้านกาแฟ'">จำนวน</th>
+                <th v-if="ingredientStore.importStoreType === 'ร้านกาแฟ'">ราคาต้นทุน</th>
+                <th v-if="ingredientStore.importStoreType === 'ร้านกาแฟ'">ราคารวม</th>
                 <th>แอคชั่น</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="(item, index) in ingredientStore.ingredientList" :key="index">
                 <td>{{ index + 1 }}</td>
-                <td>{{ item.ingredient.ingredientName }}</td>
-                <td>{{ item.ingredient.ingredientSupplier }}</td>
-                <td>
+                <td>{{ ingredientStore.importStoreType === 'ร้านข้าว' ? item.name : item.ingredient?.ingredientName }}
+                </td>
+                <td v-if="ingredientStore.importStoreType === 'ร้านกาแฟ'">{{ item.ingredient?.ingredientSupplier }}</td>
+                <td v-if="ingredientStore.importStoreType === 'ร้านกาแฟ'">
                   <input type="number" v-model.number="item.count" class="styled-input" />
                 </td>
-                <td>
-                  <input type="number" v-model.number="item.totalunit" class="styled-input" />
-                </td>
-                <td>
+                <td v-if="ingredientStore.importStoreType === 'ร้านกาแฟ'">
                   <input type="number" v-model.number="item.unitprice" class="styled-input" />
+                </td>
+                <td v-if="ingredientStore.importStoreType === 'ร้านกาแฟ'">
+                  <input type="number" v-model.number="item.totalunit" class="styled-input" />
                 </td>
                 <td>
                   <button @click="ingredientStore.removeIngredient(index)" class="styled-button">
@@ -124,8 +127,8 @@
             <v-row>
               <v-col cols="12">หมายเหตุ</v-col>
               <v-col cols="12">
-                <v-text-field ref="discountField" label="กรุณาระบุหมายเหตุ **ถ้ามี" dense hide-details
-                  variant="solo"></v-text-field>
+                <v-text-field ref="discountField" label="กรุณาระบุหมายเหตุ **ถ้ามี"
+                  v-model="ingredientStore.importDescription" dense hide-details variant="solo"></v-text-field>
               </v-col>
             </v-row>
           </v-col>
@@ -144,7 +147,7 @@
   </v-container>
 </template>
 <script lang="ts" setup>
-import { ref, watch, onMounted } from "vue";
+import { ref, watch, onMounted, computed } from "vue";
 import { useIngredientStore } from "@/stores/Ingredient.store";
 import Swal from "sweetalert2";
 import type { VForm } from "vuetify/components";
@@ -156,9 +159,9 @@ const storeField = ref(null);
 const discountField = ref(null);
 const totalField = ref(null);
 const newIngredientName = ref("");
-const newIngredientPrice = ref("");
 onMounted(async () => {
   await ingredientStore.getIngredients();
+
 });
 
 watch(searchQuery, async (newQuery) => {
@@ -168,14 +171,7 @@ watch(searchQuery, async (newQuery) => {
     await ingredientStore.getAllIngredients();
   }
 });
-const addRiceIngredient = () => {
-  const newIngredient = {
-    ingredientName: newIngredientName.value,
-    ingredientPrice: newIngredientPrice.value,
-  };
-  newIngredientName.value = "";
-  newIngredientPrice.value = "";
-};
+
 function onSearch() {
   if (searchQuery.value.length >= 3) {
     ingredientStore.searchIngredients(searchQuery.value);
@@ -245,6 +241,18 @@ const resetForm = () => {
     totalField.value.resetValidation();
   }
 };
+watch(() => ingredientStore.importStoreType, (newType) => {
+  ingredientStore.ingredientList = [];
+});
+// const computedTotal = computed(() => {
+//   if (ingredientStore.importStoreType === 'ร้านกาแฟ') {
+//     return ingredientStore.ingredientList.reduce((total, item) => {
+//       return total + (item.totalunit || 0);
+//     }, 0) - (ingredientStore.discount || 0);
+//   }
+//   return 0;
+// });
+
 </script>
 
 <style scoped>

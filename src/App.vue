@@ -40,6 +40,7 @@ onMounted(() => {
 * {
   font-family: 'Kanit', sans-serif;
 }
+
 /* Webkit-based browsers */
 ::-webkit-scrollbar {
   width: 12px;
@@ -85,4 +86,5 @@ onMounted(() => {
 *::-ms-scrollbar-thumb:hover {
   background: #555; 
 }
+
 </style>
