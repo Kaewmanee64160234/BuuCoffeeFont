@@ -315,7 +315,7 @@ export const usePosStore = defineStore("pos", () => {
     }
     await receiptStore.getRecieptIn30Min();
   };
-  const createReceiptForCatering = async () => {
+  const createReceiptForCatering = async (checkStockId:number) => {
     const receiptStatus = "ร้านจัดเลี้ยง";
     if (currentReceipt.value?.queueNumber !== undefined) {
       receipt.value.receiptItems = selectedItems.value;
@@ -347,7 +347,7 @@ export const usePosStore = defineStore("pos", () => {
       receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice;
     }
 
-    const res = await receiptService.createReceipt(receipt.value);
+    const res = await receiptService.createReceipt(receipt.value,checkStockId);
     if (res.status === 201) {
       console.log("Receipt created successfully", res.data);
       currentReceipt.value = res.data;

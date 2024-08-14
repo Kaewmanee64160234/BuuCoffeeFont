@@ -6,6 +6,7 @@ import type { Importingredient } from "@/types/importIngredient.type";
 import { useLoadingStore } from "./loading";
 import { useMessageStore } from "./message";
 import type { Importingredientitem } from "@/types/importIngredientItem.type";
+import type { Checkingredient } from "@/types/checkingredientitem.type";
 
 export const useIngredientStore = defineStore("ingredient", () => {
   const loadingStore = useLoadingStore();
@@ -15,6 +16,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
   const all_ingredients = ref<Ingredient[]>([]);
   const ingredientlow = ref<Ingredient[]>([]);
   const importingredients = ref<Importingredient[]>([]);
+  const checkIngerdient = ref<Checkingredient>();
   const search = ref<string>("");
   const selectedAction = ref<string>('');
   const checkDescription = ref<string>('');
@@ -247,6 +249,11 @@ export const useIngredientStore = defineStore("ingredient", () => {
 
     try {
       const response = await ingredientService.createCheckIngredients(checkIngredientsPayload);
+      if(response.status === 201) {
+        checkIngerdient.value = response.data;
+        console.log('checkIngerdient', checkIngerdient.value);
+        
+      }
       console.log('API response:', response);
     } catch (error) {
       console.error('Error saving check data:', error);
@@ -343,5 +350,6 @@ export const useIngredientStore = defineStore("ingredient", () => {
     getIngredientlow,
     getIngredients,
     saveCheckData,
+    checkIngerdient
   };
 });

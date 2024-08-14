@@ -7,9 +7,12 @@ function getAllReceipts() {
 function getReceiptById(id: number) {
   return http.get(`/receipts/${id}`);
 }
-function createReceipt(receipt : Receipt) {
+function createReceipt(receipt : Receipt,checkStockId?:number) {
 console.log("receipt", JSON.stringify(receipt));
-  return http.post("/receipts", receipt);
+
+  return http.post("/receipts", {...receipt,checkStockId:checkStockId
+    
+  });
 }
 function updateReceipt(id: number, receipt: Receipt) {
   return http.patch(`/receipts/${id}`, receipt);

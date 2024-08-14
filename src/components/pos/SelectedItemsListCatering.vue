@@ -107,8 +107,8 @@ function removeIngredient(index: number) {
 
 const saveCheckData = async () => {
   ingredientStore.selectedAction = 'export';
+
   try {
-    // ส่งช้อมูล
     await ingredientStore.saveCheckData();
   } catch (error) {
     console.error('Error saving check data:', error);
@@ -153,14 +153,10 @@ async function save() {
       await posStore.updateReceiptCatering(posStore.receipt.receiptId, posStore.receipt);
       receiptCreated = true;
     } else {
-      if (selectedItems.value.length > 0) {
-        await posStore.createReceiptForCatering();
-        receiptCreated = true;
-      }
-      if (ingredientStore.ingredientCheckList.length > 0) {
         await saveCheckData();
-        stockChecked = true;
-      }
+        console.log('Check data saved', ingredientStore.checkIngerdient);
+        await posStore.createReceiptForCatering(ingredientStore.checkIngerdient?.CheckID!);
+
     }
 
     // Clear the selected items and reset receipt details
@@ -178,18 +174,12 @@ async function save() {
     posStore.receipt.receiptId = null;
     posStore.receipt.receiptStatus = 'รอชำระเงิน';
 
-    // Show appropriate dialog based on the actions performed
-    if (receiptCreated && stockChecked) {
-      posStore.receiptDialog = true;  // Show receipt dialog
-    } else if (receiptCreated) {
-      posStore.receiptDialog = true;  // Show receipt dialog
-    } else if (stockChecked) {
       Swal.fire({
         icon: 'success',
         title: 'สำเร็จ',
         text: 'การตรวจสอบสต็อกวัตถุดิบเสร็จสิ้น',
       });
-    }
+    
   } else {
     // If neither products nor ingredients are selected, show an error
     Swal.fire({
@@ -285,6 +275,7 @@ function openReceiptDialog() {
                 </v-list-item-group>
               </v-list>
             </div>
+
             <v-divider></v-divider>
 
             <!-- Ingredient Summary -->
@@ -300,7 +291,8 @@ function openReceiptDialog() {
                       <v-row no-gutters class="align-center">
                         <v-col cols="5" class="product-name">
                           {{ ingredient.ingredientcheck.ingredientName }}
-                          <span v-if="ingredient.ingredientcheck.ingredientSupplier !== '-' &&  ingredient.ingredientcheck.ingredientSupplier !== '' ">
+                          <span
+                            v-if="ingredient.ingredientcheck.ingredientSupplier !== '-' && ingredient.ingredientcheck.ingredientSupplier !== ''">
                             ({{ ingredient.ingredientcheck.ingredientSupplier }})
                           </span>
                         </v-col>
