@@ -242,7 +242,7 @@ function openReceiptDialog() {
                   <div v-for="(item, index) in selectedItems" :key="index" class="selected-item my-2">
                     <v-list-item :prepend-avatar="`${url}/products/${item.product?.productId}/image`"
                       class="full-width">
-                      <v-row no-gutters align="center">
+                      <v-row no-gutters class="align-center">
                         <v-col cols="5" class="product-name">
                           {{ item.product?.productName }}
                         </v-col>
@@ -297,7 +297,7 @@ function openReceiptDialog() {
                     <v-list-item :prepend-avatar="`${url}/ingredients/${ingredient.ingredientcheck.ingredientId}/image`"
                       class="full-width">
 
-                      <v-row no-gutters align="center">
+                      <v-row no-gutters class="align-center">
                         <v-col cols="5" class="product-name">
                           {{ ingredient.ingredientcheck.ingredientName }}
                           <span v-if="ingredient.ingredientcheck.ingredientSupplier !== '-' &&  ingredient.ingredientcheck.ingredientSupplier !== '' ">
