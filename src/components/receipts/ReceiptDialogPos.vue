@@ -10,9 +10,7 @@ const receiptStore = useReceiptStore();
 const posStore = usePosStore();
 
 
-onMounted(async () => {
-  await receiptStore.getRecieptIn30Min();
-});
+
 
 const cancelReceipt = async (receipt:Receipt) => {
   // dialog close
@@ -65,6 +63,8 @@ const selectReceipt = (receipt: Receipt) => {
 
   posStore.receipt = receipt;
   posStore.selectedItems = receipt.receiptItems;
+  posStore.receipt.change = receipt.change;
+  posStore.receipt.receive = receipt.receive;
   posStore.ReceiptDialogPos = false;
   
   console.log('Selected Receipt:', receipt);

@@ -36,6 +36,11 @@ function getRecieptIn30Min(typeOfProduct: string) {
   );
 }
 
+// getRecieptCateringIn24Hours
+function getRecieptCateringIn24Hours() {
+  return http.get(`/receipts/receipt-catering-in-24-hours`);
+}
+
 
 
 
@@ -46,5 +51,6 @@ export default {
   updateReceipt,
   deleteReceipt,
   cancelReceipt,
-  getRecieptIn30Min
+  getRecieptIn30Min,
+  getRecieptCateringIn24Hours
 };

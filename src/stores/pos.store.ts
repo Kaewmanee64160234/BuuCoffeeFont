@@ -36,6 +36,8 @@ export const usePosStore = defineStore("pos", () => {
     receiptPromotions: [],
     receiptTotalPrice: 0,
     paymentMethod: "",
+    change: 0,
+    receive: 0,
     customer: {
       customerId: 0,
       customerName: "",
@@ -312,6 +314,48 @@ export const usePosStore = defineStore("pos", () => {
       await customerStore.getAllCustomers();
     }
     await receiptStore.getRecieptIn30Min();
+  };
+  const createReceiptForCatering = async () => {
+    const receiptStatus = "ร้านจัดเลี้ยง";
+    if (currentReceipt.value?.queueNumber !== undefined) {
+      receipt.value.receiptItems = selectedItems.value;
+      receipt.value.receiptStatus = receiptStatus;
+      if (receipt.value.receive > 0) {
+        receipt.value.receiptStatus = "paid";
+      } else {
+        receipt.value.receiptStatus = "unpaid";
+        receipt.value.change = 0;
+      }
+      receipt.value.createdDate = new Date();
+      receipt.value.queueNumber = currentReceipt.value?.queueNumber + 1;
+    } else {
+      receipt.value.receiptItems = selectedItems.value;
+      receipt.value.receiptType = receiptStatus;
+      if (receipt.value.receive > 0) {
+        receipt.value.receiptStatus = "paid";
+      } else {
+        receipt.value.receiptStatus = "unpaid";
+        receipt.value.change = 0;
+
+      }
+      receipt.value.createdDate = new Date();
+      receipt.value.queueNumber = queueNumber.value;
+    }
+    queueNumber.value++;
+    saveQueueNumber();
+    if (receipt.value.receive != 0) {
+      receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice;
+    }
+
+    const res = await receiptService.createReceipt(receipt.value);
+    if (res.status === 201) {
+      console.log("Receipt created successfully", res.data);
+      currentReceipt.value = res.data;
+      queueReceipt.value.push(currentReceipt.value!);
+      saveQueueListToLocalStorage();
+      await customerStore.getAllCustomers();
+    }
+    await receiptStore.getRecieptCateringIn24Hours();
   };
 
   const applyPromotion = (promotion: Promotion) => {
@@ -600,13 +644,26 @@ export const usePosStore = defineStore("pos", () => {
     }
     await receiptStore.getRecieptIn30Min();
   };
+  // ipdateReceiptCatering
+  const updateReceiptCatering = async (id: number, receipt: Receipt) => {
+    console.log("updateReceipt", JSON.stringify(receipt));
+    if (receipt.receive != 0) {
+      receipt.receiptStatus = "paid";
+    }
+
+    const res = await receiptService.updateReceipt(id, receipt);
+    if (res.status === 200) {
+      console.log("Receipt updated successfully", res.data);
+
+      currentReceipt.value = res.data;
+      await customerStore.getAllCustomers();
+      await receiptStore.getRecieptCateringIn24Hours();
+    }
+  };
 
   function saveQueueListToLocalStorage() {
-    localStorage.setItem('queueReceipt', JSON.stringify(queueReceipt.value));
+    localStorage.setItem("queueReceipt", JSON.stringify(queueReceipt.value));
   }
-
-  
-  
 
   return {
     selectedItems,
@@ -637,6 +694,8 @@ export const usePosStore = defineStore("pos", () => {
     selectedItemsUsePromotion,
     queueReceipt,
     loadQueueNumber,
-    saveQueueListToLocalStorage
+    saveQueueListToLocalStorage,
+    createReceiptForCatering,
+    updateReceiptCatering,
   };
 });

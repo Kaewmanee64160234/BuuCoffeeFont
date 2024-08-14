@@ -28,6 +28,8 @@ export interface Receipt {
   receiptNetPrice: number;
   receiptStatus: string;
   queueNumber: number;
+  receive: number;
+  change: number;
   customer?: Customer;
   user?: User;
   receiptItems: ReceiptItem[];

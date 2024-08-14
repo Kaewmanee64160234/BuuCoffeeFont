@@ -127,7 +127,7 @@ watch(paginate, async (newValue, oldValue) => {
       <v-table class="mx-auto" style="width: 97%">
         <thead>
           <tr>
-            <th></th>
+            <th style="text-align: center;font-weight: bold;">รหัสวัตถุดิบ</th>
             <th style="text-align: center;font-weight: bold;">รูปภาพ</th>
             <th style="text-align: center;font-weight: bold;">ชื่อวัตถุดิบ</th>
             <th style="text-align: center;font-weight: bold;">ผู้จัดจำหน่าย</th>

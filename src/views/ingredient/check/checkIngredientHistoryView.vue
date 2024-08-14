@@ -14,6 +14,7 @@ onMounted(async () => {
 });
 
 const formatDate = (dateString: string) => {
+
     const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', timeZone: 'UTC' };
     return new Date(dateString).toLocaleDateString('th-TH', options);
 };
@@ -21,6 +22,7 @@ const formatDate = (dateString: string) => {
 const navigateTo = (routeName: string) => {
     router.push({ name: routeName });
 };
+
 const openHistoryCheckDialog = (checkingredient: Checkingredient) => {
     ingredientStore.checkingredient = checkingredient;
     ingredientStore.dialogCheckItem = true;
@@ -64,7 +66,7 @@ function exportToExcel(checkingredient: Checkingredient) {
                         ประวัติเช็ควัตถุดิบ
                     </v-col>
                     <v-col cols="3">
-                        <v-text-field label="ค้นหาประวัติการเช็ควัตถุดิบ" append-inner-icon="mdi-magnify" hide-details
+                        <v-text-field variant="solo" label="ค้นหาประวัติการเช็ควัตถุดิบ" append-inner-icon="mdi-magnify" hide-details
                             dense></v-text-field>
                     </v-col>
                 </v-row>
@@ -86,10 +88,10 @@ function exportToExcel(checkingredient: Checkingredient) {
             <v-table class="mx-auto" style="width: 97%">
                 <thead>
                     <tr>
-                        <th></th>
-                        <th>วันที่</th>
-                        <th>รูปแบบ</th>
-                        <th>การกระทำ</th>
+                        <th style="text-align: center;font-weight: bold;">รหัสประวัติการเช็ควัตถุดิบ</th>
+                        <th style="text-align: center;font-weight: bold;">วันที่</th>
+                        <th style="text-align: center;font-weight: bold;">รูปแบบ</th>
+                        <th style="text-align: center;font-weight: bold;">การกระทำ</th>
 
                     </tr>
                 </thead>
@@ -100,6 +102,14 @@ function exportToExcel(checkingredient: Checkingredient) {
                     <tr v-for="(item, index) in ingredientStore.CheckIngredientsHistory" :key="index">
                         <td>{{ index + 1 }}</td>
                         <td>{{ formatDate(item.date) }}</td>
+<<<<<<< HEAD
+                        <td>{{ item.user.userName }}</td>
+                        <td>
+                            <v-btn color="#FFDD83" class="mr-2" icon="mdi-pencil"
+                                @click="showDetail(item.checkingredientitem)">ดู</v-btn>
+
+                        </td>
+=======
                         <td
                             :style="{ color: item.actionType === 'issuing' ? 'red' : (item.actionType === 'check' ? '#CCCC00' : 'green') }">
                             {{ item.actionType === 'issuing' ? 'นำวัตถุดิบออก' : (item.actionType === 'check' ?
@@ -118,6 +128,7 @@ function exportToExcel(checkingredient: Checkingredient) {
                             </v-btn>
                         </td>
 
+>>>>>>> d7d6bbf2d701166f9f08ed7f343ee52cb290632d
                     </tr>
                 </tbody>
             </v-table>

@@ -1,23 +1,24 @@
 <script lang="ts" setup>
+
 import { ref, computed, watch, onMounted } from 'vue';
 import { usePosStore } from '@/stores/pos.store';
 import Swal from 'sweetalert2';
-import type {  ReceiptItem } from '../../types/receipt.type';
+import type { ReceiptItem } from '../../types/receipt.type';
 import { useReceiptStore } from '@/stores/receipt.store';
 import { useIngredientStore } from '@/stores/Ingredient.store'; // Assuming you have an ingredient store
+import ReceiptDetailsDialogPos from '../receipts/ReceiptDialogPos.vue';
 
 const step = ref(1);
 const posStore = usePosStore();
 const selectedItems = computed(() => posStore.selectedItems);
-const recive = ref(0);
-const change = ref(0);
 const receiptStore = useReceiptStore();
 const ingredientStore = useIngredientStore(); // Assuming this is the correct import for ingredients
 const selectedCategory = ref('Products');
 const ingredientFilters = ref<any[]>([]); // To store filtered ingredients
+const url = import.meta.env.VITE_URL_PORT
 
 onMounted(async () => {
-  await receiptStore.getRecieptIn30Min();
+  await receiptStore.getRecieptCateringIn24Hours();
   await ingredientStore.getAllIngredients(); // Load all ingredients (assuming this method exists)
 
   // Filter ingredients or products based on selectedCategory
@@ -31,7 +32,7 @@ onMounted(async () => {
 });
 
 function nextStep() {
-  if (selectedItems.value.length === 0) {
+  if (selectedItems.value.length === 0 && ingredientStore.ingredientCheckList.length === 0) {
     Swal.fire({
       icon: 'error',
       title: 'ข้อมูลไม่สมบูรณ์',
@@ -61,27 +62,16 @@ function removeItem(index: number) {
 }
 
 function calculateChange() {
-  if (posStore.receipt.paymentMethod === 'cash') {
-    change.value = recive.value - posStore.receipt.receiptNetPrice;
-  }
+
+  posStore.receipt.change = posStore.receipt.receive - posStore.receipt.receiptNetPrice;
+
 }
 
-function openReceiptDialog() {
-  posStore.ReceiptDialogPos = true;
-  console.log(" openReceiptDialog ", posStore.ReceiptDialogPos);
-}
+watch(() => posStore.receipt.receive, () => {
+  console.log('Receive:', posStore.receipt.receive);
+  console.log('Change:', posStore.receipt.change);
 
-function selectPaymentMethod(method: string) {
-  console.log(`Selected payment method: ${method}`);
-  posStore.receipt.paymentMethod = method;
-  if (method === 'cash') {
-    calculateChange();
-  } else {
-    change.value = 0;
-  }
-}
 
-watch(() => recive.value, () => {
   calculateChange();
 });
 
@@ -98,53 +88,130 @@ function decreaseQuantity(index: number) {
   }
 }
 
+// Functions for ingredient list
+function increaseIngredientQuantity(index: number) {
+  ingredientStore.ingredientCheckList[index].count++;
+}
+
+function decreaseIngredientQuantity(index: number) {
+  if (ingredientStore.ingredientCheckList[index].count === 1) {
+    removeIngredient(index);
+  } else {
+    ingredientStore.ingredientCheckList[index].count--;
+  }
+}
+
+function removeIngredient(index: number) {
+  ingredientStore.ingredientCheckList.splice(index, 1);
+}
+
+const saveCheckData = async () => {
+  ingredientStore.selectedAction = 'export';
+  try {
+    // ส่งช้อมูล
+    await ingredientStore.saveCheckData();
+  } catch (error) {
+    console.error('Error saving check data:', error);
+
+    Swal.fire({
+      title: 'เกิดข้อผิดพลาด!',
+      text: 'เกิดข้อผิดพลาดในการบันทึกข้อมูลของคุณ.',
+      icon: 'error',
+    });
+  }
+};
+
 async function save() {
   posStore.receipt.paymentMethod = 'cash';
-  posStore.receipt.receiptType = 'เลี้ยงรับรอง';
 
-  if (selectedItems.value.length === 0) {
-    Swal.fire({
-      icon: 'error',
-      title: 'ข้อมูลไม่สมบูรณ์',
-      text: 'กรุณาเพิ่มรายการอย่างน้อยหนึ่งรายการในใบเสร็จ',
-    });
-    return;
-  }
-  if (posStore.receipt.paymentMethod === '') {
-    Swal.fire({
-      icon: 'error',
-      title: 'ข้อมูลไม่สมบูรณ์',
-      text: 'กรุณาเลือกวิธีการชำระเงิน',
-    });
-    return;
-  }
-  if (posStore.receipt.paymentMethod === 'cash' && recive.value < posStore.receipt.receiptNetPrice) {
+  // Check if there are products in the selectedItems list or ingredients in the ingredientCheckList
+  if (selectedItems.value.length > 0 || ingredientStore.ingredientCheckList.length > 0) {
+    // Ensure payment method is selected
+    if (posStore.receipt.paymentMethod === '') {
+      Swal.fire({
+        icon: 'error',
+        title: 'ข้อมูลไม่สมบูรณ์',
+        text: 'กรุณาเลือกวิธีการชำระเงิน',
+      });
+      return;
+    }
+
+    // Ensure received amount is sufficient for cash payments
+    if (posStore.receipt.paymentMethod === 'cash' && posStore.receipt.receive < posStore.receipt.receiptNetPrice && posStore.receipt.receive != 0) {
+      Swal.fire({
+        icon: 'error',
+        title: 'จำนวนเงินไม่เพียงพอ',
+        text: 'กรุณาตรวจสอบจำนวนเงินที่รับมา',
+      });
+      return;
+    }
+
+    let receiptCreated = false;
+    let stockChecked = false;
+
+    if (posStore.receipt.receiptId) {
+      await posStore.updateReceiptCatering(posStore.receipt.receiptId, posStore.receipt);
+      receiptCreated = true;
+    } else {
+      if (selectedItems.value.length > 0) {
+        await posStore.createReceiptForCatering();
+        receiptCreated = true;
+      }
+      if (ingredientStore.ingredientCheckList.length > 0) {
+        await saveCheckData();
+        stockChecked = true;
+      }
+    }
+
+    // Clear the selected items and reset receipt details
+    posStore.selectedItems = [];
+    posStore.receipt.receiptTotalPrice = 0;
+    posStore.receipt.receiptTotalDiscount = 0;
     posStore.receipt.receiptNetPrice = 0;
+    posStore.receipt.receiptPromotions = [];
+    ingredientStore.ingredientCheckList = [];
+    posStore.receipt.receive = 0;
+    posStore.receipt.change = 0;
+    step.value = 1;
+    posStore.receipt.paymentMethod = '';
+    posStore.receipt.customer = null;
+    posStore.receipt.receiptId = null;
+    posStore.receipt.receiptStatus = 'รอชำระเงิน';
 
-  }
-  if (posStore.receipt.receiptId) {
-    posStore.updateReceipt(posStore.receipt.receiptId, posStore.receipt);
+    // Show appropriate dialog based on the actions performed
+    if (receiptCreated && stockChecked) {
+      posStore.receiptDialog = true;  // Show receipt dialog
+    } else if (receiptCreated) {
+      posStore.receiptDialog = true;  // Show receipt dialog
+    } else if (stockChecked) {
+      Swal.fire({
+        icon: 'success',
+        title: 'สำเร็จ',
+        text: 'การตรวจสอบสต็อกวัตถุดิบเสร็จสิ้น',
+      });
+    }
   } else {
-    posStore.createReceipt();
+    // If neither products nor ingredients are selected, show an error
+    Swal.fire({
+      icon: 'error',
+      title: 'ข้อมูลไม่สมบูรณ์',
+      text: 'กรุณาเพิ่มสินค้าหรือวัตถุดิบอย่างน้อยหนึ่งรายการ',
+    });
   }
-  posStore.selectedItems = [];
-  posStore.receipt.receiptTotalPrice = 0;
-  posStore.receipt.receiptTotalDiscount = 0;
-  posStore.receipt.receiptNetPrice = 0;
-  posStore.receipt.receiptPromotions = [];
-  posStore.receiptDialog = true;
-  recive.value = 0;
-  change.value = 0;
-  step.value = 1;
-  posStore.receipt.paymentMethod = '';
-  posStore.receipt.customer = null;
-  posStore.receipt.receiptId = null;
-  posStore.receipt.receiptStatus = 'รอชำระเงิน';
+}
+
+function openReceiptDialog() {
+  posStore.ReceiptDialogPos = true;
+  console.log("openReceiptDialog", posStore.ReceiptDialogPos);
 }
 </script>
 
 
+
 <template>
+  <ReceiptDetailsDialogPos />
+
+
   <div class="h-screen app">
 
     <v-window v-model="step" transition="fade" class="h-screen">
@@ -153,20 +220,29 @@ async function save() {
         <div class="content-container">
           <div class="header">
             <div class="d-flex justify-space-between align-center">
-              <h3>รายละเอียดการสั่งซื้อ</h3>
+              <h3>รายละเอียดการจัดเลี้ยงรับรอง</h3>
             </div>
+            <v-row class="d-flex align-center justify-start mt-4">
+
+
+              <v-btn class="mb-2" color="#ff9800" @click="openReceiptDialog()"
+                style="border-radius: 8px; background-color: #FF9642;">
+                ประวัติการสั่งซื้อ
+              </v-btn>
+
+            </v-row>
 
             <v-divider class="my-2"></v-divider>
 
             <!-- Product Summary -->
-            <h3>สรุปรายการสินค้าในร้าน</h3>
+            <h3>สรุปรายการสินค้า</h3>
             <div class="selected-items-list">
               <v-list class="full-width">
                 <v-list-item-group>
                   <div v-for="(item, index) in selectedItems" :key="index" class="selected-item my-2">
-                    <v-list-item :prepend-avatar="`http://localhost:3000/products/${item.product?.productId}/image`"
+                    <v-list-item :prepend-avatar="`${url}/products/${item.product?.productId}/image`"
                       class="full-width">
-                      <v-row no-gutters align="center">
+                      <v-row no-gutters class="align-center">
                         <v-col cols="5" class="product-name">
                           {{ item.product?.productName }}
                         </v-col>
@@ -213,35 +289,54 @@ async function save() {
 
             <!-- Ingredient Summary -->
             <h3 class="mt-4">สรุปรายการวัตถุดิบ</h3>
-            <div class="ingredient-list" >
+            <div class="ingredient-list">
               <v-list class="full-width">
                 <v-list-item-group>
-                  <div v-for="(ingredient, index) in ingredientStore.ingredientList" :key="index"
+                  <div v-for="(ingredient, index) in ingredientStore.ingredientCheckList" :key="index"
                     class="selected-item my-2">
-                    <v-list-item :prepend-avatar="`http://localhost:3000/ingredients/${ingredient.ingredientId}/image`"
+                    <v-list-item :prepend-avatar="`${url}/ingredients/${ingredient.ingredientcheck.ingredientId}/image`"
                       class="full-width">
-                      <v-row no-gutters align="center">
+
+                      <v-row no-gutters class="align-center">
                         <v-col cols="5" class="product-name">
-                          {{ ingredient.ingredient.ingredientName }}
+                          {{ ingredient.ingredientcheck.ingredientName }}
+                          <span v-if="ingredient.ingredientcheck.ingredientSupplier !== '-' &&  ingredient.ingredientcheck.ingredientSupplier !== '' ">
+                            ({{ ingredient.ingredientcheck.ingredientSupplier }})
+                          </span>
                         </v-col>
+
                         <v-col cols="2" class="text-right pr-2" style="color: black;">
-                          <p>{{ ingredient.ingredient.ingredientPrice }}</p>
+                          <p>{{ ingredient.ingredientcheck.ingredientPrice }}</p>
                         </v-col>
-                        <v-col cols="5" class="ingredient-details">
-                          {{ ingredient.ingredient.ingredientSupplier }} | {{ ingredient.totalunit }} units
+                        <v-col cols="3" class="text-right pr-2">
+                          <v-btn size="xs-small" color="#C5C5C5" icon @click="decreaseIngredientQuantity(index)">
+                            <v-icon>mdi-minus</v-icon>
+                          </v-btn>
+                          <span class="pa-2">{{ ingredient.count }}</span>
+                          <v-btn size="xs-small" color="#FF9642" icon @click="increaseIngredientQuantity(index)">
+                            <v-icon>mdi-plus</v-icon>
+                          </v-btn>
                         </v-col>
+                        <v-col cols="2" class="text-right">
+                          <v-btn icon variant="text" @click="removeIngredient(index)">
+                            <v-icon color="red">mdi-delete</v-icon>
+                          </v-btn>
+                        </v-col>
+
                       </v-row>
+
                     </v-list-item>
                   </div>
                 </v-list-item-group>
               </v-list>
             </div>
 
+
             <!-- Order Summary -->
             <div class="summary-section" style="width: 100%;">
               <v-divider></v-divider>
-            
-            
+
+
             </div>
           </div>
           <div class="footer-buttons">
@@ -276,17 +371,19 @@ async function save() {
                 <div>
                   <p class="d-flex justify-space-between align-center pr-6 my-2">
                     <span style="width: 50%;">จำนวนที่ทำการเบิก:</span>
-                    <v-text-field v-model="recive" type="number" variant="solo" label="จำนวนเงิน"
+                    <v-text-field v-model="posStore.receipt.receive" type="number" variant="solo" label="จำนวนเงิน"
                       style="width: 50%;"></v-text-field>
                   </p>
                 </div>
 
                 <!-- Change Amount -->
                 <p class="d-flex justify-space-between pr-6 my-2">
-                  <span>คงเหลือจากการเบิก:</span>
-                  <span :class="recive < 0 || recive < posStore.receipt.receiptNetPrice ? 'red--text' : 'black'"
+                  <span>ทอน:</span>
+                  <span
+                    :class="posStore.receipt.receive < 0 || posStore.receipt.receive < posStore.receipt.receiptNetPrice ? 'red--text' : 'black'"
                     class="info-value">
-                    {{ parseFloat(change.toFixed(2)) < 0 ? 'จำนวนเงินไม่พอ' : change.toFixed(2) }} </span>
+                    {{ parseFloat(posStore.receipt.change.toFixed(2)) < 0 ? 'จำนวนเงินไม่พอ' :
+                      posStore.receipt.change.toFixed(2) }} </span>
                 </p>
 
                 <v-divider></v-divider>
@@ -305,7 +402,8 @@ async function save() {
 
             <div class="footer-buttons">
               <v-row class="d-flex justify-center" style="width: 100%;">
-                <v-btn style="width: 40%; margin-right: 10px;" color="secondary" rounded @click="prevStep">ย้อนกลับ</v-btn>
+                <v-btn style="width: 40%; margin-right: 10px;" color="secondary" rounded
+                  @click="prevStep">ย้อนกลับ</v-btn>
                 <v-btn style="width: 40%;" color="#FF9642" rounded @click="save">บันทึก</v-btn>
               </v-row>
             </div>
@@ -369,7 +467,7 @@ async function save() {
 .selected-items-list,
 .ingredient-list {
   overflow-y: auto;
-  max-height: 40vh;
+  height: 30vh;
   margin-bottom: 20px;
 }
 

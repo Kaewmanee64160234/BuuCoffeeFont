@@ -79,13 +79,11 @@ function exportToExcel(importingredient: Importingredient) {
                         ประวัตินำเข้าวัตถุดิบ
                     </v-col>
                     <v-col cols="3">
-                        <v-text-field label="Search" append-inner-icon="mdi-magnify" hide-details dense></v-text-field>
+                        <v-text-field label="ค้นหาประวัตินำเข้าวัตถุดิบ" variant="solo" append-inner-icon="mdi-magnify" hide-details dense></v-text-field>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col>
-
-
                         <v-btn color="success" class="button-full-width" :to="{ name: 'importingredients' }">
                             <v-icon left>mdi-plus</v-icon>
                             นำเข้าวัตถุดิบ
@@ -99,29 +97,29 @@ function exportToExcel(importingredient: Importingredient) {
 
             <v-table class="mx-auto" style="width: 97%">
                 <thead>
-                    <tr>
-                        <th style="text-align: center;font-weight: bold;"></th>
-                        <th style="text-align: center;font-weight: bold;">วันที่</th>
-                        <th style="text-align: center;font-weight: bold;">ซัพพาย</th>
-                        <th style="text-align: center;font-weight: bold;">ราคารวม</th>
-                        <th style="text-align: center;font-weight: bold;">ส่วนลด</th>
-                        <th style="text-align: center;font-weight: bold;">รูปแบบ</th>
-                        <th style="text-align: center;font-weight: bold;">การกระทำ</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(item, index) in ingredientStore.importIngredientsHistory" :key="index">
-                        <td>{{ index + 1 }}</td>
-                        <td>{{ formatDate(item.date) }}</td>
-                        <td>{{ item.store }}</td>
-                        <td>{{ item.total }}</td>
-                        <td>{{ item.discount }}</td>
-                        <td>{{ item.importStoreType }}</td>
-                        <td>
-                            <v-btn color="#ed8731" class="mr-2" icon="mdi-pencil"
-                                @click="openHistoryCheckDialog(item)"><v-icon color="white"
-                                    style="font-size: 20px;">mdi-eye-circle</v-icon></v-btn>
-                            <v-btn color="#4CAF50" icon @click="exportToExcel(item)">
+
+    <tr>
+        <th style="text-align: center;font-weight: bold;">รหัสประวัตินำเข้าวัตถุดิบ</th>
+        <th style="text-align: center;font-weight: bold;">วันที่</th>
+        <th style="text-align: center;font-weight: bold;">ซัพพาย</th>
+        <th style="text-align: center;font-weight: bold;">ราคารวม</th>
+        <th style="text-align: center;font-weight: bold;">ส่วนลด</th>
+        <th style="text-align: center;font-weight: bold;">รูปแบบ</th>
+        <th style="text-align: center;font-weight: bold;">การกระทำ</th>
+    </tr>
+</thead>
+<tbody>
+    <tr v-for="(item, index) in ingredientStore.importIngredientsHistory" :key="index">
+        <td>{{ index + 1 }}</td>
+        <td>{{ formatDate(item.date) }}</td>
+        <td>{{ item.store }}</td>
+        <td>{{ item.total }}</td>
+        <td>{{ item.discount }}</td>
+        <td>{{ item.importStoreType }}</td>
+        <td>
+            <v-btn color="#ed8731" class="mr-2" icon="mdi-pencil" @click="openHistoryCheckDialog(item)"><v-icon color="white"
+                style="font-size: 20px;">mdi-eye-circle</v-icon></v-btn>
+                <v-btn color="#4CAF50" icon @click="exportToExcel(item)">
                                 <v-icon color="white" style="font-size: 20px;">mdi-file-excel</v-icon>
                             </v-btn>
                         </td>
