@@ -5,6 +5,8 @@ import type { Receipt } from '@/types/receipt.type';
 import { useReceiptsStore } from '@/stores/report/receiptsStore';
 import * as XLSX from 'xlsx';
 import HistoryReceiptDialog from '@/components/receipts/HistoryReceiptDialog.vue';
+import HistoryReceiptDialogCatering from '@/components/receipts/HistoryReceiptDialogCatering.vue';
+import { useCheckIngredientStore } from '@/stores/historyIngredientCheck.store';
 
 const receiptsStore = useReceiptsStore();
 const startDate = ref('');
@@ -12,6 +14,7 @@ const endDate = ref('');
 const receiptType = ref<string>('ร้านจัดเลี้ยง'); // Set default to 'ร้านจัดเลี้ยง'
 const receiptStore = useReceiptStore();
 const historyReceiptDialog = ref(false);
+const ingredientStore = useCheckIngredientStore();
 const selectedReceipt = ref<Receipt | null>(null);
 
 const fetchData = async () => {
@@ -62,9 +65,11 @@ onMounted(async () => {
   await receiptStore.getAllReceipts();
 });
 
-const openHistoryReceiptDialog = (receipt: Receipt) => {
+const openHistoryReceiptDialog = async (receipt: Receipt) => {
   receiptStore.receipt = receipt;
-  receiptStore.historyReceiptDialog = true;
+  await ingredientStore.getHistoryCheckById(receiptStore.receipt?.checkIngredientId!);
+
+  receiptStore.historyReceiptDialogCatering = true;
 };
 
 const handleSearchKeydown = (event: KeyboardEvent) => {
@@ -83,16 +88,17 @@ const filteredReceipts = computed(() => {
 
   // Further filter based on searchQuery if provided
   if (!receiptStore.searchQuery) {
-    return filteredByType.sort((a, b) => (a.receiptId ?? 0) - (b.receiptId ?? 0));
+    return filteredByType.sort((a, b) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime());
   }
-  
+
   return filteredByType
     .filter(receipt =>
       receipt.customer?.customerName?.toLowerCase().includes(receiptStore.searchQuery.toLowerCase()) ||
       receipt.receiptId?.toString().includes(receiptStore.searchQuery)
     )
-    .sort((a, b) => (a.receiptId ?? 0) - (b.receiptId ?? 0));
+    .sort((a, b) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime());
 });
+
 
 const formatDate = (date: any) => {
   if (!date) return ''; // Handle case where date is not provided
@@ -189,7 +195,7 @@ const statusText = (status: string) => {
 </style>
 
 <template>
-  <HistoryReceiptDialog v-model:dialog="historyReceiptDialog" :receipt="selectedReceipt" />
+  <HistoryReceiptDialogCatering v-model:dialog="historyReceiptDialog" />
 
   <v-container>
     <v-card class="flex-container">

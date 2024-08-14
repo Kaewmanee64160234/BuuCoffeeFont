@@ -9,6 +9,7 @@ export const useReceiptStore = defineStore("receipt", () => {
   const receipt = ref<Receipt | null>(null);
   const searchQuery = ref<string>("");
   const historyReceiptDialog = ref(false);
+  const historyReceiptDialogCatering = ref(false);
   const userStore = useUserStore();
 
   const getAllReceipts = async () => {
@@ -114,6 +115,7 @@ export const useReceiptStore = defineStore("receipt", () => {
     filteredReceipts,
     getRecieptIn30Min,
     cancelReceipt,
-    getRecieptCateringIn24Hours
+    getRecieptCateringIn24Hours,
+    historyReceiptDialogCatering
   };
 });
