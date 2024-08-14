@@ -5,6 +5,7 @@ import type { Receipt } from '@/types/receipt.type';
 import { useReceiptsStore } from '@/stores/report/receiptsStore';
 import * as XLSX from 'xlsx';
 import HistoryReceiptDialog from '@/components/receipts/HistoryReceiptDialog.vue';
+
 const receiptsStore = useReceiptsStore();
 const startDate = ref('');
 const endDate = ref('');
@@ -12,9 +13,25 @@ const receiptType = ref<string>('ร้านกาแฟ');
 const receiptStore = useReceiptStore();
 const historyReceiptDialog = ref(false);
 const selectedReceipt = ref<Receipt | null>(null);
+
+// Pagination
+const currentPage = ref(1);
+const itemsPerPage = ref(8);
+
+const totalPages = computed(() => {
+  return Math.ceil(filteredReceipts.value.length / itemsPerPage.value);
+});
+
+const paginatedReceipts = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value;
+  const end = start + itemsPerPage.value;
+  return filteredReceipts.value.slice(start, end);
+});
+
 const fetchData = async () => {
   await receiptsStore.fetchReceipts(startDate.value, endDate.value, receiptType.value);
 };
+
 const exportToExcel = () => {
   fetchData();
   const formattedReceipts = formatReceiptsForExcel(receiptsStore.receipts);
@@ -53,14 +70,11 @@ const s2ab = (s: string) => {
   return buf;
 };
 
-
-const receipts = receiptsStore.receipts;
 onMounted(async () => {
   await receiptStore.getAllReceipts();
 });
 
 const openHistoryReceiptDialog = (receipt: Receipt) => {
-  // selectedReceipt.value = receipt;
   receiptStore.receipt = receipt;
   receiptStore.historyReceiptDialog = true;
 };
@@ -83,27 +97,25 @@ const filteredReceipts = computed(() => {
     .sort((a, b) => (a.receiptId ?? 0) - (b.receiptId ?? 0));
 });
 
-
 const formatDate = (date: any) => {
-  if (!date) return ''; // กรณีไม่มีข้อมูลวันที่
+  if (!date) return '';
 
-  const jsDate = new Date(date.toString()); // แปลงข้อมูลวันที่เป็น string เป็นวัตถุ Date
+  const jsDate = new Date(date.toString());
   const formattedDate = jsDate.toLocaleDateString('th-TH', { 
     day: '2-digit', 
     month: '2-digit', 
     year: 'numeric', 
     timeZone: 'Asia/Bangkok' 
-  }); // กำหนดรูปแบบวันที่ตามที่ต้องการ
+  });
   
   const formattedTime = jsDate.toLocaleTimeString('th-TH', {
     hour: '2-digit',
     minute: '2-digit',
     timeZone: 'Asia/Bangkok'
-  }); // กำหนดรูปแบบเวลาตามที่ต้องการ
+  });
   
-  return `${formattedDate} เวลา ${formattedTime}`; // รวมวันที่และเวลาเข้าด้วยกัน
+  return `${formattedDate} เวลา ${formattedTime}`;
 };
-
 
 const formatReceiptsForExcel = (receipts: Receipt[]) => {
   return receipts.flatMap(receipt => {
@@ -131,6 +143,7 @@ const formatReceiptsForExcel = (receipts: Receipt[]) => {
     }));
   });
 };
+
 const statusClass = (status: string) => {
   return {
     'text-success': status === 'paid',
@@ -148,9 +161,8 @@ const statusText = (status: string) => {
       return status;
   }
 };
-
-
 </script>
+
 <style scoped>
 .flex-container {
   display: flex;
@@ -172,7 +184,29 @@ const statusText = (status: string) => {
   margin-left: 2%;
   margin-top: 3%;
 }
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .v-table th, .v-table td {
+    font-size: 12px;
+  }
+
+  .flex-container {
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .v-table th, .v-table td {
+    font-size: 10px;
+  }
+
+  .flex-container {
+    padding: 5px;
+  }
+}
 </style>
+
 
 <template>
   <HistoryReceiptDialog v-model:dialog="historyReceiptDialog" :receipt="selectedReceipt" />
@@ -223,17 +257,15 @@ const statusText = (status: string) => {
             <th class="text-center font-weight: bold;">ราคารวมสุทธิ</th>
             <th class="text-center font-weight: bold;">ส่วนลด</th>
             <th class="text-center font-weight: bold;">สมาชิก</th>
-            <!-- <th class="text-center">แต้มสะสม</th> -->
             <th class="text-center">โปรโมชั่น</th>
-
             <th class="text-center">รูปแบบการจ่ายเงิน</th>
             <th class="text-center">พนักงาน</th>
             <th class="text-center">การกระทำ</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(receipt, index) in filteredReceipts" :key="receipt.receiptId">
-            <td class="text-center">{{ index + 1 }}</td>
+          <tr v-for="(receipt, index) in paginatedReceipts" :key="receipt.receiptId">
+            <td class="text-center">{{ index + 1 + (currentPage - 1) * itemsPerPage }}</td>
             <td class="text-center">{{ formatDate(receipt.createdDate + '') }}</td>
             <td class="text-center">
               <span :class="statusClass(receipt.receiptStatus)">
@@ -243,7 +275,6 @@ const statusText = (status: string) => {
             <td class="text-center">{{ receipt.receiptNetPrice }}</td>
             <td class="text-center">{{ receipt.receiptTotalDiscount }}</td>
             <td class="text-center">{{ receipt.customer?.customerName || '-' }}</td>
-            <!-- <td class="text-center">{{ receipt.customer?.customerNumberOfStamp || 0 }}</td> -->
             <td class="text-center">
               <span v-if="receipt.receiptPromotions && receipt.receiptPromotions.length > 0">
                 มีการใช้โปรโมชั่น
@@ -258,13 +289,21 @@ const statusText = (status: string) => {
               <v-btn color="#FFDD83" icon="mdi-eye" @click="openHistoryReceiptDialog(receipt)"></v-btn>
             </td>
           </tr>
-          <tr v-if="!filteredReceipts.length">
+          <tr v-if="!paginatedReceipts.length">
             <td colspan="10" class="text-center">No data</td>
           </tr>
         </tbody>
-
       </v-table>
-    </v-card>
 
+      <!-- Pagination Controls -->
+      <v-row justify="center" class="mt-4">
+        <v-pagination
+          v-model="currentPage"
+          :length="totalPages"
+          total-visible="7"
+        ></v-pagination>
+      </v-row>
+    </v-card>
   </v-container>
 </template>
+

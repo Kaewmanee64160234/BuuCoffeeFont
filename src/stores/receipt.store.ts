@@ -11,31 +11,42 @@ export const useReceiptStore = defineStore("receipt", () => {
   const historyReceiptDialog = ref(false);
   const historyReceiptDialogCatering = ref(false);
   const userStore = useUserStore();
+  const isLoading = ref(false); // loading state
+  const errorMessage = ref<string | null>(null); // error message state
 
   const getAllReceipts = async () => {
     try {
+      isLoading.value = true;
       const response = await receiptService.getAllReceipts();
       if (response.status === 200) {
         receipts.value = response.data;
       }
     } catch (error) {
       console.error(error);
+      errorMessage.value = "ไม่สามารถโหลดข้อมูลใบเสร็จได้";
+    } finally {
+      isLoading.value = false;
     }
   };
 
   const getReceiptById = async (id: number) => {
     try {
+      isLoading.value = true;
       const response = await receiptService.getReceiptById(id);
       if (response.status === 200) {
         receipt.value = response.data;
       }
     } catch (error) {
       console.error(error);
+      errorMessage.value = `ไม่สามารถโหลดข้อมูลใบเสร็จ ID: ${id} ได้`;
+    } finally {
+      isLoading.value = false;
     }
   };
 
   const createReceipt = async (newReceipt: Receipt) => {
     try {
+      isLoading.value = true;
       const response = await receiptService.createReceipt(newReceipt);
       if (response.status === 201) {
         receipts.value.push(response.data);
@@ -43,6 +54,9 @@ export const useReceiptStore = defineStore("receipt", () => {
       }
     } catch (error) {
       console.error("Error creating receipt:", error);
+      errorMessage.value = "เกิดข้อผิดพลาดในการสร้างใบเสร็จ";
+    } finally {
+      isLoading.value = false;
     }
   };
 
@@ -55,33 +69,32 @@ export const useReceiptStore = defineStore("receipt", () => {
     );
   });
 
-  // getRecieptIn30Min
   const getRecieptIn30Min = async () => {
     try {
+      isLoading.value = true;
       let typeOfStore = "";
-      if(userStore.currentUser.userRole == "พนักงานขายข้าว"){
-        typeOfStore = "ร้านข้าว"
-      }else{
-        typeOfStore = "ร้านกาแฟ"
+      if (userStore.currentUser.userRole == "พนักงานขายข้าว") {
+        typeOfStore = "ร้านข้าว";
+      } else {
+        typeOfStore = "ร้านกาแฟ";
       }
 
-      const response = await receiptService.getRecieptIn30Min(
-        typeOfStore
-      );
+      const response = await receiptService.getRecieptIn30Min(typeOfStore);
       if (response.status === 200) {
         receipts.value = response.data;
         console.log("receipts", receipts.value);
       }
     } catch (error) {
       console.error(error);
+      errorMessage.value = "ไม่สามารถโหลดข้อมูลใบเสร็จใน 30 นาทีได้";
+    } finally {
+      isLoading.value = false;
     }
-
-
   };
 
-  // get recipt Catering in 24 hours
   const getRecieptCateringIn24Hours = async () => {
     try {
+      isLoading.value = true;
       const response = await receiptService.getRecieptCateringIn24Hours();
       if (response.status === 200) {
         receipts.value = response.data;
@@ -89,11 +102,15 @@ export const useReceiptStore = defineStore("receipt", () => {
       }
     } catch (error) {
       console.error(error);
+      errorMessage.value = "ไม่สามารถโหลดข้อมูลใบเสร็จรับรองใน 24 ชั่วโมงได้";
+    } finally {
+      isLoading.value = false;
     }
   };
-// cancelReceipt
+
   const cancelReceipt = async (id: number) => {
     try {
+      isLoading.value = true;
       const response = await receiptService.cancelReceipt(id);
       if (response.status === 200) {
         await getRecieptIn30Min();
@@ -101,9 +118,12 @@ export const useReceiptStore = defineStore("receipt", () => {
       return response;
     } catch (error) {
       console.error(error);
+      errorMessage.value = `ไม่สามารถยกเลิกใบเสร็จ ID: ${id} ได้`;
+    } finally {
+      isLoading.value = false;
     }
-  }
-  
+  };
+
   return {
     receipts,
     receipt,
@@ -116,6 +136,8 @@ export const useReceiptStore = defineStore("receipt", () => {
     getRecieptIn30Min,
     cancelReceipt,
     getRecieptCateringIn24Hours,
-    historyReceiptDialogCatering
+    historyReceiptDialogCatering,
+    isLoading, // expose loading state
+    errorMessage, // expose error message state
   };
 });
