@@ -47,7 +47,7 @@ const formatDate = (dateString: string) => {
         </v-row>
 
       </v-card-title>
-      <v-table class="text-center mt-5" >
+      <v-table class="text-center mt-5">
         <thead>
           <tr>
             <th class="column-header text-center"></th>
@@ -58,7 +58,8 @@ const formatDate = (dateString: string) => {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(item, index) in ingredientStore.importingredient?.importingredientitem" :key="item.importIngredientsItemID">
+          <tr v-for="(item, index) in ingredientStore.importingredient?.importingredientitem"
+            :key="item.importIngredientsItemID">
             <td class="column-data text-center">{{ index + 1 }}</td>
             <td class="column-data text-center">{{ item.ingredient.ingredientName }}</td>
             <td class="column-data text-center">{{ item.Quantity }} {{ item.ingredient?.ingredientUnit }}</td>

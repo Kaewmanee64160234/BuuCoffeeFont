@@ -30,13 +30,13 @@ const formatDate = (dateString: string) => {
 //     year: 'numeric', 
 //     timeZone: 'Asia/Bangkok' 
 //   }); // กำหนดรูปแบบวันที่ตามที่ต้องการ
-  
+
 //   const formattedTime = jsDate.toLocaleTimeString('th-TH', {
 //     hour: '2-digit',
 //     minute: '2-digit',
 //     timeZone: 'Asia/Bangkok'
 //   }); // กำหนดรูปแบบเวลาตามที่ต้องการ
-  
+
 //   return `${formattedDate} เวลา ${formattedTime}`; // รวมวันที่และเวลาเข้าด้วยกัน
 // };
 const openHistoryCheckDialog = (importingredient: Importingredient) => {
@@ -53,13 +53,13 @@ function exportToExcel(importingredient: Importingredient) {
 
 
     const tableData = importingredient.importingredientitem.map((item, index) => ({
-    ลำดับ: index + 1,
-    ชื่อวัตถุดิบ: item.ingredient?.ingredientName,
-    ซัพพาย: item.ingredient?.ingredientSupplier,
-    จำนวน: item.Quantity,
-    ราคาต่อขิ้น: item.unitPrice,
-    ราคารวม: item.pricePerUnit,
-}));
+        ลำดับ: index + 1,
+        ชื่อวัตถุดิบ: item.ingredient?.ingredientName,
+        ซัพพาย: item.ingredient?.ingredientSupplier,
+        จำนวน: item.Quantity,
+        ราคาต่อขิ้น: item.unitPrice,
+        ราคารวม: item.pricePerUnit,
+    }));
     const wb = XLSX.utils.book_new();
     const ws1 = XLSX.utils.json_to_sheet([basicData], { header: Object.keys(basicData) });
     const ws2 = XLSX.utils.json_to_sheet(tableData, { header: Object.keys(tableData[0]) });
@@ -70,7 +70,7 @@ function exportToExcel(importingredient: Importingredient) {
 </script>
 
 <template>
-<dialogCheckItem v-model:dialog="historyImportDialog" :importingredient="selectedImport" />
+    <dialogCheckItem v-model:dialog="historyImportDialog" :importingredient="selectedImport" />
     <v-container>
         <v-card>
             <v-card-title>
@@ -99,33 +99,34 @@ function exportToExcel(importingredient: Importingredient) {
 
             <v-table class="mx-auto" style="width: 97%">
                 <thead>
-    <tr>
-        <th style="text-align: center;font-weight: bold;"></th>
-        <th style="text-align: center;font-weight: bold;">วันที่</th>
-        <th style="text-align: center;font-weight: bold;">ซัพพาย</th>
-        <th style="text-align: center;font-weight: bold;">ราคารวม</th>
-        <th style="text-align: center;font-weight: bold;">ส่วนลด</th>
-        <th style="text-align: center;font-weight: bold;">รูปแบบ</th>
-        <th style="text-align: center;font-weight: bold;">การกระทำ</th>
-    </tr>
-</thead>
-<tbody>
-    <tr v-for="(item, index) in ingredientStore.importIngredientsHistory" :key="index">
-        <td>{{ index + 1 }}</td>
-        <td>{{ formatDate(item.date) }}</td>
-        <td>{{ item.store }}</td>
-        <td>{{ item.total }}</td>
-        <td>{{ item.discount }}</td>
-        <td>{{ item.importStoreType }}</td>
-        <td>
-            <v-btn color="#ed8731" class="mr-2" icon="mdi-pencil" @click="openHistoryCheckDialog(item)"><v-icon color="white"
-                style="font-size: 20px;">mdi-eye-circle</v-icon></v-btn>
-                <v-btn color="#4CAF50" icon @click="exportToExcel(item)">
+                    <tr>
+                        <th style="text-align: center;font-weight: bold;"></th>
+                        <th style="text-align: center;font-weight: bold;">วันที่</th>
+                        <th style="text-align: center;font-weight: bold;">ซัพพาย</th>
+                        <th style="text-align: center;font-weight: bold;">ราคารวม</th>
+                        <th style="text-align: center;font-weight: bold;">ส่วนลด</th>
+                        <th style="text-align: center;font-weight: bold;">รูปแบบ</th>
+                        <th style="text-align: center;font-weight: bold;">การกระทำ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(item, index) in ingredientStore.importIngredientsHistory" :key="index">
+                        <td>{{ index + 1 }}</td>
+                        <td>{{ formatDate(item.date) }}</td>
+                        <td>{{ item.store }}</td>
+                        <td>{{ item.total }}</td>
+                        <td>{{ item.discount }}</td>
+                        <td>{{ item.importStoreType }}</td>
+                        <td>
+                            <v-btn color="#ed8731" class="mr-2" icon="mdi-pencil"
+                                @click="openHistoryCheckDialog(item)"><v-icon color="white"
+                                    style="font-size: 20px;">mdi-eye-circle</v-icon></v-btn>
+                            <v-btn color="#4CAF50" icon @click="exportToExcel(item)">
                                 <v-icon color="white" style="font-size: 20px;">mdi-file-excel</v-icon>
                             </v-btn>
-        </td>
-    </tr>
-</tbody>
+                        </td>
+                    </tr>
+                </tbody>
 
                 <tbody v-if="!ingredientStore.importIngredientsHistory.length">
                     <tr>
@@ -149,11 +150,11 @@ function exportToExcel(importingredient: Importingredient) {
 .button-full-width {
     width: 100%;
 }
-th, td {
-  padding-top: 12px !important; 
-  padding-bottom: 12px !important; 
-  text-align: center !important; 
+
+th,
+td {
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
+    text-align: center !important;
 }
-
-
 </style>
