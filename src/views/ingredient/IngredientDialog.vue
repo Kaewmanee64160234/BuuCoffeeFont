@@ -79,6 +79,7 @@ const subunits = [
   'อื่นๆ'
 ];
 </script>
+
 <template>
   <v-dialog v-model="ingredientStore.dialog" persistent width="1024">
     <v-card class="rounded-card white-background">
@@ -107,28 +108,28 @@ const subunits = [
 
             </v-row>
             <v-row>
-              <v-col cols="6">
+              <v-col cols="12" sm="6">
                 <v-text-field label="ชื่อวัตถุดิบ (ตัวอย่าง : ผงกาแฟ)" required
                   v-model="ingredientStore.editedIngredient.ingredientName" :rules="[
                     (v) => !!v || 'กรุณากรอกชื่อวัตถุดิบ',
                     (v) => v.length >= 3 || 'ความยาวต้องมากกว่า 3 ตัวอักษร',
                   ]" dense hide-details variant="solo"></v-text-field>
               </v-col>
-              <v-col cols="6">
+              <v-col cols="12" sm="6">
                 <v-text-field label="ชื่อแบรนด์ (ตัวอย่าง : เนสกาแฟ)" required
                   v-model="ingredientStore.editedIngredient.ingredientSupplier"
                   :rules="[(v) => !!v || 'กรุณากรอกชื่อแบรนด์']" dense hide-details variant="solo"></v-text-field>
               </v-col>
             </v-row>
             <v-row>
-              <v-col cols="6">
+              <v-col cols="12" sm="6">
                 <v-text-field label="ขั้นต่ำ (ตัวอย่าง : 10)" v-model.number="ingredientStore.editedIngredient.ingredientMinimun
                   " :rules="[
                     (v) => !!v || 'กรุณากรอกขั้นต่ำ',
                     (v) => v >= 0 || 'ขั้นต่ำต้องมากกว่า 0',
                   ]" dense hide-details variant="solo"></v-text-field>
               </v-col>
-              <v-col cols="6">
+              <v-col cols="12" sm="6">
                 <v-autocomplete label="หน่วย (ตัวอย่าง : ซอง)" v-model="ingredientStore.editedIngredient.ingredientUnit"
                   :items="units" dense hide-details variant="solo"></v-autocomplete>
               </v-col>
@@ -137,14 +138,14 @@ const subunits = [
             <v-row>
 
 
-              <v-col cols="6">
+              <v-col cols="12" sm="6">
                 <v-text-field label="ปริมาณต่อหน่วย/ย่อย (ตัวอย่าง : 250)" v-model.number="ingredientStore.editedIngredient.ingredientQuantityPerUnit
                   " :rules="[
                     (v) => !!v || 'กรุณากรอกปริมาณต่อหน่วย',
                     (v) => v > 0 || 'ปริมาณต้องมากกว่า 0',
                   ]" dense hide-details variant="solo"></v-text-field>
               </v-col>
-              <v-col cols="6">
+              <v-col cols="12" sm="6">
                 <v-autocomplete label="หน่วย/ย่อย (ตัวอย่าง : มิลิกรัม ) **หน่วยที่ใช้ปรุง" v-model.number="ingredientStore.editedIngredient
                     .ingredientQuantityPerSubUnit
                   " :items="subunits" dense hide-details variant="solo"></v-autocomplete>
@@ -169,3 +170,47 @@ const subunits = [
     </v-card>
   </v-dialog>
 </template>
+
+<style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+* {
+  font-family: 'Kanit', sans-serif;
+}
+
+.v-dialog {
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.v-card {
+  width: 100%;
+  max-width: 1024px;
+}
+
+.v-card-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.v-text-field,
+.v-autocomplete {
+  width: 100%;
+}
+
+@media (max-width: 600px) {
+  .v-card-title {
+    font-size: 1.2rem;
+  }
+
+  .v-btn {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .v-col {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+}
+</style>
