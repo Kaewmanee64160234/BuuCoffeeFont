@@ -10,7 +10,7 @@
           <v-form ref="form">
             <v-row>
               <v-col cols="12" md="6">
-                <v-text-field v-model="userName" label="ชื่อผู้ใช้" required></v-text-field>
+                <v-text-field v-model="userName" label="ชื่อผู้ใช้" variant="solo" required></v-text-field>
               </v-col>
               <v-col cols="12" md="6">
                 <v-text-field 
@@ -18,17 +18,21 @@
                   label="รหัสผ่าน" 
                   :type="show ? 'text' : 'password'"
                   :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
+                  variant="solo"
                   @click:append="show = !show"
                   required
+                  :disabled="true"
                 ></v-text-field>
               </v-col>
+              
               <v-col cols="12" md="6">
-                <v-text-field v-model="userEmail" label="อีเมล" required></v-text-field>
+                <v-text-field v-model="userEmail" label="อีเมล" variant="solo" required></v-text-field>
               </v-col>
               <v-col cols="12" md="6">
                 <v-select v-model="userStatus" 
                   label="สถานะผู้ใช้งาน" 
                   :items="['ลาออกแล้ว', 'ยังไม่ลาออก']"
+                  variant="solo"
                   required>
                 </v-select>
               </v-col>
@@ -40,6 +44,7 @@
                     'พนักงานขายกาแฟ',
                     'พนักงานขายข้าว',
                   ]"
+                  variant="solo"
                   required
                 ></v-select>
               </v-col>
