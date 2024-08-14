@@ -177,7 +177,7 @@ async function save() {
       Swal.fire({
         icon: 'success',
         title: 'สำเร็จ',
-        text: 'การตรวจสอบสต็อกวัตถุดิบเสร็จสิ้น',
+        text: 'บันทึกข้อมูลสำเร็จ',
       });
     
   } else {
@@ -212,15 +212,7 @@ function openReceiptDialog() {
             <div class="d-flex justify-space-between align-center">
               <h3>รายละเอียดการจัดเลี้ยงรับรอง</h3>
             </div>
-            <v-row class="d-flex align-center justify-start mt-4">
-
-
-              <v-btn class="mb-2" color="#ff9800" @click="openReceiptDialog()"
-                style="border-radius: 8px; background-color: #FF9642;">
-                ประวัติการสั่งซื้อ
-              </v-btn>
-
-            </v-row>
+            
 
             <v-divider class="my-2"></v-divider>
 

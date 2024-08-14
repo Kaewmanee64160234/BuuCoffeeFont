@@ -120,6 +120,12 @@ const router = createRouter({
       component: () => import("../views/pos/PosCateringView.vue"),
 
     },
+    // historyReceiptCatering
+    {
+      path:'/historyReceiptCatering',
+      name:'historyReceiptCatering',
+      component: () => import("../views/receipt/HistoryReceiptCatering.vue"),
+    },
     {
       path: "/:catchAll(.*)",
       name: "NotFound",
