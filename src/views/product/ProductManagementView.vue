@@ -173,12 +173,12 @@ const deleteProduct = async (productId: number) => {
           <v-table class="text-center " style="width: 97%;">
             <thead>
               <tr>
-                <th style="text-align: center;"></th>
-                <th style="text-align: center;">รูปภาพ</th>
-                <th style="text-align: center;">ชื่อสินค้า</th>
-                <th style="text-align: center;">ประเภทสินค้า</th>
-                <th style="text-align: center;">ราคา</th>
-                <th style="text-align: center;">การกระทำ</th>
+                <th style="text-align: center; font-weight: bold;">รหัสสินค้า</th>
+                <th style="text-align: center; font-weight: bold;">รูปภาพ</th>
+                <th style="text-align: center; font-weight: bold;">ชื่อสินค้า</th>
+                <th style="text-align: center; font-weight: bold;">ประเภทสินค้า</th>
+                <th style="text-align: center; font-weight: bold;">ราคา</th>
+                <th style="text-align: center; font-weight: bold;">การกระทำ</th>
               </tr>
             </thead>
             <tbody>

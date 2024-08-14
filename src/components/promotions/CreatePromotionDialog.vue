@@ -7,25 +7,84 @@
       <v-card-text>
         <v-stepper v-model="step" :items="items" show-actions>
           <template v-slot:item.1>
-            <h3 class="text-h6">รายละเอียดโปรโมชั่น</h3>
+            <v-icon color="red" left style="font-size: 20px;">mdi-numeric-1-circle</v-icon><span> รายละเอียดโปรโมชั่น</span>
             <br>
             <v-form ref="form1">
-              <v-text-field v-model="promotionName" label="ชื่อโปรโมชั่น"
-                :rules="[v => !!v || 'กรุณากรอกชื่อโปรโมชั่น',]" variant="solo" required></v-text-field>
-              <v-text-field v-model="startDate" label="วันที่เริ่มต้น" type="date"
-                :rules="[v => !!v || 'กรุณาเลือกวันที่เริ่มต้น']" variant="solo" required></v-text-field>
-              <v-checkbox v-model="noEndDate" label="ไม่มีวันสิ้นสุด"></v-checkbox>
-              <v-text-field v-if="!noEndDate" v-model="endDate" label="วันที่สิ้นสุด" type="date"
-                :rules="[v => !!v || 'กรุณาเลือกวันที่สิ้นสุด']" :disabled="noEndDate" variant="solo" required></v-text-field>
-              <v-select v-model="promotionTypeName"
-                :items="promotionStore.promotionTypes.map(promotionType_ => promotionType_.text)" item-text="text"
-                item-value="value" label="ประเภทโปรโมชั่น" :rules="[v => !!v || 'กรุณาเลือกประเภทโปรโมชั่น']"
-                variant="solo" required></v-select>
-              <v-select v-model="promotionStore_" :items="store" item-text="text" item-value="value"
-                label="ร้านที่ใช้promotion" :rules="[v => !!v || 'กรุณาเลือกร้านที่ใช้โปรโมชั่น']" variant="solo" required></v-select>
-              <v-checkbox v-model="promotionCanUseManyTimes" label="โปรโมชั่นนี้สามารถใช้ได้หลายครั้ง"></v-checkbox>
-              <v-textarea v-model="description" label="คำอธิบาย" variant="solo" required></v-textarea>
-            </v-form>
+  <v-text-field 
+    v-model="promotionName" 
+    label="ชื่อโปรโมชั่น"
+    :rules="[v => !!v || 'กรุณากรอกชื่อโปรโมชั่น']" 
+    :error-messages="!promotionName ? ['กรุณากรอกชื่อโปรโมชั่น'] : []"
+    variant="solo" 
+    required>
+  </v-text-field>
+
+  <v-text-field 
+    v-model="startDate" 
+    label="วันที่เริ่มต้น" 
+    type="date"
+    :rules="[v => !!v || 'กรุณาเลือกวันที่เริ่มต้น']"
+    :error-messages="!startDate ? ['กรุณาเลือกวันที่เริ่มต้น'] : []"
+    variant="solo" 
+    required>
+  </v-text-field>
+
+  <v-checkbox 
+    v-model="noEndDate" 
+    label="ไม่มีวันสิ้นสุด">
+  </v-checkbox>
+
+  <v-text-field 
+    v-if="!noEndDate" 
+    v-model="endDate" 
+    label="วันที่สิ้นสุด" 
+    type="date"
+    :rules="[v => !!v || 'กรุณาเลือกวันที่สิ้นสุด']"
+    :disabled="noEndDate" 
+    :error-messages="!endDate && !noEndDate ? ['กรุณาเลือกวันที่สิ้นสุด'] : []"
+    variant="solo" 
+    required>
+  </v-text-field>
+
+  <v-select 
+    v-model="promotionTypeName"
+    :items="promotionStore.promotionTypes.map(promotionType_ => promotionType_.text)" 
+    item-text="text"
+    item-value="value" 
+    label="ประเภทโปรโมชั่น" 
+    :rules="[v => !!v || 'กรุณาเลือกประเภทโปรโมชั่น']"
+    :error-messages="!promotionTypeName ? ['กรุณาเลือกประเภทโปรโมชั่น'] : []"
+    variant="solo" 
+    required>
+  </v-select>
+
+  <v-select 
+    v-model="promotionStore_" 
+    :items="store" 
+    item-text="text" 
+    item-value="value"
+    label="ร้านที่ใช้promotion" 
+    :rules="[v => !!v || 'กรุณาเลือกร้านที่ใช้โปรโมชั่น']"
+    :error-messages="!promotionStore_ ? ['กรุณาเลือกร้านที่ใช้โปรโมชั่น'] : []"
+    variant="solo" 
+    required>
+  </v-select>
+
+  <v-checkbox 
+    v-model="promotionCanUseManyTimes" 
+    label="โปรโมชั่นนี้สามารถใช้ได้หลายครั้ง">
+  </v-checkbox>
+
+  <v-textarea 
+    v-model="description" 
+    label="คำอธิบาย" 
+    :rules="[v => !!v || 'กรุณากรอกคำอธิบาย']"
+    :error-messages="!description ? ['กรุณากรอกคำอธิบาย'] : []"
+    variant="solo" 
+    required>
+  </v-textarea>
+</v-form>
+
           </template>
 
           <template v-slot:item.2>
@@ -82,7 +141,7 @@ const promotionStore = usePromotionStore();
 const productStore = useProductStore();
 
 const step = ref(1);
-const promotionName = ref('โปรโมชั่นใหม่'); // Default value
+const promotionName = ref(''); // Default value
 const discountValue = ref<number | null>(10); // Default value for discount
 const buyProductId = ref<number | null>(null);
 const freeProductId = ref<number | null>(null);
@@ -302,6 +361,10 @@ const createPromotion = async () => {
 
 
 <style scoped>
+.v-card-title {
+  background-color: #f5f5f5;
+  padding: 16px;
+}
 .swal-button {
   font-size: 16px;
 }

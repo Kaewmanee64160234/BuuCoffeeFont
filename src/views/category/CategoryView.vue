@@ -31,7 +31,7 @@
           <v-table class="text-center mt-5" style="width: 97%;">
             <thead>
               <tr>
-                <th style="text-align: center; font-weight: bold;"></th>
+                <th style="text-align: center; font-weight: bold;">รหัสหมวดหมู่</th>
                 <th style="text-align: center; font-weight: bold;">ชื่อหมวดหมู่</th>
                 <th style="text-align: center; font-weight: bold;">หมวดหมู่นี้สามารถใส่ท็อปปิ้งได้</th>
                 <th style="text-align: center; font-weight: bold;">การกระทำ</th>

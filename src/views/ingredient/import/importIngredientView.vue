@@ -80,14 +80,15 @@
                 </td>
                 <td v-if="ingredientStore.importStoreType === 'ร้านกาแฟ'">{{ item.ingredient?.ingredientSupplier }}</td>
                 <td v-if="ingredientStore.importStoreType === 'ร้านกาแฟ'">
-                  <input type="number" v-model.number="item.count" class="styled-input" />
+                  <input type="number" v-model.number="item.count" class="styled-input" min="1" />
                 </td>
                 <td v-if="ingredientStore.importStoreType === 'ร้านกาแฟ'">
-                  <input type="number" v-model.number="item.unitprice" class="styled-input" />
+                  <input type="number" v-model.number="item.unitprice" class="styled-input" min="0" />
                 </td>
                 <td v-if="ingredientStore.importStoreType === 'ร้านกาแฟ'">
-                  <input type="number" v-model.number="item.totalunit" class="styled-input" />
+                  <input type="number" v-model.number="item.totalunit" class="styled-input" min="0" />
                 </td>
+
                 <td>
                   <button @click="ingredientStore.removeIngredient(index)" class="styled-button">
                     ลบ

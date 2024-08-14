@@ -66,7 +66,7 @@ function exportToExcel(checkingredient: Checkingredient) {
                         ประวัติเช็ควัตถุดิบ
                     </v-col>
                     <v-col cols="3">
-                        <v-text-field label="ค้นหาประวัติการเช็ควัตถุดิบ" append-inner-icon="mdi-magnify" hide-details
+                        <v-text-field variant="solo" label="ค้นหาประวัติการเช็ควัตถุดิบ" append-inner-icon="mdi-magnify" hide-details
                             dense></v-text-field>
                     </v-col>
                 </v-row>
@@ -88,10 +88,10 @@ function exportToExcel(checkingredient: Checkingredient) {
             <v-table class="mx-auto" style="width: 97%">
                 <thead>
                     <tr>
-                        <th></th>
-                        <th>วันที่</th>
-                        <th>รูปแบบ</th>
-                        <th>การกระทำ</th>
+                        <th style="text-align: center;font-weight: bold;">รหัสประวัติการเช็ควัตถุดิบ</th>
+                        <th style="text-align: center;font-weight: bold;">วันที่</th>
+                        <th style="text-align: center;font-weight: bold;">รูปแบบ</th>
+                        <th style="text-align: center;font-weight: bold;">การกระทำ</th>
 
                     </tr>
                 </thead>
