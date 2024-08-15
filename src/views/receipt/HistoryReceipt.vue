@@ -7,8 +7,11 @@ import * as XLSX from 'xlsx';
 import HistoryReceiptDialog from '@/components/receipts/HistoryReceiptDialog.vue';
 import ReceiptOld from '@/components/receipts/ReceiptOld.vue';
 const receiptsStore = useReceiptsStore();
-const startDate = ref('');
-const endDate = ref('');
+const currentDate = new Date();
+const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+const startDate = ref(startOfMonth.toISOString().substring(0, 10));
+const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+const endDate = ref(endOfMonth.toISOString().substring(0, 10));
 const receiptType = ref<string>('ร้านกาแฟ');
 const receiptStore = useReceiptStore();
 const historyReceiptDialog = ref(false);
@@ -33,8 +36,8 @@ const fetchData = async () => {
   await receiptsStore.fetchReceipts(startDate.value, endDate.value, receiptType.value);
 };
 
-const exportToExcel = () => {
-  fetchData();
+const exportToExcel = async () => {
+  await fetchData();
   const formattedReceipts = formatReceiptsForExcel(receiptsStore.receipts);
   const worksheet = XLSX.utils.json_to_sheet(formattedReceipts, {
     header: [
@@ -63,6 +66,7 @@ const exportToExcel = () => {
   link.download = 'receipts.xlsx';
   link.click();
 };
+
 
 const s2ab = (s: string) => {
   const buf = new ArrayBuffer(s.length);
@@ -105,19 +109,19 @@ const formatDate = (date: any) => {
   if (!date) return '';
 
   const jsDate = new Date(date.toString());
-  const formattedDate = jsDate.toLocaleDateString('th-TH', { 
-    day: '2-digit', 
-    month: '2-digit', 
-    year: 'numeric', 
-    timeZone: 'Asia/Bangkok' 
+  const formattedDate = jsDate.toLocaleDateString('th-TH', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    timeZone: 'Asia/Bangkok'
   });
-  
+
   const formattedTime = jsDate.toLocaleTimeString('th-TH', {
     hour: '2-digit',
     minute: '2-digit',
     timeZone: 'Asia/Bangkok'
   });
-  
+
   return `${formattedDate} เวลา ${formattedTime}`;
 };
 
@@ -183,7 +187,7 @@ const statusText = (status: string) => {
 }
 
 .table-container {
-  max-height: 70vh; 
+  max-height: 70vh;
   overflow-y: auto;
   margin-left: 2%;
   margin-top: 3%;
@@ -191,7 +195,9 @@ const statusText = (status: string) => {
 
 /* Responsive styles */
 @media (max-width: 768px) {
-  .v-table th, .v-table td {
+
+  .v-table th,
+  .v-table td {
     font-size: 12px;
   }
 
@@ -201,7 +207,9 @@ const statusText = (status: string) => {
 }
 
 @media (max-width: 480px) {
-  .v-table th, .v-table td {
+
+  .v-table th,
+  .v-table td {
     font-size: 10px;
   }
 
@@ -225,32 +233,31 @@ const statusText = (status: string) => {
           </v-col>
           <v-row>
             <v-col cols="12" md="4" style="margin-left: 1%;">
-              <v-text-field v-model="startDate" label="Start Date" type="date" outlined dense hide-details
+              <v-text-field v-model="startDate" label="วันเริ่ม" type="date" outlined dense hide-details
                 variant="solo"></v-text-field>
             </v-col>
             <v-col cols="12" md="4">
-              <v-text-field v-model="endDate" label="End Date" type="date" outlined dense hide-details
+              <v-text-field v-model="endDate" label="วันสิ้นสุด" type="date" outlined dense hide-details
                 variant="solo"></v-text-field>
             </v-col>
             <v-col cols="12" md="3">
               <v-radio-group v-model="receiptType" row>
                 <v-radio label="ร้านข้าว" value="ร้านข้าว"></v-radio>
                 <v-radio label="ร้านกาแฟ" value="ร้านกาแฟ"></v-radio>
-                <v-radio label="ร้านเลี้ยงรับรอง" value="ร้านเลี้ยงรับรอง"></v-radio>
               </v-radio-group>
             </v-col>
           </v-row>
           <v-row class="mt-4 mr-2" justify="end">
-            <v-btn @click="fetchData" color="primary" class="mr-2">
-              โหลดข้อมูล
-            </v-btn>
-            <v-btn @click="exportToExcel" color="success">
-              Export to Excel
-            </v-btn>
-          </v-row>
+            <v-row class="mt-4 mr-2" justify="end">
+              <v-btn @click="exportToExcel" color="success">
+                <v-icon color="white" style="font-size: 20px;">mdi-file-excel</v-icon> 
+              </v-btn>
+            </v-row>
 
+
+          </v-row>
         </v-row>
-        <v-spacer></v-spacer>
+          <v-spacer></v-spacer>
       </v-card-title>
 
       <v-table class="mx-auto" style="width: 97%">
@@ -291,14 +298,16 @@ const statusText = (status: string) => {
             <td class="text-center">{{ receipt.paymentMethod || '-' }}</td>
             <td class="text-center">{{ receipt.user?.userName }}</td>
             <td class="text-center">
-              <v-btn color="#ed8731 " class="mr-2" icon="mdi-pencil"
-                                @click="openHistoryReceiptDialog(receipt)"><v-icon color="white"
-                                    style="font-size: 20px;">mdi-eye-circle</v-icon></v-btn>
-                                    <v-btn color="#4CAF50 " class="mr-2" icon="mdi-pencil"
+              <v-btn color="#ed8731 " class="mr-2" icon="mdi-pencil" @click="openHistoryReceiptDialog(receipt)"><v-icon
+                  color="white" style="font-size: 20px;">mdi-eye-circle</v-icon></v-btn>
+              <v-btn color="#4CAF50 " class="mr-2" icon="mdi-pencil" @click="openOldReceiptDialog(receipt)"><v-icon
+                  color="white" style="font-size: 20px;">mdi-receipt-text-outline</v-icon></v-btn>
+              <!-- <v-btn color="#4CAF50 " class="mr-2" icon="mdi-pencil"
                                 @click="openOldReceiptDialog(receipt)"><v-icon color="white"
-                                    style="font-size: 20px;">mdi-receipt-text-outline</v-icon></v-btn>
+                                    style="font-size: 20px;">mdi-file-excel</v-icon></v-btn> -->
+
             </td>
-           
+
           </tr>
           <tr v-if="!paginatedReceipts.length">
             <td colspan="10" class="text-center">No data</td>
@@ -308,13 +317,8 @@ const statusText = (status: string) => {
 
       <!-- Pagination Controls -->
       <v-row justify="center" class="mt-4">
-        <v-pagination
-          v-model="currentPage"
-          :length="totalPages"
-          total-visible="7"
-        ></v-pagination>
+        <v-pagination v-model="currentPage" :length="totalPages" total-visible="7"></v-pagination>
       </v-row>
     </v-card>
   </v-container>
 </template>
-
