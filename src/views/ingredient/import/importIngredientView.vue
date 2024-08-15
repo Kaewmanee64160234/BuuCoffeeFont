@@ -25,8 +25,20 @@
             </v-col>
           </v-row>
         </v-col>
-      </v-row>
+        <v-col cols="auto">
+          <v-card-title
+        ref="storeField"
+        
 
+        dense
+        hide-details
+        variant="solo"
+      >
+       ราคารวม : {{ computedTotal }}
+      </v-card-title>
+              </v-col>
+      </v-row>
+  
       <v-spacer></v-spacer>
     </v-card-title>
     <v-row>
@@ -98,9 +110,11 @@
             </tbody>
           </v-table>
         </v-card>
-
+       
         <v-row>
+          
           <v-col cols="6">
+         
             <v-row>
               <v-col cols="12">ชื่อร้านค้า</v-col>
               <v-col cols="12">
@@ -245,20 +259,23 @@ const resetForm = () => {
 watch(() => ingredientStore.importStoreType, (newType) => {
   ingredientStore.ingredientList = [];
 });
-// const computedTotal = computed(() => {
-//   if (ingredientStore.importStoreType === 'ร้านกาแฟ') {
-//     return ingredientStore.ingredientList.reduce((total, item) => {
-//       return total + (item.totalunit || 0);
-//     }, 0) - (ingredientStore.discount || 0);
-//   }
-//   return 0;
-// });
-// Reverse Index Function
+const computedTotal = computed(() => {
+  if (ingredientStore.importStoreType === 'ร้านกาแฟ') {
+    return ingredientStore.ingredientList.reduce((total, item) => {
+      return total + (item.totalunit || 0);
+    }, 0) - (ingredientStore.discount || 0);
+  }
+  if (ingredientStore.importStoreType === 'ร้านข้าว') {
+
+    return (ingredientStore.total  || 0)- (ingredientStore.discount || 0);
+  }
+  return 0;
+});
+
 const reversedIndex = (index: number) => {
   return ingredientStore.ingredientList.length - 1 - index;
 };
 
-// Computed Reversed List
 const reversedIngredientList = computed(() => {
   return [...ingredientStore.ingredientList].reverse();
 });
