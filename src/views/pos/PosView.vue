@@ -49,10 +49,23 @@ onMounted(async () => {
   if (userStore.currentUser?.userRole === "พนักงานขายข้าว") {
     promotionStore.getPromotionByType("ร้านข้าว");
     selectedCategory.value = "กับข้าว";
-    categoryStore.categoriesForCreate = categoryStore.categoriesForCreate.filter(category => !category.haveTopping);
-    productFilters.value = productStore.products.filter(product => !product.category.haveTopping);
-    promotionStore.promotions = promotionStore.promotions.filter(promotion => promotion.promotionForStore === "ร้านข้าว");
-  } else if (userStore.currentUser?.userRole === "พนักงานขายกาแฟ") {
+
+    // Filter categories to show only "กับข้าว"
+    categoryStore.categoriesForCreate = categoryStore.categoriesForCreate.filter(
+      category => category.categoryName === "กับข้าว"
+    );
+
+    // Filter products to show only those without toppings and in the "กับข้าว" category
+    productFilters.value = productStore.products.filter(
+      product => product.category.categoryName === "กับข้าว" && !product.category.haveTopping
+    );
+
+    // Filter promotions to show only those for "ร้านข้าว"
+    promotionStore.promotions = promotionStore.promotions.filter(
+      promotion => promotion.promotionForStore === "ร้านข้าว"
+    );
+  }
+  else if (userStore.currentUser?.userRole === "พนักงานขายกาแฟ") {
     promotionStore.getPromotionByType("ร้านกาแฟ");
     selectedCategory.value = "กาแฟ";
     const cateIndex = categoryStore.categoriesForCreate.findIndex(category => category.categoryName === "กับข้าว");
@@ -75,7 +88,7 @@ onMounted(async () => {
 const loadQueueListFromLocalStorage = () => {
   const storedQueueList = localStorage.getItem('queueReceipt');
   console.log(storedQueueList);
-  
+
   if (storedQueueList) {
     posStore.queueReceipt = JSON.parse(storedQueueList);
   } else {
@@ -182,37 +195,32 @@ const showQueue = computed(() => {
     <v-row :style="{ height: '100%' }">
       <!-- Left Column (Queue) -->
       <v-col cols="2" class="queue-column" style="padding: 0;" v-if="showQueue">
-  <v-container fluid class="queue-container" style="height: 100%; overflow-y: auto;">
-    <h2 class="pa-2">Queue</h2>
-    <v-row>
-      <v-col v-if="posStore.queueReceipt.length>0" cols="12">
-        <v-card
-          v-for="(receipt, index) in posStore.queueReceipt"
-          :key="index"
-          class="queue-card"
-          @click="selectReceipt(receipt!)"
-          elevation="3"
-        >
-          <v-card-title class="d-flex justify-space-between align-center">
-            <div class="queue-title">
-              <span class="queue-number">#{{ receipt.queueNumber }}</span>
-              <span class="customer-name">{{ receipt.customer?.customerName || 'Guest' }}</span>
-            </div>
-            <v-btn icon @click.stop="removeFromQueue(index)" class="delete-button">
-              <v-icon color="red">mdi-delete</v-icon>
-            </v-btn>
-          </v-card-title>
-          <v-card-subtitle class="queue-details">รายละเอียด</v-card-subtitle>
-        </v-card>
+        <v-container fluid class="queue-container" style="height: 100%; overflow-y: auto;">
+          <h2 class="pa-2">Queue</h2>
+          <v-row>
+            <v-col v-if="posStore.queueReceipt.length > 0" cols="12">
+              <v-card v-for="(receipt, index) in posStore.queueReceipt" :key="index" class="queue-card"
+                @click="selectReceipt(receipt!)" elevation="3">
+                <v-card-title class="d-flex justify-space-between align-center">
+                  <div class="queue-title">
+                    <span class="queue-number">#{{ receipt.queueNumber }}</span>
+                    <span class="customer-name">{{ receipt.customer?.customerName || 'Guest' }}</span>
+                  </div>
+                  <v-btn icon @click.stop="removeFromQueue(index)" class="delete-button">
+                    <v-icon color="red">mdi-delete</v-icon>
+                  </v-btn>
+                </v-card-title>
+                <v-card-subtitle class="queue-details">รายละเอียด</v-card-subtitle>
+              </v-card>
+            </v-col>
+            <v-col v-else cols="12">
+              <v-card class="queue-card" elevation="3">
+                <v-card-title class="text-center">ไม่มีคิว</v-card-title>
+              </v-card>
+            </v-col>
+          </v-row>
+        </v-container>
       </v-col>
-      <v-col v-else cols="12">
-        <v-card class="queue-card" elevation="3">
-          <v-card-title class="text-center">ไม่มีคิว</v-card-title>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
-</v-col>
 
 
       <!-- Main Interface Column -->
@@ -308,10 +316,13 @@ const showQueue = computed(() => {
 }
 
 .product-list-container {
-  height: calc(100vh - 250px); /* Adjust based on the height of other elements */
+  height: calc(100vh - 250px);
+  /* Adjust based on the height of other elements */
   overflow-y: auto;
-  scrollbar-width: thin; /* Firefox */
-  scrollbar-color: #888 #f1f1f1; /* Customize scrollbar colors */
+  scrollbar-width: thin;
+  /* Firefox */
+  scrollbar-color: #888 #f1f1f1;
+  /* Customize scrollbar colors */
 }
 
 .product-card {
@@ -346,7 +357,8 @@ const showQueue = computed(() => {
 
 .queue-column {
   width: 100%;
-  max-width: 240px; /* Maximum width for queue column */
+  max-width: 240px;
+  /* Maximum width for queue column */
   transition: all 0.3s ease;
   overflow-y: auto;
   padding: 10px;
@@ -369,7 +381,8 @@ const showQueue = computed(() => {
 }
 
 .queue-card {
-  width: 100%; /* Ensures all queue cards have the same width */
+  width: 100%;
+  /* Ensures all queue cards have the same width */
   cursor: pointer;
   transition: background-color 0.3s, transform 0.3s;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -466,5 +479,4 @@ const showQueue = computed(() => {
 .product-list-container::-ms-scrollbar-thumb:hover {
   background: #555;
 }
-
 </style>
