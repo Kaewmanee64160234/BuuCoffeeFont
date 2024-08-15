@@ -227,38 +227,47 @@ const statusText = (status: string) => {
   <v-container>
     <v-card class="flex-container">
       <v-card-title>
-        <v-row>
-          <v-col cols="9" style="padding: 20px;">
-            <h3>ประวัติการขาย</h3>
-          </v-col>
-          <v-row>
-            <v-col cols="12" md="4" style="margin-left: 1%;">
-              <v-text-field v-model="startDate" label="วันเริ่ม" type="date" outlined dense hide-details
-                variant="solo"></v-text-field>
-            </v-col>
-            <v-col cols="12" md="4">
-              <v-text-field v-model="endDate" label="วันสิ้นสุด" type="date" outlined dense hide-details
-                variant="solo"></v-text-field>
-            </v-col>
-            <v-col cols="12" md="3">
-              <v-radio-group v-model="receiptType" row>
-                <v-radio label="ร้านข้าว" value="ร้านข้าว"></v-radio>
-                <v-radio label="ร้านกาแฟ" value="ร้านกาแฟ"></v-radio>
-              </v-radio-group>
-            </v-col>
-          </v-row>
-          <v-row class="mt-4 mr-2" justify="end">
-            <v-row class="mt-4 mr-2" justify="end">
-              <v-btn @click="exportToExcel" color="success">
-                <v-icon color="white" style="font-size: 20px;">mdi-file-excel</v-icon> 
-              </v-btn>
-            </v-row>
+  <v-row>
+    <v-col cols="12" md="4" style="padding: 20px;">
+      <h3>ประวัติการขาย</h3>
+    </v-col>
+    <v-col cols="12" md="4">
+      <v-text-field 
+        v-model="startDate" 
+        label="วันเริ่ม" 
+        type="date" 
+        outlined 
+        dense 
+        hide-details 
+        variant="solo"
+      ></v-text-field>
+    </v-col>
+    <v-col cols="12" md="4">
+      <v-text-field 
+        v-model="endDate" 
+        label="วันสิ้นสุด" 
+        type="date" 
+        outlined 
+        dense 
+        hide-details 
+        variant="solo"
+      ></v-text-field>
+    </v-col>
+    <v-col cols="12" md="2">
+      <v-radio-group v-model="receiptType" row>
+        <v-radio label="ร้านข้าว" value="ร้านข้าว"></v-radio>
+        <v-radio label="ร้านกาแฟ" value="ร้านกาแฟ"></v-radio>
+      </v-radio-group>
+    </v-col>
+    <v-col cols="12" md="2">
+      <v-btn @click="exportToExcel" color="success">
+        <v-icon color="white" style="font-size: 20px;">mdi-file-excel</v-icon>
+      </v-btn>
+    </v-col>
+  </v-row>
+  <v-spacer></v-spacer>
+</v-card-title>
 
-
-          </v-row>
-        </v-row>
-          <v-spacer></v-spacer>
-      </v-card-title>
 
       <v-table class="mx-auto" style="width: 97%">
         <thead>
