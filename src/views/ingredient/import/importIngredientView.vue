@@ -74,7 +74,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, index) in ingredientStore.ingredientList" :key="index">
+              <tr v-for="(item, index) in reversedIngredientList" :key="index">
                 <td>{{ index + 1 }}</td>
                 <td>{{ ingredientStore.importStoreType === 'ร้านข้าว' ? item.name : item.ingredient?.ingredientName }}
                 </td>
@@ -90,7 +90,7 @@
                 </td>
 
                 <td>
-                  <button @click="ingredientStore.removeIngredient(index)" class="styled-button">
+                  <button @click="ingredientStore.removeIngredient(reversedIndex(index))" class="styled-button">
                     ลบ
                   </button>
                 </td>
@@ -253,7 +253,15 @@ watch(() => ingredientStore.importStoreType, (newType) => {
 //   }
 //   return 0;
 // });
+// Reverse Index Function
+const reversedIndex = (index: number) => {
+  return ingredientStore.ingredientList.length - 1 - index;
+};
 
+// Computed Reversed List
+const reversedIngredientList = computed(() => {
+  return [...ingredientStore.ingredientList].reverse();
+});
 </script>
 
 <style scoped>

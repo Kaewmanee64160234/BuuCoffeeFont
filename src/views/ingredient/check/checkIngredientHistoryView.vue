@@ -29,17 +29,19 @@ const openHistoryCheckDialog = (checkingredient: Checkingredient) => {
 };
 function exportToExcel(checkingredient: Checkingredient) {
     const basicData = {
-        date: checkingredient.date,
-        actionType: checkingredient.actionType,
-        checkDescription: checkingredient.checkDescription,
-        userName: checkingredient.user.userName,
+        วันที่: checkingredient.date,
+        รูปแบบ: checkingredient.actionType,
+        คำอธิบาย: checkingredient.checkDescription,
+        ผู้รับผิดชอบ: checkingredient.user.userName,
     };
 
 
-    const tableData = checkingredient.checkingredientitem.map(item => ({
-        ingredientName: item.ingredient.ingredientName,
-        ingredientSupplier: item.ingredient.ingredientSupplier,
-        UsedQuantity: item.UsedQuantity
+    const tableData = checkingredient.checkingredientitem.map((item, index)=> ({
+        ลำดับ: index + 1,
+        ชื่อวัตถุดิบ: item.ingredient.ingredientName,
+        ผู้จัดจำหน่าย: item.ingredient.ingredientSupplier,
+        จำนวนเดิม: item.oldRemain,
+        จำนวนนับ: item.UsedQuantity,
     }));
 
 

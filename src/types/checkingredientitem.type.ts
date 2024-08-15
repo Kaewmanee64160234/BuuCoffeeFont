@@ -4,6 +4,7 @@ import type { User } from "./user.type";
 export interface  Checkingredientitem {
     CheckIngredientsItemID: number;
     UsedQuantity: number;
+    oldRemain: number;
     checkingredient: Checkingredient;
     ingredient: Ingredient;
   }

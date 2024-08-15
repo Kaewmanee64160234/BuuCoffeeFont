@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { useCheckIngredientStore } from '@/stores/historyIngredientCheck.store';
+import { computed } from 'vue';
 const ingredientStore = useCheckIngredientStore();
 function closeDialog() {
   ingredientStore.checkingredient = null;
@@ -9,6 +10,13 @@ const formatDate = (dateString: string) => {
   const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', timeZone: 'UTC' };
   return new Date(dateString).toLocaleDateString('th-TH', options);
 };
+const actionTypeLabel = computed(() => {
+  return ingredientStore.checkingredient?.actionType === 'check'
+    ? 'จำนวนที่นับ'
+    : ingredientStore.checkingredient?.actionType === 'issuing'
+    ? 'จำนวนนำออก'
+    : 'จำนวนที่เลี้ยงรับรอง';
+});
 </script>
 <template>
   <v-dialog v-model="ingredientStore.dialogCheckItem" max-width="50%">
@@ -55,7 +63,8 @@ const formatDate = (dateString: string) => {
           <tr>
             <th class="column-header text-center">ลำดับ</th>
             <th class="column-header text-center">ชื่อวัตถุดิบ</th>
-            <th class="column-header text-center">จำนวน</th>
+            <th class="column-header text-center">จำนวนเดิม</th>
+            <th class="column-header text-center">{{ actionTypeLabel }}</th>
 
           </tr>
         </thead>
@@ -64,6 +73,7 @@ const formatDate = (dateString: string) => {
             :key="item.CheckIngredientsItemID">
             <th class="column-header text-center">{{ index + 1 }}</th>
             <td>{{ item.ingredient.ingredientName }}</td>
+            <td>{{ item.oldRemain }} {{ item.ingredient.ingredientUnit }}</td>
             <td>{{ item.UsedQuantity }} {{ item.ingredient.ingredientUnit }}</td>
           </tr>
         </tbody>
