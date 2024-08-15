@@ -487,14 +487,19 @@ export const usePosStore = defineStore("pos", () => {
       const product2 = selectedItems.value.find(
         (item) => item.product?.productId === promotion.freeProductId
       );
+      console.log("product", product);
+      console.log("product2", product2);
+      
       if (product2 && product) {
         if (promotion.freeProductId === promotion.buyProductId) {
           const numberOfUsedPromotions = receipt.value.receiptPromotions.filter(
             (item) => item.promotion.promotionId === promotion.promotionId
           ).length;
-          if (product.quantity - numberOfUsedPromotions * 2 >= 2) {
+          if (product.quantity - numberOfUsedPromotions * 2 >= 2 || (product2 && product)) {
             if (product.quantity >= 2) {
-              newDiscount = product.product?.productPrice!;
+              newDiscount = parseInt(product.product?.productPrice!+'') + parseInt(product.productType?.productTypePrice!+'');
+              console.log("newDiscount", newDiscount);
+              
               applyDiscount(promotion, newDiscount);
             } else {
               Swal.fire({
