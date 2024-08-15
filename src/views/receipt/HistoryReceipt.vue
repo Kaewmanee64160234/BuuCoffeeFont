@@ -41,19 +41,19 @@ const exportToExcel = async () => {
   const formattedReceipts = formatReceiptsForExcel(receiptsStore.receipts);
   const worksheet = XLSX.utils.json_to_sheet(formattedReceipts, {
     header: [
-      'receiptTotalPrice',
-      'receiptTotalDiscount',
-      'receiptNetPrice',
-      'receiptStatus',
-      'receiptType',
-      'queueNumber',
-      'paymentMethod',
-      'createdDate',
-      'updatedDate',
-      'receiptItems',
-      'userName',
-      'customer',
-      'receiptPromotions',
+      'ราคารวม',
+      'ส่วนลดรวม',
+      'ราคารวมสุทธิ',
+      'สถานะรายการ',
+      'รูปแบบร้าน',
+      'เลขคิว',
+      'รูปแบบชำระเงิน',
+      'วันที่สร้าง',
+      'วันที่แก้ไข',
+      'รายการที่สั่งซื้อ',
+      'พนักงาน',
+      'ลูกค้า',
+      'โปรโมชั้นที่ใช้',
     ]
   });
   const workbook = XLSX.utils.book_new();
@@ -257,6 +257,7 @@ const statusText = (status: string) => {
       <v-radio-group v-model="receiptType" row>
         <v-radio label="ร้านข้าว" value="ร้านข้าว"></v-radio>
         <v-radio label="ร้านกาแฟ" value="ร้านกาแฟ"></v-radio>
+        <v-radio label="ทั้งหมด" value="ทั้งหมด"></v-radio>
       </v-radio-group>
     </v-col>
     <v-col cols="12" md="2">
