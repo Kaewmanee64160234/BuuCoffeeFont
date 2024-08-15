@@ -5,13 +5,14 @@ import type { Receipt } from '@/types/receipt.type';
 import { useReceiptsStore } from '@/stores/report/receiptsStore';
 import * as XLSX from 'xlsx';
 import HistoryReceiptDialog from '@/components/receipts/HistoryReceiptDialog.vue';
-
+import ReceiptOld from '@/components/receipts/ReceiptOld.vue';
 const receiptsStore = useReceiptsStore();
 const startDate = ref('');
 const endDate = ref('');
 const receiptType = ref<string>('ร้านกาแฟ');
 const receiptStore = useReceiptStore();
 const historyReceiptDialog = ref(false);
+const receiptOld = ref(false);
 const selectedReceipt = ref<Receipt | null>(null);
 
 // Pagination
@@ -78,7 +79,10 @@ const openHistoryReceiptDialog = (receipt: Receipt) => {
   receiptStore.receipt = receipt;
   receiptStore.historyReceiptDialog = true;
 };
-
+const openOldReceiptDialog = (receipt: Receipt) => {
+  receiptStore.receipt = receipt;
+  receiptStore.receiptOld = true;
+};
 const handleSearchKeydown = (event: KeyboardEvent) => {
   if (event.key === 'Enter') {
     // Optionally, you could trigger search here if needed
@@ -209,6 +213,7 @@ const statusText = (status: string) => {
 
 
 <template>
+  <ReceiptOld v-model:dialog="receiptOld" :receipt="selectedReceipt" />
   <HistoryReceiptDialog v-model:dialog="historyReceiptDialog" :receipt="selectedReceipt" />
 
   <v-container>
@@ -286,8 +291,14 @@ const statusText = (status: string) => {
             <td class="text-center">{{ receipt.paymentMethod || '-' }}</td>
             <td class="text-center">{{ receipt.user?.userName }}</td>
             <td class="text-center">
-              <v-btn color="#FFDD83" icon="mdi-eye" @click="openHistoryReceiptDialog(receipt)"></v-btn>
+              <v-btn color="#ed8731 " class="mr-2" icon="mdi-pencil"
+                                @click="openHistoryReceiptDialog(receipt)"><v-icon color="white"
+                                    style="font-size: 20px;">mdi-eye-circle</v-icon></v-btn>
+                                    <v-btn color="#4CAF50 " class="mr-2" icon="mdi-pencil"
+                                @click="openOldReceiptDialog(receipt)"><v-icon color="white"
+                                    style="font-size: 20px;">mdi-receipt-text-outline</v-icon></v-btn>
             </td>
+           
           </tr>
           <tr v-if="!paginatedReceipts.length">
             <td colspan="10" class="text-center">No data</td>

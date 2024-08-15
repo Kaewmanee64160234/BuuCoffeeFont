@@ -8,6 +8,7 @@ export const useReceiptStore = defineStore("receipt", () => {
   const receipts = ref<Receipt[]>([]);
   const receipt = ref<Receipt | null>(null);
   const searchQuery = ref<string>("");
+  const receiptOld = ref(false);
   const historyReceiptDialog = ref(false);
   const historyReceiptDialogCatering = ref(false);
   const userStore = useUserStore();
@@ -135,6 +136,7 @@ export const useReceiptStore = defineStore("receipt", () => {
     filteredReceipts,
     getRecieptIn30Min,
     cancelReceipt,
+    receiptOld,
     getRecieptCateringIn24Hours,
     historyReceiptDialogCatering,
     isLoading, // expose loading state
