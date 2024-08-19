@@ -44,8 +44,9 @@ function createCheckIngredients(ingredient: {
   date: string;
   checkDescription: string;
   actionType: string;
+  shopType: string;
 }) {
-  return http.post("/checkingredients", ingredient);
+  return http.post("/checkingredients/without-inventory", ingredient);
 }
 
 
@@ -103,7 +104,12 @@ function getHistoryCheckById(id: number) {
 function getHistoryImportById(id: number) {
   return http.get(`/importingredients/${id}`);
 }
-
+function getSubIngredients_Coffee() {
+  return http.get(`/sub-inventories-coffee`);
+}
+function getSubIngredients_Rice() {
+  return http.get(`/sub-inventories-rice`);
+}
 
 export default {
   getAllIngredients,
@@ -118,5 +124,7 @@ export default {
   deleteIngredient,
   searchIngredientsByName,
   getIngredientlow,
+  getSubIngredients_Coffee,
+  getSubIngredients_Rice,
   getAllHistoryCheckIngredients
 };

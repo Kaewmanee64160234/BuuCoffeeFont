@@ -105,8 +105,22 @@
           <template v-slot:prepend>
             <img src="../../src/components/img/groceries.png" alt="รายการวัตถุดิบ" class="nav-icon" />
           </template>
-          รายการวัตถุดิบ
+           คลังวัตถุดิบ
         </v-list-item>
+        <v-list-item to="/ingredientCoffeeList">
+          <template v-slot:prepend>
+            <img src="../../src/components/img/coffee-beans.png" alt="รายการวัตถุดิบ" class="nav-icon" />
+          </template>
+           คลังร้านกาแฟ
+        </v-list-item>
+
+        <v-list-item to="/ingredientRiceList">
+          <template v-slot:prepend>
+            <img src="../../src/components/img/rice.png" alt="รายการวัตถุดิบ" class="nav-icon" />
+          </template>
+           คลังร้านข้าว
+        </v-list-item>
+
 
         <v-subheader v-if="!rail">อื่นๆ</v-subheader>
         <v-list-item @click="logout">

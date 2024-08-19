@@ -4,7 +4,7 @@ import Swal from 'sweetalert2';
 import { useIngredientStore } from '@/stores/Ingredient.store';
 const ingredientStore = useIngredientStore();
 const actionTypeField = ref(null);
-const selectedAction = ref<string>('check');
+const selectedAction = ref<string>('issuing');
 const isVisible = ref<boolean>(true);
 
 
@@ -61,7 +61,7 @@ const saveCheckData = async () => {
     <v-card-title>
       <v-row>
         <v-col cols="9" style="padding: 20px;">
-          <h3>เช็ควัตถุดิบ</h3>
+          <h3>วัตถุดิบหมดอายุ</h3>
         </v-col>
       </v-row>
       <v-row>
@@ -76,7 +76,7 @@ const saveCheckData = async () => {
         </v-col>
         <v-col cols="auto">
           <v-btn color="warning" :to="{ name: 'checkingredientHistory' }">
-            ประวัติเช็ควัตถุดิบ
+            ประวัติวัตถุดิบหมดอายุ
           </v-btn>
         </v-col>
 
@@ -139,29 +139,13 @@ const saveCheckData = async () => {
         </v-card>
 
         <v-row>
-          <v-col cols="6">
+          <v-col cols="12">
             <v-row>
               <v-col cols="12">หมายเหตุ</v-col>
               <v-col cols="12">
                 <v-text-field v-model="ingredientStore.checkDescription" label="กรุณาระบุหมายเหตุ **ถ้ามี" dense
                   hide-details variant="solo"></v-text-field>
               </v-col>
-            </v-row>
-          </v-col>
-          <v-col cols="6">
-            <v-row>
-              <v-col cols="12">รูปแบบ</v-col>
-              <v-col cols="12" v-if="isVisible">
-                <v-select ref="actionTypeField" v-model="ingredientStore.selectedAction" label="กรุณาระบุการดำเนินการ"
-                  :items="[
-                    'check',
-                    'issuing'
-                  ]" dense hide-details variant="solo"></v-select>
-
-              </v-col>
-
-
-
             </v-row>
           </v-col>
         </v-row>

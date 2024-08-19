@@ -65,7 +65,7 @@ function exportToExcel(checkingredient: Checkingredient) {
             <v-card-title>
                 <v-row>
                     <v-col cols="9">
-                        ประวัติเช็ควัตถุดิบ
+                        ประวัตินำออกวัตถุดิบหมดอายุ
                     </v-col>
                     <v-col cols="3">
                         <v-text-field variant="solo" label="ค้นหาประวัติการเช็ควัตถุดิบ" append-inner-icon="mdi-magnify" hide-details

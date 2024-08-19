@@ -242,7 +242,8 @@ export const useIngredientStore = defineStore("ingredient", () => {
       userId: 1,
       date: new Date().toISOString(),
       checkDescription: checkDescription.value,
-      actionType: selectedAction.value,
+      actionType: 'issuing',
+      shopType : 'inventory',
     };
 
     console.log('Sending data to API:', checkIngredientsPayload);

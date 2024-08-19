@@ -44,6 +44,18 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: "/ingredientCoffeeList",
+      name: "ingredients_coffee",
+      component: () => import("../views/ingredient/subIngredientCoffeeView.vue"),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: "/ingredientRiceList",
+      name: "ingredients_rice",
+      component: () => import("../views/ingredient/subIngredientRiceView.vue"),
+      meta: { requiresAuth: true }
+    },
+    {
       path: "/importingredient",
       name: "importingredients",
       component: () =>

@@ -66,7 +66,7 @@ watch(paginate, async (newValue, oldValue) => {
       <v-card-title>
         <v-row>
           <v-col cols="9" style="padding: 20px;">
-          <h3>รายการวัตถุดิบ</h3>
+          <h3>คลังวัตถุดิบ</h3>
           </v-col>
           <v-col cols="3">
             <v-text-field label="ค้นหารายการวัตถุดิบ" append-inner-icon="mdi-magnify" dense hide-details variant="solo"
@@ -88,7 +88,7 @@ watch(paginate, async (newValue, oldValue) => {
             <v-menu v-model="menu1" offset-y>
               <template v-slot:activator="{ props }">
                 <v-btn color="success" class="button-full-width" v-bind="props">
-                  <v-icon left>mdi-swap-vertical-bold</v-icon>
+                  <v-icon left>mdi-arrow-down-thick</v-icon>
                   นำเข้าวัตถุดิบ
                 </v-btn>
               </template>
@@ -106,9 +106,9 @@ watch(paginate, async (newValue, oldValue) => {
           <v-col>
             <v-menu v-model="menu2" offset-y>
               <template v-slot:activator="{ props }">
-                <v-btn color="success" class="button-full-width" v-bind="props">
-                  <v-icon left>mdi-swap-vertical-bold</v-icon>
-                  เช็ควัตถุดิบ และ วัตถุดิบหมดอายุ
+                <v-btn color="red" class="button-full-width" v-bind="props">
+                  <v-icon left>mdi-arrow-up-thick</v-icon>
+                   วัตถุดิบหมดอายุ
                 </v-btn>
               </template>
               <v-list>
