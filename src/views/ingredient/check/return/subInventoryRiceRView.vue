@@ -65,8 +65,6 @@ const findQuantity = (ingredientId: number | undefined): number => {
     return ingredient ? ingredient.quantity : 0;
 };
 </script>
-
-
 <template>
     <v-container fluid style="padding-left: 80px;">
         <v-card-title>
@@ -81,17 +79,10 @@ const findQuantity = (ingredientId: number | undefined): number => {
                         variant="solo" outlined v-model="ingredientStore.search"></v-text-field>
                 </v-col>
                 <v-col cols="auto">
-                    <v-btn color="success" :to="{ name: 'ingredients' }">
-                        คืนวัตถุดิบเหลือร้านข้าว
+                    <v-btn color="success" :to="{ name: 'ingredients_rice' }">
+                        <v-icon left>mdi-arrow-u-left-top-bold </v-icon> ย้อนกลับ
                     </v-btn>
                 </v-col>
-                <v-col cols="auto">
-                    <v-btn color="warning" :to="{ name: 'checkingredientHistory' }">
-                        ประวัติวัตถุดิบหมดอายุ
-                    </v-btn>
-                </v-col>
-
-
             </v-row>
             <v-spacer></v-spacer>
 
@@ -101,7 +92,7 @@ const findQuantity = (ingredientId: number | undefined): number => {
                 <v-container>
                     <v-row>
                         <v-col cols="3" style="text-align: center; padding: 8px"
-                            v-for="(item, index) in subIngredientStore.subingredients_coffee" :key="index">
+                            v-for="(item, index) in subIngredientStore.subingredients_rice" :key="index">
                             <v-card v-if="item.quantity > 0" width="100%"
                                 @click="ingredientStore.Addingredienttotable(item.ingredient)">
                                 <v-img :src="`http://localhost:3000/ingredients/${item.ingredient.ingredientId}/image`"

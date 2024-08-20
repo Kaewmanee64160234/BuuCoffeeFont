@@ -10,6 +10,7 @@ const router = useRouter();
 
 const menu1 = ref(false);
 const menu2 = ref(false);
+const menu3 = ref(false);
 const paginate = ref(true);
 const page = computed(() => ingredientStore.page);
 const take = computed(() => ingredientStore.take);
@@ -109,6 +110,24 @@ watch(paginate, async (newValue, oldValue) => {
                 <v-btn color="red" class="button-full-width" v-bind="props">
                   <v-icon left>mdi-arrow-up-thick</v-icon>
                    วัตถุดิบหมดอายุ
+                </v-btn>
+              </template>
+              <v-list>
+                <v-list-item @click="navigateTo('checkingredient')">
+                  <v-list-item-title> เช็ควัตถุดิบ </v-list-item-title>
+                </v-list-item>
+                <v-list-item @click="navigateTo('checkingredientHistory')">
+                  <v-list-item-title>ประวัติเช็ควัตถุดิบ </v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </v-col>
+          <v-col>
+            <v-menu v-model="menu3" offset-y>
+              <template v-slot:activator="{ props }">
+                <v-btn color="red" class="button-full-width" v-bind="props">
+                  <v-icon left>mdi-swap-vertical-bold</v-icon>
+                   ประวัติเบิกเข้า - เบิกออก
                 </v-btn>
               </template>
               <v-list>

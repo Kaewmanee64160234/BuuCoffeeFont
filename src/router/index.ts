@@ -91,6 +91,13 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: "/returningredientrice",
+      name: "returningredientrice",
+      component: () =>
+        import("../views/ingredient/check/return/subInventoryRiceRView.vue"),
+      meta: { requiresAuth: true }
+    },
+    {
       path: "/checkingredient",
       name: "checkingredient",
       component: () =>

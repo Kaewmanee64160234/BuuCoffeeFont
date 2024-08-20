@@ -36,7 +36,7 @@ function exportToExcel(checkingredient: Checkingredient) {
     };
 
 
-    const tableData = checkingredient.checkingredientitem.map((item, index)=> ({
+    const tableData = checkingredient.checkingredientitem.map((item, index) => ({
         ลำดับ: index + 1,
         ชื่อวัตถุดิบ: item.ingredient.ingredientName,
         ผู้จัดจำหน่าย: item.ingredient.ingredientSupplier,
@@ -68,8 +68,8 @@ function exportToExcel(checkingredient: Checkingredient) {
                         ประวัตินำออกวัตถุดิบหมดอายุ
                     </v-col>
                     <v-col cols="3">
-                        <v-text-field variant="solo" label="ค้นหาประวัติการเช็ควัตถุดิบ" append-inner-icon="mdi-magnify" hide-details
-                            dense></v-text-field>
+                        <v-text-field variant="solo" label="ค้นหาประวัติการเช็ควัตถุดิบ" append-inner-icon="mdi-magnify"
+                            hide-details dense></v-text-field>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -104,9 +104,8 @@ function exportToExcel(checkingredient: Checkingredient) {
                     <tr v-for="(item, index) in ingredientStore.CheckIngredientsHistory" :key="index">
                         <td>{{ index + 1 }}</td>
                         <td>{{ formatDate(item.date) }}</td>
-                        <td
-                            :style="{ color: item.actionType === 'issuing' ? 'red' : (item.actionType === 'check' ? '#CCCC00' : 'green') }">
-                            {{ item.actionType === 'issuing' ? 'นำวัตถุดิบออก' : (item.actionType === 'check' ?
+                        <td :style="{ color: item.actionType }">
+                            {{ item.actionType === 'issuing' ? 'หมดอายุ' : (item.actionType === 'check' ?
                                 'เช็ควัตถุดิบ' : 'เลี้ยงรับรอง') }}
                         </td>
 
@@ -151,7 +150,9 @@ td {
 
 /* Responsive styles */
 @media (max-width: 1024px) {
-    th, td {
+
+    th,
+    td {
         font-size: 14px;
         padding: 8px;
     }
@@ -162,7 +163,9 @@ td {
 }
 
 @media (max-width: 768px) {
-    th, td {
+
+    th,
+    td {
         font-size: 12px;
         padding: 6px;
     }
@@ -173,7 +176,9 @@ td {
 }
 
 @media (max-width: 480px) {
-    th, td {
+
+    th,
+    td {
         font-size: 10px;
         padding: 4px;
     }
@@ -182,17 +187,19 @@ td {
         font-size: 10px;
     }
 
-    th, td {
+    th,
+    td {
         white-space: nowrap;
     }
-    
+
     v-container {
-        padding: 0; /* ลด padding ของ container */
+        padding: 0;
+        /* ลด padding ของ container */
     }
-    
+
     v-card {
-        margin: 0; /* ลด margin ของ card */
+        margin: 0;
+        /* ลด margin ของ card */
     }
 }
 </style>
-

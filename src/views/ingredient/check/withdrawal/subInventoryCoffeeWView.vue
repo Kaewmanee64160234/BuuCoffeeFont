@@ -82,13 +82,8 @@ const saveCheckData = async () => {
             v-model="ingredientStore.search"></v-text-field>
         </v-col>
         <v-col cols="auto">
-          <v-btn color="success" :to="{ name: 'ingredients' }">
-            รายการวัตถุดิบ
-          </v-btn>
-        </v-col>
-        <v-col cols="auto">
-          <v-btn color="warning" :to="{ name: 'checkingredientHistory' }">
-            ประวัติวัตถุดิบหมดอายุ
+          <v-btn color="success" :to="{ name: 'ingredients_coffee' }">
+            <v-icon left>mdi-arrow-u-left-top-bold </v-icon> ย้อนกลับ
           </v-btn>
         </v-col>
       </v-row>

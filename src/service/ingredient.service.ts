@@ -15,7 +15,7 @@ function getAllHistoryImportIngredients() {
   return http.get("/importingredients");
 }
 function getAllHistoryCheckIngredients() {
-  return http.get("/checkingredients");
+  return http.get("/checkingredients?actionType=issuing");
 }
 function createImportIngredients(ingredient: {
   importingredientitem: {

@@ -2,14 +2,11 @@
 import { useSubIngredientStore } from '@/stores/ingredientSubInventory.store';
 import IngredientDialog from "@/views/ingredient/IngredientDialog.vue";
 import { computed, onMounted, ref, watch } from "vue";
-import { useRouter } from 'vue-router'; 
+import { useRouter } from 'vue-router';
 import Swal from 'sweetalert2';
 
 const subIngredientStore = useSubIngredientStore();
-const router = useRouter(); 
-const menu1 = ref(false);
-const menu2 = ref(false);
-
+const router = useRouter();
 
 onMounted(async () => {
   await subIngredientStore.getSubIngredients_coffee();
@@ -24,16 +21,16 @@ const navigateTo = (routeName: string) => {
 </script>
 
 <template>
-  <v-container >
+  <v-container>
     <v-card>
       <v-card-title>
         <v-row>
           <v-col cols="9" style="padding: 20px;">
-          <h3>คลังวัตถุดิบร้านกาแฟ</h3>
+            <h3>คลังวัตถุดิบร้านกาแฟ</h3>
           </v-col>
           <v-col cols="3">
             <v-text-field label="ค้นหารายการวัตถุดิบ" append-inner-icon="mdi-magnify" dense hide-details variant="solo"
-            outlined ></v-text-field>
+              outlined></v-text-field>
           </v-col>
         </v-row>
 
@@ -41,41 +38,18 @@ const navigateTo = (routeName: string) => {
 
 
           <v-col>
-            <v-menu v-model="menu1" offset-y>
-              <template v-slot:activator="{ props }">
-                <v-btn color="success" class="button-full-width" v-bind="props">
-                  <v-icon left>mdi-arrow-down-thick</v-icon>
-                  นำเข้าวัตถุดิบ
-                </v-btn>
-              </template>
-              <v-list>
-                <v-list-item @click="navigateTo('importingredientscoffee')">
-                  <v-list-item-title>นำเข้าวัตถุดิบ</v-list-item-title>
-                </v-list-item>
-                <v-list-item @click="navigateTo('importingredientsHistory')">
-                  <v-list-item-title>ประวัติการนำเข้าวัตถุดิบ</v-list-item-title>
-                </v-list-item>
-              </v-list>
-            </v-menu>
+            <v-btn color="success" class="button-full-width" @click="navigateTo('importingredientscoffee')">
+              <v-icon left>mdi-arrow-down-thick</v-icon>
+              นำเข้าวัตถุดิบ
+            </v-btn>
           </v-col>
 
           <v-col>
-            <v-menu v-model="menu2" offset-y>
-              <template v-slot:activator="{ props }">
-                <v-btn color="red" class="button-full-width" v-bind="props">
-                  <v-icon left>mdi-arrow-up-thick</v-icon>
-                   คืนวัตถุดิบ
-                </v-btn>
-              </template>
-              <v-list>
-                <v-list-item @click="navigateTo('returningredientcoffee')">
-                  <v-list-item-title> คืนวัตถุดิบ </v-list-item-title>
-                </v-list-item>
-                <v-list-item @click="navigateTo('checkingredientHistory')">
-                  <v-list-item-title>ประวัติเช็ควัตถุดิบ </v-list-item-title>
-                </v-list-item>
-              </v-list>
-            </v-menu>
+            <v-btn color="red" class="button-full-width" @click="navigateTo('returningredientcoffee')">
+              <v-icon left>mdi-arrow-up-thick</v-icon>
+              คืนวัตถุดิบ
+            </v-btn>
+
           </v-col>
         </v-row>
       </v-card-title>
@@ -90,7 +64,7 @@ const navigateTo = (routeName: string) => {
         </thead>
         <tbody>
           <tr v-for="(item, index) in subIngredientStore.subingredients_coffee" :key="index">
-            <td>{{  index + 1 }}</td>
+            <td>{{ index + 1 }}</td>
             <td>{{ item.ingredient.ingredientName }}</td>
             <td>{{ item.quantity }}</td>
           </tr>
@@ -116,10 +90,11 @@ const navigateTo = (routeName: string) => {
   width: 100%;
 }
 
-th, td {
-  padding-top: 12px !important; 
-  padding-bottom: 12px !important; 
-  text-align: center !important; 
+th,
+td {
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
+  text-align: center !important;
 }
 
 .flex-container {
@@ -154,4 +129,3 @@ th, td {
   }
 }
 </style>
-

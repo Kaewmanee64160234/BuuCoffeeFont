@@ -40,42 +40,21 @@ const navigateTo = (routeName: string) => {
 
 
           <v-col>
-            <v-menu v-model="menu1" offset-y>
-              <template v-slot:activator="{ props }">
-                <v-btn color="success" class="button-full-width" v-bind="props">
-                  <v-icon left>mdi-arrow-down-thick</v-icon>
-                  นำเข้าวัตถุดิบ
-                </v-btn>
-              </template>
-              <v-list>
-                <v-list-item @click="navigateTo('importingredients')">
-                  <v-list-item-title>นำเข้าวัตถุดิบ</v-list-item-title>
-                </v-list-item>
-                <v-list-item @click="navigateTo('importingredientsHistory')">
-                  <v-list-item-title>ประวัติการนำเข้าวัตถุดิบ</v-list-item-title>
-                </v-list-item>
-              </v-list>
-            </v-menu>
+            <v-btn color="success" class="button-full-width" @click="navigateTo('importingredientsrice')">
+              <v-icon left>mdi-arrow-down-thick</v-icon>
+              นำเข้าวัตถุดิบ
+            </v-btn>
           </v-col>
 
           <v-col>
-            <v-menu v-model="menu2" offset-y>
-              <template v-slot:activator="{ props }">
-                <v-btn color="red" class="button-full-width" v-bind="props">
-                  <v-icon left>mdi-arrow-up-thick</v-icon>
-                   คืนวัตถุดิบ
-                </v-btn>
-              </template>
-              <v-list>
-                <v-list-item @click="navigateTo('checkingredient')">
-                  <v-list-item-title> เช็ควัตถุดิบ </v-list-item-title>
-                </v-list-item>
-                <v-list-item @click="navigateTo('checkingredientHistory')">
-                  <v-list-item-title>ประวัติเช็ควัตถุดิบ </v-list-item-title>
-                </v-list-item>
-              </v-list>
-            </v-menu>
+            <v-btn color="red" class="button-full-width" @click="navigateTo('returningredientrice')">
+              <v-icon left>mdi-arrow-up-thick</v-icon>
+              คืนวัตถุดิบ
+            </v-btn>
+
           </v-col>
+
+ 
         </v-row>
       </v-card-title>
 
