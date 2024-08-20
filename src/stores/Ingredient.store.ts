@@ -18,36 +18,35 @@ export const useIngredientStore = defineStore("ingredient", () => {
   const importingredients = ref<Importingredient[]>([]);
   const checkIngerdient = ref<Checkingredient>();
   const search = ref<string>("");
-  const selectedAction = ref<string>('');
-  const checkDescription = ref<string>('');
+  const selectedAction = ref<string>("");
+  const checkDescription = ref<string>("");
   const dialog = ref(false);
   const dialogImportItem = ref(false);
   const editedIngredient = ref<Ingredient & { file: File }>({
-    ingredientName: '',
-    ingredientSupplier: '',
+    ingredientName: "",
+    ingredientSupplier: "",
     ingredientMinimun: 0,
-    ingredientUnit: '',
+    ingredientUnit: "",
     ingredientQuantityInStock: 0,
     ingredientQuantityPerUnit: 0,
-    ingredientQuantityPerSubUnit: '',
+    ingredientQuantityPerSubUnit: "",
     ingredientRemining: 0,
-    ingredientImage: 'no_image.jpg',
+    ingredientImage: "no_image.jpg",
     file: new File([""], "filename"),
-
   });
-  
+
   watch(dialog, (newDialog, oldDialog) => {
     if (!newDialog) {
       editedIngredient.value = {
-        ingredientName: '',
-        ingredientSupplier: '',
+        ingredientName: "",
+        ingredientSupplier: "",
         ingredientMinimun: 0,
-        ingredientUnit: '',
+        ingredientUnit: "",
         ingredientQuantityInStock: 0,
         ingredientQuantityPerUnit: 0,
-        ingredientQuantityPerSubUnit: '',
+        ingredientQuantityPerSubUnit: "",
         ingredientRemining: 0,
-        ingredientImage: 'no_image.jpg',
+        ingredientImage: "no_image.jpg",
         file: new File([""], "filename"),
       };
     }
@@ -75,16 +74,14 @@ export const useIngredientStore = defineStore("ingredient", () => {
       page.value = 1;
     }
   });
-  async function getIngredients(){
+  async function getIngredients() {
     try {
       const response = await ingredientService.getIngredients();
       if (response.status === 200) {
         all_ingredients.value = response.data;
-
-        
       }
     } catch (error) {
-      console.error('Error fetching ingredients:', error);
+      console.error("Error fetching ingredients:", error);
     }
   }
   async function getAllIngredients() {
@@ -116,7 +113,13 @@ export const useIngredientStore = defineStore("ingredient", () => {
   }
 
   const ingredientList = ref<
-    { ingredient: Ingredient; count: number; totalunit: number ; unitprice: number ;name:string}[]
+    {
+      ingredient: Ingredient;
+      count: number;
+      totalunit: number;
+      unitprice: number;
+      name: string;
+    }[]
   >([]);
   const ingredientCheckList = ref<
     { ingredientcheck: Ingredient; count: number }[]
@@ -126,23 +129,30 @@ export const useIngredientStore = defineStore("ingredient", () => {
   const total = ref<number>(0);
   const importStoreType = ref<string>("ร้านกาแฟ");
   const importDescription = ref<string>("");
-
-  function AddRiceIngredient(item: { ingredientName: string}) {
+  const actionType = ref<string>("");
+  const shopType = ref<string>("");
+  function AddRiceIngredient(item: { ingredientName: string }) {
     const newImportIngredientItem: any = {
       name: item.ingredientName,
-      pricePerUnit: 0,  
-      unitPrice: 0,     
-      Quantity: 0,      
+      pricePerUnit: 0,
+      unitPrice: 0,
+      Quantity: 0,
     };
     ingredientList.value.push(newImportIngredientItem);
   }
-  
+
   function Addingredient(item: Ingredient) {
     const exists = ingredientList.value.some(
       (ingredient) => ingredient.ingredient.ingredientId === item.ingredientId
     );
     if (!exists) {
-      ingredientList.value.push({ ingredient: item, count: 1, totalunit: 0 ,unitprice:0 ,name:''});
+      ingredientList.value.push({
+        ingredient: item,
+        count: 1,
+        totalunit: 0,
+        unitprice: 0,
+        name: "",
+      });
     }
   }
   function Addingredienttotable(item: Ingredient) {
@@ -153,7 +163,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
     if (!exists) {
       ingredientCheckList.value.push({ ingredientcheck: item, count: 1 });
     }
-    if(exists) {
+    if (exists) {
       const index = ingredientCheckList.value.findIndex(
         (ingredient) =>
           ingredient.ingredientcheck.ingredientId === item.ingredientId
@@ -192,24 +202,22 @@ export const useIngredientStore = defineStore("ingredient", () => {
   };
 
   async function saveImportData() {
-    const importingredientitem = ingredientList.value
-     
-      .map((item) => {
-        if (importStoreType.value === 'ร้านกาแฟ') {
-          item.ingredient.ingredientId !== undefined
-          return {
-            ingredientId: item.ingredient.ingredientId!,
-            pricePerUnit: item.totalunit,
-            Quantity: item.count,
-            unitPrice	: item.unitprice,
-          };
-        } else {
-          return {
-            name: item.name, 
-          };
-        }
-      });
-  
+    const importingredientitem = ingredientList.value.map((item) => {
+      if (importStoreType.value === "ร้านกาแฟ") {
+        item.ingredient.ingredientId !== undefined;
+        return {
+          ingredientId: item.ingredient.ingredientId!,
+          pricePerUnit: item.totalunit,
+          Quantity: item.count,
+          unitPrice: item.unitprice,
+        };
+      } else {
+        return {
+          name: item.name,
+        };
+      }
+    });
+
     const importingredient = {
       userId: 1,
       importingredientitem: importingredientitem,
@@ -220,17 +228,19 @@ export const useIngredientStore = defineStore("ingredient", () => {
       importStoreType: importStoreType.value,
       importDescription: importDescription.value,
     };
-  
+
     console.log("Sending data to API:", importingredient);
-  
+
     try {
-      const res = await ingredientService.createImportIngredients(importingredient);
+      const res = await ingredientService.createImportIngredients(
+        importingredient
+      );
       console.log("API response:", res);
     } catch (error) {
       console.error("Error saving import data:", error);
     }
   }
-  
+
   async function saveCheckData() {
     const ingredientList = ingredientCheckList.value.map((item) => ({
       ingredientId: item.ingredientcheck.ingredientId!,
@@ -242,31 +252,54 @@ export const useIngredientStore = defineStore("ingredient", () => {
       userId: 1,
       date: new Date().toISOString(),
       checkDescription: checkDescription.value,
-      actionType: 'issuing',
-      shopType : 'inventory',
+      actionType: "issuing",
+      shopType: "inventory",
     };
-
-    console.log('Sending data to API:', checkIngredientsPayload);
-
     try {
-      const response = await ingredientService.createCheckIngredients(checkIngredientsPayload);
-      if(response.status === 201) {
+      const response = await ingredientService.createCheckIngredients(
+        checkIngredientsPayload
+      );
+      if (response.status === 201) {
         checkIngerdient.value = response.data;
-        console.log('checkIngerdient', checkIngerdient.value);
-        
+        console.log("checkIngerdient", checkIngerdient.value);
       }
-      console.log('API response:', response);
+      console.log("API response:", response);
     } catch (error) {
-      console.error('Error saving check data:', error);
+      console.error("Error saving check data:", error);
+    }
+  }
+  async function createReturnWithdrawalIngredients() {
+    const ingredientList = ingredientCheckList.value.map((item) => ({
+      ingredientId: item.ingredientcheck.ingredientId!,
+      UsedQuantity: item.count,
+    }));
+
+    const checkIngredientsPayload = {
+      checkingredientitems: ingredientList,
+      userId: 1,
+      date: new Date().toISOString(),
+      checkDescription: checkDescription.value,
+      actionType: actionType.value,
+      shopType: shopType.value,
+    };
+    try {
+      const response =
+        await ingredientService.createReturnWithdrawalIngredients(
+          checkIngredientsPayload
+        );
+      if (response.status === 201) {
+        checkIngerdient.value = response.data;
+        console.log("checkIngerdient", checkIngerdient.value);
+      }
+      console.log("API response:", response);
+    } catch (error) {
+      console.error("Error saving check data:", error);
     }
   }
 
-
-
-
   async function saveIngredient() {
     loadingStore.isLoading = true;
-    
+
     try {
       let res;
       if (editedIngredient.value.ingredientId) {
@@ -278,13 +311,10 @@ export const useIngredientStore = defineStore("ingredient", () => {
           }
         );
       } else {
-        res = await ingredientService.saveIngredient(
-          {
-            ...editedIngredient.value,
-            imageFile: editedIngredient.value.file,
-
-          }
-        );
+        res = await ingredientService.saveIngredient({
+          ...editedIngredient.value,
+          imageFile: editedIngredient.value.file,
+        });
       }
       dialog.value = false; // ปิด dialog หลังจากบันทึกข้อมูลเสร็จสิ้น
       window.location.reload();
@@ -326,10 +356,13 @@ export const useIngredientStore = defineStore("ingredient", () => {
     lastPage,
     importDescription,
     editedIngredient,
+    actionType,
     setEditedIngredient,
+    createReturnWithdrawalIngredients,
     removeCheckIngredient,
     ingredientList,
     store,
+    shopType,
     discount,
     total,
     importStoreType,
@@ -351,6 +384,6 @@ export const useIngredientStore = defineStore("ingredient", () => {
     getIngredientlow,
     getIngredients,
     saveCheckData,
-    checkIngerdient
+    checkIngerdient,
   };
 });

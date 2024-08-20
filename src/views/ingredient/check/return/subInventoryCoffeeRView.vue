@@ -1,13 +1,10 @@
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
+import { onMounted } from 'vue';
 import Swal from 'sweetalert2';
 import { useIngredientStore } from '@/stores/Ingredient.store';
 import { useSubIngredientStore } from '@/stores/ingredientSubInventory.store';
 
 const ingredientStore = useIngredientStore();
-const actionTypeField = ref(null);
-const selectedAction = ref<string>('issuing');
-const isVisible = ref<boolean>(true);
 const subIngredientStore = useSubIngredientStore();
 
 
@@ -35,9 +32,13 @@ const saveCheckData = async () => {
                     Swal.showLoading();
                 }
             });
+            ingredientStore.shopType = 'coffee';
+            ingredientStore.actionType = 'return';
 
             // ส่งช้อมูล
-            await ingredientStore.saveCheckData();
+            await ingredientStore.createReturnWithdrawalIngredients();
+            ingredientStore.ingredientCheckList = [];
+            await subIngredientStore.getSubIngredients_coffee();
 
             Swal.fire({
                 title: 'สำเร็จ!',
@@ -55,6 +56,13 @@ const saveCheckData = async () => {
             icon: 'error',
         });
     }
+};
+const findQuantity = (ingredientId: number | undefined): number => {
+    if (!ingredientId) return 0;
+    const ingredient = subIngredientStore.subingredients_coffee.find(
+        (item) => item.ingredient.ingredientId === ingredientId
+    );
+    return ingredient ? ingredient.quantity : 0;
 };
 </script>
 
@@ -94,7 +102,8 @@ const saveCheckData = async () => {
                     <v-row>
                         <v-col cols="3" style="text-align: center; padding: 8px"
                             v-for="(item, index) in subIngredientStore.subingredients_coffee" :key="index">
-                            <v-card v-if="item.quantity > 0" width="100%" @click="ingredientStore.Addingredienttotable(item.ingredient)">
+                            <v-card v-if="item.quantity > 0" width="100%"
+                                @click="ingredientStore.Addingredienttotable(item.ingredient)">
                                 <v-img :src="`http://localhost:3000/ingredients/${item.ingredient.ingredientId}/image`"
                                     height="100"></v-img>
                                 <v-card-title style="font-size: 14px">{{ item.ingredient.ingredientName
@@ -128,6 +137,7 @@ const saveCheckData = async () => {
                                 <td>{{ index + 1 }}</td>
                                 <td>{{ item.ingredientcheck.ingredientName }}</td>
                                 <td>{{ item.ingredientcheck.ingredientSupplier }}</td>
+                                <td>{{ findQuantity(item.ingredientcheck.ingredientId) }}</td>
                                 <td>
                                     <input type="number" v-model.number="item.count" class="styled-input" />
                                 </td>
@@ -254,7 +264,6 @@ td {
     background-color: #d43b3b;
 }
 
-/* Responsive styles */
 @media (max-width: 1024px) {
     .styled-input {
         font-size: 14px;
@@ -332,12 +341,10 @@ td {
 
     v-container {
         padding: 0;
-        /* ลด padding ของ container */
     }
 
     v-card {
         margin: 0;
-        /* ลด margin ของ card */
     }
 
     v-row,

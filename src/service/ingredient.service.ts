@@ -48,8 +48,19 @@ function createCheckIngredients(ingredient: {
 }) {
   return http.post("/checkingredients/without-inventory", ingredient);
 }
-
-
+function  createReturnWithdrawalIngredients(ingredient: {
+  checkingredientitems: {
+    ingredientId: number;
+    UsedQuantity: number;
+  }[];
+  userId: number;
+  date: string;
+  checkDescription: string;
+  actionType: string;
+  shopType: string;
+}) {
+  return http.post("/checkingredients", ingredient);
+}
 async function saveIngredient(ingredient: Ingredient & { imageFile: File }) {
   console.log("Image file', " + JSON.stringify(ingredient));
   
@@ -115,6 +126,7 @@ export default {
   getAllIngredients,
   createImportIngredients,
   createCheckIngredients,
+  createReturnWithdrawalIngredients,
   getHistoryCheckById,
   getHistoryImportById,
   getAllHistoryImportIngredients,
