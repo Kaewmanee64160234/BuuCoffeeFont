@@ -100,27 +100,30 @@
           จัดการท็อปปิ้ง
         </v-list-item>
 
-        <v-subheader v-if="!rail">วัตถุดิบ</v-subheader>
-        <v-list-item to="/ingredientList">
-          <template v-slot:prepend>
-            <img src="../../src/components/img/groceries.png" alt="รายการวัตถุดิบ" class="nav-icon" />
-          </template>
-           คลังวัตถุดิบ
-        </v-list-item>
-        <v-list-item to="/ingredientCoffeeList">
-          <template v-slot:prepend>
-            <img src="../../src/components/img/coffee-beans.png" alt="รายการวัตถุดิบ" class="nav-icon" />
-          </template>
-           คลังร้านกาแฟ
-        </v-list-item>
+        <v-subheader @click="toggleIngredients">วัตถุดิบ</v-subheader>
+        <v-expand-transition>
+          <v-list v-show="showIngredients">
+            <v-list-item to="/ingredientList">
+              <template v-slot:prepend>
+                <img src="../../src/components/img/groceries.png" alt="รายการวัตถุดิบ" class="nav-icon" />
+              </template>
+              คลังวัตถุดิบ
+            </v-list-item>
+            <v-list-item to="/ingredientCoffeeList">
+              <template v-slot:prepend>
+                <img src="../../src/components/img/coffee-beans.png" alt="รายการวัตถุดิบ" class="nav-icon" />
+              </template>
+              คลังร้านกาแฟ
+            </v-list-item>
 
-        <v-list-item to="/ingredientRiceList">
-          <template v-slot:prepend>
-            <img src="../../src/components/img/rice.png" alt="รายการวัตถุดิบ" class="nav-icon" />
-          </template>
-           คลังร้านข้าว
-        </v-list-item>
-
+            <v-list-item to="/ingredientRiceList">
+              <template v-slot:prepend>
+                <img src="../../src/components/img/rice.png" alt="รายการวัตถุดิบ" class="nav-icon" />
+              </template>
+              คลังร้านข้าว
+            </v-list-item>
+          </v-list>
+        </v-expand-transition>
 
         <v-subheader v-if="!rail">อื่นๆ</v-subheader>
         <v-list-item @click="logout">
@@ -158,6 +161,12 @@ const isAuthenticated = computed(() => authStore.isLogin)
 const shouldShowDrawer = computed(() => {
   return isAuthenticated.value && !posStore.hideNavigation
 })
+
+const showIngredients = ref(false)
+
+const toggleIngredients = () => {
+  showIngredients.value = !showIngredients.value
+}
 
 const getUserFromLocalStorage = () => {
   const userString = localStorage.getItem("user")
@@ -240,117 +249,24 @@ const logout = () => {
 .nav-icon {
   width: 24px;
   height: 24px;
-}
-
-.v-list-item.rail .nav-icon {
-  margin-right: 0;
-  margin-left: 8px;
+  margin-right: 8px;
 }
 
 .drawer-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 56px;
+  background-color: #f5f5f5;
   padding: 16px;
 }
 
-.toggle-button {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  background-color: #f2e4d8;
-  border-radius: 50%;
+.username {
+  font-size: 18px;
+}
+
+.v-subheader {
   cursor: pointer;
 }
-
-/* Responsive adjustments */
-@media (max-width: 1024px) {
-  .v-navigation-drawer {
-    width: 200px;
-  }
-
-  .v-main {
-    margin-left: 200px;
-  }
-
-  .v-navigation-drawer.rail {
-    width: 48px;
-  }
-
-  .v-main.main-rail {
-    margin-left: 48px;
-  }
+.v-list {
+  transition: max-height 0.5s ease-out;
+  overflow: hidden;
 }
 
-@media (max-width: 768px) {
-  .v-navigation-drawer {
-    width: 150px;
-  }
-
-  .v-main {
-    margin-left: 150px;
-  }
-
-  .v-navigation-drawer.rail {
-    width: 40px;
-  }
-
-  .v-main.main-rail {
-    margin-left: 40px;
-  }
-
-  .nav-icon {
-    width: 20px;
-    height: 20px;
-  }
-}
-
-@media (max-width: 480px) {
-  .v-navigation-drawer {
-    width: 100px;
-  }
-
-  .v-main {
-    margin-left: 100px;
-  }
-
-  .v-navigation-drawer.rail {
-    width: 32px;
-  }
-
-  .v-main.main-rail {
-    margin-left: 32px;
-  }
-
-  .nav-icon {
-    width: 18px;
-    height: 18px;
-  }
-
-  .v-navigation-drawer {
-    position: absolute;
-    left: -100%;
-    transition: left 0.3s ease;
-  }
-
-  .v-navigation-drawer.open {
-    left: 0;
-  }
-
-  .v-main {
-    margin-left: 0;
-  }
-}
 </style>
-
-
-
-
-
