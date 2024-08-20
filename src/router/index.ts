@@ -70,6 +70,27 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: "/importingredientcoffee",
+      name: "importingredientscoffee",
+      component: () =>
+        import("../views/ingredient/check/withdrawal/subInventoryCoffeeWView.vue"),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: "/importingredientrice",
+      name: "importingredientsrice",
+      component: () =>
+        import("../views/ingredient/check/withdrawal/subInventoryRiceWView.vue"),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: "/returningredientcoffee",
+      name: "returningredientcoffee",
+      component: () =>
+        import("../views/ingredient/check/return/subInventoryCoffeeRView.vue"),
+      meta: { requiresAuth: true }
+    },
+    {
       path: "/checkingredient",
       name: "checkingredient",
       component: () =>

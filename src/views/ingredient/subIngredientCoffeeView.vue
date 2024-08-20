@@ -49,7 +49,7 @@ const navigateTo = (routeName: string) => {
                 </v-btn>
               </template>
               <v-list>
-                <v-list-item @click="navigateTo('importingredients')">
+                <v-list-item @click="navigateTo('importingredientscoffee')">
                   <v-list-item-title>นำเข้าวัตถุดิบ</v-list-item-title>
                 </v-list-item>
                 <v-list-item @click="navigateTo('importingredientsHistory')">
@@ -68,8 +68,8 @@ const navigateTo = (routeName: string) => {
                 </v-btn>
               </template>
               <v-list>
-                <v-list-item @click="navigateTo('checkingredient')">
-                  <v-list-item-title> เช็ควัตถุดิบ </v-list-item-title>
+                <v-list-item @click="navigateTo('returningredientcoffee')">
+                  <v-list-item-title> คืนวัตถุดิบ </v-list-item-title>
                 </v-list-item>
                 <v-list-item @click="navigateTo('checkingredientHistory')">
                   <v-list-item-title>ประวัติเช็ควัตถุดิบ </v-list-item-title>
