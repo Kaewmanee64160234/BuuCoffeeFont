@@ -1,3 +1,136 @@
+<script setup lang="ts">
+import { usePosStore } from '@/stores/pos.store';
+import { useProductStore } from '@/stores/product.store';
+import { useToppingStore } from '@/stores/topping.store';
+import type { ProductType } from '@/types/productType.type';
+import type { Topping } from '@/types/topping.type';
+import type { ProductTypeTopping } from '@/types/productTypeTopping.type';
+import { ref, computed, watch } from 'vue';
+import Swal from 'sweetalert2';
+
+const posStore = usePosStore();
+const productStore = useProductStore();
+const toppingStore = useToppingStore();
+const selectedType = ref<ProductType | null>(null);
+const selectedSweetness = ref<number>(100);
+const selectedToppings = ref<Array<{ topping: Topping; quantity: number }>>([]);
+const productTypeToppings = ref<ProductTypeTopping[]>([]);
+
+const quantity = ref<number>(1);
+const showAlert = ref<boolean>(false);
+
+const sweetnessLevels = [0, 25, 50, 75, 100];
+
+const toppingGroups = computed(() => {
+  const groups = [];
+  for (let i = 0; i < toppingStore.toppings.length; i += 4) {
+    groups.push(toppingStore.toppings.slice(i, i + 4));
+  }
+  return groups;
+});
+
+function selectType(type: ProductType) {
+  selectedType.value = type;
+  showAlert.value = false;
+}
+
+function selectSweetness(level: number) {
+  selectedSweetness.value = level;
+}
+
+function toggleTopping(topping: Topping) {
+  const index = selectedToppings.value.findIndex((t) => t.topping.toppingId === topping.toppingId);
+  if (index === -1) {
+    selectedToppings.value.push({ topping, quantity: 1 });
+  } else {
+    selectedToppings.value.splice(index, 1);
+  }
+}
+
+function decreaseQuantity() {
+  if (quantity.value > 1) {
+    quantity.value--;
+  }
+}
+
+function increaseQuantity() {
+  quantity.value++;
+}
+
+function increaseToppingQuantity(topping: Topping) {
+  const toppingItem = selectedToppings.value.find((t) => t.topping.toppingId === topping.toppingId);
+  if (toppingItem) {
+    toppingItem.quantity++;
+  }
+}
+
+function decreaseToppingQuantity(topping: Topping) {
+  const toppingItem = selectedToppings.value.find((t) => t.topping.toppingId === topping.toppingId);
+  if (toppingItem && toppingItem.quantity > 1) {
+    toppingItem.quantity--;
+  }
+  if (toppingItem && toppingItem.quantity === 1) {
+    const index = selectedToppings.value.findIndex((t) => t.topping.toppingId === topping.toppingId);
+    selectedToppings.value.splice(index, 1);
+  }
+}
+
+function closeDialog() {
+  posStore.toppingDialog = false;
+  clearData();
+}
+
+function confirmSelection() {
+  if (!selectedType.value) {
+    showAlert.value = true;
+    return;
+  }
+
+  for (var i = 0; i < selectedToppings.value.length; i++) {
+    productTypeToppings.value.push({
+      productTypeToppingId: 0,
+      productType: selectedType.value,
+      topping: selectedToppings.value[i].topping,
+      quantity: selectedToppings.value[i].quantity,
+    });
+  }
+
+  
+
+  
+  
+
+  posStore.addToReceipt(
+    productStore.selectedProduct!,
+    selectedType.value,
+    productTypeToppings.value,
+    quantity.value,
+    selectedSweetness.value
+  );
+  closeDialog();
+}
+
+function clearData() {
+  selectedType.value = null;
+  selectedSweetness.value = 100;
+  selectedToppings.value = [];
+  quantity.value = 1;
+  productStore.selectedProduct = null;
+  productTypeToppings.value = [];
+}
+
+watch(
+  () => posStore.toppingDialog,
+  (newVal) => {
+    if (newVal && !productStore.selectedProduct) {
+      console.warn("Topping dialog opened without selected product.");
+      posStore.toppingDialog = false; // Close the dialog if no product is selected
+    }
+  }
+);
+
+</script>
+
 <template>
   <v-dialog v-model="posStore.toppingDialog" max-width="650">
     <v-card v-if="productStore.selectedProduct">
@@ -100,133 +233,7 @@
   </v-dialog>
 </template>
 
-<script setup lang="ts">
-import { usePosStore } from '@/stores/pos.store';
-import { useProductStore } from '@/stores/product.store';
-import { useToppingStore } from '@/stores/topping.store';
-import type { ProductType } from '@/types/productType.type';
-import type { Topping } from '@/types/topping.type';
-import type { ProductTypeTopping } from '@/types/productTypeTopping.type';
-import { ref, computed, watch } from 'vue';
-import Swal from 'sweetalert2';
 
-const posStore = usePosStore();
-const productStore = useProductStore();
-const toppingStore = useToppingStore();
-const selectedType = ref<ProductType | null>(null);
-const selectedSweetness = ref<number>(100);
-const selectedToppings = ref<Array<{ topping: Topping; quantity: number }>>([]);
-const productTypeToppings = ref<ProductTypeTopping[]>([]);
-
-const quantity = ref<number>(1);
-const showAlert = ref<boolean>(false);
-
-const sweetnessLevels = [0, 25, 50, 75, 100];
-
-const toppingGroups = computed(() => {
-  const groups = [];
-  for (let i = 0; i < toppingStore.toppings.length; i += 4) {
-    groups.push(toppingStore.toppings.slice(i, i + 4));
-  }
-  return groups;
-});
-
-function selectType(type: ProductType) {
-  selectedType.value = type;
-  showAlert.value = false;
-}
-
-function selectSweetness(level: number) {
-  selectedSweetness.value = level;
-}
-
-function toggleTopping(topping: Topping) {
-  const index = selectedToppings.value.findIndex((t) => t.topping.toppingId === topping.toppingId);
-  if (index === -1) {
-    selectedToppings.value.push({ topping, quantity: 1 });
-  } else {
-    selectedToppings.value.splice(index, 1);
-  }
-}
-
-function decreaseQuantity() {
-  if (quantity.value > 1) {
-    quantity.value--;
-  }
-}
-
-function increaseQuantity() {
-  quantity.value++;
-}
-
-function increaseToppingQuantity(topping: Topping) {
-  const toppingItem = selectedToppings.value.find((t) => t.topping.toppingId === topping.toppingId);
-  if (toppingItem) {
-    toppingItem.quantity++;
-  }
-}
-
-function decreaseToppingQuantity(topping: Topping) {
-  const toppingItem = selectedToppings.value.find((t) => t.topping.toppingId === topping.toppingId);
-  if (toppingItem && toppingItem.quantity > 1) {
-    toppingItem.quantity--;
-  }
-  if (toppingItem && toppingItem.quantity === 1) {
-    const index = selectedToppings.value.findIndex((t) => t.topping.toppingId === topping.toppingId);
-    selectedToppings.value.splice(index, 1);
-  }
-}
-
-function closeDialog() {
-  posStore.toppingDialog = false;
-  clearData();
-}
-
-function confirmSelection() {
-  if (!selectedType.value) {
-    showAlert.value = true;
-    return;
-  }
-
-  for (var i = 0; i < selectedToppings.value.length; i++) {
-    productTypeToppings.value.push({
-      productTypeToppingId: 0,
-      productType: selectedType.value,
-      topping: selectedToppings.value[i].topping,
-      quantity: selectedToppings.value[i].quantity,
-    });
-  }
-
-  posStore.addToReceipt(
-    productStore.selectedProduct!,
-    selectedType.value,
-    productTypeToppings.value,
-    quantity.value,
-    selectedSweetness.value
-  );
-  closeDialog();
-}
-
-function clearData() {
-  selectedType.value = null;
-  selectedSweetness.value = 100;
-  selectedToppings.value = [];
-  quantity.value = 1;
-  productStore.selectedProduct = null;
-  productTypeToppings.value = [];
-}
-
-watch(
-  () => posStore.toppingDialog,
-  (newVal) => {
-    if (newVal && !productStore.selectedProduct) {
-      console.warn("Topping dialog opened without selected product.");
-      posStore.toppingDialog = false; // Close the dialog if no product is selected
-    }
-  }
-);
-
-</script>
 
 <style scoped>
 .product-info-container {

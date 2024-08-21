@@ -81,7 +81,7 @@ watch(() => posStore.receipt.receive, () => {
 });
 
 function increaseQuantity(item: ReceiptItem) {
-  console.log('increase quantity', item);
+  // console.log('increase quantity', item);
   if (item.product?.category.haveTopping) {
     if (item.productTypeToppings.length > 0) {
       posStore.addToReceipt(item.product, item.productType, item.productTypeToppings, 1, item.sweetnessLevel);

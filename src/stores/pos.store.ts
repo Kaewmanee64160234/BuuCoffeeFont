@@ -125,7 +125,8 @@ export const usePosStore = defineStore("pos", () => {
           JSON.stringify(item.productTypeToppings) ===
             JSON.stringify(productTypeToppings) &&
           item.product?.productId === product.productId &&
-          item.sweetnessLevel === sweetness
+          item.sweetnessLevel === sweetness &&
+          item.productType?.productTypeName === productType.productTypeName
       );
     } else {
       existingItem = selectedItems.value.find(
