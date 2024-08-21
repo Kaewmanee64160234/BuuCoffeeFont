@@ -246,9 +246,9 @@ const showQueue = computed(() => {
 
 
       <!-- Main Interface Column -->
-      <v-col :cols="mainInterfaceCols" class="d-flex flex-column align-center "
+      <v-col :cols="mainInterfaceCols" class="d-flex flex-column align-center  "
         style="background-color: #f7f7f7; height: 100%; overflow: hidden;">
-        <v-container fluid class="full-width-container" style="height: 100%; overflow: hidden; margin-left: 6%;">
+        <v-container fluid class="full-width-container " style="height: 100%; overflow: hidden; margin-left: 6%;">
           <!-- Promotion Carousel and Dialogs -->
           <v-row class="full-width-row" style="overflow: hidden;">
             <v-col cols="12" class="d-flex justify-center align-center" style="overflow: hidden;">
@@ -278,8 +278,8 @@ const showQueue = computed(() => {
           </v-row>
 
           <!-- Category Tabs -->
-          <v-row class="full-width-row" style="overflow: hidden; margin-bottom: 10px;">
-            <v-col cols="12">
+          <v-row class="full-width-row " style="overflow: hidden; margin-bottom: 10px;">
+            <v-col cols="12" >
               <v-tabs v-model="selectedCategory" align-tabs="start" color="brown" class="full-width-tabs"
                 background-color="#fff">
                 <v-tab v-for="category in categoryStore.categoriesForCreate" :key="category.categoryId"
@@ -294,7 +294,7 @@ const showQueue = computed(() => {
           <v-row class="full-width-row product-list-container" style="flex: 1; overflow-y: auto;">
             <v-tabs-items v-model="selectedCategory" style="width: 100%;">
               <v-tab-item>
-                <v-container fluid class="full-width-container">
+                <v-container fluid class="full-width-container" style="margin-left: 20px;"   >
                   <v-row class="full-width-row">
                     <!-- Adjusted column size to 6 for 2 columns per row -->
                     <v-col v-for="product in productFilters" :key="product.productId" cols="12" sm="6" md="6" lg="6"
