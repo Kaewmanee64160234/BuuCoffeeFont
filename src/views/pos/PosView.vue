@@ -274,7 +274,8 @@ const showQueue = computed(() => {
               <v-tab-item>
                 <v-container fluid class="full-width-container">
                   <v-row class="full-width-row">
-                    <v-col v-for="product in productFilters" :key="product.productId" cols="12" sm="6" md="4" lg="3"
+                    <!-- Adjusted column size to 6 for 2 columns per row -->
+                    <v-col v-for="product in productFilters" :key="product.productId" cols="12" sm="6" md="6" lg="6"
                       class="d-flex">
                       <product-card :product="product" class="product-card"></product-card>
                     </v-col>
@@ -301,6 +302,7 @@ const showQueue = computed(() => {
     <receipt-dialog />
   </v-app>
 </template>
+
 
 
 <style scoped>
