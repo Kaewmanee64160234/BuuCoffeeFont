@@ -34,8 +34,8 @@
                 row
                 :rules="[rules.required]"
               >
-                <v-radio label="ร้านกาแฟ" value="ร้านกาแฟ"></v-radio>
-                <v-radio label="ร้านข้าว" value="ร้านข้าว"></v-radio>
+                <v-radio label="เพิ่มรายการวัตถุดิบ" value="ร้านกาแฟ"></v-radio>
+                <v-radio label="เพิ่มรายการด้วยตัวเอง" value="ร้านข้าว"></v-radio>
               </v-radio-group>
             </v-col>
           </v-row>
@@ -86,6 +86,7 @@
                   v-model="newIngredientName"
                   label="ชื่อวัตถุดิบ"
                   required
+                  variant="solo"
                   @keyup.enter="
                     ingredientStore.AddRiceIngredient({
                       ingredientName: newIngredientName,
