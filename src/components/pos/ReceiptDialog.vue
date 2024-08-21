@@ -7,25 +7,25 @@
             <h4 class="header-text">Café@Library</h4>
             <div class="dashed-line"></div>
             <div class="d-flex justify-space-between">
-              <p style="text-align: start">Queue: {{ posStore.currentReceipt?.queueNumber }}</p>
+              <p style="text-align: start">คิวที่: {{ posStore.currentReceipt?.queueNumber }}</p>
               <p style="text-align: start">#{{ posStore.currentReceipt?.receiptNumber }}</p>
             </div>
-            <p style="text-align: start">Staff: {{ posStore.currentReceipt?.user?.userName }}</p>
+            <p style="text-align: start">พนักงานออกใบเสร็จ: {{ posStore.currentReceipt?.user?.userName }}</p>
             <p style="text-align: start">
-              Guests: {{
+              ชื่อลูกค้า: {{
                 posStore.currentReceipt?.customer === null
                   ? "guest"
                   : posStore.currentReceipt?.customer?.customerName
               }}
             </p>
             <div class="d-flex justify-space-between">
-              <p style="text-align: start">Date: {{ formattedDate }}</p>
-              <p style="text-align: start">Time: {{ formattedTime }}</p>
+              <p style="text-align: start">วันที่ออกใบเสร็จ: {{ formattedDate }}</p>
+              <p style="text-align: start">เวลา: {{ formattedTime }}</p>
             </div>
             <div class="dashed-line"></div>
           </div>
           <div class="receipt-body">
-            <h4 class="text-center">Receipt</h4>
+            <h4 class="text-center">ใบเสร็จ</h4>
             <div v-for="item in posStore.currentReceipt?.receiptItems" :key="item.receiptItemId" class="receipt-item">
               <div class="item-details">
                 <div class="item-info d-flex justify-space-between">
@@ -54,32 +54,32 @@
           </div>
           <div class="dashed-line"></div>
           <div class="receipt-summary">
-            <p>Items: {{ posStore.currentReceipt?.receiptItems.length }}</p>
-            <p>Promotions:</p>
+            <p>จำนวนสินค้าที่ซื้อ: {{ posStore.currentReceipt?.receiptItems.length }}</p>
+            <p>โปรโมชันที่ใช้:</p>
             <div class="d-flex justify-space-between toppings"
               v-for="promotion in posStore.currentReceipt?.receiptPromotions" :key="promotion.promotion.promotionId">
               <p>{{ promotion.promotion.promotionName }}</p>
               <p> {{ promotion.discount }} ฿</p>
             </div>
             <p class="total">
-              Total:
-              <span class="float-right">{{ posStore.currentReceipt?.receiptTotalPrice }} ฿</span>
+              ยอดเงินรวม:
+              <span class="float-right">{{ posStore.currentReceipt?.receiptTotalPrice }} บาท</span>
             </p>
 
             <p class="discount">
-              Discount:
+              ส่วนลด:
               <span class="float-right">{{ posStore.currentReceipt?.receiptTotalDiscount }} ฿</span>
             </p>
             <p class="received">
-              Received:
+              เงินที่ได้รับ:
               <span class="float-right">{{ posStore.currentReceipt?.receive }} ฿</span>
             </p>
             <p class="change">
-              Change:
+              เงินทอน:
               <span class="float-right">{{ posStore.currentReceipt?.change}} ฿</span>
             </p>
             <p class="net-total">
-              Net Total:
+              ยอดรวมสุทธิ:
               <span class="float-right">{{ posStore.currentReceipt?.receiptNetPrice }} ฿</span>
             </p>
            
@@ -92,8 +92,8 @@
         </div>
       </v-card-text>
       <v-card-actions class="justify-center">
-        <v-btn color="primary" @click="closeDialog">Close</v-btn>
-        <v-btn color="secondary" @click="printReceipt">Print</v-btn>
+        <v-btn color="primary" @click="closeDialog">ปิด</v-btn>
+        <v-btn color="secondary" @click="printReceipt">พิมพ์ใบเสร็จ</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
