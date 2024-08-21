@@ -195,31 +195,53 @@ const showQueue = computed(() => {
     <v-row :style="{ height: '100%' }">
       <!-- Left Column (Queue) -->
       <v-col cols="2" class="queue-column" style="padding: 0;" v-if="showQueue">
-        <v-container fluid class="queue-container" style="height: 100%; overflow-y: auto;">
-          <h2 class="pa-2">Queue</h2>
-          <v-row>
-            <v-col v-if="posStore.queueReceipt.length > 0" cols="12">
-              <v-card v-for="(receipt, index) in posStore.queueReceipt" :key="index" class="queue-card"
-                @click="selectReceipt(receipt!)" elevation="3">
-                <v-card-title class="d-flex justify-space-between align-center">
-                  <div class="queue-title">
-                    <span class="queue-number">#{{ receipt.queueNumber }}</span>
-                    <span class="customer-name">{{ receipt.customer?.customerName || 'Guest' }}</span>
-                  </div>
-                  <v-btn icon @click.stop="removeFromQueue(index)" class="delete-button">
-                    <v-icon color="red">mdi-delete</v-icon>
-                  </v-btn>
-                </v-card-title>
-                <v-card-subtitle class="queue-details">รายละเอียด</v-card-subtitle>
-              </v-card>
-            </v-col>
-            <v-col v-else cols="12">
-              <v-card class="queue-card" elevation="3">
-                <v-card-title class="text-center">ไม่มีคิว</v-card-title>
-              </v-card>
-            </v-col>
+        <v-container fluid class="queue-container" style="height: 100vh; overflow-y: auto; padding: 0;">
+          <h2 class="pa-2 ml-3 mt-2">Queue</h2>
+          <v-row class="fill-height" no-gutters>
+              <v-col v-if="posStore.queueReceipt.length > 0" cols="12">
+                  <v-card v-for="(receipt, index) in posStore.queueReceipt" :key="index" class="queue-card"
+                          @click="selectReceipt(receipt!)" elevation="3" style="margin-bottom: 8px;">
+                      <v-card-title class="d-flex" style="fit-content; position: relative; padding-left: 8px;">
+                          <div class="queue-title" style="display: flex; flex-direction: column; align-items: flex-start; width: 100%;">
+                              <span class="queue-info" style="font-size: 1em; width: 100%;">
+                                  คิวที่{{ index + 1 }}
+                                  <span class="customer-name" style="font-size: 0.8em;">
+                                      {{ receipt.customer?.customerName || 'ลูกค้าทั่วไป' }}
+                                  </span>
+                              </span>
+      
+                              <!-- Product List -->
+                              <div v-if="receipt.products && receipt.products.length > 0" style="margin-top: 4px;">
+                                  <span v-for="(item, itemIndex) in receipt.products" :key="itemIndex" style="font-size: 0.8em;">
+                                      {{ item.productName }} - {{ item.quantity }} ชิ้น
+                                  </span>
+                              </div>
+      
+                              <!-- Total Price -->
+                              <span class="total-price" style="font-size: 0.8em; font-weight: bold; margin-top: 4px;">
+                                  ราคารวมสุทธิ: {{ receipt.receiptTotalPrice }} บาท
+                              </span>
+                          </div>
+                          <v-btn icon @click.stop="removeFromQueue(index)" class="delete-button" style="position: absolute; top: 1px; right: 1px; border-radius: 50%; width: 36px; height: 36px; background-color: white;">
+                              <v-icon color="red" style="font-size: 24px;">mdi-delete</v-icon>
+                          </v-btn>
+                      </v-card-title>
+      
+                      <v-card-subtitle class="queue-details" style="font-size: 0.75em; padding-left: 8px;">
+                          คลิกเพื่อดูรายละเอียดเพิ่มเติม
+                      </v-card-subtitle>
+                  </v-card>
+              </v-col>
+      
+              <v-col v-else cols="12">
+                  <v-card class="queue-card" elevation="3">
+                      <v-card-title class="text-center">ไม่มีคิว</v-card-title>
+                  </v-card>
+              </v-col>
           </v-row>
-        </v-container>
+      </v-container>
+      
+      
       </v-col>
 
 
@@ -383,7 +405,7 @@ const showQueue = computed(() => {
 }
 
 .queue-card {
-  width: 100%;
+  width: 90%;
   /* Ensures all queue cards have the same width */
   cursor: pointer;
   transition: background-color 0.3s, transform 0.3s;
@@ -392,6 +414,7 @@ const showQueue = computed(() => {
   border-radius: 8px;
   padding: 15px;
   margin-bottom: 15px;
+  margin-left: 18px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
