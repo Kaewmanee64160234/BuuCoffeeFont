@@ -17,6 +17,12 @@ function getAllHistoryImportIngredients() {
 function getAllHistoryCheckIngredients() {
   return http.get("/checkingredients?actionType=issuing");
 }
+function getAllHistoryCoffee() {
+  return http.get("/checkingredients/findByShopType?shopType=coffee");
+}
+function getAllHistoryRice() {
+  return http.get("/checkingredients/findByShopType?shopType=rice");
+}
 function createImportIngredients(ingredient: {
   importingredientitem: {
     ingredientId: number;
@@ -104,8 +110,9 @@ async function updateIngredient(id: number, ingredient: Ingredient & { imageFile
 function deleteIngredient(id: number) {
   return http.delete(`/ingredients/${id}`);
 }
-
-
+function getIngredientLog() {
+  return http.get(`/ingredientusagelog/withdrawal-return-pairs`);
+}
 function searchIngredientsByName(name: string) {
   return http.get("/ingredients/search", { params: { name } });
 }
@@ -121,7 +128,9 @@ function getSubIngredients_Coffee() {
 function getSubIngredients_Rice() {
   return http.get(`/sub-inventories-rice`);
 }
-
+function getLog() {
+  return http.get(`/ingredientusagelog`);
+}
 export default {
   getAllIngredients,
   createImportIngredients,
@@ -130,13 +139,17 @@ export default {
   getHistoryCheckById,
   getHistoryImportById,
   getAllHistoryImportIngredients,
+  getLog,
   saveIngredient,
   updateIngredient,
   getIngredients,
   deleteIngredient,
   searchIngredientsByName,
   getIngredientlow,
+  getAllHistoryCoffee,
   getSubIngredients_Coffee,
+  getAllHistoryRice,
   getSubIngredients_Rice,
+  getIngredientLog,
   getAllHistoryCheckIngredients
 };

@@ -2,15 +2,18 @@
 import { useCheckIngredientStore } from "@/stores/historyIngredientCheck.store";
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
-import dialogImportItem from "./dialogCheck.vue";
+import dialogImportItem from "@/views/ingredient/check/dialogCheck.vue";
+import { useSubIngredientStore } from "@/stores/ingredientSubInventory.store";
 import type { Checkingredient } from "@/types/checkingredientitem.type";
 import * as XLSX from "xlsx";
 const ingredientStore = useCheckIngredientStore();
+const subIngredientStore = useSubIngredientStore();
+
 const router = useRouter();
 const historyCheckDialog = ref(false);
 const selectedCheck = ref<Checkingredient | null>(null);
 onMounted(async () => {
-  await ingredientStore.getAllHistortIngredients();
+  await subIngredientStore.findByShopTypeRice();
 });
 
 const formatDate = (dateString: string) => {
@@ -73,7 +76,7 @@ function exportToExcel(checkingredient: Checkingredient) {
     <v-card>
       <v-card-title>
         <v-row>
-          <v-col cols="9"> ประวัตินำออกวัตถุดิบหมดอายุ </v-col>
+          <v-col cols="9"> ร้านกาแฟ </v-col>
           <v-col cols="3">
             <v-text-field
               variant="solo"
@@ -85,24 +88,15 @@ function exportToExcel(checkingredient: Checkingredient) {
           </v-col>
         </v-row>
         <v-row>
-          <v-row>
-            <v-col cols="6">
-              <v-btn block color="success" :to="{ name: 'ingredients' }">
-                <v-icon left>mdi-arrow-u-left-top-bold</v-icon>
-                ย้อนกลับ
-              </v-btn>
-            </v-col>
-            <v-col cols="6">
-              <v-btn
-                color="success"
-                class="button-full-width"
-                :to="{ name: 'checkingredient' }"
-              >
-                <v-icon left>mdi-plus</v-icon>
-                วัตถุดิบหมดอายุ
-              </v-btn>
-            </v-col>
-          </v-row>
+          <v-col>
+            <v-btn
+              color="success"
+              class="button-full-width"
+              :to="{ name: 'ingredients' }"
+            >
+              <v-icon left>mdi-arrow-u-left-top-bold </v-icon> ย้อนกลับ
+            </v-btn>
+          </v-col>
         </v-row>
       </v-card-title>
 
@@ -117,22 +111,20 @@ function exportToExcel(checkingredient: Checkingredient) {
             <th style="text-align: center; font-weight: bold">การกระทำ</th>
           </tr>
         </thead>
-        <tbody></tbody>
         <tbody>
-          <tr
-            v-for="(item, index) in ingredientStore.CheckIngredientsHistory"
-            :key="index"
-          >
+          <tr v-for="(item, index) in subIngredientStore.HistoryRice" :key="index">
             <td>{{ index + 1 }}</td>
             <td>{{ formatDate(item.date) }}</td>
-            <td :style="{ color: item.actionType }">
-              {{
-                item.actionType === "issuing"
-                  ? "หมดอายุ"
-                  : item.actionType === "check"
-                  ? "เช็ควัตถุดิบ"
-                  : "เลี้ยงรับรอง"
-              }}
+            <td>
+              <span v-if="item.actionType === 'withdrawal'">
+                เบิกเข้าร้านกาแฟ
+              </span>
+              <span v-else-if="item.actionType === 'return'">
+                คืนคลังวัตถุดิบ
+              </span>
+              <span v-else>
+                {{ item.actionType }}
+              </span>
             </td>
 
             <td>
@@ -154,6 +146,11 @@ function exportToExcel(checkingredient: Checkingredient) {
             </td>
           </tr>
         </tbody>
+        <tbody v-if="!subIngredientStore.HistoryRice || subIngredientStore.HistoryRice.length === 0">
+            <tr>
+              <td colspan="4" class="text-center">ไม่มีข้อมูล</td>
+            </tr>
+          </tbody>
       </v-table>
     </v-card>
   </v-container>

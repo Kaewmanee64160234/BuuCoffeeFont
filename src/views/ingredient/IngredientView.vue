@@ -131,11 +131,14 @@ watch(paginate, async (newValue, oldValue) => {
                 </v-btn>
               </template>
               <v-list>
-                <v-list-item @click="navigateTo('checkingredient')">
-                  <v-list-item-title> เช็ควัตถุดิบ </v-list-item-title>
+                <v-list-item @click="navigateTo('history-coffee-store')">
+                  <v-list-item-title> ร้านกาแฟ </v-list-item-title>
                 </v-list-item>
-                <v-list-item @click="navigateTo('checkingredientHistory')">
-                  <v-list-item-title>ประวัติเช็ควัตถุดิบ </v-list-item-title>
+                <v-list-item @click="navigateTo('history-rice-store')">
+                  <v-list-item-title>ร้านข้าว </v-list-item-title>
+                </v-list-item>
+                <v-list-item @click="navigateTo('report-inggredient-log')">
+                  <v-list-item-title>การใช้วัตถุดิบ </v-list-item-title>
                 </v-list-item>
               </v-list>
             </v-menu>
