@@ -182,7 +182,7 @@ function decreaseSweetness() {
       <div v-if="props.product.category.haveTopping" class="d-flex flex-column mt-4">
         <span>ท็อปปิ้ง</span>
         <v-btn variant="outlined" color="primary" @click="toppingMenu = !toppingMenu" small>
-          {{ toppingMenu ? 'Hide Toppings' : 'Show Toppings' }}
+          {{ toppingMenu ? 'ซ้อนท็อปปิ้ง' : 'แสดงท็อปปิ้ง' }}
         </v-btn>
         <v-list v-if="toppingMenu" class="mt-2">
           <v-list-item v-for="(topping, index) in toppingStore.toppings" :key="topping.toppingId">
