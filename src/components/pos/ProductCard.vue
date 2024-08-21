@@ -83,35 +83,35 @@ function confirmSelection() {
 
   if (props.product.category.haveTopping === true) {
 
-    
-      if (!selectedType.value) {
-        showAlert.value = true;
-        return;
-      }
 
-      for (var i = 0; i < selectedToppings.value.length; i++) {
-        productTypeToppings.value.push({
-          productTypeToppingId: 0,
-          productType: selectedType.value,
-          topping: selectedToppings.value[i].topping,
-          quantity: selectedToppings.value[i].quantity,
-        });
-      }
+    if (!selectedType.value) {
+      showAlert.value = true;
+      return;
+    }
+
+    for (var i = 0; i < selectedToppings.value.length; i++) {
+      productTypeToppings.value.push({
+        productTypeToppingId: 0,
+        productType: selectedType.value,
+        topping: selectedToppings.value[i].topping,
+        quantity: selectedToppings.value[i].quantity,
+      });
+    }
 
 
 
-      console.log(selectedType.value);
+    console.log(selectedType.value);
 
-      posStore.addToReceipt(
-        props.product,
-        selectedType.value,
-        productTypeToppings.value,
-        quantity.value,
-        selectedSweetness.value
-      );
-      clearData();
+    posStore.addToReceipt(
+      props.product,
+      selectedType.value,
+      productTypeToppings.value,
+      quantity.value,
+      selectedSweetness.value
+    );
+    clearData();
 
-    
+
   } else {
     if (props.product) {
       posStore.addToReceipt(props.product, null, [], 1, null);
@@ -208,7 +208,7 @@ function decreaseSweetness() {
         </v-list>
       </div>
 
-      <div class="quantity-container d-flex justify-space-between align-center mt-4">
+      <div class="quantity-container d-flex justify-space-between align-center mt-4" v-if="props.product.category.haveTopping == true" >
         <p class="pa-2">จำนวนสินค้า</p>
         <v-btn variant="elevated" color="#C5C5C5" @click="decreaseQuantity" icon="mdi-minus" size="x-small"></v-btn>
         <span class="mx-2">{{ quantity }}</span>
@@ -216,10 +216,11 @@ function decreaseSweetness() {
       </div>
     </v-card-text>
 
-    <v-card-actions>
-      <v-btn variant="elevated" color="#FF9642" rounded="xl" style="width: 90%;"
+    <v-card-actions style=" width: 100%;">
+      <v-btn variant="elevated" color="#FF9642" rounded="xl" style="width: 100%;"
         @click="confirmSelection">ยืนยัน</v-btn>
     </v-card-actions>
+
   </v-card>
 </template>
 
