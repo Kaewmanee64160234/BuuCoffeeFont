@@ -26,6 +26,7 @@ export const usePosStore = defineStore("pos", () => {
   const netPrice = ref<number>(0);
   const selectUsePointDialog = ref(false);
   const countingPromotion = ref<number>(0);
+  const updateReceiptDialog = ref(false);
   const receipt = ref<Receipt>({
     receiptType: "",
     receiptTotalDiscount: 0,
@@ -650,6 +651,7 @@ export const usePosStore = defineStore("pos", () => {
     }
     await receiptStore.getRecieptIn30Min();
   };
+
   // ipdateReceiptCatering
   const updateReceiptCatering = async (id: number, receipt: Receipt) => {
     console.log("updateReceipt", JSON.stringify(receipt));
@@ -671,7 +673,27 @@ export const usePosStore = defineStore("pos", () => {
     localStorage.setItem("queueReceipt", JSON.stringify(queueReceipt.value));
   }
 
+  const setReceiptForEdit = (receiptToEdit: Receipt) => {
+    receipt.value = receiptToEdit;
+  };
+
+  const getCurrentReceipt = async () => {
+    try {
+      const receipt = localStorage.getItem('receipt');
+      if (receipt) {
+        currentReceipt.value = JSON.parse(receipt);
+      }
+    } catch (error) {
+      console.error('Error getting current user:', error);
+    }
+  };
+
+  
   return {
+    setReceiptForEdit,
+    getCurrentReceipt,
+    updateReceiptDialog,
+
     selectedItems,
     receiptPromotions,
     customerPhone,
