@@ -213,7 +213,7 @@ const showQueue = computed(() => {
                               <!-- Product List -->
                               <div v-if="receipt.receiptItems && receipt.receiptItems.length > 0" style="margin-top: 4px;">
                                 <div v-for="(item, itemIndex) in receipt.receiptItems" :key="itemIndex" style="font-size: 0.8em; margin-bottom: 4px;">
-                                  {{ item.product?.productName }} จำนวน {{ item.quantity }} ชิ้น
+                                  {{ item.product?.productName }} x {{ item.quantity }}
                                 </div>
                               </div>
                               
