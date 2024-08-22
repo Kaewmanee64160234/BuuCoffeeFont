@@ -210,18 +210,29 @@ const showQueue = computed(() => {
                                   </span>
                               </span>
       
-                              <!-- Product List -->
                               <div v-if="receipt.receiptItems && receipt.receiptItems.length > 0" style="margin-top: 4px;">
                                 <div v-for="(item, itemIndex) in receipt.receiptItems" :key="itemIndex" style="font-size: 0.8em; margin-bottom: 4px;">
+                                  <!-- Display product name and quantity -->
                                   {{ item.product?.productName }} x {{ item.quantity }}
+                                
+                                  <!-- Display additional product details if applicable -->
+                                  <div v-if="item.product?.category.haveTopping">
+                                    ประเภท {{ item.productType?.productTypeName }}
+                                  </div>
+                                  <div class="toppings" v-if="item.product?.category.haveTopping">
+                                    ความหวาน {{ item.sweetnessLevel }}%
+                                  </div>
+                              
+                                  <!-- Display toppings and quantities -->
+                                  <div v-if="item.productTypeToppings && item.productTypeToppings.length > 0">
+                                    <span v-for="(topping, toppingIndex) in item.productTypeToppings" :key="toppingIndex">
+                                      <span v-if="topping.topping">
+                                        ท็อปปิ้ง {{ topping.topping.toppingName }} x {{ topping.quantity }} 
+                                      </span>
+                                    </span>
+                                  </div>
                                 </div>
                               </div>
-                              
-      
-                              <!-- Total Price -->
-                              <span class="total-price" style="font-size: 0.8em; font-weight: bold; margin-top: 4px;">
-                                  ราคารวมสุทธิ: {{ receipt.receiptTotalPrice }} บาท
-                              </span>
                           </div>
                           <v-btn icon @click.stop="removeFromQueue(index)" class="delete-button" style="position: absolute; top: 1px; right: 1px; border-radius: 50%; width: 36px; height: 36px; background-color: white;">
                               <v-icon color="red" style="font-size: 24px;">mdi-delete</v-icon>
