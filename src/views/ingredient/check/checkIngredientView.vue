@@ -1,12 +1,11 @@
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
-import Swal from 'sweetalert2';
-import { useIngredientStore } from '@/stores/Ingredient.store';
+import { ref, onMounted } from "vue";
+import Swal from "sweetalert2";
+import { useIngredientStore } from "@/stores/Ingredient.store";
 const ingredientStore = useIngredientStore();
 const actionTypeField = ref(null);
-const selectedAction = ref<string>('issuing');
+const selectedAction = ref<string>("issuing");
 const isVisible = ref<boolean>(true);
-
 
 onMounted(async () => {
   await ingredientStore.getIngredients();
@@ -15,63 +14,69 @@ onMounted(async () => {
 const saveCheckData = async () => {
   try {
     const confirmation = await Swal.fire({
-      title: 'คุณแน่ใจหรือไม่?',
-      text: 'คุณต้องการบันทึกข้อมูลนี้หรือไม่?',
-      icon: 'warning',
+      title: "คุณแน่ใจหรือไม่?",
+      text: "คุณต้องการบันทึกข้อมูลนี้หรือไม่?",
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonText: 'ใช่, บันทึก!',
-      cancelButtonText: 'ไม่, ยกเลิก!',
+      confirmButtonText: "ใช่, บันทึก!",
+      cancelButtonText: "ไม่, ยกเลิก!",
     });
 
     if (confirmation.isConfirmed) {
       Swal.fire({
-        title: 'กำลังบันทึกข้อมูล...',
-        text: 'กรุณารอสักครู่ขณะที่เราบันทึกข้อมูลของคุณ.',
+        title: "กำลังบันทึกข้อมูล...",
+        text: "กรุณารอสักครู่ขณะที่เราบันทึกข้อมูลของคุณ.",
         allowOutsideClick: false,
         didOpen: () => {
           Swal.showLoading();
-        }
+        },
       });
 
       // ส่งช้อมูล
       await ingredientStore.saveCheckData();
 
       Swal.fire({
-        title: 'สำเร็จ!',
-        text: 'ข้อมูลของคุณถูกบันทึกเรียบร้อยแล้ว.',
-        icon: 'success',
-        confirmButtonText: 'ตกลง'
+        title: "สำเร็จ!",
+        text: "ข้อมูลของคุณถูกบันทึกเรียบร้อยแล้ว.",
+        icon: "success",
+        confirmButtonText: "ตกลง",
       });
     }
   } catch (error) {
-    console.error('Error saving check data:', error);
+    console.error("Error saving check data:", error);
 
     Swal.fire({
-      title: 'เกิดข้อผิดพลาด!',
-      text: 'เกิดข้อผิดพลาดในการบันทึกข้อมูลของคุณ.',
-      icon: 'error',
+      title: "เกิดข้อผิดพลาด!",
+      text: "เกิดข้อผิดพลาดในการบันทึกข้อมูลของคุณ.",
+      icon: "error",
     });
   }
 };
 </script>
 
-
 <template>
-  <v-container fluid style="padding-left: 80px;">
+  <v-container fluid style="padding-left: 80px">
     <v-card-title>
       <v-row>
-        <v-col cols="9" style="padding: 20px;">
+        <v-col cols="9" style="padding: 20px">
           <h3>วัตถุดิบหมดอายุ</h3>
         </v-col>
       </v-row>
       <v-row>
         <v-col cols="3">
-          <v-text-field label="ค้นหาวัตถุดิบ" append-inner-icon="mdi-magnify"  dense hide-details variant="solo" outlined
-            v-model="ingredientStore.search"></v-text-field>
+          <v-text-field
+            label="ค้นหาวัตถุดิบ"
+            append-inner-icon="mdi-magnify"
+            dense
+            hide-details
+            variant="solo"
+            outlined
+            v-model="ingredientStore.search"
+          ></v-text-field>
         </v-col>
         <v-col cols="auto">
           <v-btn color="success" :to="{ name: 'ingredients' }">
-            รายการวัตถุดิบ
+            <v-icon left>mdi-arrow-u-left-top-bold </v-icon> ย้อนกลับ
           </v-btn>
         </v-col>
         <v-col cols="auto">
@@ -79,32 +84,50 @@ const saveCheckData = async () => {
             ประวัติวัตถุดิบหมดอายุ
           </v-btn>
         </v-col>
-
-
       </v-row>
       <v-spacer></v-spacer>
-
     </v-card-title>
     <v-row>
       <v-col cols="6" class="d-flex flex-column">
         <v-container>
           <v-row>
-  <v-col cols="3" style="text-align: center; padding: 8px"
-    v-for="(item, index) in ingredientStore.all_ingredients" :key="index">
-    <v-card
-      width="100%"
-      :class="{ 'disabled-card': item.ingredientQuantityInStock <= 0 }"
-      :style="{ height: '200px', cursor: item.ingredientQuantityInStock <= 0 ? 'not-allowed' : 'pointer' }"
-      @click="item.ingredientQuantityInStock > 0 && ingredientStore.Addingredienttotable(item)"
-      :ripple="item.ingredientQuantityInStock > 0">
-      <v-img :src="`http://localhost:3000/ingredients/${item.ingredientId}/image`" height="100"></v-img>
-      <v-card-title style="font-size: 14px">{{ item.ingredientName }}</v-card-title>
-      <v-card-subtitle style="font-size: 12px">{{ item.ingredientSupplier }}</v-card-subtitle>
-    </v-card>
-  </v-col>
-</v-row>
-
-
+            <v-col
+              cols="3"
+              style="text-align: center; padding: 8px"
+              v-for="(item, index) in ingredientStore.all_ingredients"
+              :key="index"
+            >
+              <v-card
+                width="100%"
+                :class="{
+                  'disabled-card': item.ingredientQuantityInStock <= 0,
+                }"
+                :style="{
+                  height: '200px',
+                  cursor:
+                    item.ingredientQuantityInStock <= 0
+                      ? 'not-allowed'
+                      : 'pointer',
+                }"
+                @click="
+                  item.ingredientQuantityInStock > 0 &&
+                    ingredientStore.Addingredienttotable(item)
+                "
+                :ripple="item.ingredientQuantityInStock > 0"
+              >
+                <v-img
+                  :src="`http://localhost:3000/ingredients/${item.ingredientId}/image`"
+                  height="100"
+                ></v-img>
+                <v-card-title style="font-size: 14px">{{
+                  item.ingredientName
+                }}</v-card-title>
+                <v-card-subtitle style="font-size: 12px">{{
+                  item.ingredientSupplier
+                }}</v-card-subtitle>
+              </v-card>
+            </v-col>
+          </v-row>
         </v-container>
       </v-col>
       <v-col cols="6" class="d-flex flex-column">
@@ -120,16 +143,26 @@ const saveCheckData = async () => {
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, index) in ingredientStore.ingredientCheckList" :key="index">
+              <tr
+                v-for="(item, index) in ingredientStore.ingredientCheckList"
+                :key="index"
+              >
                 <td>{{ index + 1 }}</td>
                 <td>{{ item.ingredientcheck.ingredientName }}</td>
                 <td>{{ item.ingredientcheck.ingredientSupplier }}</td>
                 <td>
-                  <input type="number" v-model.number="item.count" class="styled-input" />
+                  <input
+                    type="number"
+                    v-model.number="item.count"
+                    class="styled-input"
+                  />
                 </td>
 
                 <td>
-                  <button @click="ingredientStore.removeCheckIngredient(index)" class="styled-button">
+                  <button
+                    @click="ingredientStore.removeCheckIngredient(index)"
+                    class="styled-button"
+                  >
                     ลบ
                   </button>
                 </td>
@@ -143,24 +176,31 @@ const saveCheckData = async () => {
             <v-row>
               <v-col cols="12">หมายเหตุ</v-col>
               <v-col cols="12">
-                <v-text-field v-model="ingredientStore.checkDescription" label="กรุณาระบุหมายเหตุ **ถ้ามี" dense
-                  hide-details variant="solo"></v-text-field>
+                <v-text-field
+                  v-model="ingredientStore.checkDescription"
+                  label="กรุณาระบุหมายเหตุ **ถ้ามี"
+                  dense
+                  hide-details
+                  variant="solo"
+                ></v-text-field>
               </v-col>
             </v-row>
           </v-col>
         </v-row>
-        <v-row> <v-col>
-            <v-btn color="success" class="button-full-width" @click="saveCheckData">
+        <v-row>
+          <v-col>
+            <v-btn
+              color="success"
+              class="button-full-width"
+              @click="saveCheckData"
+            >
               <v-icon left>mdi-plus</v-icon>
               บันทึกข้อมูล
             </v-btn>
-          </v-col></v-row>
+          </v-col></v-row
+        >
       </v-col>
-
     </v-row>
-
-
-
   </v-container>
 </template>
 <style scoped>
@@ -237,7 +277,7 @@ td {
 }
 
 .red-button {
-  background-color: #EE4E4E;
+  background-color: #ee4e4e;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -290,7 +330,8 @@ td {
     font-size: 12px;
   }
 
-  thead, th {
+  thead,
+  th {
     font-size: 10px;
   }
 
@@ -324,19 +365,19 @@ td {
   td {
     white-space: nowrap;
   }
-  
+
   v-container {
     padding: 0; /* ลด padding ของ container */
   }
-  
+
   v-card {
     margin: 0; /* ลด margin ของ card */
   }
-  
-  v-row, v-col {
+
+  v-row,
+  v-col {
     margin: 0;
     padding: 0;
   }
 }
 </style>
-

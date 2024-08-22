@@ -1,16 +1,15 @@
 <script lang="ts" setup>
-import { useCheckIngredientStore } from "@/stores/historyIngredientCheck.store";
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
-import dialogImportItem from "./dialogCheck.vue";
+import { useSubIngredientStore } from "@/stores/ingredientSubInventory.store";
+import dialogLogitem from './dialogLog.vue';
 import type { Checkingredient } from "@/types/checkingredientitem.type";
 import * as XLSX from "xlsx";
-const ingredientStore = useCheckIngredientStore();
+const subIngredientStore = useSubIngredientStore();
+const dialogLod = ref(false);
 const router = useRouter();
-const historyCheckDialog = ref(false);
-const selectedCheck = ref<Checkingredient | null>(null);
 onMounted(async () => {
-  await ingredientStore.getAllHistortIngredients();
+  await subIngredientStore.getIngredientLog();
 });
 
 const formatDate = (dateString: string) => {
@@ -29,9 +28,8 @@ const navigateTo = (routeName: string) => {
   router.push({ name: routeName });
 };
 
-const openHistoryCheckDialog = (checkingredient: Checkingredient) => {
-  ingredientStore.checkingredient = checkingredient;
-  ingredientStore.dialogCheckItem = true;
+const openDialog = () => {
+  subIngredientStore.dialoglog = true;
 };
 function exportToExcel(checkingredient: Checkingredient) {
   const basicData = {
@@ -65,15 +63,12 @@ function exportToExcel(checkingredient: Checkingredient) {
 </script>
 
 <template>
-  <dialogImportItem
-    v-model:dialog="historyCheckDialog"
-    :checkingredient="selectedCheck"
-  />
+<dialogLogitem v-model:dialog="dialogLod"/>
   <v-container>
     <v-card>
       <v-card-title>
         <v-row>
-          <v-col cols="9"> ประวัตินำออกวัตถุดิบหมดอายุ </v-col>
+          <v-col cols="9">รายงานวัตถุดิบ</v-col>
           <v-col cols="3">
             <v-text-field
               variant="solo"
@@ -85,7 +80,6 @@ function exportToExcel(checkingredient: Checkingredient) {
           </v-col>
         </v-row>
         <v-row>
-          <v-row>
             <v-col cols="6">
               <v-btn block color="success" :to="{ name: 'ingredients' }">
                 <v-icon left>mdi-arrow-u-left-top-bold</v-icon>
@@ -96,14 +90,13 @@ function exportToExcel(checkingredient: Checkingredient) {
               <v-btn
                 color="success"
                 class="button-full-width"
-                :to="{ name: 'checkingredient' }"
+                @click="openDialog">
               >
-                <v-icon left>mdi-plus</v-icon>
-                วัตถุดิบหมดอายุ
+                <v-icon left>mdi-format-list-bulleted</v-icon>
+                show Log
               </v-btn>
             </v-col>
           </v-row>
-        </v-row>
       </v-card-title>
 
       <v-table class="mx-auto" style="width: 97%">
@@ -112,46 +105,44 @@ function exportToExcel(checkingredient: Checkingredient) {
             <th style="text-align: center; font-weight: bold">
               รหัสประวัติการเช็ควัตถุดิบ
             </th>
-            <th style="text-align: center; font-weight: bold">วันที่</th>
-            <th style="text-align: center; font-weight: bold">รูปแบบ</th>
-            <th style="text-align: center; font-weight: bold">การกระทำ</th>
+            <th style="text-align: center; font-weight: bold">ชื่อวัตถุดิบ</th>
+            <th style="text-align: center; font-weight: bold">วันที่เบิก</th>
+            <th style="text-align: center; font-weight: bold">จำนวนที่เบิก</th>
+            <th style="text-align: center; font-weight: bold">วันที่คืน</th>
+            <th style="text-align: center; font-weight: bold">จำนวนที่เหลือ</th>
+            <th style="text-align: center; font-weight: bold">
+              <v-icon left>mdi-desktop-classic</v-icon>
+              หน่วยที่ใช้งานรวม
+            </th>
+            <th style="text-align: center; font-weight: bold">
+              <v-icon left>mdi-desktop-classic</v-icon>
+              จำนวนที่ขายไป
+            </th>
           </tr>
         </thead>
-        <tbody></tbody>
         <tbody>
           <tr
-            v-for="(item, index) in ingredientStore.CheckIngredientsHistory"
+            v-for="(item, index) in subIngredientStore.IngredientLog"
             :key="index"
           >
             <td>{{ index + 1 }}</td>
-            <td>{{ formatDate(item.date) }}</td>
-            <td :style="{ color: item.actionType }">
-              {{
-                item.actionType === "issuing"
-                  ? "หมดอายุ"
-                  : item.actionType === "check"
-                  ? "เช็ควัตถุดิบ"
-                  : "เลี้ยงรับรอง"
-              }}
-            </td>
-
-            <td>
-              <v-btn
-                color="#ed8731 "
-                class="mr-2"
-                icon="mdi-pencil"
-                @click="openHistoryCheckDialog(item)"
-                ><v-icon color="white" style="font-size: 20px"
-                  >mdi-eye-circle</v-icon
-                ></v-btn
-              >
-
-              <v-btn color="#4CAF50" icon @click="exportToExcel(item)">
-                <v-icon color="white" style="font-size: 20px"
-                  >mdi-file-excel</v-icon
-                >
-              </v-btn>
-            </td>
+            <td>{{ item.ingredientName }}</td>
+            <td>{{ formatDate(item.WithdrawalDate) }}</td>
+            <td>{{ item.WithdrawalQuantity }}</td>
+            <td>{{ formatDate(item.ReturnDate) }}</td>
+            <td>{{ item.WithdrawalQuantity - item.ReturnQuantity }}</td>
+            <td style="color: blue">{{ item.TotalUsedLogQuantity }}</td>
+            <td style="color: blue">{{ item.TotalUnit }}</td>
+          </tr>
+        </tbody>
+        <tbody
+          v-if="
+            !subIngredientStore.IngredientLog ||
+            subIngredientStore.IngredientLog.length === 0
+          "
+        >
+          <tr>
+            <td colspan="4" class="text-center">ไม่มีข้อมูล</td>
           </tr>
         </tbody>
       </v-table>
