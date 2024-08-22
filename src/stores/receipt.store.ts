@@ -14,6 +14,7 @@ export const useReceiptStore = defineStore("receipt", () => {
   const userStore = useUserStore();
   const isLoading = ref(false); // loading state
   const errorMessage = ref<string | null>(null); // error message state
+  const currentReceipt = ref({});
 
   const getAllReceipts = async () => {
     try {
@@ -124,8 +125,26 @@ export const useReceiptStore = defineStore("receipt", () => {
       isLoading.value = false;
     }
   };
+  const setReceiptForEdit = (receiptToEdit: Receipt) => {
+    receipt.value = receiptToEdit;
+  };
+
+  const getCurrentReceipt = async () => {
+    try {
+      const receipt = localStorage.getItem('receipt');
+      if (receipt) {
+        currentReceipt.value = JSON.parse(receipt); // Use = for assignment
+      }
+    } catch (error) {
+      console.error('Error getting current user:', error);
+    }
+  };
+  
 
   return {
+    setReceiptForEdit,
+    getCurrentReceipt,
+
     receipts,
     receipt,
     getAllReceipts,

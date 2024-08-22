@@ -9,6 +9,7 @@ import type { Promotion } from '../../types/promotion.type';
 import { useUserStore } from '@/stores/user.store';
 import { useReceiptStore } from '@/stores/receipt.store';
 import ReceiptDetailsDialogPos from '../receipts/ReceiptDialogPos.vue';
+import DrinkSelectionDialog from '../pos/DrinkSelectionDialog.vue';
 
 const step = ref(1);
 const posStore = usePosStore();
@@ -18,6 +19,7 @@ const selectedItems = computed(() => posStore.selectedItems);
 const selectedCustomer = ref('');
 const receiptStore = useReceiptStore();
 const url = import.meta.env.VITE_URL_PORT
+
 
 
 onMounted(async () => {
@@ -145,7 +147,6 @@ async function save() {
   step.value = 1;
   posStore.receipt.paymentMethod = '';
   posStore.receipt.customer = null;
-  posStore.receipt.receiptId = null;
   posStore.receipt.receiptStatus = 'รอชำระเงิน';
   selectedCustomer.value = '';
 }
@@ -192,6 +193,21 @@ function removePromotion(promotion: Promotion) {
   posStore.removePromotion(promotion);
 }
 
+function openProductCardDialog(item: ReceiptItem) {
+  if (item.product) {
+    posStore.selectedProduct = item.product; // Set the selected product
+    posStore.ProductCardDialog = true; // Open the dialog
+  } else {
+    console.error("Product is undefined");
+  }
+}
+
+const openEditReceiptDialog = (receipt: Receipt) => {
+  posStore.setReceiptForEdit(receipt);
+  posStore.toppingDialog = true;
+};
+
+
 watch(() => selectedCustomer.value, () => {
   if (selectedCustomer.value === '' || selectedCustomer.value === null) {
     posStore.receipt.customer = null;
@@ -233,6 +249,7 @@ const selectReceipt = (receipt: Receipt) => {
 
 <template>
   <ReceiptDetailsDialogPos />
+  <DrinkSelectionDialog v-model:dialog="posStore.updateReceiptDialog" :pos="posStore.receipt"></DrinkSelectionDialog>
   <div class="h-screen app">
     <AddCustomerDialog />
 
@@ -357,6 +374,9 @@ const selectReceipt = (receipt: Receipt) => {
                           <v-btn icon variant="text" @click="removeItem(index)">
                             <v-icon color="red">mdi-delete</v-icon>
                           </v-btn>
+                          <v-btn icon variant="text" @click="openEditReceiptDialog(posStore.receipt)">
+                            <v-icon color="#FABC3F">mdi-pencil</v-icon>
+                          </v-btn>
                         </v-col>
                       </v-row>
                     </v-list-item>
@@ -383,6 +403,7 @@ const selectReceipt = (receipt: Receipt) => {
                       <v-btn size="small" icon variant="text" @click="removePromotion(promotion.promotion)">
                         <v-icon color="red">mdi-delete</v-icon>
                       </v-btn>
+                      
                     </div>
                   </div>
                 </div>

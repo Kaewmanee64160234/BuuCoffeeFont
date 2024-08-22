@@ -19,6 +19,7 @@ const productTypeToppings = ref<ProductTypeTopping[]>([]);
 const quantity = ref<number>(1);
 const showAlert = ref<boolean>(false);
 
+
 const sweetnessLevels = [0, 25, 50, 75, 100];
 
 const toppingGroups = computed(() => {
@@ -119,6 +120,7 @@ function clearData() {
   productTypeToppings.value = [];
 }
 
+
 watch(
   () => posStore.toppingDialog,
   (newVal) => {
@@ -128,6 +130,8 @@ watch(
     }
   }
 );
+
+
 
 </script>
 

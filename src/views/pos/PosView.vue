@@ -211,11 +211,12 @@ const showQueue = computed(() => {
                               </span>
       
                               <!-- Product List -->
-                              <div v-if="receipt.products && receipt.products.length > 0" style="margin-top: 4px;">
-                                  <span v-for="(item, itemIndex) in receipt.products" :key="itemIndex" style="font-size: 0.8em;">
-                                      {{ item.productName }} - {{ item.quantity }} ชิ้น
-                                  </span>
+                              <div v-if="receipt.receiptItems && receipt.receiptItems.length > 0" style="margin-top: 4px;">
+                                <div v-for="(item, itemIndex) in receipt.receiptItems" :key="itemIndex" style="font-size: 0.8em; margin-bottom: 4px;">
+                                  {{ item.product?.productName }} x {{ item.quantity }}
+                                </div>
                               </div>
+                              
       
                               <!-- Total Price -->
                               <span class="total-price" style="font-size: 0.8em; font-weight: bold; margin-top: 4px;">
