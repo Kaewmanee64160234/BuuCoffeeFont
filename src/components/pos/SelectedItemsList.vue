@@ -157,7 +157,7 @@ function openCreateCustomerDialog() {
 const loadQueueListFromLocalStorage = () => {
   const storedQueueList = localStorage.getItem('queueReceipt');
   console.log(storedQueueList);
-  
+
   if (storedQueueList) {
     posStore.queueReceipt = JSON.parse(storedQueueList);
   } else {
@@ -249,7 +249,7 @@ const selectReceipt = (receipt: Receipt) => {
 
 <template>
   <ReceiptDetailsDialogPos />
-  <DrinkSelectionDialog ></DrinkSelectionDialog>
+  <DrinkSelectionDialog></DrinkSelectionDialog>
   <div class="h-screen app">
     <AddCustomerDialog />
 
@@ -327,60 +327,62 @@ const selectReceipt = (receipt: Receipt) => {
             <div
               :class="userStore.currentUser?.userRole === 'พนักงานขายข้าว' ? 'selected-items-list-50' : 'selected-items-list-40'">
               <v-list class="full-width" style="height: 20vh;">
-  <v-list-item-group>
-    <div v-for="(item, index) in selectedItems" :key="index" class="selected-item full-width my-2">
-      <!-- Clicking on the list item will open the product card dialog -->
-      <v-list-item @click="openProductCardDialog(item)" :prepend-avatar="`${url}/products/${item.product?.productId}/image`" class="full-width">
-        <v-row no-gutters>
-          <v-col cols="6" class="product-name" style="color: black;">
-            {{ item.product?.productName }}
-          </v-col>
-          <v-col cols="6" class="text-right pr-8" style="color: black;">
-            <p>{{ item.receiptSubTotal.toFixed(2) }}</p>
-          </v-col>
-        </v-row>
-        <v-row no-gutters>
-          <v-col cols="7" style="color: gray;">
-            <div v-if="item.product?.category.haveTopping" class="product-details">
-              {{ item.productType?.productTypeName }} +{{ item.productType?.productTypePrice }} | ความหวาน
-              {{ item.sweetnessLevel }}%
-            </div>
-            <div v-else>
-              <div class="product-details">
-                {{ item.product?.productName }} ({{ item.product?.category.categoryName }}) {{
-                  item.product?.productPrice }}.-
-              </div>
-            </div>
-            <div v-if="item.productTypeToppings && item.productTypeToppings.length > 0">
-              <ul class="toppings-list">
-                <li v-for="topping in item.productTypeToppings" :key="topping?.topping?.toppingId" class="topping-item">
-                  x{{ topping?.quantity }} {{ topping?.topping?.toppingName }}
-                  <span v-if="topping?.topping?.toppingName && topping.topping.toppingName.length > 3">
-                    : {{ topping?.topping?.toppingPrice }}.-
-                  </span>
-                </li>
-              </ul>
-            </div>
-          </v-col>
-          <v-col cols="5">
-            <!-- Quantity controls, prevent event propagation to list item click -->
-            <v-btn size="xs-small" color="#C5C5C5" icon @click.stop="decreaseQuantity(index)">
-              <v-icon>mdi-minus</v-icon>
-            </v-btn>
-            <span class="pa-2">{{ item.quantity }}</span>
-            <v-btn size="xs-small" color="#FF9642" icon @click.stop="increaseQuantity(item)">
-              <v-icon>mdi-plus</v-icon>
-            </v-btn>
-            <!-- Delete button, prevent event propagation to list item click -->
-            <v-btn icon variant="text" @click.stop="removeItem(index)">
-              <v-icon color="red">mdi-delete</v-icon>
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-list-item>
-    </div>
-  </v-list-item-group>
-</v-list>
+                <v-list-item-group>
+                  <div v-for="(item, index) in selectedItems" :key="index" class="selected-item full-width my-2">
+                    <!-- Clicking on the list item will open the product card dialog -->
+                    <v-list-item @click="openProductCardDialog(item)"
+                      :prepend-avatar="`${url}/products/${item.product?.productId}/image`" class="full-width">
+                      <v-row no-gutters>
+                        <v-col cols="6" class="product-name" style="color: black;">
+                          {{ item.product?.productName }}
+                        </v-col>
+                        <v-col cols="6" class="text-right pr-8" style="color: black;">
+                          <p>{{ item.receiptSubTotal.toFixed(2) }}</p>
+                        </v-col>
+                      </v-row>
+                      <v-row no-gutters>
+                        <v-col cols="7" style="color: gray;">
+                          <div v-if="item.product?.category.haveTopping" class="product-details">
+                            {{ item.productType?.productTypeName }} +{{ item.productType?.productTypePrice }} | ความหวาน
+                            {{ item.sweetnessLevel }}%
+                          </div>
+                          <div v-else>
+                            <div class="product-details">
+                              {{ item.product?.productName }} ({{ item.product?.category.categoryName }}) {{
+                                item.product?.productPrice }}.-
+                            </div>
+                          </div>
+                          <div v-if="item.productTypeToppings && item.productTypeToppings.length > 0">
+                            <ul class="toppings-list">
+                              <li v-for="topping in item.productTypeToppings" :key="topping?.topping?.toppingId"
+                                class="topping-item">
+                                x{{ topping?.quantity }} {{ topping?.topping?.toppingName }}
+                                <span v-if="topping?.topping?.toppingName && topping.topping.toppingName.length > 3">
+                                  : {{ topping?.topping?.toppingPrice }}.-
+                                </span>
+                              </li>
+                            </ul>
+                          </div>
+                        </v-col>
+                        <v-col cols="5">
+                          <!-- Quantity controls, prevent event propagation to list item click -->
+                          <v-btn size="xs-small" color="#C5C5C5" icon @click.stop="decreaseQuantity(index)">
+                            <v-icon>mdi-minus</v-icon>
+                          </v-btn>
+                          <span class="pa-2">{{ item.quantity }}</span>
+                          <v-btn size="xs-small" color="#FF9642" icon @click.stop="increaseQuantity(item)">
+                            <v-icon>mdi-plus</v-icon>
+                          </v-btn>
+                          <!-- Delete button, prevent event propagation to list item click -->
+                          <v-btn icon variant="text" @click.stop="removeItem(index)">
+                            <v-icon color="red">mdi-delete</v-icon>
+                          </v-btn>
+                        </v-col>
+                      </v-row>
+                    </v-list-item>
+                  </div>
+                </v-list-item-group>
+              </v-list>
 
             </div>
 
@@ -402,7 +404,7 @@ const selectReceipt = (receipt: Receipt) => {
                       <v-btn size="small" icon variant="text" @click="removePromotion(promotion.promotion)">
                         <v-icon color="red">mdi-delete</v-icon>
                       </v-btn>
-                      
+
                     </div>
                   </div>
                 </div>
@@ -530,9 +532,11 @@ const selectReceipt = (receipt: Receipt) => {
               <!-- Change Amount -->
               <p class="d-flex justify-space-between pr-6 my-2">
                 <span>ทอน:</span>
-                <span :class="posStore.receipt.receive < 0 || posStore.receipt.receive < posStore.receipt.receiptNetPrice ? 'red--text' : 'black'"
+                <span
+                  :class="posStore.receipt.receive < 0 || posStore.receipt.receive < posStore.receipt.receiptNetPrice ? 'red--text' : 'black'"
                   class="info-value">
-                  {{ parseFloat(posStore.receipt.change.toFixed(2)) < 0 ? 'จำนวนเงินไม่พอ' : posStore.receipt.change.toFixed(2) }} </span>
+                  {{ parseFloat(posStore.receipt.change.toFixed(2)) < 0 ? 'จำนวนเงินไม่พอ' :
+                    posStore.receipt.change.toFixed(2) }} </span>
               </p>
 
               <v-divider></v-divider>
