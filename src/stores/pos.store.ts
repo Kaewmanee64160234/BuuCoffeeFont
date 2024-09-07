@@ -27,6 +27,7 @@ export const usePosStore = defineStore("pos", () => {
   const selectUsePointDialog = ref(false);
   const countingPromotion = ref<number>(0);
   const updateReceiptDialog = ref(false);
+  const selectedItemForEdit = ref<ReceiptItem>();
   const receipt = ref<Receipt>({
     receiptType: "",
     receiptTotalDiscount: 0,
@@ -218,6 +219,61 @@ export const usePosStore = defineStore("pos", () => {
     }
 
     console.log("last", selectedItems.value[selectedItems.value.length - 1]);
+    receipt.value.receiptTotalPrice = calculateTotal(selectedItems.value);
+    if (receipt.value.receiptTotalDiscount === 0) {
+      receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice;
+    } else {
+      receipt.value.receiptNetPrice =
+        receipt.value.receiptTotalPrice - receipt.value.receiptTotalDiscount;
+    }
+  };
+
+  // update receipt Item for edit in receipt
+  const updateReceiptItem = (item: ReceiptItem) => {
+    const index =  selectedItems.value.findIndex(
+      (item) =>
+        JSON.stringify(item.productTypeToppings) ===
+          JSON.stringify(item.productTypeToppings) &&
+        item.product?.productId === item.product?.productId &&
+        item.sweetnessLevel === item.sweetnessLevel &&
+        item.productType?.productTypeName === item.productType?.productTypeName
+    );
+    const existingItem = selectedItems.value[index];
+    const parsedQuantity = item.quantity;
+    const productPrice = parseInt(item.product!.productPrice.toString(), 10);
+    if (index !== -1) {
+       if (item.product?.category.haveTopping) {
+        // มี topping
+        if (item.productTypeToppings.length > 0) {
+          existingItem.quantity = parsedQuantity ;
+          const toppingsTotal = item.productTypeToppings.reduce(
+            (toppingAcc, toppingItem) =>
+              toppingAcc +
+              parseFloat(toppingItem.topping.toppingPrice.toString()) *
+                parseFloat(toppingItem.quantity.toString()) *
+                existingItem.quantity,
+            0
+          );
+          const itemTotal =
+            (
+              parseFloat(item.productType!.productTypePrice!.toString())) *
+              existingItem.quantity +
+            toppingsTotal;
+          existingItem.receiptSubTotal = itemTotal;
+        } else {
+        // ไม่มี topping
+
+          existingItem.receiptSubTotal +=
+            (
+              parseFloat(item.productType!.productTypePrice.toString())) *
+            parsedQuantity;
+          existingItem.quantity = parsedQuantity;
+        }
+      } else {
+        existingItem.receiptSubTotal += productPrice * parsedQuantity;
+        existingItem.quantity = parsedQuantity ;
+      }
+    }
     receipt.value.receiptTotalPrice = calculateTotal(selectedItems.value);
     if (receipt.value.receiptTotalDiscount === 0) {
       receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice;
@@ -691,7 +747,10 @@ export const usePosStore = defineStore("pos", () => {
       console.error('Error getting current user:', error);
     }
   };
-
+ function setReceiptItemForEdit(item: ReceiptItem) {
+    selectedItemForEdit.value = item;
+  }
+  
   
   return {
     setReceiptForEdit,
@@ -729,5 +788,9 @@ export const usePosStore = defineStore("pos", () => {
     saveQueueListToLocalStorage,
     createReceiptForCatering,
     updateReceiptCatering,
+    setReceiptItemForEdit,
+    selectedItemForEdit,
+    calculateTotal,
+    updateReceiptItem
   };
 });

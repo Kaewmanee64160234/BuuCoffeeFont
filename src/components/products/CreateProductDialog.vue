@@ -11,19 +11,19 @@
               <v-img v-if="imagePreview" :src="imagePreview" max-height="100" style="border-radius: 50%;" />
             </v-col>
             <v-col cols="12" sm="12">
-              <v-file-input v-model="productImage" label="รูปภาพสินค้า" prepend-icon="mdi-camera"
-                accept="image/*" variant="solo" @change="handleImageUpload" />
+              <v-file-input v-model="productImage" label="รูปภาพสินค้า" prepend-icon="mdi-camera" accept="image/*"
+                variant="solo" @change="handleImageUpload" />
             </v-col>
             <v-col cols="12" sm="6">
-              <v-text-field variant="solo" v-model="productName" label="ชื่อสินค้า" :rules="nameRules"  
+              <v-text-field variant="solo" v-model="productName" label="ชื่อสินค้า" :rules="nameRules"
                 :error-messages="!productName ? ['กรุณากรอกชื่อสินค้า'] : []" required />
             </v-col>
 
             <v-col cols="12" sm="6">
               <v-select v-model="selectedCategory"
-                :items="categoryStore.categoriesForCreate.map(category => category.categoryName)"
-                label="เลือกหมวดหมู่" dense variant="solo" @change="checkCategory"
-                :error-messages="!selectedCategory ? ['กรุณาเลือก'] : []"  />
+                :items="categoryStore.categoriesForCreate.map(category => category.categoryName)" label="เลือกหมวดหมู่"
+                dense variant="solo" @change="checkCategory"
+                :error-messages="!selectedCategory ? ['กรุณาเลือก'] : []" />
             </v-col>
             <v-col cols="12" sm="6">
               <v-text-field variant="solo" v-model="barcode" label="บาร์โค้ด" />
@@ -33,25 +33,31 @@
                 :error-messages="!storeName ? ['กรุณาเลือก'] : []" />
             </v-col>
             <v-col cols="12" sm="6" v-if="!isDrink">
-              <v-text-field variant="solo" v-model="productPrice" label="ราคา" type="number" 
-                :rules="priceRules" :error-messages="!productPrice ? ['กรุณากรอกราคาเริ่มต้น'] : []" required />
+              <v-text-field variant="solo" v-model="productPrice" label="ราคา" type="number" :rules="priceRules"
+                :error-messages="!productPrice ? ['กรุณากรอกราคาเริ่มต้น'] : []" required />
             </v-col>
             <!-- Product Type Checkboxes (Only show if haveTopping === true) -->
             <v-col cols="12" v-if="isDrink">
-              <v-checkbox label="ร้อน" v-model="productTypes.hot" @change="handleProductTypeChange('ร้อน', productTypes.hot)" />
-              <v-checkbox label="เย็น" v-model="productTypes.cold" @change="handleProductTypeChange('เย็น', productTypes.cold)" />
-              <v-checkbox label="ปั่น" v-model="productTypes.blend" @change="handleProductTypeChange('ปั่น', productTypes.blend)" />
+              <v-checkbox label="ร้อน" v-model="productTypes.hot"
+                @change="handleProductTypeChange('ร้อน', productTypes.hot)" />
+              <v-checkbox label="เย็น" v-model="productTypes.cold"
+                @change="handleProductTypeChange('เย็น', productTypes.cold)" />
+              <v-checkbox label="ปั่น" v-model="productTypes.blend"
+                @change="handleProductTypeChange('ปั่น', productTypes.blend)" />
             </v-col>
 
             <!-- Show Price TextFields Based on Selected Product Types -->
-            <v-col cols="12" v-if="productTypes.hot && isDrink ">
-              <v-text-field variant="solo" v-model="productTypesPrice.hot" label="ราคาสินค้าร้อน" type="number" required />
+            <v-col cols="12" v-if="productTypes.hot && isDrink">
+              <v-text-field variant="solo" v-model="productTypesPrice.hot" label="ราคาสินค้าร้อน" type="number"
+                required />
             </v-col>
-            <v-col cols="12" v-if="productTypes.cold  && isDrink ">
-              <v-text-field variant="solo" v-model="productTypesPrice.cold" label="ราคาสินค้าเย็น" type="number" required />
+            <v-col cols="12" v-if="productTypes.cold && isDrink">
+              <v-text-field variant="solo" v-model="productTypesPrice.cold" label="ราคาสินค้าเย็น" type="number"
+                required />
             </v-col>
-            <v-col cols="12" v-if="productTypes.blend  && isDrink ">
-              <v-text-field variant="solo" v-model="productTypesPrice.blend" label="ราคาสินค้าปั่น" type="number" required />
+            <v-col cols="12" v-if="productTypes.blend && isDrink">
+              <v-text-field variant="solo" v-model="productTypesPrice.blend" label="ราคาสินค้าปั่น" type="number"
+                required />
             </v-col>
           </v-row>
         </v-form>
@@ -161,12 +167,20 @@ const submitForm = async () => {
   if (productTypes.blend) {
     productData.productTypes.push({ productTypeName: 'ปั่น', productTypePrice: productTypesPrice.blend });
   }
+  const category = categoryStore.categories.find(c => c.categoryName === selectedCategory.value);
+  console.log(category);
 
   productStore.product = {
     ...productData,
     productId: 0,
-    file: productImage.value
+    file: productImage.value,
+    category: {
+      ...category
+    }
   };
+  console.log(productStore.product);
+
+
 
   await productStore.createProduct();
   clearData();
