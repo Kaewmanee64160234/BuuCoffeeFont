@@ -31,15 +31,15 @@
                 <div class="item-info d-flex justify-space-between">
                   <p class="product-name">
                     {{ item.quantity }} x {{ item.product?.productName }} {{
-                      item.product?.category.haveTopping ? item.productType?.productTypeName : '' }}
+                      item.product?.haveTopping ? item.productType?.productTypeName : '' }}
                   </p>
                   <p class="product-price">{{ item.receiptSubTotal.toFixed(2) }} ฿</p>
                 </div>
               </div>
-              <p class="toppings" v-if="item.product?.category.haveTopping">
+              <p class="toppings" v-if="item.product?.haveTopping">
                 ความหวาน {{ item.sweetnessLevel }}%
               </p>
-              <p v-if="item.productTypeToppings && item.productTypeToppings.length > 0 && item.product?.category.haveTopping"
+              <p v-if="item.productTypeToppings && item.productTypeToppings.length > 0 && item.product?.haveTopping"
                 class="toppings">
 
                 <span v-for="topping in item.productTypeToppings" :key="topping.productTypeToppingId">

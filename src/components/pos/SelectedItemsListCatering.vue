@@ -246,7 +246,7 @@ function openReceiptDialog() {
                           </v-btn>
                         </v-col>
                       </v-row>
-                      <v-row no-gutters v-if="item.product?.category.haveTopping">
+                      <v-row no-gutters v-if="item.product.haveTopping">
                         <v-col cols="12" class="product-details">
                           {{ item.productType?.productTypeName }} +{{ item.productType?.productTypePrice }} | ความหวาน
                           {{ item.sweetnessLevel }}%

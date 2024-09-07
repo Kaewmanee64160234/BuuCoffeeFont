@@ -55,7 +55,7 @@ function applyPromotion(promotion: Promotion) {
   }
   if (promotion.promotionName == "นำแก้วมา 🌏") {
     const numberOfCups = posStore.selectedItems.reduce((acc, item) => {
-      if (item.product?.category.haveTopping) {
+      if (item.product?.haveTopping) {
         return acc + item.quantity;
       }
       return acc; 

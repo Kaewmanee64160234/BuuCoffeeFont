@@ -84,7 +84,7 @@ watch(() => posStore.receipt.receive, () => {
 
 function increaseQuantity(item: ReceiptItem) {
   // console.log('increase quantity', item);
-  if (item.product?.category.haveTopping) {
+  if (item.product?.haveTopping) {
     if (item.productTypeToppings.length > 0) {
       posStore.addToReceipt(item.product, item.productType, item.productTypeToppings, 1, item.sweetnessLevel);
     } else {
@@ -194,7 +194,7 @@ function removePromotion(promotion: Promotion) {
 }
 
 function openProductCardDialog(item: ReceiptItem) {
-  if (item.product?.category.haveTopping) {
+  if (item.product?.haveTopping) {
     posStore.selectedItemForEdit = item;
     console.log('Selected Product:', posStore.selectedItemForEdit);
     posStore.toppingDialog = true;
@@ -342,7 +342,7 @@ const selectReceipt = (receipt: Receipt) => {
                       </v-row>
                       <v-row no-gutters>
                         <v-col cols="7" style="color: gray;">
-                          <div v-if="item.product?.category.haveTopping" class="product-details">
+                          <div v-if="item.product?.haveTopping" class="product-details">
                             {{ item.productType?.productTypeName }} +{{ item.productType?.productTypePrice }} | ความหวาน
                             {{ item.sweetnessLevel }}%
                           </div>

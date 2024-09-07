@@ -23,13 +23,13 @@ export const useProductStore = defineStore("product", () => {
     productPrice: 0,
     productImage: "",
     countingPoint: false,
+    haveTopping: false,
     barcode: "",
     storeType: "",
     category: {
       categoryId: 0,
       categoryName: "",
 
-      haveTopping: false,
     },
     file: new File([""], "filename"),
     productTypes: [
@@ -51,12 +51,12 @@ export const useProductStore = defineStore("product", () => {
     barcode: "",
     productImage: "",
     storeType: "",
+    haveTopping: false,
 
     countingPoint: false,
     category: {
       categoryId: 0,
       categoryName: "",
-      haveTopping: false,
     },
     file: new File([""], "filename"),
     productTypes: [],

@@ -44,7 +44,6 @@ export const useCategoryStore = defineStore("category", () => {
         categories.value.push({
           categoryId: 0,
           categoryName: "ทั้งหมด",
-          haveTopping: false,
         });
 
         categoriesForCreate.value = categories.value.slice(0, categories.value.length - 1);

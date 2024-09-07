@@ -79,9 +79,9 @@ function decreaseToppingQuantity(topping: Topping) {
   }
 }
 function confirmSelection() {
-  console.log(props.product.category.haveTopping);
+  console.log(props.product.haveTopping);
 
-  if (props.product.category.haveTopping === true) {
+  if (props.product.haveTopping === true) {
 
 
     if (!selectedType.value) {
@@ -157,7 +157,7 @@ function decreaseSweetness() {
       </v-alert>
 
       <v-row v-if="props.product.productTypes && props.product.productTypes.length > 0" class="mt-3">
-        <div class="d-flex flex-column " v-if="props.product.category.haveTopping == true">
+        <div class="d-flex flex-column " v-if="props.product.haveTopping == true">
           <span>ตัวเลือก</span>
           <div class="d-flex flex-wrap">
             <v-chip v-for="type in props.product.productTypes" :key="type.productTypeId" variant="outlined"
@@ -168,7 +168,7 @@ function decreaseSweetness() {
         </div>
       </v-row>
 
-      <div v-if="props.product.category.haveTopping" class="d-flex flex-column mt-4">
+      <div v-if="props.product.haveTopping" class="d-flex flex-column mt-4">
         <span>ระดับความหวาน</span>
         <div class="d-flex justify-start align-center">
           <v-btn variant="elevated" color="#C5C5C5" @click="decreaseSweetness" icon="mdi-minus"
@@ -179,7 +179,7 @@ function decreaseSweetness() {
         </div>
       </div>
 
-      <div v-if="props.product.category.haveTopping" class="d-flex flex-column mt-4">
+      <div v-if="props.product.haveTopping" class="d-flex flex-column mt-4">
         <span>ท็อปปิ้ง</span>
         <v-btn variant="outlined" color="primary" @click="toppingMenu = !toppingMenu" small>
           {{ toppingMenu ? 'ซ้อนท็อปปิ้ง' : 'แสดงท็อปปิ้ง' }}
@@ -208,7 +208,7 @@ function decreaseSweetness() {
         </v-list>
       </div>
 
-      <div class="quantity-container d-flex justify-space-between align-center mt-4" v-if="props.product.category.haveTopping == true" >
+      <div class="quantity-container d-flex justify-space-between align-center mt-4" v-if="props.product.haveTopping == true" >
         <p class="pa-2">จำนวนสินค้า</p>
         <v-btn variant="elevated" color="#C5C5C5" @click="decreaseQuantity" icon="mdi-minus" size="x-small"></v-btn>
         <span class="mx-2">{{ quantity }}</span>

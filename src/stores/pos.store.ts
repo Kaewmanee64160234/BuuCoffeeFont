@@ -121,7 +121,7 @@ export const usePosStore = defineStore("pos", () => {
     const productPrice = parseInt(product.productPrice.toString(), 10);
 
     let existingItem;
-    if (product.category.haveTopping) {
+    if (product.haveTopping) {
       existingItem = selectedItems.value.find(
         (item) =>
           JSON.stringify(item.productTypeToppings) ===
@@ -138,7 +138,7 @@ export const usePosStore = defineStore("pos", () => {
 // เคยมี
     if (existingItem) {
       // แบบมี topping
-      if (product.category.haveTopping) {
+      if (product.haveTopping) {
         // มี topping
         if (productTypeToppings.length > 0) {
           existingItem.quantity += parseInt(parsedQuantity + "");
@@ -170,7 +170,7 @@ export const usePosStore = defineStore("pos", () => {
         existingItem.quantity += parseInt(parsedQuantity + "");
       }
     } else {
-      if (product.category.haveTopping) {
+      if (product.haveTopping) {
         if (productTypeToppings.length > 0) {
           const toppingsTotal = productTypeToppings.reduce(
             (toppingAcc, toppingItem) =>
@@ -242,7 +242,7 @@ export const usePosStore = defineStore("pos", () => {
     const parsedQuantity = item.quantity;
     const productPrice = parseInt(item.product!.productPrice.toString(), 10);
     if (index !== -1) {
-       if (item.product?.category.haveTopping) {
+       if (item.product?.haveTopping) {
         // มี topping
         if (item.productTypeToppings.length > 0) {
           existingItem.quantity = parsedQuantity ;
