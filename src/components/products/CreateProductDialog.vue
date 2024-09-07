@@ -5,162 +5,56 @@
         <span class="headline">สร้างสินค้า</span>
       </v-card-title>
       <v-card-text>
-        <v-stepper v-model="e1">
-          <template v-slot:default="{ prev, next }">
-            <v-stepper-header>
-              <v-stepper-item :complete="e1 > 1" step="1" :value="1" editable>
-                รายละเอียดสินค้า
-              </v-stepper-item>
-              <v-divider></v-divider>
-              <v-stepper-item v-if="isDrink" :complete="e1 > 2" step="2" :value="2" editable>
-                เลือกประเภทสินค้า
-              </v-stepper-item>
-              <v-divider v-if="isDrink"></v-divider>
-              <template v-for="(step, index) in computedSteps" :key="index">
-                <v-stepper-item :complete="e1 > step.value" :step="step.label" :value="step.value" editable>
-                  {{ step.label }}
-                </v-stepper-item>
-                <v-divider v-if="index < computedSteps.length - 1"></v-divider>
-              </template>
-            </v-stepper-header>
+        <v-form ref="form" v-model="valid">
+          <v-row>
+            <v-col cols="12" sm="12">
+              <v-img v-if="imagePreview" :src="imagePreview" max-height="100" style="border-radius: 50%;" />
+            </v-col>
+            <v-col cols="12" sm="12">
+              <v-file-input v-model="productImage" label="รูปภาพสินค้า" prepend-icon="mdi-camera"
+                accept="image/*" variant="solo" @change="handleImageUpload" />
+            </v-col>
+            <v-col cols="12" sm="6">
+              <v-text-field variant="solo" v-model="productName" label="ชื่อสินค้า" :rules="nameRules"  
+                :error-messages="!productName ? ['กรุณากรอกชื่อสินค้า'] : []" required />
+            </v-col>
 
-            <v-stepper-window>
-              <v-stepper-window-item :value="1">
-                <v-form ref="form" v-model="valid">
-                  <v-row>
-                    <v-col cols="12" sm="12">
-                      <v-img v-if="imagePreview" :src="imagePreview" max-height="100"
-                        style="border-radius: 50%;" ></v-img>
-                    </v-col>
-                    <v-col cols="12" sm="12">
-                      <v-file-input v-model="productImage" label="รูปภาพสินค้า" prepend-icon="mdi-camera"
-                        accept="image/*" variant="solo" @change="handleImageUpload" />
-                    </v-col>
-                    <v-col cols="12" sm="6">
-                      <v-text-field variant="solo" v-model="productName" label="ชื่อสินค้า" :rules="nameRules"  :error-messages="!productName ? ['กรุณากรอกชื่อสินค้า'] : []" required />
-                    </v-col>
-                    <v-col cols="12" sm="6">
-                      <v-text-field variant="solo" v-model="productPrice" label="ราคา" type="number" :rules="priceRules"  :error-messages="!productPrice ? ['กรุณากรอกราคาเริ่มต้น'] : []"  required />
-                    </v-col>
-                    <v-col cols="12" sm="6">
+            <v-col cols="12" sm="6">
+              <v-select v-model="selectedCategory"
+                :items="categoryStore.categoriesForCreate.map(category => category.categoryName)"
+                label="เลือกหมวดหมู่" dense variant="solo" @change="checkCategory"
+                :error-messages="!selectedCategory ? ['กรุณาเลือก'] : []"  />
+            </v-col>
+            <v-col cols="12" sm="6">
+              <v-text-field variant="solo" v-model="barcode" label="บาร์โค้ด" />
+            </v-col>
+            <v-col cols="12" sm="6">
+              <v-select v-model="storeName" :items="storeNames" label="เลือกชื่อร้าน" dense variant="solo"
+                :error-messages="!storeName ? ['กรุณาเลือก'] : []" />
+            </v-col>
+            <v-col cols="12" sm="6" v-if="!isDrink">
+              <v-text-field variant="solo" v-model="productPrice" label="ราคา" type="number" 
+                :rules="priceRules" :error-messages="!productPrice ? ['กรุณากรอกราคาเริ่มต้น'] : []" required />
+            </v-col>
+            <!-- Product Type Checkboxes (Only show if haveTopping === true) -->
+            <v-col cols="12" v-if="isDrink">
+              <v-checkbox label="ร้อน" v-model="productTypes.hot" @change="handleProductTypeChange('ร้อน', productTypes.hot)" />
+              <v-checkbox label="เย็น" v-model="productTypes.cold" @change="handleProductTypeChange('เย็น', productTypes.cold)" />
+              <v-checkbox label="ปั่น" v-model="productTypes.blend" @change="handleProductTypeChange('ปั่น', productTypes.blend)" />
+            </v-col>
 
-                      <v-select v-model="selectedCategory"
-                        :items="categoryStore.categoriesForCreate.map(category => category.categoryName)"
-                        label="เลือกหมวดหมู่" dense variant="solo" @change="checkCategory" :error-messages="!selectedCategory ? ['กรุณาเลือก'] : []"  />
-                    </v-col>
-
-                    <v-col cols="12" sm="6">
-                      <v-text-field variant="solo" v-model="barcode" label="บาร์โค้ด" />
-                    </v-col>
-                    <v-col cols="12" sm="6">
-                      <v-select variant="solo" v-model="storeName" :items="storeNames" label="เลือกชื่อร้าน" dense :error-messages="!storeName ? ['กรุณาเลือก'] : []" />
-                    </v-col>
-                    <v-col cols="12" sm="6">
-                      <v-checkbox v-model="productStore.product.countingPoint" label="นับแต้ม" />
-                    </v-col>
-                  </v-row>
-                </v-form>
-              </v-stepper-window-item>
-
-              <v-stepper-window-item v-if="isDrink" :value="2">
-                <v-form ref="form" v-model="valid">
-                  <v-row class="d-flex justify-space-between">
-                    <v-checkbox label="ร้อน" v-model="productTypes.hot"
-                      @change="() => handleProductTypeChange('ร้อน', productTypes.hot)" />
-                    <v-checkbox label="เย็น" v-model="productTypes.cold"
-                      @change="() => handleProductTypeChange('เย็น', productTypes.cold)" />
-                    <v-checkbox label="ปั่น" v-model="productTypes.blend"
-                      @change="() => handleProductTypeChange('ปั่น', productTypes.blend)" />
-                  </v-row>
-                </v-form>
-              </v-stepper-window-item>
-
-              <v-stepper-window-item v-for="(step, index) in computedSteps" :key="`content-${index + 3}`"
-                :value="step.value">
-                <v-form ref="form" v-model="valid">
-                  <v-container>
-                    <v-row>
-                      <v-row >
-              <v-col cols="12">
-                <v-alert type="info" border="left" color="blue" elevation="2" icon="mdi-information">
-  เป็นราคาที่คิดเพิ่มราคาเริ่มต้น
-</v-alert>
-
-              </v-col>
-            </v-row>
-                      <v-col cols="12">
-                        <v-subheader>{{ step.label }}</v-subheader>
-
-                        <v-text-field variant="solo" v-model="getProductType(step.label).productTypePrice"
-                          label="ราคาประเภทสินค้า" type="number" required />
-                      </v-col>
-                      <v-col cols="12">
-                        <!-- Search bar for filtering ingredients -->
-                        <v-text-field variant="solo" v-model="searchQuery" label="ค้นหาวัตถุดิบ"
-                          prepend-icon="mdi-magnify" />
-                      </v-col>
-                      <v-col cols="12">
-                        <v-table>
-                          <thead>
-                            <tr>
-                              <th>เลือก</th>
-                              <th>รูปภาพ</th>
-                              <th>ชื่อ</th>
-                              <th>จำนวน</th>
-                              <th>หน่วย</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr v-for="ingredient in filteredIngredients" :key="ingredient.ingredientId">
-                              <td>
-                                <v-checkbox v-if="step.label === 'ร้อน'"
-                                  v-model="getProductType(step.label).selectedIngredients"
-                                  :value="ingredient.ingredientId"
-                                  @change="() => handleHotIngredientSelect(getProductType(step.label), ingredient)" />
-                                <v-checkbox v-if="step.label === 'เย็น'"
-                                  v-model="getProductType(step.label).selectedIngredients"
-                                  :value="ingredient.ingredientId"
-                                  @change="() => handleColdIngredientSelect(getProductType(step.label), ingredient)" />
-                                <v-checkbox v-if="step.label === 'ปั่น'"
-                                  v-model="getProductType(step.label).selectedIngredients"
-                                  :value="ingredient.ingredientId"
-                                  @change="() => handleBlendIngredientSelect(getProductType(step.label), ingredient)" />
-                              </td>
-                              <td>
-                                <v-img :src="`http://localhost:3000/ingredients/${ingredient.ingredientId}/image`"
-                                  height="100" />
-                              </td>
-                              <td>{{ ingredient.ingredientName }}</td>
-                              <td>
-
-                                <v-text-field variant="solo"
-                                  v-if="step.label === 'ร้อน' && selectedIngredientsHot.includes(ingredient.ingredientId)"
-                                  v-model="ingredientQuantitiesHot[ingredient.ingredientId]" type="number" min="0"
-                                  label="จำนวน" />
-                                <v-text-field variant="solo"
-                                  v-if="step.label === 'เย็น' && selectedIngredientsCold.includes(ingredient.ingredientId)"
-                                  v-model="ingredientQuantitiesCold[ingredient.ingredientId]" type="number" min="0"
-                                  label="จำนวน" />
-                                <v-text-field variant="solo"
-                                  v-if="step.label === 'ปั่น' && selectedIngredientsBlend.includes(ingredient.ingredientId)"
-                                  v-model="ingredientQuantitiesBlend[ingredient.ingredientId]" type="number" min="0"
-                                  label="จำนวน" />
-                              </td>
-                              <td>{{ ingredient.ingredientQuantityPerSubUnit }}</td>
-                            </tr>
-                          </tbody>
-                        </v-table>
-                      </v-col>
-                    </v-row>
-                  </v-container>
-                </v-form>
-              </v-stepper-window-item>
-            </v-stepper-window>
-
-            <v-stepper-actions v-if="isDrink" :disabled="disabled" @click:next="next"
-              @click:prev="prev"></v-stepper-actions>
-          </template>
-        </v-stepper>
+            <!-- Show Price TextFields Based on Selected Product Types -->
+            <v-col cols="12" v-if="productTypes.hot && isDrink ">
+              <v-text-field variant="solo" v-model="productTypesPrice.hot" label="ราคาสินค้าร้อน" type="number" required />
+            </v-col>
+            <v-col cols="12" v-if="productTypes.cold  && isDrink ">
+              <v-text-field variant="solo" v-model="productTypesPrice.cold" label="ราคาสินค้าเย็น" type="number" required />
+            </v-col>
+            <v-col cols="12" v-if="productTypes.blend  && isDrink ">
+              <v-text-field variant="solo" v-model="productTypesPrice.blend" label="ราคาสินค้าปั่น" type="number" required />
+            </v-col>
+          </v-row>
+        </v-form>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
@@ -172,163 +66,61 @@
 </template>
 
 <script lang="ts" setup>
+import { ref, reactive, onMounted, watch } from 'vue';
 import { useCategoryStore } from '@/stores/category.store';
-import { useIngredientStore } from '@/stores/Ingredient.store';
 import { useProductStore } from '@/stores/product.store';
-import type { Ingredient } from '@/types/ingredient.type';
-import type { ProductType } from '@/types/productType.type';
-import { ref, reactive, onMounted, watch, computed } from 'vue';
 import Swal from 'sweetalert2';
 
-interface IngredientQuantities {
-  [key: number]: number;
-}
-
-interface CustomProductType extends ProductType {
-  selectedIngredients: number[];
-  ingredientQuantities: IngredientQuantities;
-}
-
-const e1 = ref(1);
 const valid = ref(false);
 const productName = ref('');
 const productPrice = ref(0);
-const barcode = ref(''); // New barcode ref
+const barcode = ref(''); // Barcode ref
 const productImage = ref(new File([], ''));
 const imagePreview = ref<string | null>(null);
 const selectedCategory = ref(null);
 const productStore = useProductStore();
-const isDrink = ref(false);
-const productDetails = ref<CustomProductType[]>([]);
 const categoryStore = useCategoryStore();
-const ingredientStore = useIngredientStore();
-const selectedIngredientsHot = ref<number[]>([]);
-const selectedIngredientsCold = ref<number[]>([]);
-const selectedIngredientsBlend = ref<number[]>([]);
-const ingredientQuantitiesHot = ref<IngredientQuantities>({});
-const ingredientQuantitiesCold = ref<IngredientQuantities>({});
-const ingredientQuantitiesBlend = ref<IngredientQuantities>({});
+const storeName = ref('');
+const storeNames = ['ร้านข้าว', 'ร้านกาแฟ'];
+
+// Define the reactive model for product types and prices
 const productTypes = reactive({
   hot: false,
   cold: false,
   blend: false
 });
-const storeName = ref('')
-const storeNames = ['ร้านข้าว','ร้านกาแฟ']
 
-// New reactive property for search query
-const searchQuery = ref('');
+const productTypesPrice = reactive({
+  hot: 0,
+  cold: 0,
+  blend: 0
+});
 
-// Add validation rules
+const isDrink = ref(false); // This will be used to show checkboxes based on `haveTopping`
+
 const nameRules = [
   (v: string) => !!v || 'ชื่อสินค้าจำเป็นต้องระบุ',
   (value: string) => /^[\u0E00-\u0E7Fa-zA-Z0-9]+$/.test(value) || 'กรุณากรอกชื่อสินค้าเป็นตัวอักษรหรือตัวเลขเท่านั้น',
 ];
-
 
 const priceRules = [
   (v: number) => !!v || 'ราคาสินค้าจำเป็นต้องระบุ',
   (v: number) => v > 0 || 'ราคาสินค้าต้องมากกว่า 0'
 ];
 
-const categoryRules = [
-  (v: string) => !!v || 'หมวดหมู่สินค้าจำเป็นต้องระบุ'
-];
-
-const productTypePriceRules = [
-  (v: number) => !!v || 'กรอกราคาประเภทสินค้า',
-  (v: number) => v > 0 || 'ราคาประเภทสินค้าต้องมากกว่า 0'
-];
-
-const productNumberRules = [
-  (v: number) => !!v || 'กรอกจำนวน',
-  (v: number) => v > 0 || 'ราคาประเภทสินค้าต้องมากกว่า 0'
-];
-
-const computedSteps = computed(() => {
-  const stepsArray = [];
-  if (isDrink.value) {
-    if (productTypes.hot) stepsArray.push({ label: 'ร้อน', value: 3 });
-    if (productTypes.cold) stepsArray.push({ label: 'เย็น', value: 4 });
-    if (productTypes.blend) stepsArray.push({ label: 'ปั่น', value: 5 });
-  }
-  return stepsArray;
-});
-
-const filteredIngredients = computed(() => {
-  if (!searchQuery.value) return ingredientStore.all_ingredients;
-  return ingredientStore.all_ingredients.filter((ingredient) =>
-    ingredient.ingredientName.toLowerCase().includes(searchQuery.value.toLowerCase())
-  );
-});
-
-watch(() => selectedCategory.value, (newVal) => {
-  const category = categoryStore.categories.find(c => c.categoryName === newVal);
-  isDrink.value = category?.haveTopping === true;
-  if (!isDrink.value) {
-    productTypes.hot = false;
-    productTypes.cold = false;
-    productTypes.blend = false;
-    productDetails.value = [];
-  }
+// Watch the selected category and determine if it has topping
+watch(() => selectedCategory.value, (newCategory) => {
+  checkCategory();
 });
 
 onMounted(async () => {
   await categoryStore.getAllCategories();
-  await ingredientStore.getIngredients();
 });
 
-const handleProductTypeChange = (type: string, isChecked: boolean) => {
-  const typeIndex = productDetails.value.findIndex(pt => pt.productTypeName === type);
-  if (isChecked && typeIndex === -1) {
-    productDetails.value.push({
-      productTypeName: type,
-      productTypePrice: 5,
-      selectedIngredients: [] as number[],
-      ingredientQuantities: reactive({}) as IngredientQuantities,
-      recipes: []
-    });
-  } else if (!isChecked && typeIndex !== -1) {
-    productDetails.value.splice(typeIndex, 1);
-  }
-};
-
-const handleHotIngredientSelect = (type: CustomProductType, ingredient: Ingredient) => {
-  const index = selectedIngredientsHot.value.findIndex(id => id === ingredient.ingredientId);
-  if (index === -1) {
-    selectedIngredientsHot.value.push(ingredient.ingredientId);
-    ingredientQuantitiesHot.value[ingredient.ingredientId] = 0;
-  } else {
-    selectedIngredientsHot.value.splice(index, 1);
-    delete ingredientQuantitiesHot.value[ingredient.ingredientId];
-  }
-};
-
-const handleColdIngredientSelect = (type: CustomProductType, ingredient: Ingredient) => {
-  const index = selectedIngredientsCold.value.findIndex(id => id === ingredient.ingredientId);
-  if (index === -1) {
-    selectedIngredientsCold.value.push(ingredient.ingredientId);
-    ingredientQuantitiesCold.value[ingredient.ingredientId] = 0;
-  } else {
-    selectedIngredientsCold.value.splice(index, 1);
-    delete ingredientQuantitiesCold.value[ingredient.ingredientId];
-  }
-};
-
-const handleBlendIngredientSelect = (type: CustomProductType, ingredient: Ingredient) => {
-  const index = selectedIngredientsBlend.value.findIndex(id => id === ingredient.ingredientId);
-  if (index === -1) {
-    selectedIngredientsBlend.value.push(ingredient.ingredientId);
-    ingredientQuantitiesBlend.value[ingredient.ingredientId] = 0;
-  } else {
-    selectedIngredientsBlend.value.splice(index, 1);
-    delete ingredientQuantitiesBlend.value[ingredient.ingredientId];
-  }
-};
-
-const getProductType = (typeName: string): CustomProductType => {
-  const pddt = productDetails.value.find(pt => pt.productTypeName === typeName) as CustomProductType;
-  return pddt;
+// Function to check if the category has topping
+const checkCategory = () => {
+  const category = categoryStore.categories.find(c => c.categoryName === selectedCategory.value);
+  isDrink.value = category?.haveTopping === true; // If haveTopping is true, show the product type checkboxes
 };
 
 const handleImageUpload = (event: Event) => {
@@ -340,148 +132,62 @@ const handleImageUpload = (event: Event) => {
   }
 };
 
-const addRecipe = (type: CustomProductType) => {
-  type.recipes.push({ ingredient: {} as Ingredient, quantity: 0 });
-};
-
-const checkCategory = () => {
-  const category = categoryStore.categories.find(c => c.categoryName === selectedCategory.value);
-  isDrink.value = category?.haveTopping === true;
+const handleProductTypeChange = (type: string, isChecked: boolean) => {
+  if (!isChecked) {
+    if (type === 'ร้อน') productTypesPrice.hot = 0;
+    if (type === 'เย็น') productTypesPrice.cold = 0;
+    if (type === 'ปั่น') productTypesPrice.blend = 0;
+  }
 };
 
 const submitForm = async () => {
-  if (!selectedCategory.value) {
-    alert('Please select a valid category.');
-    return;
-  }
-
-  if (!productName.value) {
-    alert('Please enter a product name.');
-    return;
-  }
-
-  if (productPrice.value <= 0) {
-    alert('Please enter a valid product price.');
-    return;
-  }
-
   const productData = {
     productName: productName.value,
     productPrice: productPrice.value,
-    barcode: barcode.value, // Include barcode in product data
+    barcode: barcode.value,
     productImage: productImage.value,
     categoryId: categoryStore.categories.find(c => c.categoryName === selectedCategory.value)?.categoryId,
-
     storeType: storeName.value,
-    countingPoint:productStore.product.countingPoint,
-    productTypes: [] as ProductType[]
+    productTypes: []
   };
 
-  if (isDrink.value) {
-    const hotSelected = selectedIngredientsHot.value.length > 0;
-    const coldSelected = selectedIngredientsCold.value.length > 0;
-    const blendSelected = selectedIngredientsBlend.value.length > 0;
-
-    if (!hotSelected && !coldSelected && !blendSelected) {
-      alert('Please select at least one product type for drinks.');
-      return;
-    }
-
-    for (const ingredientId of selectedIngredientsHot.value) {
-      if (ingredientQuantitiesHot.value[ingredientId] <= 0) {
-        alert('Ingredient quantities for Hot must be greater than zero.');
-        return;
-      }
-    }
-    for (const ingredientId of selectedIngredientsCold.value) {
-      if (ingredientQuantitiesCold.value[ingredientId] <= 0) {
-        alert('Ingredient quantities for Cold must be greater than zero.');
-        return;
-      }
-    }
-    for (const ingredientId of selectedIngredientsBlend.value) {
-      if (ingredientQuantitiesBlend.value[ingredientId] <= 0) {
-        alert('Ingredient quantities for Blend must be greater than zero.');
-        return;
-      }
-    }
-
-    if (selectedIngredientsHot.value.length > 0) {
-      productData.productTypes.push({
-        productTypeName: 'ร้อน',
-        productTypePrice: getProductType('ร้อน').productTypePrice,
-        recipes: selectedIngredientsHot.value.map((ingredientId) => {
-          return {
-            ingredient: ingredientStore.all_ingredients.find(i => i.ingredientId === ingredientId)!,
-            quantity: ingredientQuantitiesHot.value[ingredientId]
-          };
-        })
-      });
-    }
-    if (selectedIngredientsCold.value.length > 0) {
-      productData.productTypes.push({
-        productTypeName: 'เย็น',
-        productTypePrice: getProductType('เย็น').productTypePrice,
-        recipes: selectedIngredientsCold.value.map((ingredientId) => {
-          return {
-            ingredient: ingredientStore.all_ingredients.find(i => i.ingredientId === ingredientId)!,
-            quantity: ingredientQuantitiesCold.value[ingredientId]
-          };
-        })
-      });
-    }
-    if (selectedIngredientsBlend.value.length > 0) {
-      productData.productTypes.push({
-        productTypeName: 'ปั่น',
-        productTypePrice: getProductType('ปั่น').productTypePrice,
-        recipes: selectedIngredientsBlend.value.map((ingredientId) => {
-          return {
-            ingredient: ingredientStore.all_ingredients.find(i => i.ingredientId === ingredientId)!,
-            quantity: ingredientQuantitiesBlend.value[ingredientId]
-          };
-        })
-      });
-    }
+  // Add selected product types and their corresponding prices
+  if (productTypes.hot) {
+    productData.productTypes.push({ productTypeName: 'ร้อน', productTypePrice: productTypesPrice.hot });
+  }
+  if (productTypes.cold) {
+    productData.productTypes.push({ productTypeName: 'เย็น', productTypePrice: productTypesPrice.cold });
+  }
+  if (productTypes.blend) {
+    productData.productTypes.push({ productTypeName: 'ปั่น', productTypePrice: productTypesPrice.blend });
   }
 
   productStore.product = {
-    category: categoryStore.categories.find(c => c.categoryName === selectedCategory.value)!,
-    productName: productData.productName,
-    storeType: productData.storeType,
-    countingPoint: productData.countingPoint,
-    productPrice: productData.productPrice,
-    barcode: productData.barcode, // Include barcode in product object
-    productImage: '',
-    productTypes: productData.productTypes,
+    ...productData,
     productId: 0,
     file: productImage.value
   };
+
   await productStore.createProduct();
   clearData();
   showSuccessDialog('สินค้านี้ถูกสร้างเรียบร้อยแล้ว!');
-
-
 };
 
 const clearData = () => {
   productName.value = '';
   productPrice.value = 0;
-  barcode.value = ''; // Clear barcode field
+  barcode.value = '';
   productImage.value = new File([], '');
   imagePreview.value = null;
-  selectedCategory.value = null; // Clear selected category
+  selectedCategory.value = null;
   productTypes.hot = false;
   productTypes.cold = false;
   productTypes.blend = false;
-  productDetails.value = [];
-  selectedIngredientsHot.value = [];
-  selectedIngredientsCold.value = [];
-  selectedIngredientsBlend.value = [];
-  ingredientQuantitiesHot.value = {};
-  ingredientQuantitiesCold.value = {};
-  ingredientQuantitiesBlend.value = {};
+  productTypesPrice.hot = 0;
+  productTypesPrice.cold = 0;
+  productTypesPrice.blend = 0;
+  storeName.value = '';
   productStore.createProductDialog = false;
-  e1.value = 1; // Reset stepper to first step
 };
 
 const showSuccessDialog = (message: string) => {
@@ -492,21 +198,4 @@ const showSuccessDialog = (message: string) => {
     confirmButtonText: 'ตกลง'
   });
 };
-
-function next() {
-  if (e1.value < 3 + computedSteps.value.length) {
-    e1.value++;
-    searchQuery.value = ''; // Reset search query when clicking next
-  }
-}
-
-function prev() {
-  if (e1.value > 1) {
-    e1.value--;
-  }
-}
-
-const disabled = computed(() => {
-  return e1.value === 1 ? 'prev' : e1.value === 3 + computedSteps.value.length ? 'next' : undefined;
-});
 </script>

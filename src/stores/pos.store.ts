@@ -134,9 +134,11 @@ export const usePosStore = defineStore("pos", () => {
         (item) => item.product?.productId === product.productId
       );
     }
-
+// เคยมี
     if (existingItem) {
+      // แบบมี topping
       if (product.category.haveTopping) {
+        // มี topping
         if (productTypeToppings.length > 0) {
           existingItem.quantity += parseInt(parsedQuantity + "");
           const toppingsTotal = productTypeToppings.reduce(
@@ -148,14 +150,16 @@ export const usePosStore = defineStore("pos", () => {
             0
           );
           const itemTotal =
-            (productPrice +
+            (
               parseFloat(productType.productTypePrice.toString())) *
               existingItem.quantity +
             toppingsTotal;
           existingItem.receiptSubTotal = itemTotal;
         } else {
+        // ไม่มี topping
+
           existingItem.receiptSubTotal +=
-            (productPrice +
+            (
               parseFloat(productType.productTypePrice.toString())) *
             parsedQuantity;
           existingItem.quantity += parseInt(parsedQuantity + "");
@@ -176,7 +180,7 @@ export const usePosStore = defineStore("pos", () => {
             0
           );
           const itemTotal =
-            (productPrice +
+            (
               parseFloat(productType.productTypePrice.toString())) *
               parsedQuantity +
             toppingsTotal;
@@ -193,7 +197,7 @@ export const usePosStore = defineStore("pos", () => {
             productTypeToppings: [],
             quantity: parsedQuantity,
             receiptSubTotal:
-              (productPrice +
+              (
                 parseFloat(productType.productTypePrice.toString())) *
               parsedQuantity,
             product,
