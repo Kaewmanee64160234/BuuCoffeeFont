@@ -30,6 +30,7 @@ export function mapToProduct(data: any): Product {
         productTypeName: productType.productTypeName,
         productTypePrice: productType.productTypePrice,
         selectedIngredients: productType.selectedIngredients,
+        disable: productType.disable,
         
         ingredientQuantities: productType.ingredientQuantities,
         product: productType.product,

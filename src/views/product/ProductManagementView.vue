@@ -42,52 +42,56 @@ const loadProductData = () => {
   productStore.storeName = product.storeType;
   productStore.countingPoint = product.countingPoint;
 
-  if (product.productTypes && Array.isArray(product.productTypes)) {
-    product.productTypes.forEach(productType => {
-      if (productType.productTypeName === 'ร้อน') {
+  if (product.productTypes!.length>0) {
+    product.productTypes!.forEach(productType => {
+      if (productType.productTypeName === 'ร้อน'  && productType.disable == false ) {
         productStore.productTypePriceHot = productType.productTypePrice;
         productStore.isHot = true;
-        productStore.selectedIngredientsHot = productType.recipes?.map(recipeItem => recipeItem.ingredient.IngredientId) || [];
-        productStore.ingredientQuantitiesHot = productType.recipes?.reduce((acc, recipeItem) => {
-          acc[recipeItem.ingredient.IngredientId] = recipeItem.quantity;
-          return acc;
-        }, {} as IngredientQuantities) || {};
+        // productStore.selectedIngredientsHot = productType.recipes?.map(recipeItem => recipeItem.ingredient.IngredientId) || [];
+        // productStore.ingredientQuantitiesHot = productType.recipes?.reduce((acc, recipeItem) => {
+        //   acc[recipeItem.ingredient.IngredientId] = recipeItem.quantity;
+        //   return acc;
+        // }, {} as IngredientQuantities) || {};
       }
 
-      if (productType.productTypeName === 'เย็น') {
+      if (productType.productTypeName === 'เย็น' && productType.disable == false ) {
         productStore.productTypePriceCold = productType.productTypePrice;
         productStore.isCold = true;
-        productStore.selectedIngredientsCold = productType.recipes?.map(recipeItem => recipeItem.ingredient.IngredientId) || [];
-        productStore.ingredientQuantitiesCold = productType.recipes?.reduce((acc, recipeItem) => {
-          acc[recipeItem.ingredient.IngredientId] = recipeItem.quantity;
-          return acc;
-        }, {} as IngredientQuantities) || {};
+        // productStore.selectedIngredientsCold = productType.recipes?.map(recipeItem => recipeItem.ingredient.IngredientId) || [];
+        // productStore.ingredientQuantitiesCold = productType.recipes?.reduce((acc, recipeItem) => {
+        //   acc[recipeItem.ingredient.IngredientId] = recipeItem.quantity;
+        //   return acc;
+        // }, {} as IngredientQuantities) || {};
       }
 
-      if (productType.productTypeName === 'ปั่น') {
+      if (productType.productTypeName === 'ปั่น' && productType.disable == false ) {
         productStore.isBlend = true;
         productStore.productTypePriceBlend = productType.productTypePrice;
-        productStore.selectedIngredientsBlend = productType.recipes?.map(recipeItem => recipeItem.ingredient.IngredientId) || [];
-        productStore.ingredientQuantitiesBlend = productType.recipes?.reduce((acc, recipeItem) => {
-          acc[recipeItem.ingredient.IngredientId] = recipeItem.quantity;
-          return acc;
-        }, {} as IngredientQuantities) || {};
+        // productStore.selectedIngredientsBlend = productType.recipes?.map(recipeItem => recipeItem.ingredient.IngredientId) || [];
+        // productStore.ingredientQuantitiesBlend = productType.recipes?.reduce((acc, recipeItem) => {
+        //   acc[recipeItem.ingredient.IngredientId] = recipeItem.quantity;
+        //   return acc;
+        // }, {} as IngredientQuantities) || {};
       }
 
       productStore.productTypes.push({
         productTypeName: productType.productTypeName,
         productTypePrice: productType.productTypePrice,
-        selectedIngredients: productType.recipes?.map(recipeItem => recipeItem.ingredient.IngredientId) || [],
-        ingredientQuantities: productType.recipes?.reduce((acc, recipeItem) => {
-          acc[recipeItem.ingredient.IngredientId] = recipeItem.quantity;
-          return acc;
-        }, {} as IngredientQuantities) || {},
-        recipes: productType.recipes || []
+        // selectedIngredients: productType.recipes?.map(recipeItem => recipeItem.ingredient.IngredientId) || [],
+        // ingredientQuantities: productType.recipes?.reduce((acc, recipeItem) => {
+        //   acc[recipeItem.ingredient.IngredientId] = recipeItem.quantity;
+        //   return acc;
+        // }, {} as IngredientQuantities) || {},
+        // recipes: productType.recipes || []
       });
     });
   } else {
     productStore.productTypes = [];
   }
+  console.log(productStore.isHot);
+  console.log(productStore.isCold);
+  console.log(productStore.isBlend);
+  
 };
 
 const confirmDelete = async (deleteAction: () => Promise<void>) => {

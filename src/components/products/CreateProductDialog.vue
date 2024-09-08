@@ -22,42 +22,48 @@
             <v-col cols="12" sm="6">
               <v-select v-model="selectedCategory"
                 :items="categoryStore.categoriesForCreate.map(category => category.categoryName)" label="เลือกหมวดหมู่"
-                dense variant="solo" @change="checkCategory"
-                :error-messages="!selectedCategory ? ['กรุณาเลือก'] : []" />
+                dense variant="solo" :error-messages="!selectedCategory ? ['กรุณาเลือก'] : []" />
             </v-col>
+
             <v-col cols="12" sm="6">
               <v-text-field variant="solo" v-model="barcode" label="บาร์โค้ด" />
+            </v-col>
+  <!-- Checkbox for "เครื่องดื่มที่สามารถชงได้" -->
+  <v-col cols="12">
+              <v-checkbox label="เครื่องดื่มที่สามารถชงได้" v-model="haveTopping" />
+            </v-col>
+              <!-- Checkbox for "เครื่องดื่มที่สามารถชงได้" -->
+              <v-col cols="12">
+              <v-checkbox label="นับชแต้ม" v-model="countingPoint" />
             </v-col>
             <v-col cols="12" sm="6">
               <v-select v-model="storeName" :items="storeNames" label="เลือกชื่อร้าน" dense variant="solo"
                 :error-messages="!storeName ? ['กรุณาเลือก'] : []" />
             </v-col>
-            <v-col cols="12" sm="6" v-if="!isDrink">
+
+            <v-col cols="12" sm="6" v-if="!haveTopping" >
               <v-text-field variant="solo" v-model="productPrice" label="ราคา" type="number" :rules="priceRules"
                 :error-messages="!productPrice ? ['กรุณากรอกราคาเริ่มต้น'] : []" required />
             </v-col>
-            <!-- Product Type Checkboxes (Only show if haveTopping === true) -->
-            <v-col cols="12" v-if="isDrink">
-              <v-checkbox label="ร้อน" v-model="productTypes.hot"
-                @change="handleProductTypeChange('ร้อน', productTypes.hot)" />
-              <v-checkbox label="เย็น" v-model="productTypes.cold"
-                @change="handleProductTypeChange('เย็น', productTypes.cold)" />
-              <v-checkbox label="ปั่น" v-model="productTypes.blend"
-                @change="handleProductTypeChange('ปั่น', productTypes.blend)" />
+
+          
+
+            <!-- Product Type Checkboxes (Only show if haveTopping is true) -->
+            <v-col cols="12" v-if="haveTopping">
+              <v-checkbox label="ร้อน" v-model="productTypes.hot" @change="handleProductTypeChange('ร้อน', productTypes.hot)" />
+              <v-checkbox label="เย็น" v-model="productTypes.cold" @change="handleProductTypeChange('เย็น', productTypes.cold)" />
+              <v-checkbox label="ปั่น" v-model="productTypes.blend" @change="handleProductTypeChange('ปั่น', productTypes.blend)" />
             </v-col>
 
             <!-- Show Price TextFields Based on Selected Product Types -->
-            <v-col cols="12" v-if="productTypes.hot && isDrink">
-              <v-text-field variant="solo" v-model="productTypesPrice.hot" label="ราคาสินค้าร้อน" type="number"
-                required />
+            <v-col cols="12" v-if="productTypes.hot && haveTopping">
+              <v-text-field variant="solo" v-model="productTypesPrice.hot" label="ราคาสินค้าร้อน" type="number" required />
             </v-col>
-            <v-col cols="12" v-if="productTypes.cold && isDrink">
-              <v-text-field variant="solo" v-model="productTypesPrice.cold" label="ราคาสินค้าเย็น" type="number"
-                required />
+            <v-col cols="12" v-if="productTypes.cold && haveTopping">
+              <v-text-field variant="solo" v-model="productTypesPrice.cold" label="ราคาสินค้าเย็น" type="number" required />
             </v-col>
-            <v-col cols="12" v-if="productTypes.blend && isDrink">
-              <v-text-field variant="solo" v-model="productTypesPrice.blend" label="ราคาสินค้าปั่น" type="number"
-                required />
+            <v-col cols="12" v-if="productTypes.blend && haveTopping">
+              <v-text-field variant="solo" v-model="productTypesPrice.blend" label="ราคาสินค้าปั่น" type="number" required />
             </v-col>
           </v-row>
         </v-form>
@@ -76,11 +82,13 @@ import { ref, reactive, onMounted, watch } from 'vue';
 import { useCategoryStore } from '@/stores/category.store';
 import { useProductStore } from '@/stores/product.store';
 import Swal from 'sweetalert2';
+import type { Product } from '@/types/product.type';
 
 const valid = ref(false);
+const haveTopping = ref(false); // Controls topping checkbox
 const productName = ref('');
 const productPrice = ref(0);
-const barcode = ref(''); // Barcode ref
+const barcode = ref('');
 const productImage = ref(new File([], ''));
 const imagePreview = ref<string | null>(null);
 const selectedCategory = ref(null);
@@ -88,8 +96,9 @@ const productStore = useProductStore();
 const categoryStore = useCategoryStore();
 const storeName = ref('');
 const storeNames = ['ร้านข้าว', 'ร้านกาแฟ'];
+const countingPoint = ref(false);
 
-// Define the reactive model for product types and prices
+// Define product types and their prices
 const productTypes = reactive({
   hot: false,
   cold: false,
@@ -102,8 +111,6 @@ const productTypesPrice = reactive({
   blend: 0
 });
 
-const isDrink = ref(false); // This will be used to show checkboxes based on `haveTopping`
-
 const nameRules = [
   (v: string) => !!v || 'ชื่อสินค้าจำเป็นต้องระบุ',
   (value: string) => /^[\u0E00-\u0E7Fa-zA-Z0-9]+$/.test(value) || 'กรุณากรอกชื่อสินค้าเป็นตัวอักษรหรือตัวเลขเท่านั้น',
@@ -114,20 +121,9 @@ const priceRules = [
   (v: number) => v > 0 || 'ราคาสินค้าต้องมากกว่า 0'
 ];
 
-// Watch the selected category and determine if it has topping
-watch(() => selectedCategory.value, (newCategory) => {
-  checkCategory();
-});
-
 onMounted(async () => {
   await categoryStore.getAllCategories();
 });
-
-// Function to check if the category has topping
-const checkCategory = () => {
-  const category = categoryStore.categories.find(c => c.categoryName === selectedCategory.value);
-  isDrink.value = category?.haveTopping === true; // If haveTopping is true, show the product type checkboxes
-};
 
 const handleImageUpload = (event: Event) => {
   const input = event.target as HTMLInputElement;
@@ -147,17 +143,21 @@ const handleProductTypeChange = (type: string, isChecked: boolean) => {
 };
 
 const submitForm = async () => {
-  const productData = {
+  const productData:Product = {
     productName: productName.value,
     productPrice: productPrice.value,
     barcode: barcode.value,
     productImage: productImage.value,
     categoryId: categoryStore.categories.find(c => c.categoryName === selectedCategory.value)?.categoryId,
     storeType: storeName.value,
-    productTypes: []
+    category: categoryStore.categories.find(c => c.categoryName === selectedCategory.value)!,
+    haveTopping: haveTopping.value,
+    productTypes: [],
+    file: productImage.value,
+    countingPoint: countingPoint.value
   };
 
-  // Add selected product types and their corresponding prices
+  // Add selected product types and their prices
   if (productTypes.hot) {
     productData.productTypes.push({ productTypeName: 'ร้อน', productTypePrice: productTypesPrice.hot });
   }
@@ -167,20 +167,7 @@ const submitForm = async () => {
   if (productTypes.blend) {
     productData.productTypes.push({ productTypeName: 'ปั่น', productTypePrice: productTypesPrice.blend });
   }
-  const category = categoryStore.categories.find(c => c.categoryName === selectedCategory.value);
-  console.log(category);
-
-  productStore.product = {
-    ...productData,
-    productId: 0,
-    file: productImage.value,
-    category: {
-      ...category
-    }
-  };
-  console.log(productStore.product);
-
-
+ productStore.product = {...productData};
 
   await productStore.createProduct();
   clearData();
