@@ -35,16 +35,14 @@ const cancelReceipt = async (receipt:Receipt) => {
     },
   }).then(async (result) => {
     if (result.isConfirmed) {
-      const response = await receiptStore.cancelReceipt(receipt.receiptId!);
-      if (response) {
-        Swal.fire('ยกเลิกคำสั่งซื้อสำเร็จ', '', 'success');
-        posStore.ReceiptDialogPos = false;
-      } else {
-        Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถยกเลิกคำสั่งซื้อได้', 'error');
-      }
+       await receiptStore.cancelReceipt(receipt.receiptId!);
+
+     
     }
   });
-  posStore.ReceiptDialogPos = true;
+  await receiptStore.getRecieptIn30Min();
+
+  // posStore.ReceiptDialogPos = true;
 
 };
 const handleSearchKeydown = (event: KeyboardEvent) => {

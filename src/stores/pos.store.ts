@@ -135,7 +135,7 @@ export const usePosStore = defineStore("pos", () => {
         (item) => item.product?.productId === product.productId
       );
     }
-// เคยมี
+    // เคยมี
     if (existingItem) {
       // แบบมี topping
       if (product.haveTopping) {
@@ -151,17 +151,15 @@ export const usePosStore = defineStore("pos", () => {
             0
           );
           const itemTotal =
-            (
-              parseFloat(productType.productTypePrice.toString())) *
+            parseFloat(productType.productTypePrice.toString()) *
               existingItem.quantity +
             toppingsTotal;
           existingItem.receiptSubTotal = itemTotal;
         } else {
-        // ไม่มี topping
+          // ไม่มี topping
 
           existingItem.receiptSubTotal +=
-            (
-              parseFloat(productType.productTypePrice.toString())) *
+            parseFloat(productType.productTypePrice.toString()) *
             parsedQuantity;
           existingItem.quantity += parseInt(parsedQuantity + "");
         }
@@ -181,8 +179,7 @@ export const usePosStore = defineStore("pos", () => {
             0
           );
           const itemTotal =
-            (
-              parseFloat(productType.productTypePrice.toString())) *
+            parseFloat(productType.productTypePrice.toString()) *
               parsedQuantity +
             toppingsTotal;
           selectedItems.value.push({
@@ -198,8 +195,7 @@ export const usePosStore = defineStore("pos", () => {
             productTypeToppings: [],
             quantity: parsedQuantity,
             receiptSubTotal:
-              (
-                parseFloat(productType.productTypePrice.toString())) *
+              parseFloat(productType.productTypePrice.toString()) *
               parsedQuantity,
             product,
             sweetnessLevel: sweetness,
@@ -230,7 +226,7 @@ export const usePosStore = defineStore("pos", () => {
 
   // update receipt Item for edit in receipt
   const updateReceiptItem = (item: ReceiptItem) => {
-    const index =  selectedItems.value.findIndex(
+    const index = selectedItems.value.findIndex(
       (item) =>
         JSON.stringify(item.productTypeToppings) ===
           JSON.stringify(item.productTypeToppings) &&
@@ -242,10 +238,10 @@ export const usePosStore = defineStore("pos", () => {
     const parsedQuantity = item.quantity;
     const productPrice = parseInt(item.product!.productPrice.toString(), 10);
     if (index !== -1) {
-       if (item.product?.haveTopping) {
+      if (item.product?.haveTopping) {
         // มี topping
         if (item.productTypeToppings.length > 0) {
-          existingItem.quantity = parsedQuantity ;
+          existingItem.quantity = parsedQuantity;
           const toppingsTotal = item.productTypeToppings.reduce(
             (toppingAcc, toppingItem) =>
               toppingAcc +
@@ -255,23 +251,21 @@ export const usePosStore = defineStore("pos", () => {
             0
           );
           const itemTotal =
-            (
-              parseFloat(item.productType!.productTypePrice!.toString())) *
+            parseFloat(item.productType!.productTypePrice!.toString()) *
               existingItem.quantity +
             toppingsTotal;
           existingItem.receiptSubTotal = itemTotal;
         } else {
-        // ไม่มี topping
+          // ไม่มี topping
 
           existingItem.receiptSubTotal +=
-            (
-              parseFloat(item.productType!.productTypePrice.toString())) *
+            parseFloat(item.productType!.productTypePrice.toString()) *
             parsedQuantity;
           existingItem.quantity = parsedQuantity;
         }
       } else {
         existingItem.receiptSubTotal += productPrice * parsedQuantity;
-        existingItem.quantity = parsedQuantity ;
+        existingItem.quantity = parsedQuantity;
       }
     }
     receipt.value.receiptTotalPrice = calculateTotal(selectedItems.value);
@@ -377,7 +371,7 @@ export const usePosStore = defineStore("pos", () => {
     }
     await receiptStore.getRecieptIn30Min();
   };
-  const createReceiptForCatering = async (checkStockId:number) => {
+  const createReceiptForCatering = async (checkStockId: number) => {
     const receiptStatus = "ร้านจัดเลี้ยง";
     if (currentReceipt.value?.queueNumber !== undefined) {
       receipt.value.receiptItems = selectedItems.value;
@@ -398,7 +392,6 @@ export const usePosStore = defineStore("pos", () => {
       } else {
         receipt.value.receiptStatus = "unpaid";
         receipt.value.change = 0;
-
       }
       receipt.value.createdDate = new Date();
       receipt.value.queueNumber = queueNumber.value;
@@ -409,7 +402,7 @@ export const usePosStore = defineStore("pos", () => {
       receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice;
     }
 
-    const res = await receiptService.createReceipt(receipt.value,checkStockId);
+    const res = await receiptService.createReceipt(receipt.value, checkStockId);
     if (res.status === 201) {
       console.log("Receipt created successfully", res.data);
       currentReceipt.value = res.data;
@@ -551,17 +544,22 @@ export const usePosStore = defineStore("pos", () => {
       );
       console.log("product", product);
       console.log("product2", product2);
-      
+
       if (product2 && product) {
         if (promotion.freeProductId === promotion.buyProductId) {
           const numberOfUsedPromotions = receipt.value.receiptPromotions.filter(
             (item) => item.promotion.promotionId === promotion.promotionId
           ).length;
-          if (product.quantity - numberOfUsedPromotions * 2 >= 2 || (product2 && product)) {
+          if (
+            product.quantity - numberOfUsedPromotions * 2 >= 2 ||
+            (product2 && product)
+          ) {
             if (product.quantity >= 2) {
-              newDiscount = parseInt(product.product?.productPrice!+'') + parseInt(product.productType?.productTypePrice!+'');
+              newDiscount =
+                parseInt(product.product?.productPrice! + "") +
+                parseInt(product.productType?.productTypePrice! + "");
               console.log("newDiscount", newDiscount);
-              
+
               applyDiscount(promotion, newDiscount);
             } else {
               Swal.fire({
@@ -707,6 +705,11 @@ export const usePosStore = defineStore("pos", () => {
       // console.log("Receipt updated successfully", res.data);
       currentReceipt.value = res.data;
       await customerStore.getAllCustomers();
+      if (currentReceipt.value?.receiptStatus !== "cancel") {
+        updateReceiptInLocalStorage(res.data);
+      } else {
+        deleteReceiptFromLocalStorage(res.data.receiptId);
+      }
       // await receiptStore.getRecieptIn30Min();
     }
     await receiptStore.getRecieptIn30Min();
@@ -732,6 +735,16 @@ export const usePosStore = defineStore("pos", () => {
   function saveQueueListToLocalStorage() {
     localStorage.setItem("queueReceipt", JSON.stringify(queueReceipt.value));
   }
+  const updateReceiptInLocalStorage = (updatedReceipt: Receipt) => {
+    const receiptIndex = queueReceipt.value.findIndex(
+      (receipt) => receipt.receiptId === updatedReceipt.receiptId
+    );
+    if (receiptIndex !== -1) {
+      queueReceipt.value[receiptIndex] = updatedReceipt;
+      saveQueueListToLocalStorage();
+    }
+  };
+
 
   const setReceiptForEdit = (receiptToEdit: Receipt) => {
     receipt.value = receiptToEdit;
@@ -739,19 +752,18 @@ export const usePosStore = defineStore("pos", () => {
 
   const getCurrentReceipt = async () => {
     try {
-      const receipt = localStorage.getItem('receipt');
+      const receipt = localStorage.getItem("receipt");
       if (receipt) {
         currentReceipt.value = JSON.parse(receipt);
       }
     } catch (error) {
-      console.error('Error getting current user:', error);
+      console.error("Error getting current user:", error);
     }
   };
- function setReceiptItemForEdit(item: ReceiptItem) {
+  function setReceiptItemForEdit(item: ReceiptItem) {
     selectedItemForEdit.value = item;
   }
-  
-  
+
   return {
     setReceiptForEdit,
     getCurrentReceipt,
@@ -791,6 +803,6 @@ export const usePosStore = defineStore("pos", () => {
     setReceiptItemForEdit,
     selectedItemForEdit,
     calculateTotal,
-    updateReceiptItem
+    updateReceiptItem,
   };
 });
