@@ -73,14 +73,14 @@ const selectReceipt = (receipt: Receipt) => {
 
 const filteredReceipts = computed(() => {
   if (!receiptStore.searchQuery) {
-    return receiptStore.receipts.slice().sort((a, b) => (a.receiptId ?? 0) - (b.receiptId ?? 0));
+    return receiptStore.receipts.slice();
   }
   return receiptStore.receipts
     .filter(receipt =>
       receipt.customer?.customerName?.toLowerCase().includes(receiptStore.searchQuery.toLowerCase()) ||
       receipt.receiptId?.toString().includes(receiptStore.searchQuery)
     )
-    .sort((a, b) => (a.receiptId ?? 0) - (b.receiptId ?? 0));
+    
 });
 
 function formatDateThai(dateString: string): string {

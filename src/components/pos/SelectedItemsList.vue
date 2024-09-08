@@ -25,6 +25,8 @@ const url = import.meta.env.VITE_URL_PORT
 onMounted(async () => {
   await receiptStore.getRecieptIn30Min();
   await loadQueueListFromLocalStorage();
+  
+
 });
 
 function nextStep() {

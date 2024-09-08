@@ -83,8 +83,9 @@ export const useReceiptStore = defineStore("receipt", () => {
 
       const response = await receiptService.getRecieptIn30Min(typeOfStore);
       if (response.status === 200) {
+
         receipts.value = response.data;
-        console.log("receipts", receipts.value);
+        console.log("receipts getRecieptIn30Min", receipts.value);
       }
     } catch (error) {
       console.error(error);
