@@ -18,9 +18,7 @@
               <v-col cols="12">
                 <v-text-field variant="solo" v-model="categoryName" label="ชื่อหมวดหมู่" :rules="[rules.required, rules.categoryName]"  :error-messages="!categoryName ? ['กรุณากรอกชื่อหมวดหมู่'] : []" required></v-text-field>
               </v-col>
-              <v-col cols="12">
-                <v-checkbox v-model="haveTopping" label="มีท็อปปิ้ง"></v-checkbox>
-              </v-col>
+             
             </v-row>
           </v-form>
         </v-container>
@@ -73,7 +71,6 @@ const submitForm = async () => {
   const newCategory: Category = {
     categoryId: 0,
     categoryName: categoryName.value,
-    haveTopping: haveTopping.value,
   };
 
   try {
