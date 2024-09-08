@@ -78,7 +78,7 @@ const filteredReceipts = computed(() => {
   return receiptStore.receipts
     .filter(receipt =>
       receipt.customer?.customerName?.toLowerCase().includes(receiptStore.searchQuery.toLowerCase()) ||
-      receipt.receiptId?.toString().includes(receiptStore.searchQuery)
+      receipt.receiptNumber?.toString().includes(receiptStore.searchQuery)
     )
     
 });
@@ -129,8 +129,8 @@ function formatDateThai(dateString: string): string {
             </tr>
           </thead>
           <tbody>
-            <tr v-for="receipt in filteredReceipts" :key="receipt.receiptId">
-              <td class="text-center">{{ receipt.receiptId }}</td>
+            <tr v-for="(receipt,index) in filteredReceipts" :key="index">
+              <td class="text-center">{{ index+1 }}</td>
               <td class="text-center">{{ formatDateThai(receipt.createdDate + '') }}</td>
               <td class="text-center">{{ receipt.receiptTotalDiscount }}</td>
               <td class="text-center">{{ receipt.customer?.customerName || '-' }}</td>
