@@ -195,7 +195,7 @@ const deleteProduct = async (productId: number) => {
                 </td>
                 <td>{{ item.productName }}</td>
                 <td>{{ item.category.categoryName }}</td>
-                <td>{{ item.productPrice }}</td>
+                <td>{{ item.haveTopping ? item.productTypes![0].productTypePrice : item.productPrice }}</td>
                 <td>
                   <v-btn color="#FFDD83" icon="mdi-pencil" class="mr-2" @click="openUpdateDialog(item)">
                   </v-btn>

@@ -149,7 +149,7 @@ function decreaseSweetness() {
   <v-card class="product-card">
     <v-img class="product-image" :src="`http://localhost:3000/products/${props.product.productId}/image`"
       :lazy-src="`http://localhost:3000/products/${props.product.productId}/image`" />
-    <v-card-title class="text-center">{{ props.product.productName }} {{ props.product.productPrice }} .-</v-card-title>
+    <v-card-title class="text-center">{{ props.product.productName }} {{ props.product.haveTopping ? props.product.productTypes![0].productTypePrice : props.product.productPrice }} .-</v-card-title>
 
     <v-card-text>
       <v-alert v-if="showAlert" type="error" dismissible @input="showAlert = false">
