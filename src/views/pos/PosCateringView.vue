@@ -13,6 +13,7 @@ import { useIngredientStore } from '@/stores/Ingredient.store';
 import Swal from 'sweetalert2';
 import type { Product } from '@/types/product.type';
 import SelectedItemsListCatering from '@/components/pos/SelectedItemsListCatering.vue';
+import subInventoryCard from '@/components/subInvertory/subInventoryCard.vue';
 import { useSubIngredientStore } from '@/stores/ingredientSubInventory.store';
 import type { Ingredient } from '@/types/ingredient.type';
 import type { SubInventoriesCoffee } from '@/types/subinventoriescoffee.type';
@@ -138,8 +139,7 @@ const addToCart = (item: Product | any) => {
                                         <v-col v-for="ingredient in ingredientFilters" :key="ingredient.subInventoryId" cols="12"
                                             sm="6" md="4" lg="4" class="d-flex">
                                             <div class="ingredient-card">
-                                                <p>{{ ingredient.ingredient.ingredientName }}</p>
-                                                <!-- Add more ingredient details as needed -->
+                                             <subInventoryCard  :sub-inventory="ingredient" />
                                             </div>
                                         </v-col>
                                     </v-row>

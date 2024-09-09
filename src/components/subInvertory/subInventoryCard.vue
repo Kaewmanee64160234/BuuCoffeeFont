@@ -12,17 +12,7 @@
           <span>จำนวนในคลัง: {{ props.subInventory.quantity }} {{ props.subInventory.ingredient.ingredientUnit }}</span>
         </div>
   
-        <div class="d-flex justify-space-between align-center mt-2">
-          <span>หน่วย: {{ props.subInventory.ingredient.ingredientQuantityPerSubUnit }}</span>
-        </div>
-  
-        <div class="d-flex justify-space-between align-center mt-2">
-          <span>คงเหลือ: {{ props.subInventory.ingredient.ingredientRemining }} {{ props.subInventory.ingredient.ingredientUnit }}</span>
-        </div>
-  
-        <div class="d-flex justify-space-between align-center mt-2">
-          <span>ขั้นต่ำที่ต้องมี: {{ props.subInventory.ingredient.ingredientMinimun }} {{ props.subInventory.ingredient.ingredientUnit }}</span>
-        </div>
+       
       </v-card-text>
   
       <v-card-actions style="width: 100%;">
