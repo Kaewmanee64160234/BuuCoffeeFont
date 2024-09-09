@@ -46,6 +46,8 @@ onMounted(async () => {
     }
   } else {
     posStore.queueNumber = 1;
+    // set new lastResetDate
+    localStorage.setItem('lastResetDate', currentDate);
   }
 
 
