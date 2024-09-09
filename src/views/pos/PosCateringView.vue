@@ -136,17 +136,15 @@ const addToCart = (item: Product | any) => {
                             <v-tab-item value="วัตถุดิบร้านกาแฟ">
                                 <v-container fluid class="full-width-container">
                                     <v-row class="full-width-row">
-                                        <v-col v-for="ingredient in ingredientFilters" :key="ingredient.subInventoryId" cols="12"
-                                            sm="6" md="4" lg="4" class="d-flex">
+                                        <v-col v-for="ingredient in ingredientFilters" :key="ingredient.subInventoryId"
+                                            cols="12" sm="6" md="4" lg="4" class="d-flex">
                                             <div class="ingredient-card">
-                                             <subInventoryCard  :sub-inventory="ingredient" />
+                                                <subInventoryCard :sub-inventory="ingredient" />
                                             </div>
                                         </v-col>
                                     </v-row>
                                 </v-container>
                             </v-tab-item>
-
-                          
                         </v-tabs-items>
                     </v-row>
 
