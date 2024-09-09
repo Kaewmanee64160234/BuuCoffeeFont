@@ -25,7 +25,31 @@ const url = import.meta.env.VITE_URL_PORT
 onMounted(async () => {
   await receiptStore.getRecieptIn30Min();
   await loadQueueListFromLocalStorage();
+  const currentDate = new Date().toLocaleDateString(); // Get current date as a string
+
+  // Check if the queue number needs to be reset for a new day
+  const lastResetDate = localStorage.getItem('lastResetDate');
+  console.log('Last reset date:', lastResetDate);
+  console.log('Current date:', currentDate);
   
+  if (lastResetDate === currentDate) {
+    if(posStore.queueReceipt.length > 0) {
+    posStore.queueNumber = posStore.queueReceipt[posStore.queueReceipt.length - 1].queueNumber + 1;
+    }
+    else{
+      const auateData = localStorage.getItem('queueData');
+      if (auateData) {
+        posStore.queueNumber = JSON.parse(auateData).number + 1;
+      } else {
+        posStore.queueNumber = 1;
+      }
+    }
+  } else {
+    posStore.queueNumber = 1;
+    // set new lastResetDate
+    localStorage.setItem('lastResetDate', currentDate);
+  }
+
 
 });
 
@@ -263,8 +287,7 @@ const selectReceipt = (receipt: Receipt) => {
             <div class="d-flex justify-space-between align-center" style="padding-right: 60px;">
               <h3>รายละเอียดการสั่งซื้อ</h3>
               <h3>
-                #{{ posStore.currentReceipt?.queueNumber === null ? posStore.currentReceipt?.queueNumber + 1 :
-                  posStore.queueNumber }}
+                #{{ posStore.queueNumber }}
               </h3>
             </div>
 

@@ -149,7 +149,8 @@ function decreaseSweetness() {
   <v-card class="product-card">
     <v-img class="product-image" :src="`http://localhost:3000/products/${props.product.productId}/image`"
       :lazy-src="`http://localhost:3000/products/${props.product.productId}/image`" />
-    <v-card-title class="text-center">{{ props.product.productName }} {{ props.product.haveTopping ? props.product.productTypes![0].productTypePrice : props.product.productPrice }} .-</v-card-title>
+    <v-card-title class="text-center">{{ props.product.productName }} {{ props.product.haveTopping ?
+      props.product.productTypes![0].productTypePrice : props.product.productPrice }} .-</v-card-title>
 
     <v-card-text>
       <v-alert v-if="showAlert" type="error" dismissible @input="showAlert = false">
@@ -160,7 +161,9 @@ function decreaseSweetness() {
         <div class="d-flex flex-column " v-if="props.product.haveTopping == true">
           <span>ตัวเลือก</span>
           <div class="d-flex flex-wrap">
-            <v-chip v-for="type in props.product.productTypes" :key="type.productTypeId" variant="outlined"
+            <v-chip v-for="type in props.product.productTypes.filter((
+              type
+            ) => type.disable == false)" :key="type.productTypeId" variant="outlined"
               :color="selectedType === type ? '#f5a623' : 'gray'" @click="selectType(type)" class="chip">
               {{ type.productTypeName }} {{ type.productTypePrice }}
             </v-chip>
@@ -208,7 +211,8 @@ function decreaseSweetness() {
         </v-list>
       </div>
 
-      <div class="quantity-container d-flex justify-space-between align-center mt-4" v-if="props.product.haveTopping == true" >
+      <div class="quantity-container d-flex justify-space-between align-center mt-4"
+        v-if="props.product.haveTopping == true">
         <p class="pa-2">จำนวนสินค้า</p>
         <v-btn variant="elevated" color="#C5C5C5" @click="decreaseQuantity" icon="mdi-minus" size="x-small"></v-btn>
         <span class="mx-2">{{ quantity }}</span>

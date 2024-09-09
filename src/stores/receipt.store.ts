@@ -189,5 +189,6 @@ export const useReceiptStore = defineStore("receipt", () => {
     historyReceiptDialogCatering,
     isLoading, // expose loading state
     errorMessage, // expose error message state
+    deleteReceiptFromLocalStorage
   };
 });

@@ -337,17 +337,19 @@ export const usePosStore = defineStore("pos", () => {
   // create function create recipt
   const createReceipt = async () => {
     let receiptStatus = "";
+  
     if (userStore.currentUser?.userRole == "พนักงานขายกาแฟ") {
       receiptStatus = "ร้านกาแฟ";
     } else {
       receiptStatus = "ร้านข้าว";
     }
+  
     if (currentReceipt.value?.queueNumber !== undefined) {
       receipt.value.receiptItems = selectedItems.value;
       receipt.value.receiptStatus = receiptStatus;
       receipt.value.receiptStatus = "paid";
       receipt.value.createdDate = new Date();
-      receipt.value.queueNumber = currentReceipt.value?.queueNumber + 1;
+      receipt.value.queueNumber = queueNumber.value;
     } else {
       receipt.value.receiptItems = selectedItems.value;
       receipt.value.receiptType = receiptStatus;
@@ -355,12 +357,14 @@ export const usePosStore = defineStore("pos", () => {
       receipt.value.createdDate = new Date();
       receipt.value.queueNumber = queueNumber.value;
     }
+  
     queueNumber.value++;
     saveQueueNumber();
+  
     if (receipt.value.receiptTotalDiscount === 0) {
       receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice;
     }
-
+  
     const res = await receiptService.createReceipt(receipt.value);
     if (res.status === 201) {
       console.log("Receipt created successfully", res.data);
@@ -369,8 +373,17 @@ export const usePosStore = defineStore("pos", () => {
       saveQueueListToLocalStorage();
       await customerStore.getAllCustomers();
     }
+    
     await receiptStore.getRecieptIn30Min();
   };
+  
+
+  
+  // Function to save the queue list to local storage
+  const saveQueueListToLocalStorage = () => {
+    localStorage.setItem('queueReceipt', JSON.stringify(queueReceipt.value));
+  };
+  
   const createReceiptForCatering = async (checkStockId: number) => {
     const receiptStatus = "ร้านจัดเลี้ยง";
     if (currentReceipt.value?.queueNumber !== undefined) {
@@ -708,7 +721,7 @@ export const usePosStore = defineStore("pos", () => {
       if (currentReceipt.value?.receiptStatus !== "cancel") {
         updateReceiptInLocalStorage(res.data);
       } else {
-        deleteReceiptFromLocalStorage(res.data.receiptId);
+        receiptStore.deleteReceiptFromLocalStorage(res.data.receiptId);
       }
       // await receiptStore.getRecieptIn30Min();
     }
@@ -732,9 +745,7 @@ export const usePosStore = defineStore("pos", () => {
     }
   };
 
-  function saveQueueListToLocalStorage() {
-    localStorage.setItem("queueReceipt", JSON.stringify(queueReceipt.value));
-  }
+ 
   const updateReceiptInLocalStorage = (updatedReceipt: Receipt) => {
     const receiptIndex = queueReceipt.value.findIndex(
       (receipt) => receipt.receiptId === updatedReceipt.receiptId
