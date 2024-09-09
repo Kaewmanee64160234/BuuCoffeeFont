@@ -7,6 +7,8 @@ import type { IngredientLog } from "@/types/IngredientLog.type";
 import type { ReportIngredientLog } from "@/types/pairsWithdrawalReturn.type";
 export const useSubIngredientStore = defineStore("subinventory", () => {
   const subingredients_coffee = ref<SubInventoriesCoffee[]>([]);
+  const subingredientsRiceCatering = ref<SubInventoriesCoffee[]>([]);
+  const subingredientsCoffeeCatering = ref<SubInventoriesCoffee[]>([]);
   const subingredients_rice = ref<SubInventoriesCoffee[]>([]);
   const dialoglog= ref(false);
   const History = ref<Checkingredient[]>([]);
@@ -71,6 +73,38 @@ const findByShopTypeRice = async () => {
       console.log(e);
     }
   }
+  const addSubIngredientsCoffeeCatering 
+  = async (data: SubInventoriesCoffee) => {
+    try {
+    const index = subingredientsCoffeeCatering.value.findIndex((item) => item.subInventoryId === data.subInventoryId);
+    if(index === -1){
+      data.quantity = 1;
+
+      subingredientsCoffeeCatering.value.push(data);
+    }else{
+      subingredientsCoffeeCatering.value[index].quantity += 1;
+    }
+    
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  // addSubIngredientsRiceCatering
+  const addSubIngredientsRiceCatering = async (data: SubInventoriesCoffee) => {
+    try {
+    const index = subingredientsRiceCatering.value.findIndex((item) => item.subInventoryId === data.subInventoryId);
+    if(index === -1){
+      data.quantity = 1;
+      subingredientsRiceCatering.value.push(data);
+    }else{
+      subingredientsRiceCatering.value[index].quantity += 1;
+    }
+    
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  
   return {
     subingredients_coffee,
     subingredients_rice,
@@ -84,6 +118,10 @@ const findByShopTypeRice = async () => {
     findByShopType,
     findByShopTypeRice,
     getIngredientLog,
-    getLog
+    getLog,
+    subingredientsRiceCatering ,
+subingredientsCoffeeCatering,
+addSubIngredientsCoffeeCatering,
+addSubIngredientsRiceCatering
   };
 });

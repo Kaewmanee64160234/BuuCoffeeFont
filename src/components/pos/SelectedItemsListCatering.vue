@@ -7,6 +7,8 @@ import type { ReceiptItem } from '../../types/receipt.type';
 import { useReceiptStore } from '@/stores/receipt.store';
 import { useIngredientStore } from '@/stores/Ingredient.store'; // Assuming you have an ingredient store
 import ReceiptDetailsDialogPos from '../receipts/ReceiptDialogPos.vue';
+import type { SubInventoriesCoffee } from '@/types/subinventoriescoffee.type';
+import { useSubIngredientStore } from '@/stores/ingredientSubInventory.store';
 
 const step = ref(1);
 const posStore = usePosStore();
@@ -14,8 +16,9 @@ const selectedItems = computed(() => posStore.selectedItems);
 const receiptStore = useReceiptStore();
 const ingredientStore = useIngredientStore(); // Assuming this is the correct import for ingredients
 const selectedCategory = ref('Products');
-const ingredientFilters = ref<any[]>([]); // To store filtered ingredients
+const ingredientFilters = ref<SubInventoriesCoffee[]>([]); // To store filtered ingredients
 const url = import.meta.env.VITE_URL_PORT
+const subInventoryStore = useSubIngredientStore();
 
 onMounted(async () => {
   await receiptStore.getRecieptCateringIn24Hours();
@@ -194,16 +197,30 @@ function openReceiptDialog() {
   posStore.ReceiptDialogPos = true;
   console.log("openReceiptDialog", posStore.ReceiptDialogPos);
 }
-</script>
+function updateReceiptQuantity(index: number, quantity: number) {
+  if (quantity > 0) {
+    posStore.selectedItems[index].quantity = quantity;
+    posStore.calculateTotal();
+  } else {
+    removeItem(index);
+  }
+}
 
+function updateIngredientQuantity(index: number, quantity: number) {
+  if (quantity > 0) {
+    ingredientStore.ingredientCheckList[index].count = quantity;
+  } else {
+    removeIngredient(index);
+  }
+}
+
+</script>
 
 
 <template>
   <ReceiptDetailsDialogPos />
 
-
   <div class="h-screen app">
-
     <v-window v-model="step" transition="fade" class="h-screen">
       <!-- Order Details View -->
       <v-window-item :value="1" class="full-height">
@@ -212,52 +229,44 @@ function openReceiptDialog() {
             <div class="d-flex justify-space-between align-center">
               <h3>รายละเอียดการจัดเลี้ยงรับรอง</h3>
             </div>
-            
-
             <v-divider class="my-2"></v-divider>
 
             <!-- Product Summary -->
-            <h3>สรุปรายการสินค้า</h3>
+            <h3 class="section-title">สรุปรายการสินค้า</h3>
             <div class="selected-items-list">
               <v-list class="full-width">
                 <v-list-item-group>
                   <div v-for="(item, index) in selectedItems" :key="index" class="selected-item my-2">
-                    <v-list-item :prepend-avatar="`${url}/products/${item.product?.productId}/image`"
-                      class="full-width">
+                    <v-list-item :prepend-avatar="`${url}/products/${item.product?.productId}/image`" class="full-width">
                       <v-row no-gutters class="align-center">
-                        <v-col cols="5" class="product-name">
+                        <v-col cols="2" class="product-name">
                           {{ item.product?.productName }}
                         </v-col>
-                        <v-col cols="2" class="text-right pr-2" style="color: black;">
+                        <v-col cols="4" class="text-right pr-2" style="color: black;">
                           <p>{{ item.receiptSubTotal }}</p>
                         </v-col>
-                        <v-col cols="3" class="text-right pr-2">
-                          <v-btn size="xs-small" color="#C5C5C5" icon @click="decreaseQuantity(index)">
+                        <v-col cols="4" class="text-right pr-2">
+                          <v-btn size="xs-small" color="#C5C5C5" icon @click.stop="decreaseQuantity(index)">
                             <v-icon>mdi-minus</v-icon>
                           </v-btn>
                           <span class="pa-2">{{ item.quantity }}</span>
-                          <v-btn size="xs-small" color="#FF9642" icon @click="increaseQuantity(item)">
+                          <v-btn size="xs-small" color="#FF9642" icon @click.stop="increaseQuantity(item)">
                             <v-icon>mdi-plus</v-icon>
                           </v-btn>
-                        </v-col>
-                        <v-col cols="2" class="text-right">
-                          <v-btn icon variant="text" @click="removeItem(index)">
+                          <v-btn icon variant="text" @click.stop="removeItem(index)">
                             <v-icon color="red">mdi-delete</v-icon>
                           </v-btn>
                         </v-col>
                       </v-row>
-                      <v-row no-gutters v-if="item.product.haveTopping">
+                      <v-row no-gutters v-if="item.product!.haveTopping">
                         <v-col cols="12" class="product-details">
-                          {{ item.productType?.productTypeName }} +{{ item.productType?.productTypePrice }} | ความหวาน
-                          {{ item.sweetnessLevel }}%
+                          {{ item.productType?.productTypeName }} +{{ item.productType?.productTypePrice }} | ความหวาน {{ item.sweetnessLevel }}%
                         </v-col>
                         <v-col cols="12" v-if="item.productTypeToppings && item.productTypeToppings.length > 0">
                           <ul class="toppings-list">
-                            <li v-for="topping in item.productTypeToppings" :key="topping?.topping?.toppingId"
-                              class="topping-item">
+                            <li v-for="topping in item.productTypeToppings" :key="topping?.topping?.toppingId" class="topping-item">
                               x{{ topping?.quantity }} {{ topping?.topping?.toppingName }}
-                              <span v-if="topping?.topping?.toppingName && topping.topping.toppingName.length > 3">:
-                                {{ topping?.topping?.toppingPrice }}.-</span>
+                              <span v-if="topping?.topping?.toppingName && topping.topping.toppingName.length > 3">: {{ topping?.topping?.toppingPrice }}.-</span>
                             </li>
                           </ul>
                         </v-col>
@@ -270,57 +279,83 @@ function openReceiptDialog() {
 
             <v-divider></v-divider>
 
-            <!-- Ingredient Summary -->
-            <h3 class="mt-4">สรุปรายการวัตถุดิบ</h3>
+            <!-- Ingredient Summary (กาแฟ) -->
+            <h3 class="section-title">สรุปรายการวัตถุดิบจากร้านกาแฟ</h3>
             <div class="ingredient-list">
               <v-list class="full-width">
                 <v-list-item-group>
-                  <div v-for="(ingredient, index) in ingredientStore.ingredientCheckList" :key="index"
-                    class="selected-item my-2">
-                    <v-list-item :prepend-avatar="`${url}/ingredients/${ingredient.ingredientcheck.ingredientId}/image`"
-                      class="full-width">
-
+                  <div v-for="(ingredient, index) in subInventoryStore.subingredientsCoffeeCatering" :key="index" class="selected-item my-2">
+                    <v-list-item :prepend-avatar="`${url}/ingredients/${ingredient.ingredient.ingredientId}/image`" class="full-width">
                       <v-row no-gutters class="align-center">
                         <v-col cols="5" class="product-name">
-                          {{ ingredient.ingredientcheck.ingredientName }}
-                          <span
-                            v-if="ingredient.ingredientcheck.ingredientSupplier !== '-' && ingredient.ingredientcheck.ingredientSupplier !== ''">
-                            ({{ ingredient.ingredientcheck.ingredientSupplier }})
+                          {{ ingredient.ingredient.ingredientName }}
+                          <span v-if="ingredient.ingredient.ingredientSupplier !== '-' && ingredient.ingredient.ingredientSupplier !== ''">
+                            ({{ ingredient.ingredient.ingredientSupplier }})
                           </span>
                         </v-col>
-
-                        <v-col cols="2" class="text-right pr-2" style="color: black;">
-                          <p>{{ ingredient.ingredientcheck.ingredientPrice }}</p>
-                        </v-col>
                         <v-col cols="3" class="text-right pr-2">
-                          <v-btn size="xs-small" color="#C5C5C5" icon @click="decreaseIngredientQuantity(index)">
-                            <v-icon>mdi-minus</v-icon>
-                          </v-btn>
-                          <span class="pa-2">{{ ingredient.count }}</span>
-                          <v-btn size="xs-small" color="#FF9642" icon @click="increaseIngredientQuantity(index)">
-                            <v-icon>mdi-plus</v-icon>
-                          </v-btn>
+                         
+                            <!-- chnage to textfile input -->
+                            <input class="input-quantity" v-model="ingredient.quantity" type="number" 
+                              @change="updateIngredientQuantity(index, ingredient.quantity)"/>
+
+                         <span>
+                          {{ ingredient.ingredient.ingredientUnit }}
+                         </span>
+                         
                         </v-col>
                         <v-col cols="2" class="text-right">
-                          <v-btn icon variant="text" @click="removeIngredient(index)">
+                          <v-btn icon variant="text" @click.stop="removeIngredient(index)">
                             <v-icon color="red">mdi-delete</v-icon>
                           </v-btn>
                         </v-col>
-
                       </v-row>
-
                     </v-list-item>
                   </div>
                 </v-list-item-group>
               </v-list>
             </div>
 
+            <!-- Ingredient Summary (ข้าว) -->
+            <h3 class="section-title">สรุปรายการวัตถุดิบจากร้านข้าว</h3>
+            <div class="ingredient-list">
+              <v-list class="full-width">
+                <v-list-item-group>
+                  <div v-for="(ingredient, index) in subInventoryStore.subingredientsRiceCatering" :key="index" class="selected-item my-2">
+                    <v-list-item :prepend-avatar="`${url}/ingredients/${ingredient.ingredient.ingredientId}/image`" class="full-width">
+                      <v-row no-gutters class="align-center">
+                        <v-col cols="5" class="product-name">
+                          {{ ingredient.ingredient.ingredientName }}
+                          <span v-if="ingredient.ingredient.ingredientSupplier !== '-' && ingredient.ingredient.ingredientSupplier !== ''">
+                            ({{ ingredient.ingredient.ingredientSupplier }})
+                          </span>
+                        </v-col>
+                        <v-col cols="4" class="text-right pr-2">
+                        
+                          
+                            <!-- chnage to textfile input -->
+                            <input class="input-quantity"  v-model="ingredient.quantity" type="number"  
+                              @change="updateIngredientQuantity(index, ingredient.quantity)"/>
+                              <span>
+                          {{ ingredient.ingredient.ingredientUnit }}
+                         </span>
+                        
+                        </v-col>
+                        <v-col cols="1" class="text-right">
+                          <v-btn icon variant="text" @click.stop="removeIngredient(index)">
+                            <v-icon color="red">mdi-delete</v-icon>
+                          </v-btn>
+                        </v-col>
+                      </v-row>
+                    </v-list-item>
+                  </div>
+                </v-list-item-group>
+              </v-list>
+            </div>
 
             <!-- Order Summary -->
             <div class="summary-section" style="width: 100%;">
               <v-divider></v-divider>
-
-
             </div>
           </div>
           <div class="footer-buttons">
@@ -340,7 +375,6 @@ function openReceiptDialog() {
             <div class="d-flex justify-space-between align-center">
               <h3>รายละเอียดการสั่งซื้อ</h3>
             </div>
-
             <v-divider></v-divider>
 
             <!-- Summary Section -->
@@ -386,8 +420,7 @@ function openReceiptDialog() {
 
             <div class="footer-buttons">
               <v-row class="d-flex justify-center" style="width: 100%;">
-                <v-btn style="width: 40%; margin-right: 10px;" color="secondary" rounded
-                  @click="prevStep">ย้อนกลับ</v-btn>
+                <v-btn style="width: 40%; margin-right: 10px;" color="secondary" rounded @click="prevStep">ย้อนกลับ</v-btn>
                 <v-btn style="width: 40%;" color="#FF9642" rounded @click="save">บันทึก</v-btn>
               </v-row>
             </div>
@@ -401,17 +434,27 @@ function openReceiptDialog() {
 
 <style scoped>
 .app {
-  height: 100vh;
   display: flex;
   flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #f0f0f0;
 }
 
 .full-height {
   height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .header {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 600;
+  /* margin-bottom: 10px; */
 }
 
 .selected-item {
@@ -433,7 +476,7 @@ function openReceiptDialog() {
 .product-details,
 .ingredient-details {
   font-size: 14px;
-  color: gray;
+  /* color: gray; */
   font-weight: lighter;
 }
 
@@ -448,32 +491,40 @@ function openReceiptDialog() {
   color: gray;
 }
 
+.quantity-input {
+  margin-left: 10px;
+  margin-right: 10px;
+  border: 1px solid #000000;
+  padding: 5px;
+  border-radius: 5px;
+}
+
 .selected-items-list,
 .ingredient-list {
   overflow-y: auto;
-  height: 30vh;
+  max-height: 20vh;
   margin-bottom: 20px;
 }
 
 .promotion-section {
   overflow-y: auto;
-  max-height: 20vh;
-  margin-bottom: 20px;
-  padding-right: 15px;
+  max-height: 15vh;
+  margin-bottom: 10px;
+  padding-right: 10px;
 }
 
 .promotion-item {
-  text-align: end;
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  text-align: right;
 }
 
 .summary-section {
-  height: 30%;
-  margin-top: 20px;
-  padding: 10px;
+  padding: 15px;
+  margin-top: 10px;
+  background-color: #fff;
   border-radius: 8px;
 }
 
@@ -489,6 +540,17 @@ function openReceiptDialog() {
   justify-content: space-between;
 }
 
+.footer-buttons>v-btn {
+  width: 48%;
+}
+.input-quantity{
+  border-radius: 5px;
+  width: 80px;
+  margin: 0 5px;
+  border: 2px solid #000000;
+  /* text-align: center; */
+}
+
 @media (max-width: 768px) {
   .content-container {
     padding: 10px;
@@ -496,15 +558,16 @@ function openReceiptDialog() {
 
   .selected-items-list,
   .ingredient-list {
-    max-height: 30%;
+    max-height: 35%;
   }
 
   .promotion-section {
-    max-height: 15vh;
+    max-height: 10vh;
   }
 
   .summary-section {
-    height: 30%;
+    height: auto;
+    margin-top: 15px;
   }
 
   .footer-buttons {
@@ -517,4 +580,26 @@ function openReceiptDialog() {
     margin-bottom: 10px;
   }
 }
+
+@media (max-width: 480px) {
+  .summary-section {
+    padding: 10px;
+  }
+
+  .selected-items-list,
+  .ingredient-list {
+    max-height: 40%;
+  }
+
+  .footer-buttons>v-btn {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .footer-buttons {
+    justify-content: center;
+  }
+}
 </style>
+
+

@@ -23,6 +23,7 @@ const categoryStore = useCategoryStore();
 const subInventoryStore = useSubIngredientStore();
 const posStore = usePosStore();
 const ingredientStore = useIngredientStore();
+const typeStock = ref<string>('');
 
 const selectedCategory = ref<string>(categoryStore.categoriesForCreate[0]?.categoryName || '');
 const productFilters = ref<Product[]>([]);
@@ -78,9 +79,12 @@ const filterProducts = () => {
     if (selectedCategory.value === 'วัตถุดิบร้านกาแฟ') {
         ingredientFilters.value = subInventoryStore.subingredients_coffee
             .filter((ingredient: SubInventoriesCoffee) => ingredient.ingredient.ingredientName!.toLowerCase().includes(searchQuery.value.toLowerCase()));
-    } else if (selectedCategory.value === 'วัตถุดิบร้านข้าว') {
+            typeStock.value = 'coffee';
+        } else if (selectedCategory.value === 'วัตถุดิบร้านข้าว') {
         ingredientFilters.value = subInventoryStore.subingredients_rice
             .filter((ingredient: SubInventoriesCoffee) => ingredient.ingredient.ingredientName!.toLowerCase().includes(searchQuery.value.toLowerCase()));
+            typeStock.value = 'rice';
+
     }
 
 
@@ -139,7 +143,7 @@ const addToCart = (item: Product | any) => {
                                         <v-col v-for="ingredient in ingredientFilters" :key="ingredient.subInventoryId"
                                             cols="12" sm="6" md="4" lg="4" class="d-flex">
                                             <div class="ingredient-card">
-                                                <subInventoryCard :sub-inventory="ingredient" />
+                                                <subInventoryCard :sub-inventory="ingredient" :type="typeStock" />
                                             </div>
                                         </v-col>
                                     </v-row>
