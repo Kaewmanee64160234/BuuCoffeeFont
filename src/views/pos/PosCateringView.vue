@@ -13,27 +13,44 @@ import { useIngredientStore } from '@/stores/Ingredient.store';
 import Swal from 'sweetalert2';
 import type { Product } from '@/types/product.type';
 import SelectedItemsListCatering from '@/components/pos/SelectedItemsListCatering.vue';
+import { useSubIngredientStore } from '@/stores/ingredientSubInventory.store';
+import type { Ingredient } from '@/types/ingredient.type';
+import type { SubInventoriesCoffee } from '@/types/subinventoriescoffee.type';
 
 const productStore = useProductStore();
 const categoryStore = useCategoryStore();
-const toppingStore = useToppingStore();
-const userStore = useUserStore();
+const subInventoryStore = useSubIngredientStore();
 const posStore = usePosStore();
 const ingredientStore = useIngredientStore();
 
 const selectedCategory = ref<string>(categoryStore.categoriesForCreate[0]?.categoryName || '');
 const productFilters = ref<Product[]>([]);
-const ingredientFilters = ref<any[]>([]);
+const ingredientFilters = ref<SubInventoriesCoffee[]>([]);
 const searchQuery = ref('');
+
 
 onMounted(async () => {
     productFilters.value = [];
     ingredientFilters.value = [];
-    await productStore.getAllProducts();
     await categoryStore.getAllCategories();
+    await subInventoryStore.getSubIngredients_coffee();
+    await subInventoryStore.getSubIngredients_rice();
+
+    // Ensure the additional categories are included
+    categoryStore.categoriesForCreate.push({
+        categoryId: 101,
+        categoryName: 'วัตถุดิบร้านกาแฟ',
+    });
+    categoryStore.categoriesForCreate.push({
+        categoryId: 100,
+        categoryName: 'วัตถุดิบร้านข้าว',
+    });
+
+    await productStore.getAllProducts();
     await ingredientStore.getIngredients();
     filterProducts();
 });
+
 
 watch(selectedCategory, () => {
     filterProducts();
@@ -44,68 +61,95 @@ watch(searchQuery, () => {
 });
 
 const filterProducts = () => {
-    
-        productFilters.value = productStore.products
-            .filter(product =>
-                product.category.categoryName === selectedCategory.value &&
-                product.productName.toLowerCase().includes(searchQuery.value.toLowerCase())
-            )
-            .reduce((uniqueProducts, currentProduct) => {
-                if (!uniqueProducts.some(product => product.productId === currentProduct.productId)) {
-                    uniqueProducts.push(currentProduct);
-                }
-                return uniqueProducts;
-            }, [] as Product[]);
-        ingredientFilters.value = [];
-    
+
+    productFilters.value = productStore.products
+        .filter(product =>
+            product.category.categoryName === selectedCategory.value &&
+            product.productName.toLowerCase().includes(searchQuery.value.toLowerCase())
+        )
+        .reduce((uniqueProducts, currentProduct) => {
+            if (!uniqueProducts.some(product => product.productId === currentProduct.productId)) {
+                uniqueProducts.push(currentProduct);
+            }
+            return uniqueProducts;
+        }, [] as Product[]);
+    ingredientFilters.value = [];
+    if (selectedCategory.value === 'วัตถุดิบร้านกาแฟ') {
+        ingredientFilters.value = subInventoryStore.subingredients_coffee
+            .filter((ingredient: SubInventoriesCoffee) => ingredient.ingredient.ingredientName!.toLowerCase().includes(searchQuery.value.toLowerCase()));
+    } else if (selectedCategory.value === 'วัตถุดิบร้านข้าว') {
+        ingredientFilters.value = subInventoryStore.subingredients_rice
+            .filter((ingredient: SubInventoriesCoffee) => ingredient.ingredient.ingredientName!.toLowerCase().includes(searchQuery.value.toLowerCase()));
+    }
+
+
 };
 
 const addToCart = (item: Product | any) => {
-   
-        posStore.addToReceipt(item, null, [], 1, null);
-    
+
+    posStore.addToReceipt(item, null, [], 1, null);
+
 };
 </script>
 
 <template>
     <v-app style="width: 100vw; height: 100vh; overflow: hidden;">
         <v-row :style="{ height: '100%' }">
-            <v-col cols="7" class="d-flex flex-column align-center" style="background-color: #f7f7f7; height: 100%; overflow: hidden;">
-                <v-container fluid class="full-width-container" style="height: 100%; overflow: hidden; margin-left: 6%;">
+            <v-col cols="7" class="d-flex flex-column align-center"
+                style="background-color: #f7f7f7; height: 100%; overflow: hidden;">
+                <v-container fluid class="full-width-container"
+                    style="height: 100%; overflow: hidden; margin-left: 6%;">
                     <v-row class="full-width-row" style="margin-bottom: 10px;">
                         <v-col cols="12">
-                            <v-text-field v-model="searchQuery" append-icon="mdi-magnify" label="ค้นหา"
-                                          variant="solo" dense hide-details
-                                          style="background-color: #f1f1f1; border-radius: 8px;"></v-text-field>
+                            <v-text-field v-model="searchQuery" append-icon="mdi-magnify" label="ค้นหา" variant="solo"
+                                dense hide-details
+                                style="background-color: #f1f1f1; border-radius: 8px;"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row class="full-width-row" style="overflow: hidden; margin-bottom: 10px;">
                         <v-col cols="12">
                             <v-tabs v-model="selectedCategory" align-tabs="start" color="brown" class="full-width-tabs"
-                                    background-color="#fff">
-                               
+                                background-color="#fff">
                                 <v-tab v-for="category in categoryStore.categoriesForCreate" :key="category.categoryId"
-                                       :value="category.categoryName">
+                                    :value="category.categoryName">
                                     {{ category.categoryName }}
                                 </v-tab>
                             </v-tabs>
+
                         </v-col>
                     </v-row>
                     <v-row class="full-width-row product-list-container" style="flex: 1; overflow-y: auto;">
                         <v-tabs-items v-model="selectedCategory" style="width: 100%;">
-                           
                             <v-tab-item value="Products">
                                 <v-container fluid class="full-width-container">
                                     <v-row class="full-width-row">
-                                        <v-col v-for="product in productFilters" :key="product.productId"
-                                               cols="12" sm="6" md="4" lg="3" class="d-flex">
+                                        <v-col v-for="product in productFilters" :key="product.productId" cols="12"
+                                            sm="6" md="4" lg="4" class="d-flex">
                                             <product-card :product="product" class="product-card"></product-card>
                                         </v-col>
                                     </v-row>
                                 </v-container>
                             </v-tab-item>
+
+                            <!-- Ingredient Tab for Coffee -->
+                            <v-tab-item value="วัตถุดิบร้านกาแฟ">
+                                <v-container fluid class="full-width-container">
+                                    <v-row class="full-width-row">
+                                        <v-col v-for="ingredient in ingredientFilters" :key="ingredient.subInventoryId" cols="12"
+                                            sm="6" md="4" lg="4" class="d-flex">
+                                            <div class="ingredient-card">
+                                                <p>{{ ingredient.ingredient.ingredientName }}</p>
+                                                <!-- Add more ingredient details as needed -->
+                                            </div>
+                                        </v-col>
+                                    </v-row>
+                                </v-container>
+                            </v-tab-item>
+
+                          
                         </v-tabs-items>
                     </v-row>
+
                     <drink-selection-dialog></drink-selection-dialog>
                 </v-container>
             </v-col>
