@@ -1,5 +1,6 @@
 import type { Category } from "./category.type";
 import type { ProductType } from "./productType.type";
+import type { ProductTypeTopping } from "./productTypeTopping.type";
 
 export interface Product {
   productId: number;
@@ -11,6 +12,9 @@ export interface Product {
   barcode:string;
   category: Category;
   productTypes?: ProductType[];
+  sweetnessLevel?: number;
+  productTypeToppings?: ProductTypeTopping[];
+  quantity?: number;
 }
 export function mapToProduct(data: any): Product {
   return {
@@ -48,6 +52,14 @@ export function mapToProduct(data: any): Product {
             } : null,
           };
         }) : [],
+      };
+    }) : [],
+    sweetnessLevel: data.sweetnessLevel,
+    productTypeToppings: data.productTypeToppings ? data.productTypeToppings.map((ptt: any) => {
+      return {
+        productTypeToppingId: ptt.productTypeToppingId,
+        topping: ptt.topping,
+        quantity: ptt.quantity,
       };
     }) : [],
   };

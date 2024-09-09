@@ -689,6 +689,8 @@ export const usePosStore = defineStore("pos", () => {
   };
 
   
+
+  
   return {
     setReceiptForEdit,
     getCurrentReceipt,
