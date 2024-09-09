@@ -11,9 +11,7 @@
               <v-col cols="12">
                 <v-text-field variant="solo" v-model="categoryName" label="ชื่อหมวดหมู่" :rules="[rules.required, rules.categoryName]" required></v-text-field>
               </v-col>
-              <v-col cols="12">
-                <v-checkbox v-model="haveTopping" label="มีท็อปปิ้ง"></v-checkbox>
-              </v-col>
+             
             </v-row>
           </v-form>
         </v-container>
@@ -47,7 +45,6 @@ const rules = {
 watch(() => categoryStore.category, (newVal) => {
     if (newVal) {
         categoryName.value = newVal.categoryName;
-        haveTopping.value = newVal.haveTopping;
     }
 }, { immediate: true });
 
@@ -57,7 +54,6 @@ const submitForm = async () => {
     const updatedCategory: Category = {
         categoryId: categoryStore.category?.categoryId || 0,
         categoryName: categoryName.value,
-        haveTopping: haveTopping.value,
     };
 
     try {

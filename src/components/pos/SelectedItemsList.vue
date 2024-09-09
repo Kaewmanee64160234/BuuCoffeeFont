@@ -25,6 +25,8 @@ const url = import.meta.env.VITE_URL_PORT
 onMounted(async () => {
   await receiptStore.getRecieptIn30Min();
   await loadQueueListFromLocalStorage();
+  
+
 });
 
 function nextStep() {
@@ -84,7 +86,7 @@ watch(() => posStore.receipt.receive, () => {
 
 function increaseQuantity(item: ReceiptItem) {
   // console.log('increase quantity', item);
-  if (item.product?.category.haveTopping) {
+  if (item.product?.haveTopping) {
     if (item.productTypeToppings.length > 0) {
       posStore.addToReceipt(item.product, item.productType, item.productTypeToppings, 1, item.sweetnessLevel);
     } else {
@@ -157,7 +159,7 @@ function openCreateCustomerDialog() {
 const loadQueueListFromLocalStorage = () => {
   const storedQueueList = localStorage.getItem('queueReceipt');
   console.log(storedQueueList);
-  
+
   if (storedQueueList) {
     posStore.queueReceipt = JSON.parse(storedQueueList);
   } else {
@@ -194,18 +196,18 @@ function removePromotion(promotion: Promotion) {
 }
 
 function openProductCardDialog(item: ReceiptItem) {
-  if (item.product) {
-    posStore.selectedProduct = item.product; // Set the selected product
-    posStore.ProductCardDialog = true; // Open the dialog
+  if (item.product?.haveTopping) {
+    posStore.selectedItemForEdit = item;
+    console.log('Selected Product:', posStore.selectedItemForEdit);
+    posStore.toppingDialog = true;
   } else {
-    console.error("Product is undefined");
+    console.error("This product does not have toppings or product is undefined");
   }
 }
 
-const openEditReceiptDialog = (receipt: Receipt) => {
-  posStore.setReceiptForEdit(receipt);
-  posStore.toppingDialog = true;
-};
+
+
+
 
 
 watch(() => selectedCustomer.value, () => {
@@ -249,7 +251,7 @@ const selectReceipt = (receipt: Receipt) => {
 
 <template>
   <ReceiptDetailsDialogPos />
-  <DrinkSelectionDialog v-model:dialog="posStore.updateReceiptDialog" :pos="posStore.receipt"></DrinkSelectionDialog>
+  <DrinkSelectionDialog></DrinkSelectionDialog>
   <div class="h-screen app">
     <AddCustomerDialog />
 
@@ -329,8 +331,9 @@ const selectReceipt = (receipt: Receipt) => {
               <v-list class="full-width" style="height: 20vh;">
                 <v-list-item-group>
                   <div v-for="(item, index) in selectedItems" :key="index" class="selected-item full-width my-2">
-                    <v-list-item :prepend-avatar="`${url}/products/${item.product?.productId}/image`"
-                      class="full-width">
+                    <!-- Clicking on the list item will open the product card dialog -->
+                    <v-list-item @click="openProductCardDialog(item)"
+                      :prepend-avatar="`${url}/products/${item.product?.productId}/image`" class="full-width">
                       <v-row no-gutters>
                         <v-col cols="6" class="product-name" style="color: black;">
                           {{ item.product?.productName }}
@@ -341,7 +344,7 @@ const selectReceipt = (receipt: Receipt) => {
                       </v-row>
                       <v-row no-gutters>
                         <v-col cols="7" style="color: gray;">
-                          <div v-if="item.product?.category.haveTopping" class="product-details">
+                          <div v-if="item.product?.haveTopping" class="product-details">
                             {{ item.productType?.productTypeName }} +{{ item.productType?.productTypePrice }} | ความหวาน
                             {{ item.sweetnessLevel }}%
                           </div>
@@ -364,18 +367,17 @@ const selectReceipt = (receipt: Receipt) => {
                           </div>
                         </v-col>
                         <v-col cols="5">
-                          <v-btn size="xs-small" color="#C5C5C5" icon @click="decreaseQuantity(index)">
+                          <!-- Quantity controls, prevent event propagation to list item click -->
+                          <v-btn size="xs-small" color="#C5C5C5" icon @click.stop="decreaseQuantity(index)">
                             <v-icon>mdi-minus</v-icon>
                           </v-btn>
                           <span class="pa-2">{{ item.quantity }}</span>
-                          <v-btn size="xs-small" color="#FF9642" icon @click="increaseQuantity(item)">
+                          <v-btn size="xs-small" color="#FF9642" icon @click.stop="increaseQuantity(item)">
                             <v-icon>mdi-plus</v-icon>
                           </v-btn>
-                          <v-btn icon variant="text" @click="removeItem(index)">
+                          <!-- Delete button, prevent event propagation to list item click -->
+                          <v-btn icon variant="text" @click.stop="removeItem(index)">
                             <v-icon color="red">mdi-delete</v-icon>
-                          </v-btn>
-                          <v-btn icon variant="text" @click="openEditReceiptDialog(posStore.receipt)">
-                            <v-icon color="#FABC3F">mdi-pencil</v-icon>
                           </v-btn>
                         </v-col>
                       </v-row>
@@ -383,6 +385,7 @@ const selectReceipt = (receipt: Receipt) => {
                   </div>
                 </v-list-item-group>
               </v-list>
+
             </div>
 
             <!-- Order Summary -->
@@ -403,7 +406,7 @@ const selectReceipt = (receipt: Receipt) => {
                       <v-btn size="small" icon variant="text" @click="removePromotion(promotion.promotion)">
                         <v-icon color="red">mdi-delete</v-icon>
                       </v-btn>
-                      
+
                     </div>
                   </div>
                 </div>
@@ -531,9 +534,11 @@ const selectReceipt = (receipt: Receipt) => {
               <!-- Change Amount -->
               <p class="d-flex justify-space-between pr-6 my-2">
                 <span>ทอน:</span>
-                <span :class="posStore.receipt.receive < 0 || posStore.receipt.receive < posStore.receipt.receiptNetPrice ? 'red--text' : 'black'"
+                <span
+                  :class="posStore.receipt.receive < 0 || posStore.receipt.receive < posStore.receipt.receiptNetPrice ? 'red--text' : 'black'"
                   class="info-value">
-                  {{ parseFloat(posStore.receipt.change.toFixed(2)) < 0 ? 'จำนวนเงินไม่พอ' : posStore.receipt.change.toFixed(2) }} </span>
+                  {{ parseFloat(posStore.receipt.change.toFixed(2)) < 0 ? 'จำนวนเงินไม่พอ' :
+                    posStore.receipt.change.toFixed(2) }} </span>
               </p>
 
               <v-divider></v-divider>

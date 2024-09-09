@@ -3,6 +3,8 @@ import { defineStore } from "pinia";
 import type { Receipt } from "@/types/receipt.type";
 import receiptService from "@/service/receipt.service";
 import { useUserStore } from "./user.store";
+import { usePosStore } from "./pos.store";
+import Swal from "sweetalert2";
 
 export const useReceiptStore = defineStore("receipt", () => {
   const receipts = ref<Receipt[]>([]);
@@ -15,6 +17,7 @@ export const useReceiptStore = defineStore("receipt", () => {
   const isLoading = ref(false); // loading state
   const errorMessage = ref<string | null>(null); // error message state
   const currentReceipt = ref({});
+  const posStore = usePosStore();
 
   const getAllReceipts = async () => {
     try {
@@ -70,7 +73,26 @@ export const useReceiptStore = defineStore("receipt", () => {
       receipt.customer?.customerName?.toLowerCase().includes(searchQuery.value.toLowerCase())
     );
   });
+  const deleteReceiptFromLocalStorage = (receiptId: number) => {
+    // get from localstoage then file
 
+    const storedQueueList = localStorage.getItem("queueReceipt");
+    console.log(storedQueueList);
+
+    if (storedQueueList) {
+      posStore.queueReceipt = JSON.parse(storedQueueList);
+    } else {
+      posStore.queueReceipt = []; // Initialize if not found
+      posStore.saveQueueListToLocalStorage(); // Save initial empty list
+    }
+    const receiptIndex = posStore.queueReceipt.findIndex(
+      (receipt) => receipt.receiptId === receiptId
+    );
+    if (receiptIndex !== -1) {
+      posStore.queueReceipt.splice(receiptIndex, 1);
+      posStore.saveQueueListToLocalStorage();
+    }
+  };
   const getRecieptIn30Min = async () => {
     try {
       isLoading.value = true;
@@ -83,8 +105,9 @@ export const useReceiptStore = defineStore("receipt", () => {
 
       const response = await receiptService.getRecieptIn30Min(typeOfStore);
       if (response.status === 200) {
+
         receipts.value = response.data;
-        console.log("receipts", receipts.value);
+        console.log("receipts getRecieptIn30Min", receipts.value);
       }
     } catch (error) {
       console.error(error);
@@ -115,9 +138,15 @@ export const useReceiptStore = defineStore("receipt", () => {
       isLoading.value = true;
       const response = await receiptService.cancelReceipt(id);
       if (response.status === 200) {
-        await getRecieptIn30Min();
+        deleteReceiptFromLocalStorage(id);
+       
+          Swal.fire('ยกเลิกคำสั่งซื้อสำเร็จ', '', 'success');
+          posStore.ReceiptDialogPos = false;
+        
+        
       }
-      return response;
+
+      // return response;
     } catch (error) {
       console.error(error);
       errorMessage.value = `ไม่สามารถยกเลิกใบเสร็จ ID: ${id} ได้`;

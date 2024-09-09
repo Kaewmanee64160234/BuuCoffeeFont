@@ -7,43 +7,96 @@ function getAllProducts() {
 function getProductById(id: number) {
   return http.get(`/products/${id}`);
 }
-function createProduct(product: Product) {
-  const product_ = {
-    productName: product.productName,
-    productPrice: product.productPrice,
-    productImage: product.productImage,
-    categoryId: product.category.categoryId,
-    barcode:product.barcode,
-    storeType: product.storeType,
-    countingPoint:product.countingPoint,
-    productTypes:
-      product.productTypes?.length! > 0
-        ? product.productTypes!.map((productType) => {
-            return {
-              productTypeName: productType.productTypeName,
-              productTypePrice: productType.productTypePrice,
-              recipes: productType.recipes?.map((recipe) => {
-                return {
-                  IngredientId: recipe.ingredient.ingredientId,
-                  quantity: recipe.quantity,
-                };
-              }),
-            };
-          })
-        : [],
-  };
 
-  console.log(JSON.stringify(product_));
+function createProduct(product: Product& { file: File }) {
+  console.log(product.file);
+  
+  const formData = new FormData();
 
-  return http.post("/products", product_);
+  // Append simple fields
+  formData.append("productName", product.productName);
+  formData.append("productPrice", product.productPrice.toString());
+  formData.append("categoryId", product.category.categoryId.toString());
+  formData.append("barcode", product.barcode || '');
+  formData.append("storeType", product.storeType);
+  formData.append("countingPoint", product.countingPoint?.toString() || '');
+  formData.append("haveTopping", product.haveTopping.toString());
+
+  // Append product image file if it exists
+  if (product.file) {
+    formData.append("imageFile", product.file, product.file.name);
+  }
+
+  // If product types exist, map them and append to FormData
+  if (product.productTypes!.length > 0) {
+    product.productTypes!.forEach((productType, index) => {
+      formData.append(`productTypes[${index}][productTypeName]`, productType.productTypeName);
+      formData.append(`productTypes[${index}][productTypePrice]`, productType.productTypePrice.toString());
+
+      // Handle recipes if available
+      // if (productType.recipes?.length) {
+      //   productType.recipes.forEach((recipe, recipeIndex) => {
+      //     formData.append(`productTypes[${index}][recipes][${recipeIndex}][ingredientId]`, recipe.ingredient.ingredientId.toString());
+      //     formData.append(`productTypes[${index}][recipes][${recipeIndex}][quantity]`, recipe.quantity.toString());
+      //   });
+      // }
+    });
+  }
+
+  // Log FormData for debugging (optional)
+  for (const pair of formData.entries()) {
+    console.log(pair[0] + ': ' + pair[1]);
+  }
+
+  // Send the form data using an HTTP POST request
+  return http.post("/products", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 }
-function updateProduct(id: number, product: Product) {
 
-  return http.patch(`/products/${id}`, product);
+function updateProduct(id: number, product: Product&{file:File}) {
+  const formData = new FormData();
+  console.log("File:", product.file);
+
+  // Append simple fields to formData
+  formData.append('productName', product.productName);
+  formData.append('productPrice', product.productPrice.toString());
+  formData.append('barcode', product.barcode || '');
+  formData.append('storeType', product.storeType);
+  formData.append('countingPoint', product.countingPoint ? 'true' : 'false');
+  formData.append('haveTopping', product.haveTopping ? 'true' : 'false');
+  formData.append('categoryId', product.category.categoryId.toString());
+  
+
+  // Append product types if they exist
+  if (product.productTypes && product.productTypes.length > 0) {
+    product.productTypes.forEach((productType, index) => {
+      formData.append(`productTypes[${index}][productTypeName]`, productType.productTypeName);
+      formData.append(`productTypes[${index}][productTypePrice]`, productType.productTypePrice.toString());
+    });
+  }
+
+  // // Append product image if it exists
+  if (product.file) {
+    
+    formData.append('imageFile', product.file, product.file.name);
+  }
+
+  // Send the form data using PATCH request
+  return http.patch(`/products/${id}`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
 }
+
+
 function deleteProduct(id: number) {
   return http.delete(`/products/${id}`);
 }
+
 function uploadImage(file: File, productId: number) {
   const formData = new FormData();
   formData.append("file", file, file.name);

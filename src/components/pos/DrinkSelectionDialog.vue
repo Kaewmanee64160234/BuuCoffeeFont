@@ -4,16 +4,14 @@ import { useProductStore } from '@/stores/product.store';
 import { useToppingStore } from '@/stores/topping.store';
 import type { ProductType } from '@/types/productType.type';
 import type { Topping } from '@/types/topping.type';
-import type { ProductTypeTopping } from '@/types/productTypeTopping.type';
 import { ref, computed, watch } from 'vue';
-import Swal from 'sweetalert2';
 
 const posStore = usePosStore();
 const productStore = useProductStore();
 const toppingStore = useToppingStore();
 const selectedType = ref<ProductType | null>(null);
 const selectedSweetness = ref<number>(100);
-const selectedToppings = ref<Array<{ topping: Topping; quantity: number }>>([]);
+const selectedToppings = ref<Array<{ topping: Topping; quantity: number }>>([])
 const productTypeToppings = ref<ProductTypeTopping[]>([]);
 const currentProductTypeId = ref<number | undefined>(undefined);
 const quantity = ref<number>(1);
@@ -94,6 +92,23 @@ function populateDialogData() {
 }
 
 
+// Initialize fields when dialog opens
+watch(
+  () => posStore.toppingDialog,
+  (newVal) => {
+    if (newVal && posStore.selectedItemForEdit) {
+      // Initialize the dialog with selectedItemForEdit values
+      const item = posStore.selectedItemForEdit;
+      selectedType.value = item.productType || null;
+      selectedSweetness.value = item.sweetnessLevel || 100;
+      selectedToppings.value = item.productTypeToppings.map(topping => ({
+        topping: topping.topping,
+        quantity: topping.quantity,
+      }));
+      quantity.value = item.quantity;
+    }
+  }
+);
 
 function selectType(type: ProductType) {
   selectedType.value = type;
@@ -142,19 +157,18 @@ function decreaseToppingQuantity(topping: Topping) {
 }
 
 function confirmSelection() {
-  if (!selectedType.value) {
-    showAlert.value = true;
-    return;
-  }
-
-  for (var i = 0; i < selectedToppings.value.length; i++) {
-    productTypeToppings.value.push({
-      productTypeToppingId: 0,
-      productType: selectedType.value,
-      topping: selectedToppings.value[i].topping,
-      quantity: selectedToppings.value[i].quantity,
-    });
-  }
+  // Update the selectedItemForEdit with the new values
+  posStore.selectedItemForEdit!.productType = selectedType.value;
+  posStore.selectedItemForEdit!.sweetnessLevel = selectedSweetness.value;
+  posStore.selectedItemForEdit!.productTypeToppings = selectedToppings.value.map((t) => ({
+    productTypeToppingId: 0, // assuming ID 0 for new toppings
+    productType: selectedType.value!,
+    topping: t.topping,
+    quantity: t.quantity,
+  }));
+  posStore.selectedItemForEdit!.quantity = quantity.value;
+// add to recipt
+  posStore.updateReceiptItem(posStore.selectedItemForEdit!);
 
   posStore.addToReceipt(
     productStore.selectedProduct!,
@@ -171,8 +185,6 @@ function clearData() {
   selectedSweetness.value = 100;
   selectedToppings.value = [];
   quantity.value = 1;
-  productStore.selectedProduct = null;
-  productTypeToppings.value = [];
 }
 
 
@@ -189,14 +201,12 @@ watch(
     }
   }
 );
-
-
-
 </script>
+
 
 <template>
   <v-dialog v-model="posStore.toppingDialog" max-width="650">
-    <v-card v-if="productStore.selectedProduct">
+    <v-card v-if="posStore.selectedItemForEdit">
       <v-card-title class="d-flex justify-space-between align-center">
         <div></div>
         <v-btn icon @click="closeDialog">
@@ -209,16 +219,16 @@ watch(
       <v-card-text>
         <v-row>
           <v-col class="d-flex justify-center align-center" style="width: 200px; height: 200px;">
-            <img :src="`http://localhost:3000/products/${productStore.selectedProduct.productId}/image`"
+            <img :src="`http://localhost:3000/products/${posStore.selectedItemForEdit.product?.productId}/image`"
               class="product-image" />
           </v-col>
           <v-col>
             <v-row>
               <v-col>
-                <span class="product-name">{{ productStore.selectedProduct.productName }}</span>
+                <span class="product-name">{{ posStore.selectedItemForEdit.product?.productName }}</span>
               </v-col>
               <v-col>
-                <span class="product-price">{{ productStore.selectedProduct.productPrice }} ฿</span>
+                <span class="product-price">{{ posStore.selectedItemForEdit.receiptSubTotal.toFixed(2) }} ฿</span>
               </v-col>
             </v-row>
             <v-row class="mt-3">
@@ -300,13 +310,18 @@ watch(
             </div>
           </v-col>
           <v-col class="d-flex justify-center align-center">
-            <v-btn variant="elevated" color="#FF9642" rounded="xl" style="width: 90%;" @click="confirmSelection">ยืนยันการทำรายการ</v-btn>
+            <v-btn variant="elevated" color="#FF9642" rounded="xl" style="width: 90%;" @click="confirmSelection">
+              ยืนยันการทำรายการ
+            </v-btn>
           </v-col>
         </v-row>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
+
+
+
 
 
 

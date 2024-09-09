@@ -4,9 +4,11 @@ import http from "./axios";
 function getAllReceipts() {
   return http.get("/receipts");
 }
+
 function getReceiptById(id: number) {
   return http.get(`/receipts/${id}`);
 }
+
 function createReceipt(receipt : Receipt,checkStockId?:number) {
 console.log("receipt", JSON.stringify(receipt));
 

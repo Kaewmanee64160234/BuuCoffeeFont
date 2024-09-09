@@ -10,6 +10,7 @@ export interface Product {
   countingPoint:boolean;
   storeType: string;
   barcode:string;
+  haveTopping: boolean;
   category: Category;
   productTypes?: ProductType[];
   sweetnessLevel?: number;
@@ -24,6 +25,7 @@ export function mapToProduct(data: any): Product {
     productImage: data.productImage,
     productPrice: data.productPrice,
     countingPoint: data.countingPoint,  
+    haveTopping: data.haveTopping,
     barcode: data.barcode,
     category: data.category,
     productTypes: data.productTypes ? data.productTypes.map((productType: any) => {
@@ -32,6 +34,7 @@ export function mapToProduct(data: any): Product {
         productTypeName: productType.productTypeName,
         productTypePrice: productType.productTypePrice,
         selectedIngredients: productType.selectedIngredients,
+        disable: productType.disable,
         
         ingredientQuantities: productType.ingredientQuantities,
         product: productType.product,

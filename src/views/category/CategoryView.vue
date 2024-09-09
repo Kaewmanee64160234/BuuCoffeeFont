@@ -33,7 +33,6 @@
               <tr>
                 <th style="text-align: center; font-weight: bold;">รหัสหมวดหมู่</th>
                 <th style="text-align: center; font-weight: bold;">ชื่อหมวดหมู่</th>
-                <th style="text-align: center; font-weight: bold;">หมวดหมู่นี้สามารถใส่ท็อปปิ้งได้</th>
                 <th style="text-align: center; font-weight: bold;">การกระทำ</th>
               </tr>
             </thead>
@@ -41,7 +40,6 @@
               <tr v-for="(category, index) in filteredCategories" :key="index" style="text-align: center;">
                 <td>{{ index + 1 + (categoryStore.currentPage - 1) * categoryStore.itemsPerPage }}</td>
                 <td>{{ category.categoryName }}</td>
-                <td>{{ category.haveTopping ? 'ได้' : 'ไม่ได้' }}</td>
                 <td>
                   <template v-if="category.categoryName !== 'กาแฟ' && category.categoryName !== 'กับข้าว'">
                     <v-btn color="#FFDD83" icon="mdi-pencil" class="mr-2" @click="openUpdateDialog(category)">

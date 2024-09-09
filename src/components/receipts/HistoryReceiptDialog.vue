@@ -1,3 +1,22 @@
+
+<script lang="ts" setup>
+import { computed } from 'vue';
+import { useReceiptStore } from '@/stores/receipt.store';
+
+const reciptStore = useReceiptStore()
+
+
+const formatDate = (dateString: string) => {
+  const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', timeZone: 'UTC' };
+  return new Date(dateString).toLocaleDateString('th-TH', options);
+};
+
+function closeDialog() {
+  reciptStore.receipt = null;
+  reciptStore.historyReceiptDialog = false;
+}
+</script>
+
 <template>
   <v-dialog v-model="reciptStore.historyReceiptDialog" max-width="1090px">
     <v-card>
@@ -133,23 +152,6 @@
   </v-dialog>
 </template>
 
-<script lang="ts" setup>
-import { computed } from 'vue';
-import { useReceiptStore } from '@/stores/receipt.store';
-
-const reciptStore = useReceiptStore()
-
-
-const formatDate = (dateString: string) => {
-  const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', timeZone: 'UTC' };
-  return new Date(dateString).toLocaleDateString('th-TH', options);
-};
-
-function closeDialog() {
-  reciptStore.receipt = null;
-  reciptStore.historyReceiptDialog = false;
-}
-</script>
 
 <style scoped>
 .v-table-container {

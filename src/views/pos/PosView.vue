@@ -142,7 +142,7 @@ const handleBarcodeInput = async () => {
     const foundProduct = productStore.products.find(product => product.barcode === barcode.value);
     if (foundProduct) {
       productStore.selectedProduct = foundProduct; // Set the selected product
-      if (foundProduct.category.haveTopping) {
+      if (foundProduct.haveTopping) {
         posStore.selectedProduct = foundProduct;
         posStore.toppingDialog = true;
       } else {
@@ -161,7 +161,7 @@ const handleBarcodeInput = async () => {
 
 // Adds a product to the cart
 const addToCart = (product: Product) => {
-  if (product.category.haveTopping === false) {
+  if (product.haveTopping === false) {
     posStore.addToReceipt(product, null, [], 1, null);
   }
 };
@@ -216,10 +216,10 @@ const showQueue = computed(() => {
                                   {{ item.product?.productName }} x {{ item.quantity }}
                                 
                                   <!-- Display additional product details if applicable -->
-                                  <div v-if="item.product?.category.haveTopping">
+                                  <div v-if="item.product?.haveTopping">
                                     ประเภท {{ item.productType?.productTypeName }}
                                   </div>
-                                  <div class="toppings" v-if="item.product?.category.haveTopping">
+                                  <div class="toppings" v-if="item.product?.haveTopping">
                                     ความหวาน {{ item.sweetnessLevel }}%
                                   </div>
                               
