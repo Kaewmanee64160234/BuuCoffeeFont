@@ -19,6 +19,16 @@ const historyReceiptDialog = ref(false);
 const editDialog = ref(false); // New ref for edit dialog
 const posStore = usePosStore();
 
+const currentPage = ref(1);
+const itemsPerPage = ref(10);  // กำหนดจำนวนรายการต่อหน้า
+const paginatedReceipts = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value;
+  const end = currentPage.value * itemsPerPage.value;
+
+  return filteredReceipts.value.slice(start, end); // หั่นรายการให้ตรงกับหน้าที่เลือก
+});
+
+
 const fetchData = async () => {
   await receiptsStore.fetchReceipts(startDate.value, endDate.value, receiptType.value);
 };
@@ -203,6 +213,13 @@ const closeEditDialog = () => {
 <template>
   <HistoryReceiptDialogCatering v-model:dialog="historyReceiptDialog" />
 
+  <v-select
+        v-model="itemsPerPage"
+        :items="[5, 10, 20, 50]"
+        label="จำนวนรายการต่อหน้า"
+        dense
+      ></v-select>
+
   <!-- Edit Receipt Dialog -->
   <v-dialog v-model="editDialog" max-width="500px">
   <v-card>
@@ -254,6 +271,11 @@ const closeEditDialog = () => {
       </v-btn>
       <v-btn color="secondary" @click="closeEditDialog">ยกเลิก</v-btn>
     </v-card-actions>
+    <v-pagination
+    v-model="currentPage"
+    :length="Math.ceil(filteredReceipts.length / itemsPerPage)"
+    @input="fetchData"
+    ></v-pagination>
   </v-card>
 </v-dialog>
 
@@ -318,7 +340,7 @@ const closeEditDialog = () => {
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(receipt, index) in filteredReceipts" :key="receipt.receiptId">
+        <tr v-for="(receipt, index) in paginatedReceipts" :key="receipt.receiptId">
           <td class="text-center">{{ index + 1 }}</td>
           <td class="text-center">{{ formatDate(receipt.createdDate + '') }}</td>
           <td class="text-center">
