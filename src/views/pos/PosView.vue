@@ -216,7 +216,7 @@ const showQueue = computed(() => {
                                   {{ item.product?.productName }} x {{ item.quantity }}
                                 
                                   <!-- Display additional product details if applicable -->
-                                  <div v-if="item.product?.haveTopping">
+                                  <div v-if="item.product?.haveTopping ">
                                     ประเภท {{ item.productType?.productTypeName }}
                                   </div>
                                   <div class="toppings" v-if="item.product?.haveTopping">

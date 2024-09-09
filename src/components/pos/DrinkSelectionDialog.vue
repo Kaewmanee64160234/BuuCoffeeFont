@@ -107,7 +107,7 @@ function confirmSelection() {
     quantity: t.quantity,
   }));
   posStore.selectedItemForEdit!.quantity = quantity.value;
-// add to recipt
+  // add to recipt
   posStore.updateReceiptItem(posStore.selectedItemForEdit!);
 
 
@@ -154,9 +154,11 @@ function clearData() {
               <div class="d-flex flex-column">
                 <span>ตัวเลือก</span>
                 <div class="d-flex flex-wrap">
-                  <v-chip v-for="type in posStore.selectedItemForEdit.product?.productTypes" :key="type.productTypeId"
-                    variant="outlined" :color="selectedType === type ? '#f5a623' : 'gray'" @click="selectType(type)"
-                    class="chip">
+
+                  <v-chip v-for="type in posStore.selectedItemForEdit!.product!.productTypes!.filter((
+                    type
+                  ) => type.disable == false)" :key="type.productTypeId" variant="outlined"
+                    :color="selectedType === type ? '#f5a623' : 'gray'" @click="selectType(type)" class="chip">
                     {{ type.productTypeName }} {{ type.productTypePrice }}
                   </v-chip>
                 </div>
@@ -193,7 +195,8 @@ function clearData() {
                         <v-btn size="xs-small" icon @click="decreaseToppingQuantity(topping)">
                           <v-icon size="small">mdi-minus</v-icon>
                         </v-btn>
-                        <span>{{ selectedToppings.find(t => t.topping.toppingId === topping.toppingId)?.quantity }}</span>
+                        <span>{{ selectedToppings.find(t => t.topping.toppingId === topping.toppingId)?.quantity
+                          }}</span>
                         <v-btn size="xs-small" icon @click="increaseToppingQuantity(topping)">
                           <v-icon size="small">mdi-plus</v-icon>
                         </v-btn>
