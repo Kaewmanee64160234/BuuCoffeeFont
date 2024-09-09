@@ -11,11 +11,17 @@ const productStore = useProductStore();
 const toppingStore = useToppingStore();
 const selectedType = ref<ProductType | null>(null);
 const selectedSweetness = ref<number>(100);
-const selectedToppings = ref<Array<{ topping: Topping; quantity: number }>>([]);
+const selectedToppings = ref<Array<{ topping: Topping; quantity: number }>>([])
+const productTypeToppings = ref<ProductTypeTopping[]>([]);
+const currentProductTypeId = ref<number | undefined>(undefined);
 const quantity = ref<number>(1);
 const showAlert = ref<boolean>(false);
+const selectedProductTypeId = productStore.selectedProduct?.productTypes?.find(
+type => type.productTypeId === currentProductTypeId.value // Use your actual ID here
+)?.productTypeId;
 
-const sweetnessLevels = [0, 25, 50, 75, 100];
+
+const sweetnessLevels = [0, 25, 50, 75, 100, 150];
 
 const toppingGroups = computed(() => {
   const groups = [];
@@ -25,6 +31,65 @@ const toppingGroups = computed(() => {
   return groups;
 });
 
+function closeDialog() {
+  posStore.toppingDialog = false;
+  resetDialogData();  // รีเซ็ตข้อมูลเมื่อปิด Dialog
+}
+
+function openToppingDialog(productId: number) {
+  resetDialogData();  // รีเซ็ตข้อมูลก่อนเปิด Dialog ใหม่
+  
+  // ค้นหา product จาก productId ที่เลือก
+  const product = productStore.products.find(p => p.productId === productId);
+  
+  if (product) {
+    productStore.selectedProduct = product; // ตั้งค่า selectedProduct ใน productStore
+    posStore.toppingDialog = true; // เปิด Dialog
+    populateDialogData(); // โหลดข้อมูลใหม่จาก product ที่เลือก
+  } else {
+    console.error("Product not found!");
+  }
+}
+
+
+function resetDialogData() {
+  selectedType.value = null;
+  selectedSweetness.value = 100;
+  selectedToppings.value = [];
+  productTypeToppings.value = [];
+  quantity.value = 1;
+  currentProductTypeId.value = undefined;
+  showAlert.value = false;
+}
+
+function populateDialogData() {
+  const product = productStore.selectedProduct;
+
+  if (product) {
+    // ตั้งค่า ProductType ให้ถูกต้อง (เลือก ProductType แรกจากรายการ)
+    selectedType.value = product.productTypes?.[0] || null;
+
+    // ตั้งค่าระดับความหวาน ถ้าไม่มีค่าใช้ค่าเริ่มต้นเป็น 150
+    selectedSweetness.value = product.sweetnessLevel ?? 150;
+
+    // ตั้งค่าท็อปปิ้ง ถ้ามี
+    selectedToppings.value = product.productTypeToppings?.map((ptt: ProductTypeTopping) => ({
+      topping: ptt.topping,
+      quantity: ptt.quantity,
+    })) || [];
+
+    // ตั้งค่าจำนวนสินค้า ถ้าไม่มีค่าใช้ค่าเริ่มต้นเป็น 1
+    quantity.value = product.quantity || 1;
+
+    // ตั้งค่า ProductTypeToppings สำหรับใช้ในฟังก์ชันอื่น
+    productTypeToppings.value = selectedToppings.value.map((toppingItem) => ({
+      productTypeToppingId: 0,
+      productType: selectedType.value!,
+      topping: toppingItem.topping,
+      quantity: toppingItem.quantity,
+    }));
+  }
+}
 
 
 // Initialize fields when dialog opens
@@ -91,11 +156,6 @@ function decreaseToppingQuantity(topping: Topping) {
   }
 }
 
-function closeDialog() {
-  posStore.toppingDialog = false;
-  clearData();
-}
-
 function confirmSelection() {
   // Update the selectedItemForEdit with the new values
   posStore.selectedItemForEdit!.productType = selectedType.value;
@@ -110,7 +170,13 @@ function confirmSelection() {
 // add to recipt
   posStore.updateReceiptItem(posStore.selectedItemForEdit!);
 
-
+  posStore.addToReceipt(
+    productStore.selectedProduct!,
+    selectedType.value,
+    productTypeToppings.value,
+    quantity.value,
+    selectedSweetness.value
+  );
   closeDialog();
 }
 
@@ -120,6 +186,21 @@ function clearData() {
   selectedToppings.value = [];
   quantity.value = 1;
 }
+
+
+
+watch(
+  () => posStore.toppingDialog,
+  (newVal) => {
+    if (newVal && productStore.selectedProduct) {
+      populateDialogData();
+    } else if (newVal && !productStore.selectedProduct) {
+      clearData();
+      console.warn("Topping dialog opened without selected product.");
+      posStore.toppingDialog = false; // Close the dialog if no product is selected
+    }
+  }
+);
 </script>
 
 
@@ -154,9 +235,12 @@ function clearData() {
               <div class="d-flex flex-column">
                 <span>ตัวเลือก</span>
                 <div class="d-flex flex-wrap">
-                  <v-chip v-for="type in posStore.selectedItemForEdit.product?.productTypes" :key="type.productTypeId"
-                    variant="outlined" :color="selectedType === type ? '#f5a623' : 'gray'" @click="selectType(type)"
-                    class="chip">
+                  <v-chip v-for="type in productStore.selectedProduct.productTypes"
+                  :key="type.productTypeId"
+                  variant="outlined"
+                  :color="(selectedType?.productTypeId ?? 0) === type.productTypeId ? '#f5a623' : 'gray'"
+                  @click="selectType(type)"
+                  class="chip">
                     {{ type.productTypeName }} {{ type.productTypePrice }}
                   </v-chip>
                 </div>
@@ -169,9 +253,12 @@ function clearData() {
             <div class="d-flex flex-column mt-4">
               <span>ระดับความหวาน</span>
               <div class="d-flex justify-start">
-                <v-chip v-for="level in sweetnessLevels" :key="level" variant="outlined"
-                  :color="selectedSweetness === level ? '#f5a623' : 'gray'" @click="selectSweetness(level)"
-                  class="chip">
+                <v-chip v-for="level in sweetnessLevels"
+                :key="level"
+                variant="outlined"
+                :color="selectedSweetness === level ? '#f5a623' : 'gray'"
+                @click="selectSweetness(level)"
+                class="chip">
                   {{ level }}%
                 </v-chip>
               </div>
@@ -183,11 +270,17 @@ function clearData() {
                   <div class="d-flex justify-center">
                     <div v-for="topping in toppingGroup" :key="topping.toppingId"
                       class="topping-item d-flex flex-column align-center mx-4">
-                      <v-chip variant="outlined"
+                      <v-chip
+                        v-for="topping in toppingGroup"
+                        :key="topping.toppingId"
+                        variant="outlined"
                         :color="selectedToppings.some(t => t.topping.toppingId === topping.toppingId) ? '#f5a623' : 'gray'"
-                        @click="toggleTopping(topping)" class="chip">
+                        @click="toggleTopping(topping)"
+                        class="chip"
+                      >
                         {{ topping.toppingName }} {{ topping.toppingPrice }}
                       </v-chip>
+                  
                       <div v-if="selectedToppings.some(t => t.topping.toppingId === topping.toppingId)"
                         class="quantity-controls d-flex align-center mt-2">
                         <v-btn size="xs-small" icon @click="decreaseToppingQuantity(topping)">
