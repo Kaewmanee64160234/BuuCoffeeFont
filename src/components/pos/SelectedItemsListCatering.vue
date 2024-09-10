@@ -35,7 +35,7 @@ onMounted(async () => {
 });
 
 function nextStep() {
-  if (selectedItems.value.length === 0 && ingredientStore.ingredientCheckList.length === 0) {
+  if (selectedItems.value.length === 0 && subInventoryStore.ingredientCheckListForCofee.length === 0 && subInventoryStore.ingredientCheckListForRice.length === 0) {
     Swal.fire({
       icon: 'error',
       title: 'ข้อมูลไม่สมบูรณ์',
@@ -60,7 +60,7 @@ function prevStep() {
   console.log('Previous Step:', step.value);
 }
 
-function removeItem(index: number) {
+function removeItemForPos(index: number) {
   posStore.removeItem(index);
 }
 
@@ -85,27 +85,20 @@ function increaseQuantity(item: ReceiptItem) {
 function decreaseQuantity(index: number) {
   const item = selectedItems.value[index];
   if (item.quantity === 1) {
-    removeItem(index);
+    removeItemForPos(index);
   } else {
     posStore.spliceData(index);
   }
 }
 
-// Functions for ingredient list
-function increaseIngredientQuantity(index: number) {
-  ingredientStore.ingredientCheckList[index].count++;
+
+function removeIngredientCoffeeList(index: number) {
+  subInventoryStore.ingredientCheckListForCofee.splice(index, 1);
 }
 
-function decreaseIngredientQuantity(index: number) {
-  if (ingredientStore.ingredientCheckList[index].count === 1) {
-    removeIngredient(index);
-  } else {
-    ingredientStore.ingredientCheckList[index].count--;
-  }
-}
-
-function removeIngredient(index: number) {
-  ingredientStore.ingredientCheckList.splice(index, 1);
+// removeIngredientCoffeeList
+function removeIngredientRiceList(index: number) {
+  subInventoryStore.ingredientCheckListForRice.splice(index, 1);
 }
 
 
@@ -114,7 +107,7 @@ async function save() {
   posStore.receipt.paymentMethod = 'cash';
 
   // Check if there are products in the selectedItems list or ingredients in the ingredientCheckList
-  if (selectedItems.value.length > 0 || ingredientStore.ingredientCheckList.length > 0) {
+  if (selectedItems.value.length > 0 || subInventoryStore.ingredientCheckListForCofee.length > 0  || subInventoryStore.ingredientCheckListForRice.length > 0) {
     // Ensure payment method is selected
     if (posStore.receipt.paymentMethod === '') {
       Swal.fire({
@@ -139,20 +132,21 @@ async function save() {
 
     if (posStore.receipt.receiptId) {
       await posStore.updateReceiptCatering(posStore.receipt.receiptId, posStore.receipt);
-    } 
-    if(posStore.receipt.receiptId === null) {
-        if(posStore.selectedItems.length > 0) {
-          await posStore.createReceiptForCatering(posStore.selectedItems[0].receiptId!);
-        }
-        if(subInventoryStore.ingredientCheckListForCofee.length > 0) {
-          await subInventoryStore.createReturnWithdrawalIngredientsForCatering('coffee')
-        }
-        if(subInventoryStore.ingredientCheckListForRice.length > 0) {
-          await subInventoryStore.createReturnWithdrawalIngredientsForCatering('rice');
-        }
-     
+    } else{
+      // if(posStore.selectedItems.length > 0) {
+      //     await posStore.createReceiptForCatering(posStore.selectedItems[0].receiptId!);
+      //   }
 
+      
+        if(subInventoryStore.ingredientCheckListForCofee.length > 0 || subInventoryStore.ingredientCheckListForRice.length > 0) {
+          console.log("subInventoryStore.ingredientCheckListForCofee", subInventoryStore.ingredientCheckListForCofee);
+          
+          await subInventoryStore.createReturnWithdrawalIngredientsForCatering()
+        }
     }
+       
+        
+     
 
     // Clear the selected items and reset receipt details
     posStore.selectedItems = [];
@@ -168,6 +162,8 @@ async function save() {
     posStore.receipt.customer = null;
     posStore.receipt.receiptId = null;
     posStore.receipt.receiptStatus = 'รอชำระเงิน';
+    subInventoryStore.ingredientCheckListForCofee = [];
+    subInventoryStore.ingredientCheckListForRice = [];
 
       Swal.fire({
         icon: 'success',
@@ -185,24 +181,11 @@ async function save() {
   }
 }
 
-function openReceiptDialog() {
-  posStore.ReceiptDialogPos = true;
-  console.log("openReceiptDialog", posStore.ReceiptDialogPos);
-}
-function updateReceiptQuantity(index: number, quantity: number) {
-  if (quantity > 0) {
-    posStore.selectedItems[index].quantity = quantity;
-    posStore.calculateTotal();
-  } else {
-    removeItem(index);
-  }
-}
-
 function updateIngredientQuantity(index: number, quantity: number) {
   if (quantity > 0) {
     ingredientStore.ingredientCheckList[index].count = quantity;
   } else {
-    removeIngredient(index);
+    removeIngredientCoffeeList(index);
   }
 }
 
@@ -211,7 +194,7 @@ function updateIngredientQuantity(index: number, quantity: number) {
 
 <template>
   <ReceiptDetailsDialogPos />
-
+{{ subInventoryStore.ingredientCheckListForCofee }}
   <div class="h-screen app">
     <v-window v-model="step" transition="fade" class="h-screen">
       <!-- Order Details View -->
@@ -245,7 +228,7 @@ function updateIngredientQuantity(index: number, quantity: number) {
                           <v-btn size="xs-small" color="#FF9642" icon @click.stop="increaseQuantity(item)">
                             <v-icon>mdi-plus</v-icon>
                           </v-btn>
-                          <v-btn icon variant="text" @click.stop="removeItem(index)">
+                          <v-btn icon variant="text" @click.stop="removeItemForPos(index)">
                             <v-icon color="red">mdi-delete</v-icon>
                           </v-btn>
                         </v-col>
@@ -297,7 +280,7 @@ function updateIngredientQuantity(index: number, quantity: number) {
                          
                         </v-col>
                         <v-col cols="2" class="text-right">
-                          <v-btn icon variant="text" @click.stop="removeIngredient(index)">
+                          <v-btn icon variant="text" @click.stop="removeIngredientCoffeeList(index)">
                             <v-icon color="red">mdi-delete</v-icon>
                           </v-btn>
                         </v-col>
@@ -334,7 +317,7 @@ function updateIngredientQuantity(index: number, quantity: number) {
                         
                         </v-col>
                         <v-col cols="1" class="text-right">
-                          <v-btn icon variant="text" @click.stop="removeIngredient(index)">
+                          <v-btn icon variant="text" @click.stop="removeIngredientRiceList(index)">
                             <v-icon color="red">mdi-delete</v-icon>
                           </v-btn>
                         </v-col>
