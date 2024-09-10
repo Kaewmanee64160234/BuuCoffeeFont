@@ -17,6 +17,7 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
   const HistoryRice = ref<Checkingredient[]>([]);
   const IngredientLog = ref<ReportIngredientLog[]>([]);
   const IngredientLogitem = ref<IngredientLog[]>([]);
+  const checkIngerdient = ref<Checkingredient>();
   const userStore = useUserStore();
   const ingredientCheckListForCofee = ref<
     { ingredientcheck: Ingredient; count: number,type:string }[]
@@ -157,8 +158,8 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
             checkIngredientsPayload
           );
         if (response.status === 201) {
-          ingredientCheckListForCofee.value = response.data;
-          console.log("checkIngerdient", ingredientCheckListForCofee.value);
+          checkIngerdient.value = response.data;
+          console.log("checkIngerdient", checkIngerdient.value);
         }
         console.log("API response:", response);
       } catch (error) {
@@ -186,6 +187,7 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
     addSubIngredientsRiceCatering,
     ingredientCheckListForCofee,
     ingredientCheckListForRice,
-    createReturnWithdrawalIngredientsForCatering
+    createReturnWithdrawalIngredientsForCatering,
+    checkIngerdient
   };
 });

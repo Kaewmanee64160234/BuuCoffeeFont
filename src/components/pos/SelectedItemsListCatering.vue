@@ -133,15 +133,18 @@ async function save() {
     if (posStore.receipt.receiptId) {
       await posStore.updateReceiptCatering(posStore.receipt.receiptId, posStore.receipt);
     } else{
-      // if(posStore.selectedItems.length > 0) {
-      //     await posStore.createReceiptForCatering(posStore.selectedItems[0].receiptId!);
-      //   }
+     
 
       
         if(subInventoryStore.ingredientCheckListForCofee.length > 0 || subInventoryStore.ingredientCheckListForRice.length > 0) {
           console.log("subInventoryStore.ingredientCheckListForCofee", subInventoryStore.ingredientCheckListForCofee);
           
           await subInventoryStore.createReturnWithdrawalIngredientsForCatering()
+        }
+         if(posStore.selectedItems.length > 0 && subInventoryStore.ingredientCheckListForCofee.length > 0 || subInventoryStore.ingredientCheckListForRice.length > 0 ) {
+          await posStore.createReceiptForCatering(subInventoryStore.checkIngerdient?.CheckID!);
+        }else{
+          await posStore.createReceiptForCatering()
         }
     }
        
@@ -194,7 +197,6 @@ function updateIngredientQuantity(index: number, quantity: number) {
 
 <template>
   <ReceiptDetailsDialogPos />
-{{ subInventoryStore.ingredientCheckListForCofee }}
   <div class="h-screen app">
     <v-window v-model="step" transition="fade" class="h-screen">
       <!-- Order Details View -->
