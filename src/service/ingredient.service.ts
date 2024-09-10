@@ -1,5 +1,6 @@
 import type { Ingredient } from "@/types/ingredient.type";
 import http from "./axios";
+import type { SubInventoriesCatering } from "@/types/subinventoriescateringtype";
 function getIngredientlow() {
   return http.get("/ingredients/low-stock");
 }
@@ -131,6 +132,18 @@ function getSubIngredients_Rice() {
 function getLog() {
   return http.get(`/ingredientusagelog`);
 }
+
+const createSubInventoriesCatering = (data:SubInventoriesCatering) =>{
+  return http.post("/sub-inventories-catering", [
+    {
+      ingredient: data.ingredient,
+      quantity: data.quantity,
+      type: data.type,
+    },
+  ]);
+
+}
+
 export default {
   getAllIngredients,
   createImportIngredients,
@@ -151,5 +164,6 @@ export default {
   getAllHistoryRice,
   getSubIngredients_Rice,
   getIngredientLog,
-  getAllHistoryCheckIngredients
+  getAllHistoryCheckIngredients,
+  createSubInventoriesCatering
 };

@@ -25,15 +25,17 @@ const subInventoryStore = useSubIngredientStore();
 const props = defineProps<{ subInventory: SubInventoriesCoffee, type: string }>();
 
 const confirmSelection = () => {
+  console.log('Selected sub-inventory:', props.type);
+  
   if (props.type == 'coffee') {
-    subInventoryStore.addSubIngredientsCoffeeCatering(props.subInventory);
+    subInventoryStore.addSubIngredientsCoffeeCatering(props.subInventory.ingredient);
   }
   else {
-    subInventoryStore.addSubIngredientsRiceCatering(props.subInventory);
-    console.log('Selected sub-inventory:', props.subInventory);
+    subInventoryStore.addSubIngredientsRiceCatering(props.subInventory.ingredient);
+    console.log('Selected sub-inventory:', props.subInventory.ingredient);
   }
   // Handle the selection confirmation here
-  console.log('Selected sub-inventory:', props.subInventory);
+  console.log('Selected sub-inventory:', props.subInventory.ingredient);
 };
 </script>
 

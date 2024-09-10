@@ -16,7 +16,7 @@ const selectedItems = computed(() => posStore.selectedItems);
 const receiptStore = useReceiptStore();
 const ingredientStore = useIngredientStore(); // Assuming this is the correct import for ingredients
 const selectedCategory = ref('Products');
-const ingredientFilters = ref<SubInventoriesCoffee[]>([]); // To store filtered ingredients
+const ingredientFilters = ref<any[]>([]); // To store filtered ingredients
 const url = import.meta.env.VITE_URL_PORT
 const subInventoryStore = useSubIngredientStore();
 
@@ -108,21 +108,7 @@ function removeIngredient(index: number) {
   ingredientStore.ingredientCheckList.splice(index, 1);
 }
 
-const saveCheckData = async () => {
-  ingredientStore.selectedAction = 'export';
 
-  try {
-    await ingredientStore.saveCheckData();
-  } catch (error) {
-    console.error('Error saving check data:', error);
-
-    Swal.fire({
-      title: 'เกิดข้อผิดพลาด!',
-      text: 'เกิดข้อผิดพลาดในการบันทึกข้อมูลของคุณ.',
-      icon: 'error',
-    });
-  }
-};
 
 async function save() {
   posStore.receipt.paymentMethod = 'cash';
@@ -139,6 +125,7 @@ async function save() {
       return;
     }
 
+
     // Ensure received amount is sufficient for cash payments
     if (posStore.receipt.paymentMethod === 'cash' && posStore.receipt.receive < posStore.receipt.receiptNetPrice && posStore.receipt.receive != 0) {
       Swal.fire({
@@ -149,16 +136,21 @@ async function save() {
       return;
     }
 
-    let receiptCreated = false;
-    let stockChecked = false;
 
     if (posStore.receipt.receiptId) {
       await posStore.updateReceiptCatering(posStore.receipt.receiptId, posStore.receipt);
-      receiptCreated = true;
-    } else {
-        await saveCheckData();
-        console.log('Check data saved', ingredientStore.checkIngerdient);
-        await posStore.createReceiptForCatering(ingredientStore.checkIngerdient?.CheckID!);
+    } 
+    if(posStore.receipt.receiptId === null) {
+        if(posStore.selectedItems.length > 0) {
+          await posStore.createReceiptForCatering(posStore.selectedItems[0].receiptId!);
+        }
+        if(subInventoryStore.ingredientCheckListForCofee.length > 0) {
+          await subInventoryStore.createReturnWithdrawalIngredientsForCatering('coffee')
+        }
+        if(subInventoryStore.ingredientCheckListForRice.length > 0) {
+          await subInventoryStore.createReturnWithdrawalIngredientsForCatering('rice');
+        }
+     
 
     }
 
@@ -284,23 +276,23 @@ function updateIngredientQuantity(index: number, quantity: number) {
             <div class="ingredient-list">
               <v-list class="full-width">
                 <v-list-item-group>
-                  <div v-for="(ingredient, index) in subInventoryStore.subingredientsCoffeeCatering" :key="index" class="selected-item my-2">
-                    <v-list-item :prepend-avatar="`${url}/ingredients/${ingredient.ingredient.ingredientId}/image`" class="full-width">
+                  <div v-for="(ingredient, index) in subInventoryStore.ingredientCheckListForCofee" :key="index" class="selected-item my-2">
+                    <v-list-item :prepend-avatar="`${url}/ingredients/${ingredient.ingredientcheck.ingredientId}/image`" class="full-width">
                       <v-row no-gutters class="align-center">
                         <v-col cols="5" class="product-name">
-                          {{ ingredient.ingredient.ingredientName }}
-                          <span v-if="ingredient.ingredient.ingredientSupplier !== '-' && ingredient.ingredient.ingredientSupplier !== ''">
-                            ({{ ingredient.ingredient.ingredientSupplier }})
+                          {{ ingredient.ingredientcheck.ingredientName }}
+                          <span v-if="ingredient.ingredientcheck.ingredientSupplier !== '-' && ingredient.ingredientcheck.ingredientSupplier !== ''">
+                            ({{ ingredient.ingredientcheck.ingredientSupplier }})
                           </span>
                         </v-col>
                         <v-col cols="3" class="text-right pr-2">
                          
                             <!-- chnage to textfile input -->
-                            <input class="input-quantity" v-model="ingredient.quantity" type="number" 
-                              @change="updateIngredientQuantity(index, ingredient.quantity)"/>
+                            <input class="input-quantity" v-model="ingredient.count" type="number" 
+                              @change="updateIngredientQuantity(index, ingredient.count)"/>
 
                          <span>
-                          {{ ingredient.ingredient.ingredientUnit }}
+                          {{ ingredient.ingredientcheck.ingredientUnit }}
                          </span>
                          
                         </v-col>
@@ -321,23 +313,23 @@ function updateIngredientQuantity(index: number, quantity: number) {
             <div class="ingredient-list">
               <v-list class="full-width">
                 <v-list-item-group>
-                  <div v-for="(ingredient, index) in subInventoryStore.subingredientsRiceCatering" :key="index" class="selected-item my-2">
-                    <v-list-item :prepend-avatar="`${url}/ingredients/${ingredient.ingredient.ingredientId}/image`" class="full-width">
+                  <div v-for="(ingredient, index) in subInventoryStore.ingredientCheckListForRice" :key="index" class="selected-item my-2">
+                    <v-list-item :prepend-avatar="`${url}/ingredients/${ingredient.ingredientcheck.ingredientId}/image`" class="full-width">
                       <v-row no-gutters class="align-center">
                         <v-col cols="5" class="product-name">
-                          {{ ingredient.ingredient.ingredientName }}
-                          <span v-if="ingredient.ingredient.ingredientSupplier !== '-' && ingredient.ingredient.ingredientSupplier !== ''">
-                            ({{ ingredient.ingredient.ingredientSupplier }})
+                          {{ ingredient.ingredientcheck.ingredientName }}
+                          <span v-if="ingredient.ingredientcheck.ingredientSupplier !== '-' && ingredient.ingredientcheck.ingredientSupplier !== ''">
+                            ({{ ingredient.ingredientcheck.ingredientSupplier }})
                           </span>
                         </v-col>
                         <v-col cols="4" class="text-right pr-2">
                         
                           
                             <!-- chnage to textfile input -->
-                            <input class="input-quantity"  v-model="ingredient.quantity" type="number"  
-                              @change="updateIngredientQuantity(index, ingredient.quantity)"/>
+                            <input class="input-quantity"  v-model="ingredient.count" type="number"  
+                              @change="updateIngredientQuantity(index, ingredient.count)"/>
                               <span>
-                          {{ ingredient.ingredient.ingredientUnit }}
+                          {{ ingredient.ingredientcheck.ingredientUnit }}
                          </span>
                         
                         </v-col>

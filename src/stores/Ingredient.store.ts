@@ -124,6 +124,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
   const ingredientCheckList = ref<
     { ingredientcheck: Ingredient; count: number }[]
   >([]);
+
   const store = ref<string>("");
   const discount = ref<number>(0);
   const total = ref<number>(0);
@@ -131,6 +132,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
   const importDescription = ref<string>("");
   const actionType = ref<string>("");
   const shopType = ref<string>("");
+
   function AddRiceIngredient(item: { ingredientName: string }) {
     const newImportIngredientItem: any = {
       name: item.ingredientName,
@@ -297,6 +299,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
     }
   }
 
+ 
   async function saveIngredient() {
     loadingStore.isLoading = true;
 
