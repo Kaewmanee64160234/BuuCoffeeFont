@@ -150,6 +150,9 @@ function getSubIngredients_Coffee() {
 function getSubIngredients_Rice() {
   return http.get(`/sub-inventories-rice`);
 }
+function getSubIngredients_Catering() {
+  return http.get(`/sub-inventories-catering`);
+}
 function getLog() {
   return http.get(`/ingredientusagelog`);
 }
@@ -179,6 +182,9 @@ const createReturnWithdrawalIngredientsForCatering = (ingredient: {
   return http.post("/checkingredients/catering", ingredient);
 };
 
+
+
+
 export default {
   getAllIngredients,
   createImportIngredients,
@@ -202,4 +208,5 @@ export default {
   getAllHistoryCheckIngredients,
   createSubInventoriesCatering,
   createReturnWithdrawalIngredientsForCatering,
+  getSubIngredients_Catering
 };

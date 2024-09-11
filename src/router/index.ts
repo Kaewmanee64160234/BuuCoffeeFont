@@ -51,6 +51,13 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: "/ingredientCateringList",
+      name: "ingredients_catering",
+      component: () =>
+        import("../views/ingredient/subIngredientCateringView.vue"),
+      meta: { requiresAuth: true },
+    },
+    {
       path: "/ingredientRiceList",
       name: "ingredients_rice",
       component: () => import("../views/ingredient/subIngredientRiceView.vue"),
@@ -79,6 +86,7 @@ const router = createRouter({
         ),
       meta: { requiresAuth: true },
     },
+    
     {
       path: "/importingredientrice",
       name: "importingredientsrice",
@@ -93,6 +101,13 @@ const router = createRouter({
       name: "returningredientcoffee",
       component: () =>
         import("../views/ingredient/check/return/subInventoryCoffeeRView.vue"),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/returningredientcatering",
+      name: "returningredientcatering",
+      component: () =>
+        import("../views/ingredient/check/return/subInventoryCateringRView.vue"),
       meta: { requiresAuth: true },
     },
     {

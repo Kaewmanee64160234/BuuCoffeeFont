@@ -9,6 +9,7 @@ import type { Ingredient } from "@/types/ingredient.type";
 import { useUserStore } from "./user.store";
 export const useSubIngredientStore = defineStore("subinventory", () => {
   const subingredients_coffee = ref<SubInventoriesCoffee[]>([]);
+  const subIngredients_catering = ref<SubInventoriesCoffee[]>([]);
   const subingredients_rice = ref<SubInventoriesCoffee[]>([]);
   const subingredientsRiceCatering = ref<SubInventoriesCoffee[]>([]);
   const subingredientsCoffeeCatering = ref<SubInventoriesCoffee[]>([]);
@@ -86,6 +87,19 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
       console.log(e);
     }
   }
+
+  // get ingerdia _catering
+  async function getSubIngredients_catering() {
+    try {
+      const res = await ingredientService.getSubIngredients_Catering();
+      subIngredients_catering.value = res.data;
+      console.log(res.data);
+      
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   const addSubIngredientsCoffeeCatering = async (item: Ingredient) => {
     const exists = ingredientCheckListForCofee.value.some(
       (ingredient) =>
@@ -188,6 +202,8 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
     ingredientCheckListForCofee,
     ingredientCheckListForRice,
     createReturnWithdrawalIngredientsForCatering,
-    checkIngerdient
+    checkIngerdient,
+    getSubIngredients_catering,
+    subIngredients_catering
   };
 });

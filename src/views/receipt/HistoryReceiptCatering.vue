@@ -271,11 +271,7 @@ const closeEditDialog = () => {
       </v-btn>
       <v-btn color="secondary" @click="closeEditDialog">ยกเลิก</v-btn>
     </v-card-actions>
-    <v-pagination
-    v-model="currentPage"
-    :length="Math.ceil(filteredReceipts.length / itemsPerPage)"
-    @input="fetchData"
-    ></v-pagination>
+    
   </v-card>
 </v-dialog>
 
@@ -380,6 +376,11 @@ const closeEditDialog = () => {
         </tr>
       </tbody>
     </v-table>
+    <v-pagination
+    v-model="currentPage"
+    :length="Math.ceil(filteredReceipts.length / itemsPerPage)"
+    @input="fetchData"
+    ></v-pagination>
   </v-card>
 </v-container>
 

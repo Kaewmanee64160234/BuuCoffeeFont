@@ -4,6 +4,7 @@ export interface SubInventoriesCoffee{
     subInventoryId: number;
     ingredient: Ingredient;
     quantity: number;
+    type?:string;
 
 
 }

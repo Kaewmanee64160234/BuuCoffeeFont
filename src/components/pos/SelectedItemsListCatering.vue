@@ -107,7 +107,7 @@ async function save() {
   posStore.receipt.paymentMethod = 'cash';
 
   // Check if there are products in the selectedItems list or ingredients in the ingredientCheckList
-  if (selectedItems.value.length > 0 || subInventoryStore.ingredientCheckListForCofee.length > 0  || subInventoryStore.ingredientCheckListForRice.length > 0) {
+  if (selectedItems.value.length > 0 || subInventoryStore.ingredientCheckListForCofee.length > 0 || subInventoryStore.ingredientCheckListForRice.length > 0) {
     // Ensure payment method is selected
     if (posStore.receipt.paymentMethod === '') {
       Swal.fire({
@@ -132,24 +132,25 @@ async function save() {
 
     if (posStore.receipt.receiptId) {
       await posStore.updateReceiptCatering(posStore.receipt.receiptId, posStore.receipt);
-    } else{
-     
+    } else {
 
-      
-        if(subInventoryStore.ingredientCheckListForCofee.length > 0 || subInventoryStore.ingredientCheckListForRice.length > 0) {
-          console.log("subInventoryStore.ingredientCheckListForCofee", subInventoryStore.ingredientCheckListForCofee);
-          
-          await subInventoryStore.createReturnWithdrawalIngredientsForCatering()
-        }
-         if(posStore.selectedItems.length > 0 && subInventoryStore.ingredientCheckListForCofee.length > 0 || subInventoryStore.ingredientCheckListForRice.length > 0 ) {
-          await posStore.createReceiptForCatering(subInventoryStore.checkIngerdient?.CheckID!);
-        }else{
-          await posStore.createReceiptForCatering()
-        }
+
+
+      if (subInventoryStore.ingredientCheckListForCofee.length > 0 || subInventoryStore.ingredientCheckListForRice.length > 0) {
+        console.log("subInventoryStore.ingredientCheckListForCofee", subInventoryStore.ingredientCheckListForCofee);
+
+        await subInventoryStore.createReturnWithdrawalIngredientsForCatering()
+      }
+      if (posStore.selectedItems.length > 0 && subInventoryStore.ingredientCheckListForCofee.length > 0 || subInventoryStore.ingredientCheckListForRice.length > 0) {
+        await posStore.createReceiptForCatering(subInventoryStore.checkIngerdient?.CheckID!);
+      }
+      if (posStore.selectedItems.length === 0) {
+        await posStore.createReceiptForCatering(0)
+      }
     }
-       
-        
-     
+
+
+
 
     // Clear the selected items and reset receipt details
     posStore.selectedItems = [];
@@ -168,12 +169,12 @@ async function save() {
     subInventoryStore.ingredientCheckListForCofee = [];
     subInventoryStore.ingredientCheckListForRice = [];
 
-      Swal.fire({
-        icon: 'success',
-        title: 'สำเร็จ',
-        text: 'บันทึกข้อมูลสำเร็จ',
-      });
-    
+    Swal.fire({
+      icon: 'success',
+      title: 'สำเร็จ',
+      text: 'บันทึกข้อมูลสำเร็จ',
+    });
+
   } else {
     // If neither products nor ingredients are selected, show an error
     Swal.fire({
@@ -214,7 +215,8 @@ function updateIngredientQuantity(index: number, quantity: number) {
               <v-list class="full-width">
                 <v-list-item-group>
                   <div v-for="(item, index) in selectedItems" :key="index" class="selected-item my-2">
-                    <v-list-item :prepend-avatar="`${url}/products/${item.product?.productId}/image`" class="full-width">
+                    <v-list-item :prepend-avatar="`${url}/products/${item.product?.productId}/image`"
+                      class="full-width">
                       <v-row no-gutters class="align-center">
                         <v-col cols="2" class="product-name">
                           {{ item.product?.productName }}
@@ -237,13 +239,16 @@ function updateIngredientQuantity(index: number, quantity: number) {
                       </v-row>
                       <v-row no-gutters v-if="item.product!.haveTopping">
                         <v-col cols="12" class="product-details">
-                          {{ item.productType?.productTypeName }} +{{ item.productType?.productTypePrice }} | ความหวาน {{ item.sweetnessLevel }}%
+                          {{ item.productType?.productTypeName }} +{{ item.productType?.productTypePrice }} | ความหวาน
+                          {{ item.sweetnessLevel }}%
                         </v-col>
                         <v-col cols="12" v-if="item.productTypeToppings && item.productTypeToppings.length > 0">
                           <ul class="toppings-list">
-                            <li v-for="topping in item.productTypeToppings" :key="topping?.topping?.toppingId" class="topping-item">
+                            <li v-for="topping in item.productTypeToppings" :key="topping?.topping?.toppingId"
+                              class="topping-item">
                               x{{ topping?.quantity }} {{ topping?.topping?.toppingName }}
-                              <span v-if="topping?.topping?.toppingName && topping.topping.toppingName.length > 3">: {{ topping?.topping?.toppingPrice }}.-</span>
+                              <span v-if="topping?.topping?.toppingName && topping.topping.toppingName.length > 3">: {{
+                                topping?.topping?.toppingPrice }}.-</span>
                             </li>
                           </ul>
                         </v-col>
@@ -261,25 +266,28 @@ function updateIngredientQuantity(index: number, quantity: number) {
             <div class="ingredient-list">
               <v-list class="full-width">
                 <v-list-item-group>
-                  <div v-for="(ingredient, index) in subInventoryStore.ingredientCheckListForCofee" :key="index" class="selected-item my-2">
-                    <v-list-item :prepend-avatar="`${url}/ingredients/${ingredient.ingredientcheck.ingredientId}/image`" class="full-width">
+                  <div v-for="(ingredient, index) in subInventoryStore.ingredientCheckListForCofee" :key="index"
+                    class="selected-item my-2">
+                    <v-list-item :prepend-avatar="`${url}/ingredients/${ingredient.ingredientcheck.ingredientId}/image`"
+                      class="full-width">
                       <v-row no-gutters class="align-center">
                         <v-col cols="5" class="product-name">
                           {{ ingredient.ingredientcheck.ingredientName }}
-                          <span v-if="ingredient.ingredientcheck.ingredientSupplier !== '-' && ingredient.ingredientcheck.ingredientSupplier !== ''">
+                          <span
+                            v-if="ingredient.ingredientcheck.ingredientSupplier !== '-' && ingredient.ingredientcheck.ingredientSupplier !== ''">
                             ({{ ingredient.ingredientcheck.ingredientSupplier }})
                           </span>
                         </v-col>
                         <v-col cols="3" class="text-right pr-2">
-                         
-                            <!-- chnage to textfile input -->
-                            <input class="input-quantity" v-model="ingredient.count" type="number" 
-                              @change="updateIngredientQuantity(index, ingredient.count)"/>
 
-                         <span>
-                          {{ ingredient.ingredientcheck.ingredientUnit }}
-                         </span>
-                         
+                          <!-- chnage to textfile input -->
+                          <input class="input-quantity" v-model="ingredient.count" type="number"
+                            @change="updateIngredientQuantity(index, ingredient.count)" />
+
+                          <span>
+                            {{ ingredient.ingredientcheck.ingredientUnit }}
+                          </span>
+
                         </v-col>
                         <v-col cols="2" class="text-right">
                           <v-btn icon variant="text" @click.stop="removeIngredientCoffeeList(index)">
@@ -298,25 +306,28 @@ function updateIngredientQuantity(index: number, quantity: number) {
             <div class="ingredient-list">
               <v-list class="full-width">
                 <v-list-item-group>
-                  <div v-for="(ingredient, index) in subInventoryStore.ingredientCheckListForRice" :key="index" class="selected-item my-2">
-                    <v-list-item :prepend-avatar="`${url}/ingredients/${ingredient.ingredientcheck.ingredientId}/image`" class="full-width">
+                  <div v-for="(ingredient, index) in subInventoryStore.ingredientCheckListForRice" :key="index"
+                    class="selected-item my-2">
+                    <v-list-item :prepend-avatar="`${url}/ingredients/${ingredient.ingredientcheck.ingredientId}/image`"
+                      class="full-width">
                       <v-row no-gutters class="align-center">
                         <v-col cols="5" class="product-name">
                           {{ ingredient.ingredientcheck.ingredientName }}
-                          <span v-if="ingredient.ingredientcheck.ingredientSupplier !== '-' && ingredient.ingredientcheck.ingredientSupplier !== ''">
+                          <span
+                            v-if="ingredient.ingredientcheck.ingredientSupplier !== '-' && ingredient.ingredientcheck.ingredientSupplier !== ''">
                             ({{ ingredient.ingredientcheck.ingredientSupplier }})
                           </span>
                         </v-col>
                         <v-col cols="4" class="text-right pr-2">
-                        
-                          
-                            <!-- chnage to textfile input -->
-                            <input class="input-quantity"  v-model="ingredient.count" type="number"  
-                              @change="updateIngredientQuantity(index, ingredient.count)"/>
-                              <span>
-                          {{ ingredient.ingredientcheck.ingredientUnit }}
-                         </span>
-                        
+
+
+                          <!-- chnage to textfile input -->
+                          <input class="input-quantity" v-model="ingredient.count" type="number"
+                            @change="updateIngredientQuantity(index, ingredient.count)" />
+                          <span>
+                            {{ ingredient.ingredientcheck.ingredientUnit }}
+                          </span>
+
                         </v-col>
                         <v-col cols="1" class="text-right">
                           <v-btn icon variant="text" @click.stop="removeIngredientRiceList(index)">
@@ -397,7 +408,8 @@ function updateIngredientQuantity(index: number, quantity: number) {
 
             <div class="footer-buttons">
               <v-row class="d-flex justify-center" style="width: 100%;">
-                <v-btn style="width: 40%; margin-right: 10px;" color="secondary" rounded @click="prevStep">ย้อนกลับ</v-btn>
+                <v-btn style="width: 40%; margin-right: 10px;" color="secondary" rounded
+                  @click="prevStep">ย้อนกลับ</v-btn>
                 <v-btn style="width: 40%;" color="#FF9642" rounded @click="save">บันทึก</v-btn>
               </v-row>
             </div>
@@ -520,7 +532,8 @@ function updateIngredientQuantity(index: number, quantity: number) {
 .footer-buttons>v-btn {
   width: 48%;
 }
-.input-quantity{
+
+.input-quantity {
   border-radius: 5px;
   width: 80px;
   margin: 0 5px;
@@ -578,5 +591,3 @@ function updateIngredientQuantity(index: number, quantity: number) {
   }
 }
 </style>
-
-
