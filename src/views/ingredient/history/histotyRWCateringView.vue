@@ -2,7 +2,7 @@
 import { useCheckIngredientStore } from "@/stores/historyIngredientCheck.store";
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
-import dialogImportItem from "@/views/ingredient/check/dialogCheck.vue";
+import dialogImportItemCatering from "@/views/ingredient/check/dialogCheckCatering.vue";
 import { useSubIngredientStore } from "@/stores/ingredientSubInventory.store";
 import type { Checkingredient } from "@/types/checkingredientitem.type";
 import * as XLSX from "xlsx";
@@ -68,11 +68,12 @@ function exportToExcel(checkingredient: Checkingredient) {
 </script>
 
 <template>
-  <dialogImportItem
+  <dialogImportItemCatering
     v-model:dialog="historyCheckDialog"
     :checkingredient="selectedCheck"
   />
   <v-container>
+
     <v-card>
       <v-card-title>
         <v-row>

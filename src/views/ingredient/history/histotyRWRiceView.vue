@@ -73,8 +73,10 @@ function exportToExcel(checkingredient: Checkingredient) {
     :checkingredient="selectedCheck"
   />
   <v-container>
+
     <v-card>
       <v-card-title>
+        
         <v-row>
           <v-col cols="9"> ร้านข้าว </v-col>
           <v-col cols="3">
