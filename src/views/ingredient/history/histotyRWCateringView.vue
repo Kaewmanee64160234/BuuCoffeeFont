@@ -13,7 +13,7 @@ const router = useRouter();
 const historyCheckDialog = ref(false);
 const selectedCheck = ref<Checkingredient | null>(null);
 onMounted(async () => {
-  await subIngredientStore.findByShopTypeRice();
+  await subIngredientStore.findByShopTypeCatering();
 });
 
 const formatDate = (dateString: string) => {
@@ -25,7 +25,7 @@ const formatDate = (dateString: string) => {
     minute: "numeric",
     timeZone: "UTC",
   };
-  return new Date(dateString).toLocaleDateString("th-TH", options);
+  return new Date(dateString).toLocaleDateString("th-TH", options!);
 };
 
 const navigateTo = (routeName: string) => {
@@ -112,12 +112,12 @@ function exportToExcel(checkingredient: Checkingredient) {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(item, index) in subIngredientStore.HistoryRice" :key="index">
+          <tr v-for="(item, index) in subIngredientStore.HistoryCatering" :key="index">
             <td>{{ index + 1 }}</td>
-            <td>{{ formatDate(item.date) }}</td>
+            <td>{{ formatDate(item.date+'') }}</td>
             <td>
               <span v-if="item.actionType === 'withdrawal'">
-                เบิกเข้าร้านกาแฟ
+                เบิกเข้าร้านgเลี้ยงรับรอง
               </span>
               <span v-else-if="item.actionType === 'return'">
                 คืนคลังวัตถุดิบ

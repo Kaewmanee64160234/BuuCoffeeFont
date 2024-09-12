@@ -16,6 +16,7 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
   const dialoglog = ref(false);
   const History = ref<Checkingredient[]>([]);
   const HistoryRice = ref<Checkingredient[]>([]);
+  const HistoryCatering = ref<Checkingredient[]>([]);
   const IngredientLog = ref<ReportIngredientLog[]>([]);
   const IngredientLogitem = ref<IngredientLog[]>([]);
   const checkIngerdient = ref<Checkingredient>();
@@ -67,6 +68,16 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
       const response = await ingredientService.getAllHistoryRice();
       if (response.status === 200) {
         HistoryRice.value = response.data;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const findByShopTypeCatering = async () => {
+    try {
+      const response = await ingredientService.getAllHistoryCatering();
+      if (response.status === 200) {
+        HistoryCatering.value = response.data;
       }
     } catch (error) {
       console.error(error);
@@ -285,6 +296,8 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
     createReturnIngredientsForCatering,
     ingredientCheckList,
     addSubIngredients,
-    removeCheckIngredient
+    removeCheckIngredient,
+    findByShopTypeCatering,
+    HistoryCatering
   };
 });

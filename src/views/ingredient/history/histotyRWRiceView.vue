@@ -117,7 +117,7 @@ function exportToExcel(checkingredient: Checkingredient) {
             <td>{{ formatDate(item.date) }}</td>
             <td>
               <span v-if="item.actionType === 'withdrawal'">
-                เบิกเข้าร้านกาแฟ
+                เบิกเข้าร้านข้าว
               </span>
               <span v-else-if="item.actionType === 'return'">
                 คืนคลังวัตถุดิบ

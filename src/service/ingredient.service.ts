@@ -23,6 +23,9 @@ function getAllHistoryCoffee() {
 function getAllHistoryRice() {
   return http.get("/checkingredients/findByShopType?shopType=rice");
 }
+function getAllHistoryCatering() {
+  return http.get("/checkingredients/findByShopType?shopType=catering");
+}
 function createImportIngredients(ingredient: {
   importingredientitem: {
     ingredientId: number;
@@ -208,5 +211,6 @@ export default {
   getAllHistoryCheckIngredients,
   createSubInventoriesCatering,
   createReturnWithdrawalIngredientsForCatering,
-  getSubIngredients_Catering
+  getSubIngredients_Catering,
+  getAllHistoryCatering
 };
