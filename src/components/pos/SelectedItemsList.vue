@@ -26,7 +26,7 @@ onMounted(async () => {
   await receiptStore.getRecieptIn30Min();
   await loadQueueListFromLocalStorage();
   const currentDate = new Date().toLocaleDateString(); // Get current date as a string
-
+posStore.receipt.paymentMethod ='cash';
   // Check if the queue number needs to be reset for a new day
   const lastResetDate = localStorage.getItem('lastResetDate');
   console.log('Last reset date:', lastResetDate);
