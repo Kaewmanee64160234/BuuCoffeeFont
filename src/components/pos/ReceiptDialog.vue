@@ -33,7 +33,7 @@
                     {{ item.quantity }} x {{ item.product?.productName }} {{
                       item.product?.haveTopping ? item.productType?.productTypeName : '' }}
                   </p>
-                  <p class="product-price">{{ item.receiptSubTotal.toFixed(2) }} ฿</p>
+                  <p class="product-price">{{ parseFloat(item.receiptSubTotal + '').toFixed(2) }} ฿</p>
                 </div>
               </div>
               <p class="toppings" v-if="item.product?.haveTopping">
@@ -41,16 +41,12 @@
               </p>
               <p v-if="item.productTypeToppings && item.productTypeToppings.length > 0 && item.product?.haveTopping"
                 class="toppings">
-
                 <span v-for="topping in item.productTypeToppings" :key="topping.productTypeToppingId">
-
                   <span v-if="topping.topping">
                     {{ topping.quantity }} x {{ topping.topping.toppingName }}
                     ({{ topping.topping.toppingPrice ? topping.topping.toppingPrice : 0 }} ฿) <br>
                   </span>
                 </span>
-
-                
               </p>
             </div>
           </div>
@@ -61,30 +57,29 @@
             <div class="d-flex justify-space-between toppings"
               v-for="promotion in posStore.currentReceipt?.receiptPromotions" :key="promotion.promotion.promotionId">
               <p>{{ promotion.promotion.promotionName }}</p>
-              <p> {{ promotion.discount }} ฿</p>
+              <p> {{ (promotion.discount ) }} ฿</p>
             </div>
             <p class="total">
               ยอดเงินรวม:
-              <span class="float-right">{{ posStore.currentReceipt?.receiptTotalPrice }} บาท</span>
+              <span class="float-right">{{ (posStore.currentReceipt?.receiptTotalPrice ) }} บาท</span>
             </p>
 
             <p class="discount">
               ส่วนลด:
-              <span class="float-right">{{ posStore.currentReceipt?.receiptTotalDiscount }} ฿</span>
+              <span class="float-right">{{ (posStore.currentReceipt?.receiptTotalDiscount ) }} ฿</span>
             </p>
             <p class="received">
               เงินที่ได้รับ:
-              <span class="float-right">{{ posStore.currentReceipt?.receive }} ฿</span>
+              <span class="float-right">{{ (posStore.currentReceipt?.receive )}} ฿</span>
             </p>
             <p class="change">
               เงินทอน:
-              <span class="float-right">{{ posStore.currentReceipt?.change}} ฿</span>
+              <span class="float-right">{{ (posStore.currentReceipt?.change )}} ฿</span>
             </p>
             <p class="net-total">
               ยอดรวมสุทธิ:
-              <span class="float-right">{{ posStore.currentReceipt?.receiptNetPrice }} ฿</span>
+              <span class="float-right">{{ (posStore.currentReceipt?.receiptNetPrice ) }} ฿</span>
             </p>
-           
           </div>
           <div class="dashed-line"></div>
           <div class="receipt-footer text-center">
@@ -100,6 +95,7 @@
     </v-card>
   </v-dialog>
 </template>
+
 
 
 <script lang="ts" setup>
