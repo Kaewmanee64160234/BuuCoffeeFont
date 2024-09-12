@@ -125,6 +125,17 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
     }
   };
 
+  // removeCheckIngredient
+  const removeCheckIngredient = (item: Ingredient,type:string) => {
+    const index = ingredientCheckList.value.findIndex(
+      (ingredient) =>
+        ingredient.ingredientcheck.ingredientId === item.ingredientId &&  type === ingredient.type
+    );
+    if (index !== -1) {
+      ingredientCheckList.value.splice(index, 1);
+    }
+  };
+
   const addSubIngredientsCoffeeCatering = async (item: Ingredient) => {
     const exists = ingredientCheckListForCofee.value.some(
       (ingredient) =>
@@ -151,6 +162,7 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
       ingredientCheckList.value[index].count += 1;
     }
   };
+
   // addSubIngredientsRiceCatering
   const addSubIngredientsRiceCatering = (item: Ingredient) => {
     const exists = ingredientCheckListForRice.value.some(
@@ -186,8 +198,7 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
       type: item.type,
     }));
 
-console.log("ingredientList1", ingredientList1);
-
+    console.log("ingredientList1", ingredientList1);
 
     const checkIngredientsPayload = {
       checkingredientitems: ingredientList1,
@@ -274,5 +285,6 @@ console.log("ingredientList1", ingredientList1);
     createReturnIngredientsForCatering,
     ingredientCheckList,
     addSubIngredients,
+    removeCheckIngredient
   };
 });

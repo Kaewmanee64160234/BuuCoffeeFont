@@ -38,7 +38,7 @@ const navigateTo = (routeName: string) => {
 
 
           <v-col>
-            <v-btn color="success" class="button-full-width" @click="navigateTo('posCatering')">
+            <v-btn color="success" class="button-full-width" @click="navigateTo('importingredientscatering')">
               <v-icon left>mdi-arrow-down-thick</v-icon>
               นำเข้าวัตถุดิบ
             </v-btn>

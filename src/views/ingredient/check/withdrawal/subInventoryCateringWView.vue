@@ -109,6 +109,11 @@ const saveCheckData = async () => {
             v-model="searchQuery">
           </v-text-field>
         </v-col>
+        <v-col cols="auto">
+          <v-btn color="success" :to="{ name: 'ingredients_catering' }">
+            <v-icon left>mdi-arrow-u-left-top-bold </v-icon> ย้อนกลับ
+          </v-btn>
+        </v-col>
       </v-row>
     </v-card-title>
 
@@ -154,7 +159,7 @@ const saveCheckData = async () => {
                   <input type="number" v-model.number="item.count" class="styled-input" />
                 </td>
                 <td>
-                  <button @click="ingredientStore.removeCheckIngredient(index)" class="styled-button">ลบ</button>
+                  <button @click="subIngredientStore.removeCheckIngredient(item.ingredientcheck,item.type)" class="styled-button">ลบ</button>
                 </td>
               </tr>
             </tbody>
