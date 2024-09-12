@@ -76,7 +76,7 @@ function exportToExcel(checkingredient: Checkingredient) {
     <v-card>
       <v-card-title>
         <v-row>
-          <v-col cols="9"> ร้านข้าว </v-col>
+          <v-col cols="9"> ร้านเลี้ยงรับรอง </v-col>
           <v-col cols="3">
             <v-text-field
               variant="solo"

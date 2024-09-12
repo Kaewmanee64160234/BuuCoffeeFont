@@ -155,6 +155,13 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: "/history-catering-store",
+      name: "history-catering-store",
+      component: () =>
+        import("../views/ingredient/history/histotyRWCateringView.vue"),
+      meta: { requiresAuth: true },
+    },
+    {
       path: "/report-inggredient-log",
       name: "report-inggredient-log",
       component: () =>
