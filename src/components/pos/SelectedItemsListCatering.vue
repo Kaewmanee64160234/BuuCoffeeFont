@@ -5,31 +5,30 @@ import { usePosStore } from '@/stores/pos.store';
 import Swal from 'sweetalert2';
 import type { ReceiptItem } from '../../types/receipt.type';
 import { useReceiptStore } from '@/stores/receipt.store';
-import { useIngredientStore } from '@/stores/Ingredient.store'; // Assuming you have an ingredient store
+import { useIngredientStore } from '@/stores/Ingredient.store';
 import ReceiptDetailsDialogPos from '../receipts/ReceiptDialogPos.vue';
-import type { SubInventoriesCoffee } from '@/types/subinventoriescoffee.type';
 import { useSubIngredientStore } from '@/stores/ingredientSubInventory.store';
 
 const step = ref(1);
 const posStore = usePosStore();
 const selectedItems = computed(() => posStore.selectedItems);
 const receiptStore = useReceiptStore();
-const ingredientStore = useIngredientStore(); // Assuming this is the correct import for ingredients
+const ingredientStore = useIngredientStore();
 const selectedCategory = ref('Products');
-const ingredientFilters = ref<any[]>([]); // To store filtered ingredients
+const ingredientFilters = ref<any[]>([]);
 const url = import.meta.env.VITE_URL_PORT
 const subInventoryStore = useSubIngredientStore();
+const isError = ref(false);  // New reactive variable to track error state
 
 onMounted(async () => {
   await receiptStore.getRecieptCateringIn24Hours();
-  await ingredientStore.getAllIngredients(); // Load all ingredients (assuming this method exists)
+  await ingredientStore.getAllIngredients();
 
-  // Filter ingredients or products based on selectedCategory
   watch(selectedCategory, (newCategory) => {
     if (newCategory === 'Products') {
       ingredientFilters.value = posStore.selectedItems;
     } else if (newCategory === 'Ingredients') {
-      ingredientFilters.value = ingredientStore.all_ingredients; // Assuming ingredients are stored here
+      ingredientFilters.value = ingredientStore.all_ingredients;
     }
   });
 });
@@ -65,16 +64,10 @@ function removeItemForPos(index: number) {
 }
 
 function calculateChange() {
-
   posStore.receipt.change = posStore.receipt.receive - posStore.receipt.receiptNetPrice;
-
 }
 
 watch(() => posStore.receipt.receive, () => {
-  console.log('Receive:', posStore.receipt.receive);
-  console.log('Change:', posStore.receipt.change);
-
-
   calculateChange();
 });
 
@@ -91,24 +84,28 @@ function decreaseQuantity(index: number) {
   }
 }
 
-
 function removeIngredientCoffeeList(index: number) {
   subInventoryStore.ingredientCheckListForCofee.splice(index, 1);
 }
 
-// removeIngredientCoffeeList
 function removeIngredientRiceList(index: number) {
   subInventoryStore.ingredientCheckListForRice.splice(index, 1);
 }
 
-
-
 async function save() {
+  if (isError.value) {
+    // Prevent saving if there was a previous error
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'Please resolve the previous error before saving again.',
+    });
+    return;
+  }
+
   posStore.receipt.paymentMethod = 'cash';
 
-  // Check if there are products in the selectedItems list or ingredients in the ingredientCheckList
   if (selectedItems.value.length > 0 || subInventoryStore.ingredientCheckListForCofee.length > 0 || subInventoryStore.ingredientCheckListForRice.length > 0) {
-    // Ensure payment method is selected
     if (posStore.receipt.paymentMethod === '') {
       Swal.fire({
         icon: 'error',
@@ -118,8 +115,6 @@ async function save() {
       return;
     }
 
-
-    // Ensure received amount is sufficient for cash payments
     if (posStore.receipt.paymentMethod === 'cash' && posStore.receipt.receive < posStore.receipt.receiptNetPrice && posStore.receipt.receive != 0) {
       Swal.fire({
         icon: 'error',
@@ -129,54 +124,55 @@ async function save() {
       return;
     }
 
-
-    if (posStore.receipt.receiptId) {
-      await posStore.updateReceiptCatering(posStore.receipt.receiptId, posStore.receipt);
-    } else {
-
-
-
-      if (subInventoryStore.ingredientCheckListForCofee.length > 0 || subInventoryStore.ingredientCheckListForRice.length > 0) {
-        console.log("subInventoryStore.ingredientCheckListForCofee", subInventoryStore.ingredientCheckListForCofee);
-
-        await subInventoryStore.createReturnWithdrawalIngredientsForCatering()
+    try {
+      if (posStore.receipt.receiptId) {
+        await posStore.updateReceiptCatering(posStore.receipt.receiptId, posStore.receipt);
+      } else {
+        if (subInventoryStore.ingredientCheckListForCofee.length > 0 || subInventoryStore.ingredientCheckListForRice.length > 0) {
+          await subInventoryStore.createReturnWithdrawalIngredientsForCatering();
+        }
+        if (posStore.selectedItems.length > 0 && subInventoryStore.ingredientCheckListForCofee.length > 0 || subInventoryStore.ingredientCheckListForRice.length > 0) {
+          await posStore.createReceiptForCatering(subInventoryStore.checkIngerdient?.CheckID!);
+        }
+        if (posStore.selectedItems.length === 0) {
+          await posStore.createReceiptForCatering(0);
+        }
       }
-      if (posStore.selectedItems.length > 0 && subInventoryStore.ingredientCheckListForCofee.length > 0 || subInventoryStore.ingredientCheckListForRice.length > 0) {
-        await posStore.createReceiptForCatering(subInventoryStore.checkIngerdient?.CheckID!);
-      }
-      if (posStore.selectedItems.length === 0) {
-        await posStore.createReceiptForCatering(0)
-      }
+
+      // Clear the selected items and reset receipt details
+      posStore.selectedItems = [];
+      posStore.receipt.receiptTotalPrice = 0;
+      posStore.receipt.receiptTotalDiscount = 0;
+      posStore.receipt.receiptNetPrice = 0;
+      posStore.receipt.receiptPromotions = [];
+      ingredientStore.ingredientCheckList = [];
+      posStore.receipt.receive = 0;
+      posStore.receipt.change = 0;
+      step.value = 1;
+      posStore.receipt.paymentMethod = '';
+      posStore.receipt.customer = null;
+      posStore.receipt.receiptId = null;
+      posStore.receipt.receiptStatus = 'รอชำระเงิน';
+      subInventoryStore.ingredientCheckListForCofee = [];
+      subInventoryStore.ingredientCheckListForRice = [];
+
+      Swal.fire({
+        icon: 'success',
+        title: 'สำเร็จ',
+        text: 'บันทึกข้อมูลสำเร็จ',
+      });
+
+      isError.value = false;  // Clear error state after successful save
+    } catch (e) {
+      console.log(e);
+      isError.value = true;  // Set error state if an error occurs
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'An error occurred while saving. Please try again.',
+      });
     }
-
-
-
-
-    // Clear the selected items and reset receipt details
-    posStore.selectedItems = [];
-    posStore.receipt.receiptTotalPrice = 0;
-    posStore.receipt.receiptTotalDiscount = 0;
-    posStore.receipt.receiptNetPrice = 0;
-    posStore.receipt.receiptPromotions = [];
-    ingredientStore.ingredientCheckList = [];
-    posStore.receipt.receive = 0;
-    posStore.receipt.change = 0;
-    step.value = 1;
-    posStore.receipt.paymentMethod = '';
-    posStore.receipt.customer = null;
-    posStore.receipt.receiptId = null;
-    posStore.receipt.receiptStatus = 'รอชำระเงิน';
-    subInventoryStore.ingredientCheckListForCofee = [];
-    subInventoryStore.ingredientCheckListForRice = [];
-
-    Swal.fire({
-      icon: 'success',
-      title: 'สำเร็จ',
-      text: 'บันทึกข้อมูลสำเร็จ',
-    });
-
   } else {
-    // If neither products nor ingredients are selected, show an error
     Swal.fire({
       icon: 'error',
       title: 'ข้อมูลไม่สมบูรณ์',
@@ -194,6 +190,7 @@ function updateIngredientQuantity(index: number, quantity: number) {
 }
 
 </script>
+
 
 
 <template>

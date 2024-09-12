@@ -21,10 +21,13 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
   const checkIngerdient = ref<Checkingredient>();
   const userStore = useUserStore();
   const ingredientCheckListForCofee = ref<
-    { ingredientcheck: Ingredient; count: number,type:string }[]
+    { ingredientcheck: Ingredient; count: number; type: string }[]
   >([]);
   const ingredientCheckListForRice = ref<
-    { ingredientcheck: Ingredient; count: number,type:string }[]
+    { ingredientcheck: Ingredient; count: number; type: string }[]
+  >([]);
+  const ingredientCheckList = ref<
+    { ingredientcheck: Ingredient; count: number; type: string }[]
   >([]);
 
   const ingredientcheckForRice = ref<Ingredient[]>([]);
@@ -94,11 +97,33 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
       const res = await ingredientService.getSubIngredients_Catering();
       subIngredients_catering.value = res.data;
       console.log(res.data);
-      
     } catch (e) {
       console.log(e);
     }
   }
+  const addSubIngredients = (item: Ingredient, type: string) => {
+    const exists = ingredientCheckList.value.some(
+      (ingredient) =>
+        ingredient.ingredientcheck.ingredientId === item.ingredientId
+    );
+    console.log("item", item);
+    console.log("type", type);
+
+    if (!exists) {
+      ingredientCheckList.value.push({
+        ingredientcheck: item,
+        count: 1,
+        type: type,
+      });
+    }
+    if (exists) {
+      const index = ingredientCheckList.value.findIndex(
+        (ingredient) =>
+          ingredient.ingredientcheck.ingredientId === item.ingredientId
+      );
+      ingredientCheckList.value[index].count += 1;
+    }
+  };
 
   const addSubIngredientsCoffeeCatering = async (item: Ingredient) => {
     const exists = ingredientCheckListForCofee.value.some(
@@ -109,7 +134,12 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
       ingredientCheckListForCofee.value.push({
         ingredientcheck: item,
         count: 1,
-        type:'coffee'
+        type: "coffee",
+      });
+      ingredientCheckList.value.push({
+        ingredientcheck: item,
+        count: 1,
+        type: "coffee",
       });
     }
     if (exists) {
@@ -118,6 +148,7 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
           ingredient.ingredientcheck.ingredientId === item.ingredientId
       );
       ingredientCheckListForCofee.value[index].count += 1;
+      ingredientCheckList.value[index].count += 1;
     }
   };
   // addSubIngredientsRiceCatering
@@ -130,7 +161,12 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
       ingredientCheckListForRice.value.push({
         ingredientcheck: item,
         count: 1,
-        type:'rice'
+        type: "rice",
+      });
+      ingredientCheckList.value.push({
+        ingredientcheck: item,
+        count: 1,
+        type: "rice",
       });
     }
     if (exists) {
@@ -139,47 +175,77 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
           ingredient.ingredientcheck.ingredientId === item.ingredientId
       );
       ingredientCheckListForRice.value[index].count += 1;
+      ingredientCheckList.value[index].count += 1;
     }
   };
 
   async function createReturnWithdrawalIngredientsForCatering() {
+    const ingredientList1 = ingredientCheckList.value.map((item) => ({
+      ingredientId: item.ingredientcheck.ingredientId!,
+      UsedQuantity: item.count,
+      type: item.type,
+    }));
 
-      const ingredientList1 = ingredientCheckListForCofee.value.map((item) => ({
-        ingredientId: item.ingredientcheck.ingredientId!,
-        UsedQuantity: item.count,
-        type:item.type
-      }));
-      const ingredientList2 = ingredientCheckListForRice.value.map((item) => ({
-        ingredientId: item.ingredientcheck.ingredientId!,
-        UsedQuantity: item.count,
-        type:item.type
-      }));
-      const ingredientList = [...ingredientList1, ...ingredientList2];
+console.log("ingredientList1", ingredientList1);
 
-      const checkIngredientsPayload = {
-        checkingredientitems: ingredientList,
-        userId: userStore.currentUser?.userId || 1,
-        date: new Date().toISOString(),
-        checkDescription: "เลี้ยงรับรอง",
-        actionType: "withdrawal",
-        shopType: "catering",
-      };
-      console.log("checkIngredientsPayload", checkIngredientsPayload);
-      
-      try {
-        const response =
-          await ingredientService.createReturnWithdrawalIngredientsForCatering(
-            checkIngredientsPayload
-          );
-        if (response.status === 201) {
-          checkIngerdient.value = response.data;
-          console.log("checkIngerdient", checkIngerdient.value);
-        }
-        console.log("API response:", response);
-      } catch (error) {
-        console.error("Error saving check data:", error);
+
+    const checkIngredientsPayload = {
+      checkingredientitems: ingredientList1,
+      userId: userStore.currentUser?.userId || 1,
+      date: new Date().toISOString(),
+      checkDescription: "เลี้ยงรับรอง",
+      actionType: "withdrawal",
+      shopType: "catering",
+    };
+    console.log("checkIngredientsPayload", checkIngredientsPayload);
+
+    try {
+      const response =
+        await ingredientService.createReturnWithdrawalIngredientsForCatering(
+          checkIngredientsPayload
+        );
+      if (response.status === 201) {
+        checkIngerdient.value = response.data;
+        console.log("checkIngerdient", checkIngerdient.value);
       }
+      console.log("API response:", response);
+    } catch (error) {
+      console.error("Error saving check data:", error);
     }
+  }
+
+  // createReturnIngerdian
+  async function createReturnIngredientsForCatering() {
+    const ingredientList1 = ingredientCheckList.value.map((item) => ({
+      ingredientId: item.ingredientcheck.ingredientId!,
+      UsedQuantity: item.count,
+      type: item.type,
+    }));
+
+    const checkIngredientsPayload = {
+      checkingredientitems: ingredientList1,
+      userId: userStore.currentUser?.userId || 1,
+      date: new Date().toISOString(),
+      checkDescription: "เลี้ยงรับรอง",
+      actionType: "return",
+      shopType: "catering",
+    };
+    console.log("checkIngredientsPayload", checkIngredientsPayload);
+
+    try {
+      const response =
+        await ingredientService.createReturnWithdrawalIngredientsForCatering(
+          checkIngredientsPayload
+        );
+      if (response.status === 201) {
+        checkIngerdient.value = response.data;
+        console.log("checkIngerdient", checkIngerdient.value);
+      }
+      console.log("API response:", response);
+    } catch (error) {
+      console.error("Error saving check data:", error);
+    }
+  }
 
   return {
     subingredients_coffee,
@@ -204,6 +270,9 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
     createReturnWithdrawalIngredientsForCatering,
     checkIngerdient,
     getSubIngredients_catering,
-    subIngredients_catering
+    subIngredients_catering,
+    createReturnIngredientsForCatering,
+    ingredientCheckList,
+    addSubIngredients,
   };
 });

@@ -88,6 +88,15 @@ const router = createRouter({
     },
     
     {
+      path: "/importingredientcatering",
+      name: "importingredientscatering",
+      component: () =>
+        import(
+          "../views/ingredient/check/withdrawal/subInventoryCateringWView.vue"
+        ),
+      meta: { requiresAuth: true },
+    },
+    {
       path: "/importingredientrice",
       name: "importingredientsrice",
       component: () =>

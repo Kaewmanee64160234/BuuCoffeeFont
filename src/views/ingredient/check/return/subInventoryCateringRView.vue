@@ -3,13 +3,15 @@ import { onMounted } from 'vue';
 import Swal from 'sweetalert2';
 import { useIngredientStore } from '@/stores/Ingredient.store';
 import { useSubIngredientStore } from '@/stores/ingredientSubInventory.store';
+import type { SubInventoriesCatering } from '@/types/subinventoriescateringtype';
+import type { SubInventoriesCoffee } from '@/types/subinventoriescoffee.type';
 
 const ingredientStore = useIngredientStore();
-const subIngredientStore = useSubIngredientStore();
+const subInventoryStore = useSubIngredientStore();
 
 
 onMounted(async () => {
-    await subIngredientStore.getSubIngredients_catering();
+    await subInventoryStore.getSubIngredients_catering();
 });
 
 const saveCheckData = async () => {
@@ -32,13 +34,12 @@ const saveCheckData = async () => {
                     Swal.showLoading();
                 }
             });
-            ingredientStore.shopType = 'coffee';
-            ingredientStore.actionType = 'return';
+           
 
             // ส่งช้อมูล
-            await subIngredientStore.createReturnWithdrawalIngredientsForCatering();
-            ingredientStore.ingredientCheckList = [];
-            await subIngredientStore.getSubIngredients_coffee();
+            await subInventoryStore.createReturnIngredientsForCatering();
+            subInventoryStore.ingredientCheckList = [];
+            await subInventoryStore.getSubIngredients_catering();
 
             Swal.fire({
                 title: 'สำเร็จ!',
@@ -60,10 +61,16 @@ const saveCheckData = async () => {
 
 const findQuantity = (ingredientId: number | undefined): number => {
     if (!ingredientId) return 0;
-    const ingredient = subIngredientStore.subIngredients_catering.find(
+    const ingredient = subInventoryStore.subIngredients_catering.find(
         (item) => item.ingredient.ingredientId === ingredientId
     );
     return ingredient ? ingredient.quantity : 0;
+};
+
+const confirmSelection = (subIngrediant:SubInventoriesCoffee) => {
+  console.log('Selected sub-inventory:', subIngrediant.type);
+    subInventoryStore.addSubIngredients(subIngrediant.ingredient,subIngrediant.type!);
+  // Handle the selection confirmation here
 };
 
 </script>
@@ -94,9 +101,9 @@ const findQuantity = (ingredientId: number | undefined): number => {
                 <v-container>
                     <v-row>
                         <v-col cols="3" style="text-align: center; padding: 8px"
-                            v-for="(item, index) in subIngredientStore.subIngredients_catering" :key="index">
+                            v-for="(item, index) in subInventoryStore.subIngredients_catering" :key="index">
                             <v-card v-if="item.quantity > 0" width="100%"
-                                @click="ingredientStore.Addingredienttotable(item.ingredient)">
+                                @click="confirmSelection(item)">
                                 <v-img :src="`http://localhost:3000/ingredients/${item.ingredient.ingredientId}/image`"
                                     height="100"></v-img>
                                 <v-card-title style="font-size: 14px">{{ item.ingredient.ingredientName
@@ -127,7 +134,7 @@ const findQuantity = (ingredientId: number | undefined): number => {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="(item, index) in ingredientStore.ingredientCheckList" :key="index">
+                            <tr v-for="(item, index) in subInventoryStore.ingredientCheckList" :key="index">
                                 <td>{{ index + 1 }}</td>
                                 <td>{{ item.ingredientcheck.ingredientName }}</td>
                                 <td>{{ item.ingredientcheck.ingredientSupplier }}</td>
