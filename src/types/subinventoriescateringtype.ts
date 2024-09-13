@@ -1,10 +1,10 @@
 import type { Ingredient } from "./ingredient.type";
 
-export interface SubInventoriesCoffee{
+export interface SubInventoriesCatering{
     subInventoryId: number;
     ingredient: Ingredient;
     quantity: number;
-    type?:string;
+    type:string;
 
 
 }

@@ -7,6 +7,7 @@ export interface  Checkingredientitem {
     oldRemain: number;
     checkingredient: Checkingredient;
     ingredient: Ingredient;
+    type?: string;
   }
 
   export interface  Checkingredient {

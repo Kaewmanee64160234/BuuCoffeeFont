@@ -267,7 +267,6 @@ const closeEditDialog = () => {
       </v-btn>
       <v-btn color="secondary" @click="closeEditDialog">ยกเลิก</v-btn>
     </v-card-actions>
-  
   </v-card>
 </v-dialog>
 

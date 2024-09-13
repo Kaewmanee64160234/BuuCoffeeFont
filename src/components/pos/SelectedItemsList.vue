@@ -26,17 +26,17 @@ onMounted(async () => {
   await receiptStore.getRecieptIn30Min();
   await loadQueueListFromLocalStorage();
   const currentDate = new Date().toLocaleDateString(); // Get current date as a string
-
+  posStore.receipt.paymentMethod = 'cash';
   // Check if the queue number needs to be reset for a new day
   const lastResetDate = localStorage.getItem('lastResetDate');
   console.log('Last reset date:', lastResetDate);
   console.log('Current date:', currentDate);
-  
+
   if (lastResetDate === currentDate) {
-    if(posStore.queueReceipt.length > 0) {
-    posStore.queueNumber = posStore.queueReceipt[posStore.queueReceipt.length - 1].queueNumber + 1;
+    if (posStore.queueReceipt.length > 0) {
+      posStore.queueNumber = posStore.queueReceipt[posStore.queueReceipt.length - 1].queueNumber + 1;
     }
-    else{
+    else {
       const auateData = localStorage.getItem('queueData');
       if (auateData) {
         posStore.queueNumber = JSON.parse(auateData).number + 1;

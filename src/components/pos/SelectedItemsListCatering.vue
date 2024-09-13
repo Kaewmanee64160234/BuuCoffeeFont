@@ -5,34 +5,36 @@ import { usePosStore } from '@/stores/pos.store';
 import Swal from 'sweetalert2';
 import type { ReceiptItem } from '../../types/receipt.type';
 import { useReceiptStore } from '@/stores/receipt.store';
-import { useIngredientStore } from '@/stores/Ingredient.store'; // Assuming you have an ingredient store
+import { useIngredientStore } from '@/stores/Ingredient.store';
 import ReceiptDetailsDialogPos from '../receipts/ReceiptDialogPos.vue';
+import { useSubIngredientStore } from '@/stores/ingredientSubInventory.store';
 
 const step = ref(1);
 const posStore = usePosStore();
 const selectedItems = computed(() => posStore.selectedItems);
 const receiptStore = useReceiptStore();
-const ingredientStore = useIngredientStore(); // Assuming this is the correct import for ingredients
+const ingredientStore = useIngredientStore();
 const selectedCategory = ref('Products');
-const ingredientFilters = ref<any[]>([]); // To store filtered ingredients
+const ingredientFilters = ref<any[]>([]);
 const url = import.meta.env.VITE_URL_PORT
+const subInventoryStore = useSubIngredientStore();
+const isError = ref(false);  // New reactive variable to track error state
 
 onMounted(async () => {
   await receiptStore.getRecieptCateringIn24Hours();
-  await ingredientStore.getAllIngredients(); // Load all ingredients (assuming this method exists)
+  await ingredientStore.getAllIngredients();
 
-  // Filter ingredients or products based on selectedCategory
   watch(selectedCategory, (newCategory) => {
     if (newCategory === 'Products') {
       ingredientFilters.value = posStore.selectedItems;
     } else if (newCategory === 'Ingredients') {
-      ingredientFilters.value = ingredientStore.all_ingredients; // Assuming ingredients are stored here
+      ingredientFilters.value = ingredientStore.all_ingredients;
     }
   });
 });
 
 function nextStep() {
-  if (selectedItems.value.length === 0 && ingredientStore.ingredientCheckList.length === 0) {
+  if (selectedItems.value.length === 0 && subInventoryStore.ingredientCheckListForCofee.length === 0 && subInventoryStore.ingredientCheckListForRice.length === 0) {
     Swal.fire({
       icon: 'error',
       title: 'ข้อมูลไม่สมบูรณ์',
@@ -57,21 +59,15 @@ function prevStep() {
   console.log('Previous Step:', step.value);
 }
 
-function removeItem(index: number) {
+function removeItemForPos(index: number) {
   posStore.removeItem(index);
 }
 
 function calculateChange() {
-
   posStore.receipt.change = posStore.receipt.receive - posStore.receipt.receiptNetPrice;
-
 }
 
 watch(() => posStore.receipt.receive, () => {
-  console.log('Receive:', posStore.receipt.receive);
-  console.log('Change:', posStore.receipt.change);
-
-
   calculateChange();
 });
 
@@ -82,51 +78,34 @@ function increaseQuantity(item: ReceiptItem) {
 function decreaseQuantity(index: number) {
   const item = selectedItems.value[index];
   if (item.quantity === 1) {
-    removeItem(index);
+    removeItemForPos(index);
   } else {
     posStore.spliceData(index);
   }
 }
 
-// Functions for ingredient list
-function increaseIngredientQuantity(index: number) {
-  ingredientStore.ingredientCheckList[index].count++;
+function removeIngredientCoffeeList(index: number) {
+  subInventoryStore.ingredientCheckListForCofee.splice(index, 1);
 }
 
-function decreaseIngredientQuantity(index: number) {
-  if (ingredientStore.ingredientCheckList[index].count === 1) {
-    removeIngredient(index);
-  } else {
-    ingredientStore.ingredientCheckList[index].count--;
-  }
+function removeIngredientRiceList(index: number) {
+  subInventoryStore.ingredientCheckListForRice.splice(index, 1);
 }
-
-function removeIngredient(index: number) {
-  ingredientStore.ingredientCheckList.splice(index, 1);
-}
-
-const saveCheckData = async () => {
-  ingredientStore.selectedAction = 'export';
-
-  try {
-    await ingredientStore.saveCheckData();
-  } catch (error) {
-    console.error('Error saving check data:', error);
-
-    Swal.fire({
-      title: 'เกิดข้อผิดพลาด!',
-      text: 'เกิดข้อผิดพลาดในการบันทึกข้อมูลของคุณ.',
-      icon: 'error',
-    });
-  }
-};
 
 async function save() {
+  if (isError.value) {
+    // Prevent saving if there was a previous error
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'Please resolve the previous error before saving again.',
+    });
+    return;
+  }
+
   posStore.receipt.paymentMethod = 'cash';
 
-  // Check if there are products in the selectedItems list or ingredients in the ingredientCheckList
-  if (selectedItems.value.length > 0 || ingredientStore.ingredientCheckList.length > 0) {
-    // Ensure payment method is selected
+  if (selectedItems.value.length > 0 || subInventoryStore.ingredientCheckListForCofee.length > 0 || subInventoryStore.ingredientCheckListForRice.length > 0) {
     if (posStore.receipt.paymentMethod === '') {
       Swal.fire({
         icon: 'error',
@@ -136,7 +115,6 @@ async function save() {
       return;
     }
 
-    // Ensure received amount is sufficient for cash payments
     if (posStore.receipt.paymentMethod === 'cash' && posStore.receipt.receive < posStore.receipt.receiptNetPrice && posStore.receipt.receive != 0) {
       Swal.fire({
         icon: 'error',
@@ -146,42 +124,55 @@ async function save() {
       return;
     }
 
-    let receiptCreated = false;
-    let stockChecked = false;
+    try {
+      if (posStore.receipt.receiptId) {
+        await posStore.updateReceiptCatering(posStore.receipt.receiptId, posStore.receipt);
+      } else {
+        if (subInventoryStore.ingredientCheckListForCofee.length > 0 || subInventoryStore.ingredientCheckListForRice.length > 0) {
+          await subInventoryStore.createReturnWithdrawalIngredientsForCatering();
+        }
+        if (posStore.selectedItems.length > 0 && subInventoryStore.ingredientCheckListForCofee.length > 0 || subInventoryStore.ingredientCheckListForRice.length > 0) {
+          await posStore.createReceiptForCatering(subInventoryStore.checkIngerdient?.CheckID!);
+        }
+        if (posStore.selectedItems.length === 0) {
+          await posStore.createReceiptForCatering(0);
+        }
+      }
 
-    if (posStore.receipt.receiptId) {
-      await posStore.updateReceiptCatering(posStore.receipt.receiptId, posStore.receipt);
-      receiptCreated = true;
-    } else {
-        await saveCheckData();
-        console.log('Check data saved', ingredientStore.checkIngerdient);
-        await posStore.createReceiptForCatering(ingredientStore.checkIngerdient?.CheckID!);
-
-    }
-
-    // Clear the selected items and reset receipt details
-    posStore.selectedItems = [];
-    posStore.receipt.receiptTotalPrice = 0;
-    posStore.receipt.receiptTotalDiscount = 0;
-    posStore.receipt.receiptNetPrice = 0;
-    posStore.receipt.receiptPromotions = [];
-    ingredientStore.ingredientCheckList = [];
-    posStore.receipt.receive = 0;
-    posStore.receipt.change = 0;
-    step.value = 1;
-    posStore.receipt.paymentMethod = '';
-    posStore.receipt.customer = null;
-    posStore.receipt.receiptId = null;
-    posStore.receipt.receiptStatus = 'รอชำระเงิน';
+      // Clear the selected items and reset receipt details
+      posStore.selectedItems = [];
+      posStore.receipt.receiptTotalPrice = 0;
+      posStore.receipt.receiptTotalDiscount = 0;
+      posStore.receipt.receiptNetPrice = 0;
+      posStore.receipt.receiptPromotions = [];
+      ingredientStore.ingredientCheckList = [];
+      posStore.receipt.receive = 0;
+      posStore.receipt.change = 0;
+      step.value = 1;
+      posStore.receipt.paymentMethod = '';
+      posStore.receipt.customer = null;
+      posStore.receipt.receiptId = null;
+      posStore.receipt.receiptStatus = 'รอชำระเงิน';
+      subInventoryStore.ingredientCheckListForCofee = [];
+      subInventoryStore.ingredientCheckListForRice = [];
 
       Swal.fire({
         icon: 'success',
         title: 'สำเร็จ',
         text: 'บันทึกข้อมูลสำเร็จ',
       });
-    
+
+      isError.value = false;  // Clear error state after successful save
+    } catch (e) {
+      console.log(e);
+      isError.value = true;  // Set error state if an error occurs
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'An error occurred while saving. Please try again.',
+      });
+    }
   } else {
-    // If neither products nor ingredients are selected, show an error
     Swal.fire({
       icon: 'error',
       title: 'ข้อมูลไม่สมบูรณ์',
@@ -190,20 +181,21 @@ async function save() {
   }
 }
 
-function openReceiptDialog() {
-  posStore.ReceiptDialogPos = true;
-  console.log("openReceiptDialog", posStore.ReceiptDialogPos);
+function updateIngredientQuantity(index: number, quantity: number) {
+  if (quantity > 0) {
+    ingredientStore.ingredientCheckList[index].count = quantity;
+  } else {
+    removeIngredientCoffeeList(index);
+  }
 }
+
 </script>
 
 
 
 <template>
   <ReceiptDetailsDialogPos />
-
-
   <div class="h-screen app">
-
     <v-window v-model="step" transition="fade" class="h-screen">
       <!-- Order Details View -->
       <v-window-item :value="1" class="full-height">
@@ -212,12 +204,10 @@ function openReceiptDialog() {
             <div class="d-flex justify-space-between align-center">
               <h3>รายละเอียดการจัดเลี้ยงรับรอง</h3>
             </div>
-            
-
             <v-divider class="my-2"></v-divider>
 
             <!-- Product Summary -->
-            <h3>สรุปรายการสินค้า</h3>
+            <h3 class="section-title">สรุปรายการสินค้า</h3>
             <div class="selected-items-list">
               <v-list class="full-width">
                 <v-list-item-group>
@@ -225,28 +215,26 @@ function openReceiptDialog() {
                     <v-list-item :prepend-avatar="`${url}/products/${item.product?.productId}/image`"
                       class="full-width">
                       <v-row no-gutters class="align-center">
-                        <v-col cols="5" class="product-name">
+                        <v-col cols="2" class="product-name">
                           {{ item.product?.productName }}
                         </v-col>
-                        <v-col cols="2" class="text-right pr-2" style="color: black;">
+                        <v-col cols="4" class="text-right pr-2" style="color: black;">
                           <p>{{ item.receiptSubTotal }}</p>
                         </v-col>
-                        <v-col cols="3" class="text-right pr-2">
-                          <v-btn size="xs-small" color="#C5C5C5" icon @click="decreaseQuantity(index)">
+                        <v-col cols="4" class="text-right pr-2">
+                          <v-btn size="xs-small" color="#C5C5C5" icon @click.stop="decreaseQuantity(index)">
                             <v-icon>mdi-minus</v-icon>
                           </v-btn>
                           <span class="pa-2">{{ item.quantity }}</span>
-                          <v-btn size="xs-small" color="#FF9642" icon @click="increaseQuantity(item)">
+                          <v-btn size="xs-small" color="#FF9642" icon @click.stop="increaseQuantity(item)">
                             <v-icon>mdi-plus</v-icon>
                           </v-btn>
-                        </v-col>
-                        <v-col cols="2" class="text-right">
-                          <v-btn icon variant="text" @click="removeItem(index)">
+                          <v-btn icon variant="text" @click.stop="removeItemForPos(index)">
                             <v-icon color="red">mdi-delete</v-icon>
                           </v-btn>
                         </v-col>
                       </v-row>
-                      <v-row no-gutters v-if="item.product.haveTopping">
+                      <v-row no-gutters v-if="item.product!.haveTopping">
                         <v-col cols="12" class="product-details">
                           {{ item.productType?.productTypeName }} +{{ item.productType?.productTypePrice }} | ความหวาน
                           {{ item.sweetnessLevel }}%
@@ -256,8 +244,8 @@ function openReceiptDialog() {
                             <li v-for="topping in item.productTypeToppings" :key="topping?.topping?.toppingId"
                               class="topping-item">
                               x{{ topping?.quantity }} {{ topping?.topping?.toppingName }}
-                              <span v-if="topping?.topping?.toppingName && topping.topping.toppingName.length > 3">:
-                                {{ topping?.topping?.toppingPrice }}.-</span>
+                              <span v-if="topping?.topping?.toppingName && topping.topping.toppingName.length > 3">: {{
+                                topping?.topping?.toppingPrice }}.-</span>
                             </li>
                           </ul>
                         </v-col>
@@ -270,16 +258,15 @@ function openReceiptDialog() {
 
             <v-divider></v-divider>
 
-            <!-- Ingredient Summary -->
-            <h3 class="mt-4">สรุปรายการวัตถุดิบ</h3>
+            <!-- Ingredient Summary (กาแฟ) -->
+            <h3 class="section-title">สรุปรายการวัตถุดิบจากร้านกาแฟ</h3>
             <div class="ingredient-list">
               <v-list class="full-width">
                 <v-list-item-group>
-                  <div v-for="(ingredient, index) in ingredientStore.ingredientCheckList" :key="index"
+                  <div v-for="(ingredient, index) in subInventoryStore.ingredientCheckListForCofee" :key="index"
                     class="selected-item my-2">
                     <v-list-item :prepend-avatar="`${url}/ingredients/${ingredient.ingredientcheck.ingredientId}/image`"
                       class="full-width">
-
                       <v-row no-gutters class="align-center">
                         <v-col cols="5" class="product-name">
                           {{ ingredient.ingredientcheck.ingredientName }}
@@ -288,39 +275,72 @@ function openReceiptDialog() {
                             ({{ ingredient.ingredientcheck.ingredientSupplier }})
                           </span>
                         </v-col>
-
-                        <v-col cols="2" class="text-right pr-2" style="color: black;">
-                          <p>{{ ingredient.ingredientcheck.ingredientPrice }}</p>
-                        </v-col>
                         <v-col cols="3" class="text-right pr-2">
-                          <v-btn size="xs-small" color="#C5C5C5" icon @click="decreaseIngredientQuantity(index)">
-                            <v-icon>mdi-minus</v-icon>
-                          </v-btn>
-                          <span class="pa-2">{{ ingredient.count }}</span>
-                          <v-btn size="xs-small" color="#FF9642" icon @click="increaseIngredientQuantity(index)">
-                            <v-icon>mdi-plus</v-icon>
-                          </v-btn>
+
+                          <!-- chnage to textfile input -->
+                          <input class="input-quantity" v-model="ingredient.count" type="number"
+                            @change="updateIngredientQuantity(index, ingredient.count)" />
+
+                          <span>
+                            {{ ingredient.ingredientcheck.ingredientUnit }}
+                          </span>
+
                         </v-col>
                         <v-col cols="2" class="text-right">
-                          <v-btn icon variant="text" @click="removeIngredient(index)">
+                          <v-btn icon variant="text" @click.stop="removeIngredientCoffeeList(index)">
                             <v-icon color="red">mdi-delete</v-icon>
                           </v-btn>
                         </v-col>
-
                       </v-row>
-
                     </v-list-item>
                   </div>
                 </v-list-item-group>
               </v-list>
             </div>
 
+            <!-- Ingredient Summary (ข้าว) -->
+            <h3 class="section-title">สรุปรายการวัตถุดิบจากร้านข้าว</h3>
+            <div class="ingredient-list">
+              <v-list class="full-width">
+                <v-list-item-group>
+                  <div v-for="(ingredient, index) in subInventoryStore.ingredientCheckListForRice" :key="index"
+                    class="selected-item my-2">
+                    <v-list-item :prepend-avatar="`${url}/ingredients/${ingredient.ingredientcheck.ingredientId}/image`"
+                      class="full-width">
+                      <v-row no-gutters class="align-center">
+                        <v-col cols="5" class="product-name">
+                          {{ ingredient.ingredientcheck.ingredientName }}
+                          <span
+                            v-if="ingredient.ingredientcheck.ingredientSupplier !== '-' && ingredient.ingredientcheck.ingredientSupplier !== ''">
+                            ({{ ingredient.ingredientcheck.ingredientSupplier }})
+                          </span>
+                        </v-col>
+                        <v-col cols="4" class="text-right pr-2">
+
+
+                          <!-- chnage to textfile input -->
+                          <input class="input-quantity" v-model="ingredient.count" type="number"
+                            @change="updateIngredientQuantity(index, ingredient.count)" />
+                          <span>
+                            {{ ingredient.ingredientcheck.ingredientUnit }}
+                          </span>
+
+                        </v-col>
+                        <v-col cols="1" class="text-right">
+                          <v-btn icon variant="text" @click.stop="removeIngredientRiceList(index)">
+                            <v-icon color="red">mdi-delete</v-icon>
+                          </v-btn>
+                        </v-col>
+                      </v-row>
+                    </v-list-item>
+                  </div>
+                </v-list-item-group>
+              </v-list>
+            </div>
 
             <!-- Order Summary -->
             <div class="summary-section" style="width: 100%;">
               <v-divider></v-divider>
-
-
             </div>
           </div>
           <div class="footer-buttons">
@@ -340,7 +360,6 @@ function openReceiptDialog() {
             <div class="d-flex justify-space-between align-center">
               <h3>รายละเอียดการสั่งซื้อ</h3>
             </div>
-
             <v-divider></v-divider>
 
             <!-- Summary Section -->
@@ -401,17 +420,27 @@ function openReceiptDialog() {
 
 <style scoped>
 .app {
-  height: 100vh;
   display: flex;
   flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #f0f0f0;
 }
 
 .full-height {
   height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .header {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 600;
+  /* margin-bottom: 10px; */
 }
 
 .selected-item {
@@ -433,7 +462,7 @@ function openReceiptDialog() {
 .product-details,
 .ingredient-details {
   font-size: 14px;
-  color: gray;
+  /* color: gray; */
   font-weight: lighter;
 }
 
@@ -448,32 +477,40 @@ function openReceiptDialog() {
   color: gray;
 }
 
+.quantity-input {
+  margin-left: 10px;
+  margin-right: 10px;
+  border: 1px solid #000000;
+  padding: 5px;
+  border-radius: 5px;
+}
+
 .selected-items-list,
 .ingredient-list {
   overflow-y: auto;
-  height: 30vh;
+  max-height: 20vh;
   margin-bottom: 20px;
 }
 
 .promotion-section {
   overflow-y: auto;
-  max-height: 20vh;
-  margin-bottom: 20px;
-  padding-right: 15px;
+  max-height: 15vh;
+  margin-bottom: 10px;
+  padding-right: 10px;
 }
 
 .promotion-item {
-  text-align: end;
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  text-align: right;
 }
 
 .summary-section {
-  height: 30%;
-  margin-top: 20px;
-  padding: 10px;
+  padding: 15px;
+  margin-top: 10px;
+  background-color: #fff;
   border-radius: 8px;
 }
 
@@ -489,6 +526,18 @@ function openReceiptDialog() {
   justify-content: space-between;
 }
 
+.footer-buttons>v-btn {
+  width: 48%;
+}
+
+.input-quantity {
+  border-radius: 5px;
+  width: 80px;
+  margin: 0 5px;
+  border: 2px solid #000000;
+  /* text-align: center; */
+}
+
 @media (max-width: 768px) {
   .content-container {
     padding: 10px;
@@ -496,15 +545,16 @@ function openReceiptDialog() {
 
   .selected-items-list,
   .ingredient-list {
-    max-height: 30%;
+    max-height: 35%;
   }
 
   .promotion-section {
-    max-height: 15vh;
+    max-height: 10vh;
   }
 
   .summary-section {
-    height: 30%;
+    height: auto;
+    margin-top: 15px;
   }
 
   .footer-buttons {
@@ -515,6 +565,26 @@ function openReceiptDialog() {
   .footer-buttons>v-btn {
     width: 90%;
     margin-bottom: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .summary-section {
+    padding: 10px;
+  }
+
+  .selected-items-list,
+  .ingredient-list {
+    max-height: 40%;
+  }
+
+  .footer-buttons>v-btn {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .footer-buttons {
+    justify-content: center;
   }
 }
 </style>
