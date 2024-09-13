@@ -112,7 +112,7 @@ export const useUserStore = defineStore("user", () => {
       if (user) {
         currentUser.value = JSON.parse(user);
       }
-    } catch (error) {
+    } catch (error) { 
       console.error('Error getting current user:', error);
     }
   };

@@ -19,6 +19,10 @@ export const useReceiptStore = defineStore("receipt", () => {
   const currentReceipt = ref({});
   const posStore = usePosStore();
 
+  const currentPage = ref(1); // Current page number
+  const itemsPerPage = ref(5); // Number of items per page
+  const totalReceipts = ref(0); // Total number of users
+
   const getAllReceipts = async () => {
     try {
       isLoading.value = true;
@@ -168,11 +172,13 @@ export const useReceiptStore = defineStore("receipt", () => {
       console.error('Error getting current user:', error);
     }
   };
-  
 
   return {
     setReceiptForEdit,
     getCurrentReceipt,
+    currentPage,
+    itemsPerPage,
+    totalReceipts,
 
     receipts,
     receipt,

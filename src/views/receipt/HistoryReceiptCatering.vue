@@ -20,13 +20,8 @@ const editDialog = ref(false); // New ref for edit dialog
 const posStore = usePosStore();
 
 const currentPage = ref(1);
-const itemsPerPage = ref(10);  // กำหนดจำนวนรายการต่อหน้า
-const paginatedReceipts = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage.value;
-  const end = currentPage.value * itemsPerPage.value;
+const itemsPerPage = ref(10);  // Default 10 items per page
 
-  return filteredReceipts.value.slice(start, end); // หั่นรายการให้ตรงกับหน้าที่เลือก
-});
 
 
 const fetchData = async () => {
@@ -96,25 +91,33 @@ const handleSearchKeydown = (event: KeyboardEvent) => {
 };
 
 const filteredReceipts = computed(() => {
-  const typeFilter = 'ร้านจัดเลี้ยง';
+  // Use dynamic type filtering based on the selected receipt type
+  const typeFilter = receiptType.value || 'ร้านจัดเลี้ยง';
 
-  // Filter receipts based on the receiptType being 'ร้านจัดเลี้ยง'
-  const filteredByType = receiptStore.receipts.filter(
+  // Filter receipts based on the selected receipt type
+  let filteredByType = receiptStore.receipts.filter(
     (receipt) => receipt.receiptType === typeFilter
   );
 
-  // Further filter based on searchQuery if provided
-  if (!receiptStore.searchQuery) {
-    return filteredByType.sort((a, b) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime());
-  }
-
-  return filteredByType
-    .filter(receipt =>
+  // If search query is provided, filter by customer name or receipt ID
+  if (receiptStore.searchQuery) {
+    filteredByType = filteredByType.filter(receipt =>
       receipt.customer?.customerName?.toLowerCase().includes(receiptStore.searchQuery.toLowerCase()) ||
       receipt.receiptId?.toString().includes(receiptStore.searchQuery)
-    )
-    .sort((a, b) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime());
+    );
+  }
+
+  // Sort filtered results by creation date (newest first)
+  filteredByType = filteredByType.sort((a, b) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime());
+
+  // Apply pagination: slice the filtered array to the current page
+  const start = (receiptStore.currentPage - 1) * receiptStore.itemsPerPage;
+  const end = start + receiptStore.itemsPerPage;
+
+  return filteredByType.slice(start, end);
 });
+
+
 
 const formatDate = (date: any) => {
   if (!date) return ''; // Handle case where date is not provided
@@ -213,13 +216,6 @@ const closeEditDialog = () => {
 <template>
   <HistoryReceiptDialogCatering v-model:dialog="historyReceiptDialog" />
 
-  <v-select
-        v-model="itemsPerPage"
-        :items="[5, 10, 20, 50]"
-        label="จำนวนรายการต่อหน้า"
-        dense
-      ></v-select>
-
   <!-- Edit Receipt Dialog -->
   <v-dialog v-model="editDialog" max-width="500px">
   <v-card>
@@ -271,11 +267,7 @@ const closeEditDialog = () => {
       </v-btn>
       <v-btn color="secondary" @click="closeEditDialog">ยกเลิก</v-btn>
     </v-card-actions>
-    <v-pagination
-    v-model="currentPage"
-    :length="Math.ceil(filteredReceipts.length / itemsPerPage)"
-    @input="fetchData"
-    ></v-pagination>
+  
   </v-card>
 </v-dialog>
 
@@ -341,8 +333,8 @@ const closeEditDialog = () => {
       </thead>
       <tbody>
         <tr v-for="(receipt, index) in paginatedReceipts" :key="receipt.receiptId">
-          <td class="text-center">{{ index + 1 }}</td>
-          <td class="text-center">{{ formatDate(receipt.createdDate + '') }}</td>
+          <td class="text-center">{{ (currentPage - 1) * itemsPerPage + index + 1 }}</td>
+          <td class="text-center">{{ formatDate(receipt.createdDate) }}</td>
           <td class="text-center">
             <span :class="statusClass(receipt.receiptStatus)">
               {{ statusText(receipt.receiptStatus) }}
@@ -380,6 +372,13 @@ const closeEditDialog = () => {
         </tr>
       </tbody>
     </v-table>
+
+    <v-pagination
+        justify="center"
+        v-model="receiptStore.currentPage"
+        :length="Math.ceil(receiptStore.totalReceipts / receiptStore.itemsPerPage)"
+        rounded="circle"
+    ></v-pagination>
   </v-card>
 </v-container>
 
@@ -408,4 +407,5 @@ const closeEditDialog = () => {
   margin-left: 2%;
   margin-top: 3%;
 }
+
 </style>

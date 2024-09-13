@@ -1,34 +1,21 @@
 <template>
   <v-dialog v-model="toppingStore.createToppingDialog" persistent max-width="600px" @click:outside="resetForm">
     <v-card>
-      <v-card-title><v-icon color="black" left style="font-size: 22px;">mdi-plus-circle</v-icon>
+      <v-card-title>
+        <v-icon color="black" left style="font-size: 22px;">mdi-plus-circle</v-icon>
         <span class="headline"> สร้างท็อปปิ้ง</span>
       </v-card-title>
       <v-card-text>
         <v-container>
-          <v-row v-if="!toppingName && toppingPrice <= 0">
-              <v-col cols="12">
-                <v-alert type="warning" border="left" color="warning" elevation="2">
-                  กรุณากรอกข้อมูล [ ชื่อท้อปปิ้ง ] และ [ ราคาท็อปปิ้ง ]
-                </v-alert>
-              </v-col>
-            </v-row>
-
-            <v-row v-else-if="toppingName && toppingPrice <= 0">
-              <v-col cols="12">
-                <v-alert type="warning" border="left" color="warning" elevation="2">
-                  กรุณากรอกข้อมูล [ ราคาท็อปปิ้ง ]
-                </v-alert>
-              </v-col>
-            </v-row>
-
-            <v-row v-else-if="!toppingName && toppingPrice > 0">
-              <v-col cols="12">
-                <v-alert type="warning" border="left" color="warning" elevation="2">
-                  กรุณากรอกข้อมูล [ ชื่อท้อปปิ้ง ]
-                </v-alert>
-              </v-col>
-            </v-row>
+          <!-- แสดงข้อความเมื่อกดบันทึก -->
+          <v-row v-if="formSubmitted && (!toppingName || toppingPrice <= 0)">
+            <v-col cols="12">
+              <v-alert type="warning" border="left" color="warning" elevation="2">
+                กรุณากรอกข้อมูล [ ชื่อท้อปปิ้ง ] และ [ ราคาท็อปปิ้ง ]
+              </v-alert>
+            </v-col>
+          </v-row>
+          
           <v-form ref="form" v-model="valid">
             <v-row>
               <v-col cols="12">
@@ -37,7 +24,7 @@
                   label="ชื่อท็อปปิ้ง" 
                   :rules="[rules.required, rules.name]"
                   variant="solo" 
-                  :error-messages="!toppingName ? ['กรุณากรอกชื่อท็อปปิ้ง'] : []"
+                  :error-messages="formSubmitted && !toppingName ? ['กรุณากรอกชื่อท็อปปิ้ง'] : []"
                   required>
                 </v-text-field>
               </v-col>
@@ -47,30 +34,29 @@
                   label="ราคาท็อปปิ้ง" 
                   type="number"
                   :rules="[rules.required, rules.price]" 
-                  :error-messages="!toppingName ? ['กรุณากรอกราคาท็อปปิ้ง'] : []"
+                  :error-messages="formSubmitted && toppingPrice <= 0 ? ['กรุณากรอกราคาท็อปปิ้ง'] : []"
                   variant="solo" 
                   required>
                 </v-text-field>
               </v-col>
               <v-col cols="2" class="d-flex align-center">
-              <span>บาท</span>
-            </v-col>
+                <span>บาท</span>
+              </v-col>
             </v-row>
-           
           </v-form>
         </v-container>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn color="blue darken-1" @click="closeDialog">ปิด</v-btn>
-        <v-btn color="blue darken-1" @click="submitForm" :disabled="!valid">บันทึก</v-btn>
+        <v-btn color="blue darken-1" @click="submitForm">บันทึก</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 import { useToppingStore } from '@/stores/topping.store';
 import type { Topping } from '@/types/topping.type';
 import Swal from 'sweetalert2';
@@ -81,6 +67,7 @@ const form = ref<VForm | null>(null);
 const valid = ref(false);
 const toppingName = ref('');
 const toppingPrice = ref(0);
+const formSubmitted = ref(false);  // เพิ่มตัวแปรนี้เพื่อเก็บสถานะการกดบันทึก
 
 const rules = {
   required: (value: any) => !!value || 'กรุณากรอกข้อมูล',
@@ -91,6 +78,7 @@ const rules = {
 const resetForm = () => {
   toppingName.value = '';
   toppingPrice.value = 0;
+  formSubmitted.value = false;  // reset formSubmitted เมื่อปิดฟอร์มหรือเปิดฟอร์มใหม่
   if (form.value) {
     form.value.reset();
     form.value.resetValidation();
@@ -104,6 +92,7 @@ const closeDialog = () => {
 };
 
 const submitForm = async () => {
+  formSubmitted.value = true;  // ตั้งค่าเป็น true เมื่อกดบันทึก
   if (form.value) {
     const isValid = await form.value.validate();
     if (isValid) {
@@ -141,27 +130,9 @@ const submitForm = async () => {
     }
   }
 };
-
 </script>
 
-
 <style scoped>
-.v-table-container {
-  max-height: 300px;
-  overflow-y: auto;
-  margin-top: 16px;
-}
-
-.v-table {
-  table-layout: fixed;
-  width: 100%;
-}
-
-.v-table th,
-.v-table td {
-  width: 25%;
-}
-
 .v-card-title {
   background-color: #f5f5f5;
   padding: 16px;
