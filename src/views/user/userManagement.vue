@@ -3,6 +3,7 @@ import { useUserStore } from '@/stores/user.store';
 import { computed, onMounted, ref } from 'vue';
 import AddUserDialog from '@/components/user/AddUserDialog.vue';
 import EditUserDialog from '@/components/user/EditUserDialog.vue';
+import DetailUserDialog from '@/components/user/DetailUserDialog.vue';
 import type { User } from '@/types/user.type';
 import { watch } from 'vue';
 
@@ -19,6 +20,11 @@ onMounted(async () => {
 const openEditUserDialog = (user: User) => {
   userStore.setUserForEdit(user);
   userStore.updateUserDialog = true;
+};
+
+const openDetailUserDialog = (user: User) => {
+  userStore.user = user;
+  userStore.detailUserDialog = true;
 };
 
 const handleSearchKeydown = (event: KeyboardEvent) => {
@@ -46,6 +52,7 @@ const filteredUsers = computed(() => {
 <template>
   <AddUserDialog v-model:dialog="userStore.createUserDialog"></AddUserDialog>
   <EditUserDialog v-model:dialog="userStore.updateUserDialog" :user="userStore.user"></EditUserDialog>
+  <DetailUserDialog v-model:dialog="userStore.detailUserDialog" :user="userStore.user"></DetailUserDialog>
 
   <v-container>
     <v-card class="fit-content">
@@ -101,7 +108,10 @@ const filteredUsers = computed(() => {
               <td class="text-center">{{ item.userStatus }}</td>
               <td class="text-center">{{ item.userRole }}</td>
               <td class="text-center">
+                <v-btn color="#ed8731 " class="mr-2" icon="mdi-pencil"><v-icon
+                  color="white" style="font-size: 20px;" @click="openDetailUserDialog(item)">mdi-eye-circle</v-icon></v-btn>
                 <v-btn color="#FFDD83" icon="mdi-pencil" @click="openEditUserDialog(item)"></v-btn>
+                
               </td>
             </tr>
             <tr v-if="!filteredUsers.length">

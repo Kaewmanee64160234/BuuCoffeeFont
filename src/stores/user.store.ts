@@ -17,6 +17,7 @@ export const useUserStore = defineStore("user", () => {
   const searchQuery = ref<string>("");
   const updateUserDialog = ref(false);
   const createUserDialog = ref(false);
+  const detailUserDialog = ref(false);
   const userRole = ref("พนักงานขายกาแฟ");
 
   const currentPage = ref(1); // Current page number
@@ -143,5 +144,6 @@ export const useUserStore = defineStore("user", () => {
     currentPage,
     itemsPerPage,
     totalUsers,
+    detailUserDialog
   };
 });

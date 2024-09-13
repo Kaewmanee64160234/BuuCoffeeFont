@@ -182,7 +182,7 @@ function closeDialog() {
                 <v-select
                   v-model="userRole"
                   label="ตำแหน่งงาน"
-                  :items="['พนักงานขายกาแฟ', 'พนักงานขายข้าว', 'ผู้จัดการร้าน']"
+                  :items="['พนักงานขายกาแฟ', 'พนักงานขายข้าว', 'ผู้จัดการร้าน', 'พนักงานบัญชี']"
                   :rules="[rules.required]"
                   variant="solo"
                   required
