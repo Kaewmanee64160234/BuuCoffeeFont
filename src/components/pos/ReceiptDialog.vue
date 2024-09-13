@@ -5,6 +5,9 @@
         <div class="receipt-content" id="printableArea">
           <div class="receipt-header text-center">
             <h4 class="header-text">Café@Library</h4>
+            <p style="text-align: center">Café@Library</p>
+            <p style="text-align: center">มหาวิทยาลัยบูรพา 169 ถนนลงหาดบางแสน ต.แสนสุข อ.เมืองชลบุรี จ.ชลบุรี</p>
+            <p style="text-align: center">เบอร์โทร : 038-102-495 (มหาวิทยาลัยบูรพา)</p>
             <div class="dashed-line"></div>
             <h4 class="text-center">ใบแจ้งรายการ</h4>
             <div class="dashed-line"></div>
