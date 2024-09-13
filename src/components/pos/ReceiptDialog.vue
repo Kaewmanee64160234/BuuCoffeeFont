@@ -6,26 +6,37 @@
           <div class="receipt-header text-center">
             <h4 class="header-text">Café@Library</h4>
             <div class="dashed-line"></div>
-            <div class="d-flex justify-space-between">
-              <p style="text-align: start">คิวที่: {{ posStore.currentReceipt?.queueNumber }}</p>
-              <p style="text-align: start">#{{ posStore.currentReceipt?.receiptNumber }}</p>
-            </div>
-            <p style="text-align: start">พนักงานออกใบเสร็จ: {{ posStore.currentReceipt?.user?.userName }}</p>
-            <p style="text-align: start">
-              ชื่อลูกค้า: {{
-                posStore.currentReceipt?.customer === null
-                  ? "guest"
-                  : posStore.currentReceipt?.customer?.customerName
-              }}
-            </p>
-            <div class="d-flex justify-space-between">
-              <p style="text-align: start">วันที่ออกใบเสร็จ: {{ formattedDate }}</p>
-              <p style="text-align: start">เวลา: {{ formattedTime }}</p>
-            </div>
+            <h4 class="text-center">ใบแจ้งรายการ</h4>
             <div class="dashed-line"></div>
+            <div class="d-flex justify-space-between">
+              <p style="text-align: start">คิวที่ : {{ posStore.currentReceipt?.queueNumber }}</p>
+            </div>
+            <p style="text-align: start">พนักงานออกใบเสร็จ : {{ posStore.currentReceipt?.user?.userName }}</p>
+            <div class="d-flex justify-space-between">
+              <p style="text-align: start">
+                ชื่อลูกค้า : {{
+                  posStore.currentReceipt?.customer === null
+                    ? "guest"
+                    : posStore.currentReceipt?.customer?.customerName
+                }}
+              </p>
+              <p style="text-align: start">ID : {{ posStore.currentReceipt?.receiptNumber }}</p>
+            </div>
+            
+            <div class="d-flex justify-space-between">
+              <p style="text-align: start">วันที่ออกใบเสร็จ : {{ formattedDate }}</p>
+              <p style="text-align: start">เวลา : {{ formattedTime }}</p>
+            </div>
+            
           </div>
           <div class="receipt-body">
-            <h4 class="text-center">ใบเสร็จ</h4>
+            <div class="dashed-line"></div>
+            <div class="d-flex justify-space-between">
+              <p style="text-align: start" class="ml-4">สินค้า</p>
+              <p style="text-align: start">ราคา</p>
+            </div>
+            <div class="dashed-line"></div>
+            
             <div v-for="item in posStore.currentReceipt?.receiptItems" :key="item.receiptItemId" class="receipt-item">
               <div class="item-details">
                 <div class="item-info d-flex justify-space-between">
@@ -33,7 +44,7 @@
                     {{ item.quantity }} x {{ item.product?.productName }} {{
                       item.product?.haveTopping ? item.productType?.productTypeName : '' }}
                   </p>
-                  <p class="product-price">{{ parseFloat(item.receiptSubTotal + '').toFixed(2) }} ฿</p>
+                  <p class="product-price">{{ parseFloat(item.receiptSubTotal + '').toFixed(2) }} </p>
                 </div>
               </div>
               <p class="toppings" v-if="item.product?.haveTopping">
@@ -44,7 +55,7 @@
                 <span v-for="topping in item.productTypeToppings" :key="topping.productTypeToppingId">
                   <span v-if="topping.topping">
                     {{ topping.quantity }} x {{ topping.topping.toppingName }}
-                    ({{ topping.topping.toppingPrice ? topping.topping.toppingPrice : 0 }} ฿) <br>
+                    ({{ topping.topping.toppingPrice ? topping.topping.toppingPrice : 0 }}) <br>
                   </span>
                 </span>
               </p>
@@ -52,38 +63,39 @@
           </div>
           <div class="dashed-line"></div>
           <div class="receipt-summary">
-            <p>จำนวนสินค้าที่ซื้อ: {{ posStore.currentReceipt?.receiptItems.length }}</p>
-            <p>โปรโมชันที่ใช้:</p>
+            <p>จำนวนสินค้าที่ซื้อ : {{ posStore.currentReceipt?.receiptItems.length }}</p>
+            <p>รูปแบบการจ่ายเงิน : {{ posStore.currentReceipt?.paymentMethod?.toUpperCase() }}</p>
+            <p>โปรโมชันที่ใช้ :</p>
             <div class="d-flex justify-space-between toppings"
               v-for="promotion in posStore.currentReceipt?.receiptPromotions" :key="promotion.promotion.promotionId">
               <p>{{ promotion.promotion.promotionName }}</p>
-              <p> {{ (promotion.discount ) }} ฿</p>
+              <p> {{ (promotion.discount ) }}</p>
             </div>
             <p class="total">
-              ยอดเงินรวม:
-              <span class="float-right">{{ (posStore.currentReceipt?.receiptTotalPrice ) }} บาท</span>
+              ยอดเงินรวม :
+              <span class="float-right">{{ (posStore.currentReceipt?.receiptTotalPrice ) }}</span>
             </p>
 
             <p class="discount">
-              ส่วนลด:
-              <span class="float-right">{{ (posStore.currentReceipt?.receiptTotalDiscount ) }} ฿</span>
+              ส่วนลด :
+              <span class="float-right">{{ (posStore.currentReceipt?.receiptTotalDiscount ) }} </span>
             </p>
             <p class="received">
-              เงินที่ได้รับ:
-              <span class="float-right">{{ (posStore.currentReceipt?.receive )}} ฿</span>
+              เงินที่ได้รับ :
+              <span class="float-right">{{ (posStore.currentReceipt?.receive )}} </span>
             </p>
             <p class="change">
-              เงินทอน:
-              <span class="float-right">{{ (posStore.currentReceipt?.change )}} ฿</span>
+              เงินทอน :
+              <span class="float-right">{{ (posStore.currentReceipt?.change )}} </span>
             </p>
             <p class="net-total">
-              ยอดรวมสุทธิ:
-              <span class="float-right">{{ (posStore.currentReceipt?.receiptNetPrice ) }} ฿</span>
+              ยอดรวมสุทธิ :
+              <span class="float-right">{{ (posStore.currentReceipt?.receiptNetPrice ) }} </span>
             </p>
           </div>
           <div class="dashed-line"></div>
-          <div class="receipt-footer text-center">
-            <p>{{ posStore.currentReceipt?.paymentMethod?.toUpperCase() }}</p>
+          <div class="receipt-footer text-center" style="font-size: 35px;">
+            <p>THANK YOU</p>
           </div>
           <div class="dashed-line"></div>
         </div>
@@ -145,7 +157,7 @@ const formattedTime = computed(() => {
 }
 
 .receipt-content {
-  width: 57mm;
+  width: 77mm;
   margin: 0 auto;
   padding: 20px;
   background-color: #fff;
@@ -159,7 +171,7 @@ const formattedTime = computed(() => {
 .receipt-body,
 .receipt-summary,
 .receipt-footer {
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
 
 .dashed-line {

@@ -582,7 +582,7 @@ const selectReceipt = (receipt: Receipt) => {
             <v-row class="d-flex justify-center pr-6" style="width: 100%;">
               <v-btn style="width: 40%; margin-right: 10px;" color="secondary" rounded
                 @click="prevStep">ย้อนกลับ</v-btn>
-              <v-btn style="width: 40%;" color="#FF9642" rounded @click="save">บันทึก</v-btn>
+              <v-btn style="width: 40%;" color="#FF9642" rounded @click="save">ยืนยันการชำระเงิน</v-btn>
             </v-row>
           </div>
         </div>
