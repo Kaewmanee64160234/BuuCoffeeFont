@@ -7,7 +7,7 @@
       permanent
       app
     >
-      <v-list-item class="drawer-header justify-end">
+      <v-list-item class="drawer-header justify-end ml-9" >
         <template v-slot:append>
           <v-btn
             icon="mdi-chevron-left"
@@ -203,7 +203,7 @@ const logout = () => {
 /* Default styles */
 .v-navigation-drawer {
   width: 250px;
-  background-color: #f2e4d8;
+  background-color: #f2e4d8; /* Background color for the entire drawer */
   transition: width 0.3s ease, left 0.3s ease; /* Add smooth transition */
 }
 
@@ -232,7 +232,7 @@ const logout = () => {
 }
 
 .v-app-bar {
-  background-color: #f5f5f5;
+  background-color: #f2e4d8; /* Same color as the navigation drawer */
   color: #333;
 }
 
@@ -253,7 +253,7 @@ const logout = () => {
 }
 
 .drawer-header {
-  background-color: #f5f5f5;
+  background-color: #f2e4d8; /* Match the color of the navigation drawer */
   padding: 16px;
 }
 
@@ -264,6 +264,7 @@ const logout = () => {
 .v-subheader {
   cursor: pointer;
 }
+
 .v-list {
   transition: max-height 0.5s ease-out;
   overflow: hidden;
