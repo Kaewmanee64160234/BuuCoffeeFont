@@ -160,7 +160,7 @@ const formattedTime = computed(() => {
 }
 
 .receipt-content {
-  width: 77mm;
+  width: 57mm;
   margin: 0 auto;
   padding: 20px;
   background-color: #fff;
