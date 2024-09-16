@@ -119,6 +119,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
       totalunit: number;
       unitprice: number;
       name: string;
+      importType: 'piece' | 'box';
     }[]
   >([]);
   const ingredientCheckList = ref<
@@ -128,6 +129,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
   const store = ref<string>("");
   const discount = ref<number>(0);
   const total = ref<number>(0);
+  const TypeIngredient = ref<string>("รายการวัตถุดิบ");
   const importStoreType = ref<string>("ร้านกาแฟ");
   const importDescription = ref<string>("");
   const actionType = ref<string>("");
@@ -154,9 +156,11 @@ export const useIngredientStore = defineStore("ingredient", () => {
         totalunit: 0,
         unitprice: 0,
         name: "",
+        importType: 'piece', 
       });
     }
   }
+  
   function Addingredienttotable(item: Ingredient) {
     const exists = ingredientCheckList.value.some(
       (ingredient) =>
@@ -212,6 +216,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
           pricePerUnit: item.totalunit,
           Quantity: item.count,
           unitPrice: item.unitprice,
+          importType: item.importType,
         };
       } else {
         return {
@@ -388,5 +393,6 @@ export const useIngredientStore = defineStore("ingredient", () => {
     getIngredients,
     saveCheckData,
     checkIngerdient,
+    TypeIngredient,
   };
 });

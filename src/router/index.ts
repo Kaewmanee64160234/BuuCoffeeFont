@@ -162,13 +162,6 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: "/report-inggredient-log",
-      name: "report-inggredient-log",
-      component: () =>
-        import("../views/ingredient/history/ReportIngredientView.vue"),
-      meta: { requiresAuth: true },
-    },
-    {
       path: "/category",
       name: "category",
       component: () => import("../views/category/CategoryView.vue"),

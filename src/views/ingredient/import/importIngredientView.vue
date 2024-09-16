@@ -30,12 +30,12 @@
           <v-row align="center">
             <v-col cols="auto" style="padding: 5px">
               <v-radio-group
-                v-model="ingredientStore.importStoreType"
+                v-model="ingredientStore.TypeIngredient"
                 row
                 :rules="[rules.required]"
               >
-                <v-radio label="เพิ่มรายการวัตถุดิบ" value="ร้านกาแฟ"></v-radio>
-                <v-radio label="เพิ่มรายการด้วยตัวเอง" value="ร้านข้าว"></v-radio>
+                <v-radio label="รายการวัตถุดิบ" value="รายการวัตถุดิบ"></v-radio>
+                <v-radio label="สำหรับวัตถุดิบของสด" value="รายการวัตถุดิบสด"></v-radio>
               </v-radio-group>
             </v-col>
           </v-row>
@@ -53,7 +53,7 @@
       <v-col cols="6" class="d-flex flex-column">
         <v-container>
           <v-row>
-            <template v-if="ingredientStore.importStoreType === 'ร้านกาแฟ'">
+            <template v-if="ingredientStore.TypeIngredient === 'รายการวัตถุดิบ'">
               <v-col
                 cols="3"
                 style="text-align: center; padding: 8px"
@@ -79,7 +79,7 @@
               </v-col>
             </template>
             <template
-              v-else-if="ingredientStore.importStoreType === 'ร้านข้าว'"
+              v-else-if="ingredientStore.TypeIngredient === 'รายการวัตถุดิบสด'"
             >
               <v-col cols="12" style="text-align: center; padding: 8px">
                 <v-text-field
@@ -113,17 +113,20 @@
               <tr>
                 <th>ลำดับ</th>
                 <th>ชื่อสินค้า</th>
-                <th v-if="ingredientStore.importStoreType === 'ร้านกาแฟ'">
+                <th v-if="ingredientStore.TypeIngredient === 'รายการวัตถุดิบ'">
                   แบรนด์
                 </th>
-                <th v-if="ingredientStore.importStoreType === 'ร้านกาแฟ'">
+                <th v-if="ingredientStore.TypeIngredient === 'รายการวัตถุดิบ'">
                   จำนวน
                 </th>
-                <th v-if="ingredientStore.importStoreType === 'ร้านกาแฟ'">
+                <th v-if="ingredientStore.TypeIngredient === 'รายการวัตถุดิบ'">
                   ราคาต้นทุน
                 </th>
-                <th v-if="ingredientStore.importStoreType === 'ร้านกาแฟ'">
+                <th v-if="ingredientStore.TypeIngredient === 'รายการวัตถุดิบ'">
                   ราคารวม
+                </th>
+                <th v-if="ingredientStore.TypeIngredient === 'รายการวัตถุดิบ'">
+                  แพ็ค/ชิ้น
                 </th>
                 <th>แอคชั่น</th>
               </tr>
@@ -133,15 +136,15 @@
                 <td>{{ index + 1 }}</td>
                 <td>
                   {{
-                    ingredientStore.importStoreType === "ร้านข้าว"
+                    ingredientStore.TypeIngredient === "รายการวัตถุดิบสด"
                       ? item.name
                       : item.ingredient?.ingredientName
                   }}
                 </td>
-                <td v-if="ingredientStore.importStoreType === 'ร้านกาแฟ'">
+                <td v-if="ingredientStore.TypeIngredient === 'รายการวัตถุดิบ'">
                   {{ item.ingredient?.ingredientSupplier }}
                 </td>
-                <td v-if="ingredientStore.importStoreType === 'ร้านกาแฟ'">
+                <td v-if="ingredientStore.TypeIngredient === 'รายการวัตถุดิบ'">
                   <input
                     type="number"
                     v-model.number="item.count"
@@ -149,7 +152,7 @@
                     min="1"
                   />
                 </td>
-                <td v-if="ingredientStore.importStoreType === 'ร้านกาแฟ'">
+                <td v-if="ingredientStore.TypeIngredient === 'รายการวัตถุดิบ'">
                   <input
                     type="number"
                     v-model.number="item.unitprice"
@@ -157,7 +160,7 @@
                     min="0"
                   />
                 </td>
-                <td v-if="ingredientStore.importStoreType === 'ร้านกาแฟ'">
+                <td v-if="ingredientStore.TypeIngredient === 'รายการวัตถุดิบ'">
                   <input
                     type="number"
                     v-model.number="item.totalunit"
@@ -165,6 +168,24 @@
                     min="0"
                   />
                 </td>
+                <td v-if="ingredientStore.TypeIngredient === 'รายการวัตถุดิบ'">
+      <label>
+        <input
+          type="radio"
+          v-model="item.importType"
+          value="piece"
+        />
+        ชิ้น
+      </label>
+      <label>
+        <input
+          type="radio"
+          v-model="item.importType"
+          value="box"
+        />
+        แพ็ค
+      </label>
+    </td>
 
                 <td>
                   <button
@@ -181,68 +202,122 @@
           </v-table>
         </v-card>
 
-        <v-row>
-          <v-col cols="6">
-            <v-row>
-              <v-col cols="12">ชื่อร้านค้า</v-col>
-              <v-col cols="12">
-                <v-text-field
-                  ref="storeField"
-                  label="กรุณากรอกชื่อร้านค้า"
-                  v-model="ingredientStore.store"
-                  :rules="[rules.required, rules.name]"
-                  dense
-                  hide-details
-                  variant="solo"
-                >
-                </v-text-field>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="12">ส่วนลด</v-col>
-              <v-col cols="12">
-                <v-text-field
-                  ref="discountField"
-                  label="กรุณากรอกส่วนลด"
-                  v-model="ingredientStore.discount"
-                  :rules="[rules.required, rules.number]"
-                  dense
-                  hide-details
-                  variant="solo"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-          </v-col>
-          <v-col cols="6">
-            <v-row>
-              <v-col cols="12">ราคารวมใบเสร็จ</v-col>
-              <v-col cols="12">
-                <v-text-field
-                  ref="totalField"
-                  label="กรุณากรอกราคารวมใบเสร็จ"
-                  v-model="ingredientStore.total"
-                  :rules="[rules.required, rules.number]"
-                  dense
-                  hide-details
-                  variant="solo"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="12">หมายเหตุ</v-col>
-              <v-col cols="12">
-                <v-text-field
-                  ref="discountField"
-                  label="กรุณาระบุหมายเหตุ **ถ้ามี"
-                  v-model="ingredientStore.importDescription"
-                  dense
-                  hide-details
-                  variant="solo"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-          </v-col>
-        </v-row>
+        <v-row class="mt-2">
+  <!-- Row 1: ชื่อร้านค้า และ ประเภทร้านค้า -->
+  <v-col cols="6">
+    <v-row>
+      <v-col cols="12">ชื่อร้านค้า</v-col>
+    </v-row>
+    <v-row class="mt-2">
+      <v-col cols="12">
+        <v-text-field
+          ref="storeField"
+          label="กรุณากรอกชื่อร้านค้า"
+          v-model="ingredientStore.store"
+          :rules="[rules.required, rules.name]"
+          dense
+          hide-details
+          variant="solo"
+        />
+      </v-col>
+    </v-row>
+  </v-col>
+
+  <v-col cols="6">
+    <v-row>
+      <v-col cols="12">ประเภทร้านค้า</v-col>
+    </v-row>
+    <v-row class="mt-2">
+      <v-col cols="12">
+        <v-radio-group
+          v-model="ingredientStore.importStoreType"
+          row
+          :rules="[rules.required]"
+        >
+          <v-radio label="ร้านกาแฟ" value="ร้านกาแฟ"></v-radio>
+          <v-radio label="ร้านข้าว" value="ร้านข้าว"></v-radio>
+        </v-radio-group>
+      </v-col>
+    </v-row>
+  </v-col>
+</v-row>
+
+<v-row class="mt-2">
+  <!-- Row 2: ส่วนลด และ ราคารวมใบเสร็จ -->
+  <v-col cols="6">
+    <v-row>
+      <v-col cols="12">ส่วนลด</v-col>
+    </v-row>
+    <v-row class="mt-2">
+      <v-col cols="12">
+        <v-text-field
+          ref="discountField"
+          label="กรุณากรอกส่วนลด"
+          v-model="ingredientStore.discount"
+          :rules="[rules.required, rules.number]"
+          dense
+          hide-details
+          variant="solo"
+        />
+      </v-col>
+    </v-row>
+  </v-col>
+
+  <v-col cols="6">
+    <v-row>
+      <v-col cols="12">ราคารวมใบเสร็จ</v-col>
+    </v-row>
+    <v-row class="mt-2">
+      <v-col cols="12">
+  <v-text-field
+    v-if="ingredientStore.TypeIngredient === 'รายการวัตถุดิบ'"
+    ref="totalField"
+    :value="computedTotal"
+    readonly
+    dense
+    hide-details
+    variant="solo"
+  />
+  
+  <v-text-field
+    v-else
+    ref="totalField"
+    label="กรุณากรอกราคารวมใบเสร็จ"
+    v-model="ingredientStore.total"
+    :rules="[rules.required, rules.number]"
+    dense
+    hide-details
+    variant="solo"
+  />
+</v-col>
+
+    </v-row>
+  </v-col>
+</v-row>
+
+<v-row class="mt-2">
+  <!-- Row 3: หมายเหตุ -->
+  <v-col cols="12">
+    <v-row>
+      <v-col cols="12">หมายเหตุ</v-col>
+    </v-row>
+    <v-row class="mt-2">
+      <v-col cols="12">
+        <v-text-field
+          ref="noteField"
+          label="กรุณาระบุหมายเหตุ **ถ้ามี"
+          v-model="ingredientStore.importDescription"
+          dense
+          hide-details
+          variant="solo"
+        />
+      </v-col>
+    </v-row>
+  </v-col>
+</v-row>
+
+
+
         <v-row>
           <v-col>
             <v-btn
@@ -283,6 +358,7 @@ watch(searchQuery, async (newQuery) => {
     await ingredientStore.getAllIngredients();
   }
 });
+
 
 function onSearch() {
   if (searchQuery.value.length >= 3) {
@@ -354,24 +430,25 @@ const resetForm = () => {
   }
 };
 watch(
-  () => ingredientStore.importStoreType,
+  () => ingredientStore.TypeIngredient,
   (newType) => {
     ingredientStore.ingredientList = [];
   }
 );
 const computedTotal = computed(() => {
-  if (ingredientStore.importStoreType === "ร้านกาแฟ") {
-    return (
-      ingredientStore.ingredientList.reduce((total, item) => {
-        return total + (item.totalunit || 0);
-      }, 0) - (ingredientStore.discount || 0)
-    );
+  let total = 0;
+
+  if (ingredientStore.TypeIngredient === "รายการวัตถุดิบ") {
+    total = ingredientStore.ingredientList.reduce((sum, item) => {
+      return sum + (item.totalunit || 0);
+    }, 0);
+  } else if (ingredientStore.TypeIngredient === "รายการวัตถุดิบสด") {
+    total = ingredientStore.total || 0;
   }
-  if (ingredientStore.importStoreType === "ร้านข้าว") {
-    return (ingredientStore.total || 0) - (ingredientStore.discount || 0);
-  }
-  return 0;
+
+  return total - (ingredientStore.discount || 0);
 });
+
 
 const reversedIndex = (index: number) => {
   return ingredientStore.ingredientList.length - 1 - index;

@@ -109,15 +109,15 @@ watch(paginate, async (newValue, oldValue) => {
               <template v-slot:activator="{ props }">
                 <v-btn color="red" class="button-full-width" v-bind="props">
                   <v-icon left>mdi-arrow-up-thick</v-icon>
-                   วัตถุดิบหมดอายุ
+                   วัตถุดิบหมดอายุ / เสียหาย
                 </v-btn>
               </template>
               <v-list>
                 <v-list-item @click="navigateTo('checkingredient')">
-                  <v-list-item-title> เช็ควัตถุดิบ </v-list-item-title>
+                  <v-list-item-title> นำออกวัตถุดิบ </v-list-item-title>
                 </v-list-item>
                 <v-list-item @click="navigateTo('checkingredientHistory')">
-                  <v-list-item-title>ประวัติเช็ควัตถุดิบ </v-list-item-title>
+                  <v-list-item-title>ประวัตินำออกวัตถุดิบ </v-list-item-title>
                 </v-list-item>
               </v-list>
             </v-menu>
@@ -140,9 +140,6 @@ watch(paginate, async (newValue, oldValue) => {
                 <v-list-item @click="navigateTo('history-catering-store')">
                   <v-list-item-title>ร้านเลี้ยงรับรอง </v-list-item-title>
                 </v-list-item>
-                <v-list-item @click="navigateTo('report-inggredient-log')">
-                  <v-list-item-title>การใช้วัตถุดิบ </v-list-item-title>
-                </v-list-item>
               </v-list>
             </v-menu>
           </v-col>
@@ -156,10 +153,7 @@ watch(paginate, async (newValue, oldValue) => {
             <th style="text-align: center;font-weight: bold;">รูปภาพ</th>
             <th style="text-align: center;font-weight: bold;">ชื่อวัตถุดิบ</th>
             <th style="text-align: center;font-weight: bold;">ผู้จัดจำหน่าย</th>
-            <th style="text-align: center;font-weight: bold;">จำนวนคงเหลือ</th>
-            <th style="text-align: center;font-weight: bold;">จำนวนต่อหน่วย</th>
-            <th style="text-align: center;font-weight: bold;">จุดสั่งซื้อขั้นต่ำ</th>
-            <th style="text-align: center;font-weight: bold;">หน่วยที่ถูกใช้ไป</th>
+            <th style="text-align: center;font-weight: bold;">จำนวนที่มีในคลัง</th>
             <th style="text-align: center;font-weight: bold;">การกระทำ</th>
           </tr>
         </thead>
@@ -172,9 +166,6 @@ watch(paginate, async (newValue, oldValue) => {
             <td>{{ item.ingredientName }}</td>
             <td>{{ item.ingredientSupplier }}</td>
             <td :style="{ color: item.ingredientQuantityInStock <= item.ingredientMinimun ? 'red' : 'black' }">{{ item.ingredientQuantityInStock }} {{ item.ingredientUnit }}</td>
-            <td>{{ item.ingredientQuantityPerUnit }} {{ item.ingredientQuantityPerSubUnit}}</td>
-            <td>{{ item.ingredientMinimun }} {{ item.ingredientUnit }}</td>
-            <td>{{ item.ingredientRemining }} {{ item.ingredientQuantityPerSubUnit }}</td>
             <td>
               <v-btn color="#FFDD83" class="mr-5" icon="mdi-pencil" @click="ingredientStore.setEditedIngredient(item)"></v-btn>
               <v-btn color="#FFDD83" class="mr-5" icon="mdi-delete" @click="deleteIngredient(item.ingredientId)"></v-btn>

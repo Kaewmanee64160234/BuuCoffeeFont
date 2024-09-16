@@ -8,6 +8,7 @@ export interface Ingredient {
   ingredientUnit?: string;
   ingredientQuantityInStock: number; 
   ingredientQuantityPerUnit?: number;
+  importType?: string;
   ingredientQuantityPerSubUnit?: string;
   ingredientRemining?: number; 
 }

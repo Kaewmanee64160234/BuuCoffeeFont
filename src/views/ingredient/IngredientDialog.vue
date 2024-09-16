@@ -52,10 +52,14 @@ function cancel() {
   imagePreview.value = null;
 }
 const units = [
+  "กล่อง",
+  "แพ็ค",
+  "ถุง",
+
+];
+const subunits = [
   "กระปุก",
   "กระป๋อง",
-  "กระบอก",
-  "กล่อง",
   "แก้ว",
   "ขวด",
   "ชิ้น",
@@ -66,17 +70,6 @@ const units = [
   "ชาม",
   "ซอง",
   "ถุง",
-
-  'อื่นๆ'
-];
-const subunits = [
-  'กรัม',
-  'ชิ้น',
-  'มิลิกรัม',
-  'ลิตร',
-  'มิลิลิตร',
-  'กิโลกรัม',
-  'อื่นๆ'
 ];
 </script>
 
@@ -90,6 +83,7 @@ const subunits = [
       <v-card-text>
         <v-form ref="form">
           <v-container>
+            <v-row> ตัวอย่าง : <strong>เนสกาแฟ เบลนด์ แอนด์ บรู กาแฟปรุงสำเร็จ ริช อโรมา </strong><strong>1 ถุง มี 27 ซอง</strong>  ขั้นต่ำในคลัง <strong>100 ซอง</strong> </v-row>
             <v-row>
               <v-col cols="12" sm="12" class="d-flex justify-center align-center">
                 <v-img v-if="imagePreview" :src="imagePreview" width="200" height="200" class="rounded-card"></v-img>
@@ -109,7 +103,7 @@ const subunits = [
             </v-row>
             <v-row>
               <v-col cols="12" sm="6">
-                <v-text-field label="ชื่อวัตถุดิบ (ตัวอย่าง : ผงกาแฟ)" required
+                <v-text-field label="ชื่อวัตถุดิบ (ตัวอย่าง : เนสกาแฟ เบลนด์ แอนด์ บรู กาแฟปรุงสำเร็จ ริช อโรมา)" required
                   v-model="ingredientStore.editedIngredient.ingredientName" :rules="[
                     (v) => !!v || 'กรุณากรอกชื่อวัตถุดิบ',
                     (v) => v.length >= 3 || 'ความยาวต้องมากกว่า 3 ตัวอักษร',
@@ -123,14 +117,14 @@ const subunits = [
             </v-row>
             <v-row>
               <v-col cols="12" sm="6">
-                <v-text-field label="ขั้นต่ำ (ตัวอย่าง : 10)" v-model.number="ingredientStore.editedIngredient.ingredientMinimun
+                <v-text-field label="จุดสั่งซื้อขั้นต่ำ (ตัวอย่าง : 100) สำหรับแจ้งเตือน" v-model.number="ingredientStore.editedIngredient.ingredientMinimun
                   " :rules="[
                     (v) => !!v || 'กรุณากรอกขั้นต่ำ',
                     (v) => v >= 0 || 'ขั้นต่ำต้องมากกว่า 0',
                   ]" dense hide-details variant="solo"></v-text-field>
               </v-col>
               <v-col cols="12" sm="6">
-                <v-autocomplete label="หน่วย (ตัวอย่าง : ซอง)" v-model="ingredientStore.editedIngredient.ingredientUnit"
+                <v-autocomplete label="หน่วยใหญ่ (ตัวอย่าง : ถุง)" v-model="ingredientStore.editedIngredient.ingredientUnit"
                   :items="units" dense hide-details variant="solo"></v-autocomplete>
               </v-col>
 
@@ -139,14 +133,14 @@ const subunits = [
 
 
               <v-col cols="12" sm="6">
-                <v-text-field label="ปริมาณต่อหน่วย/ย่อย (ตัวอย่าง : 250)" v-model.number="ingredientStore.editedIngredient.ingredientQuantityPerUnit
+                <v-text-field label="ปริมาณหน่วยย่อย (ตัวอย่าง : 27)" v-model.number="ingredientStore.editedIngredient.ingredientQuantityPerUnit
                   " :rules="[
                     (v) => !!v || 'กรุณากรอกปริมาณต่อหน่วย',
                     (v) => v > 0 || 'ปริมาณต้องมากกว่า 0',
                   ]" dense hide-details variant="solo"></v-text-field>
               </v-col>
               <v-col cols="12" sm="6">
-                <v-autocomplete label="หน่วย/ย่อย (ตัวอย่าง : มิลิกรัม ) **หน่วยที่ใช้ปรุง" v-model.number="ingredientStore.editedIngredient
+                <v-autocomplete label="หน่วย/ย่อย (ตัวอย่าง : ซอง ) " v-model.number="ingredientStore.editedIngredient
                     .ingredientQuantityPerSubUnit
                   " :items="subunits" dense hide-details variant="solo"></v-autocomplete>
               </v-col>
