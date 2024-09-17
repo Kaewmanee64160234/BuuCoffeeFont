@@ -27,7 +27,7 @@
         </v-subheader>
         
         <v-expand-transition>
-          <v-list v-show="showSale">
+          <v-list v-show="showSale" style="padding-left: 33px;">
             <v-list-item to="/report">
               <template v-slot:prepend>
                 <img src="../../src/components/img/dashboard.png" alt="รายงานสรุปผล" class="nav-icon" />
@@ -59,7 +59,7 @@
         </v-subheader>
         
         <v-expand-transition>
-          <v-list v-show="showCatering">
+          <v-list v-show="showCatering" style="padding-left: 33px;">
             <v-list-item to="/pos-catering">
               <template v-slot:prepend>
                 <img src="../../src/components/img/catering.png" alt="การเลี้ยงรับรอง" class="nav-icon" />
@@ -85,7 +85,7 @@
         </v-subheader>
         
         <v-expand-transition>
-          <v-list v-show="showProductUserManagement">
+          <v-list v-show="showProductUserManagement" style="padding-left: 33px;">
             <v-list-item to="/productsManagement">
               <template v-slot:prepend>
                 <img src="../../src/components/img/product.png" alt="จัดการสินค้า" class="nav-icon" />
@@ -118,7 +118,7 @@
         </v-subheader>
 
         <v-expand-transition>
-          <v-list v-show="showPromotionCategory">
+          <v-list v-show="showPromotionCategory" style="padding-left: 33px;">
             <v-list-item to="/promotion">
               <template v-slot:prepend>
                 <img src="../../src/components/img/promotion.png" alt="จัดการโปรโมชัน" class="nav-icon" />
@@ -150,7 +150,7 @@
         </v-subheader>
 
         <v-expand-transition>
-          <v-list v-show="showIngredients">
+          <v-list v-show="showIngredients" style="padding-left: 33px;">
             <v-list-item to="/ingredientList">
               <template v-slot:prepend>
                 <img src="../../src/components/img/groceries.png" alt="รายการวัตถุดิบ" class="nav-icon" />
@@ -189,7 +189,7 @@
         </v-subheader>
 
         <v-expand-transition>
-          <v-list v-show="showOthers">
+          <v-list v-show="showOthers" style="padding-left: 33px;">
             <v-list-item @click="logout">
               <template v-slot:prepend>
                 <img src="../../src/components/img/power.png" alt="ออกจากระบบ" class="nav-icon" />
@@ -304,11 +304,7 @@ const logout = () => {
 }
 
 .v-list .v-list-item {
-  padding-left: 40px; /* Adjust this value for the desired indentation */
-}
-
-.v-list .v-list-item .nav-icon {
-  margin-left: 0; /* Remove extra left margin from icons in nested list */
+  padding-left: 30px; /* Adjust this value for the desired indentation */
 }
 
 .v-list-item-title {
@@ -336,7 +332,7 @@ const logout = () => {
 .nav-icon {
   width: 24px;
   height: 24px;
-  margin-right: 8px; /* Space between image and text */
+  margin-right: 10px; /* Space between image and text */
 }
 
 .drawer-header {
@@ -374,7 +370,7 @@ const logout = () => {
   display: flex;
   align-items: center;
   justify-content: flex-start; /* Align items to the left */
-  padding: 0 16px;
+  padding: 0 8px;
   height: 48px;
 }
 

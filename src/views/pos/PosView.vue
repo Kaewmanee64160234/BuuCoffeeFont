@@ -198,62 +198,74 @@ const showQueue = computed(() => {
         <v-container fluid class="queue-container" style="height: 100vh; overflow-y: auto; padding: 0;">
           <h2 class="pa-2 ml-3 mt-2">Queue</h2>
           <v-row class="fill-height" no-gutters>
-              <v-col v-if="posStore.queueReceipt.length > 0" cols="12">
-                  <v-card v-for="(receipt, index) in posStore.queueReceipt" :key="index" class="queue-card"
-                          @click="selectReceipt(receipt!)" elevation="3" style="margin-bottom: 8px;">
-                      <v-card-title class="d-flex" style="fit-content; position: relative; padding-left: 8px;">
-                          <div class="queue-title" style="display: flex; flex-direction: column; align-items: flex-start; width: 100%;">
-                              <span class="queue-info" style="font-size: 1em; width: 100%;">
-                                  คิวที่{{ index + 1 }}
-                                  <span class="customer-name" style="font-size: 0.8em;">
-                                      {{ receipt.customer?.customerName || 'ลูกค้าทั่วไป' }}
-                                  </span>
-                              </span>
-      
-                              <div v-if="receipt.receiptItems && receipt.receiptItems.length > 0" style="margin-top: 4px;">
-                                <div v-for="(item, itemIndex) in receipt.receiptItems" :key="itemIndex" style="font-size: 0.8em; margin-bottom: 4px;">
-                                  <!-- Display product name and quantity -->
-                                  {{ item.product?.productName }} x {{ item.quantity }}
-                                
-                                  <!-- Display additional product details if applicable -->
-                                  <div v-if="item.product?.haveTopping ">
-                                    ประเภท {{ item.productType?.productTypeName }}
-                                  </div>
-                                  <div class="toppings" v-if="item.product?.haveTopping">
-                                    ความหวาน {{ item.sweetnessLevel }}%
-                                  </div>
-                              
-                                  <!-- Display toppings and quantities -->
-                                  <div v-if="item.productTypeToppings && item.productTypeToppings.length > 0">
-                                    <span v-for="(topping, toppingIndex) in item.productTypeToppings" :key="toppingIndex">
-                                      <span v-if="topping.topping">
-                                        ท็อปปิ้ง {{ topping.topping.toppingName }} x {{ topping.quantity }} 
-                                      </span>
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
+            <v-col v-if="posStore.queueReceipt.length > 0" cols="12">
+              <v-card v-for="(receipt, index) in posStore.queueReceipt" :key="index" class="queue-card" @click="selectReceipt(receipt!)" elevation="3" style="margin-bottom: 8px;">
+                <v-card-title class="d-flex" style="fit-content; position: relative; padding-left: 8px;">
+                  <div class="queue-title" style="display: flex; flex-direction: column; align-items: flex-start; width: 100%;">
+                    <span class="queue-info" style="font-size: 1em; width: 100%;">
+                      คิวที่ {{ index + 1 }}
+                      <span class="customer-name" style="font-size: 0.8em;">
+                        {{ receipt.customer?.customerName || 'ลูกค้าทั่วไป' }}
+                      </span>
+                    </span>
+          
+                    <div v-if="receipt.receiptItems && receipt.receiptItems.length > 0" style="margin-top: 4px;">
+                      <div v-for="(item, itemIndex) in receipt.receiptItems" :key="itemIndex" style="margin-bottom: 8px;">
+                        <!-- Display product name and quantity -->
+                        <div style="font-size: 0.8em;">
+                          {{ item.product?.productName }} x {{ item.quantity }}
+                        </div>
+          
+                        <!-- Display product type if applicable -->
+                        <div v-if="item.product?.haveTopping">
+                          ประเภท: {{ item.productType?.productTypeName }}
+                        </div>
+          
+                        <!-- Display sweetness level if applicable -->
+                        <div v-if="item.product?.haveTopping">
+                          ความหวาน: {{ item.sweetnessLevel }}%
+                        </div>
+          
+                        <!-- Display toppings as a list -->
+                        <div v-if="item.productTypeToppings && item.productTypeToppings.length > 0">
+                          <span v-if="item.productTypeToppings.length === 1">
+                            ท็อปปิ้ง: {{ item.productTypeToppings[0].topping.toppingName }} x {{ item.productTypeToppings[0].quantity }}
+                          </span>
+                          <div v-else>
+                            ท็อปปิ้ง:
+                            <ul style="padding-left: 33px; font-size: 0.8em; margin-top: 4px;">
+                              <li v-for="(topping, toppingIndex) in item.productTypeToppings" :key="toppingIndex">
+                                {{ topping.topping.toppingName }} x {{ topping.quantity }}
+                              </li>
+                            </ul>
                           </div>
-                          <v-btn icon @click.stop="removeFromQueue(index)" class="delete-button" style="position: absolute; top: 1px; right: 1px; border-radius: 50%; width: 36px; height: 36px; background-color: white;">
-                              <v-icon color="red" style="font-size: 24px;">mdi-delete</v-icon>
-                          </v-btn>
-                      </v-card-title>
-      
-                      <v-card-subtitle class="queue-details" style="font-size: 0.75em; padding-left: 8px;">
-                          คลิกเพื่อดูรายละเอียดเพิ่มเติม
-                      </v-card-subtitle>
-                  </v-card>
-              </v-col>
-      
-              <v-col v-else cols="12">
-                  <v-card class="queue-card" elevation="3">
-                      <v-card-title class="text-center">ไม่มีคิว</v-card-title>
-                  </v-card>
-              </v-col>
+                        </div>
+          
+                        <!-- Separator between products -->
+                        <hr v-if="itemIndex < receipt.receiptItems.length - 1" style="border-top: dashed 1px; margin-top: 8px; margin-bottom: 8px;" />
+                      </div>
+                    </div>
+                  </div>
+                  <v-btn icon @click.stop="removeFromQueue(index)" class="delete-button" style="position: absolute; top: 1px; right: 1px; border-radius: 50%; width: 36px; height: 36px; background-color: white;">
+                    <v-icon color="red" style="font-size: 24px;">mdi-delete</v-icon>
+                  </v-btn>
+                </v-card-title>
+          
+                <v-card-subtitle class="queue-details" style="font-size: 0.75em; padding-left: 8px;">
+                  คลิกเพื่อดูรายละเอียดเพิ่มเติม
+                </v-card-subtitle>
+              </v-card>
+            </v-col>
+          
+            <v-col v-else cols="12">
+              <v-card class="queue-card" elevation="3">
+                <v-card-title class="text-center">ไม่มีคิว</v-card-title>
+              </v-card>
+            </v-col>
           </v-row>
-      </v-container>
-      
-      
+          
+          
+        </v-container>
       </v-col>
 
 
