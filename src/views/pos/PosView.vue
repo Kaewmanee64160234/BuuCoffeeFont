@@ -282,7 +282,7 @@ const showQueue = computed(() => {
           </v-row>
 
           <!-- Barcode Input and Fullscreen Button -->
-          <v-row class="full-width-row" style="overflow: hidden; margin-bottom: 10px;">
+          <v-row class="full-width-row" style="overflow: hidden; margin-bottom: 5px; margin-top: -20px;">
             <v-col cols="12" md="6">
               <v-text-field v-model="barcode" append-icon="mdi-barcode" label="สแกนบาร์โค้ด" variant="solo" dense
                 hide-details @change="handleBarcodeInput"
@@ -318,7 +318,7 @@ const showQueue = computed(() => {
           <v-row class="full-width-row product-list-container" style="flex: 1; overflow-y: auto;">
             <v-tabs-items v-model="selectedCategory" style="width: 100%;">
               <v-tab-item>
-                <v-container fluid class="full-width-container" style="margin-left: 20px;"   >
+                <v-container fluid class="full-width-container" style="margin-left: 10px;"   >
                   <v-row class="full-width-row">
                     <!-- Adjusted column size to 6 for 2 columns per row -->
                     <v-col v-for="product in productFilters" :key="product.productId" cols="12" sm="6" md="6" lg="6"
@@ -350,7 +350,6 @@ const showQueue = computed(() => {
 </template>
 
 
-
 <style scoped>
 .full-width-container,
 .full-width-row {
@@ -361,6 +360,20 @@ const showQueue = computed(() => {
 
 .full-width-tabs {
   width: 100%;
+  margin-top: -20px; /* Move tabs up */
+  /* Add padding or margin adjustments as needed */
+}
+
+.tab-content {
+  padding: 10px;
+  /* Ensure content is aligned properly */
+}
+
+.qr-code-container {
+  width: 100%;
+  margin-top: -20px; /* Move QR code scanner up */
+  padding: 10px;
+  /* Adjust padding or margin if necessary */
 }
 
 .product-list-container {
@@ -374,7 +387,9 @@ const showQueue = computed(() => {
 }
 
 .product-card {
-  width: 100%;
+  width: 90%;
+  max-width: 350px; /* Optional: Set a max-width for larger screens */
+  height: ; /* Adjust height */
   display: flex;
   flex-direction: column;
   align-items: start;
@@ -385,6 +400,8 @@ const showQueue = computed(() => {
   margin: 10px;
   transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
   background-color: #fff;
+  position: relative; /* Enable positioning adjustments */
+  top: -20px; /* Adjust to move the card further up */
 }
 
 .product-card:hover {
@@ -394,7 +411,7 @@ const showQueue = computed(() => {
 
 .product-image {
   width: 100%;
-  height: 200px;
+  height: 150px; /* Reduce image height */
   object-fit: cover;
   border-radius: 10px;
 }
@@ -529,3 +546,5 @@ const showQueue = computed(() => {
   background: #555;
 }
 </style>
+
+
