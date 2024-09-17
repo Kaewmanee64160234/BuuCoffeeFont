@@ -26,6 +26,9 @@ function getAllHistoryRice() {
 function getAllHistoryCatering() {
   return http.get("/checkingredients/findByShopType?shopType=catering");
 }
+function getAllHistoryCateringHistory() {
+  return http.get("/checkingredients/findByShopType?shopType=catering&actionType=withdrawalHistory");
+}
 function createImportIngredients(ingredient: {
   importingredientitem: {
     ingredientId: number;
@@ -187,7 +190,6 @@ const createReturnWithdrawalIngredientsForCatering = (ingredient: {
 
 
 
-
 export default {
   getAllIngredients,
   createImportIngredients,
@@ -212,5 +214,6 @@ export default {
   createSubInventoriesCatering,
   createReturnWithdrawalIngredientsForCatering,
   getSubIngredients_Catering,
-  getAllHistoryCatering
+  getAllHistoryCatering,
+  getAllHistoryCateringHistory
 };

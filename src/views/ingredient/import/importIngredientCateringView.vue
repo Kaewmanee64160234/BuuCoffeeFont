@@ -149,7 +149,7 @@ const saveCheckData = async () => {
                 <v-img :src="`http://localhost:3000/ingredients/${item.ingredient.ingredientId}/image`" height="100"></v-img>
                 <v-card-title style="font-size: 14px">{{ item.ingredient.ingredientName }}</v-card-title>
                 <v-card-subtitle style="font-size: 12px">{{ item.ingredient.ingredientSupplier }}</v-card-subtitle>
-                <v-card-subtitle style="font-size: 12px">{{ item.lastPrice }}</v-card-subtitle>
+                <v-card-subtitle style="font-size: 12px">ราคาต้นทุน {{ item.lastPrice }} บาท</v-card-subtitle>
               </v-card>
             </v-col>
           </v-row>

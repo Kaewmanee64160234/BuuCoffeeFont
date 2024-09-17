@@ -60,7 +60,7 @@
         
         <v-expand-transition>
           <v-list v-show="showCatering" style="padding-left: 33px;">
-            <v-list-item to="/pos-catering">
+            <v-list-item to="/importingredientcatering">
               <template v-slot:prepend>
                 <img src="../../src/components/img/catering.png" alt="การเลี้ยงรับรอง" class="nav-icon" />
               </template>

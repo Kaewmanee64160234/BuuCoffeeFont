@@ -83,6 +83,16 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
       console.error(error);
     }
   };
+  const findByShopTypeCateringHistory = async () => {
+    try {
+      const response = await ingredientService.getAllHistoryCateringHistory();
+      if (response.status === 200) {
+        HistoryCatering.value = response.data;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
   async function getSubIngredients_coffee() {
     try {
       const res = await ingredientService.getSubIngredients_Coffee();
@@ -329,6 +339,7 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
     removeCheckIngredient,
     findByShopTypeCatering,
     HistoryCatering,
-    createReturnWithdrawalIngredientsForCateringHistory
+    createReturnWithdrawalIngredientsForCateringHistory,
+    findByShopTypeCateringHistory
   };
 });

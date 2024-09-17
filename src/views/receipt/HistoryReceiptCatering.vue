@@ -1,410 +1,231 @@
 <script lang="ts" setup>
-import { useReceiptStore } from '@/stores/receipt.store';
-import { computed, onMounted, ref } from 'vue';
-import type { Receipt } from '@/types/receipt.type';
-import { useReceiptsStore } from '@/stores/report/receiptsStore';
-import * as XLSX from 'xlsx';
-import HistoryReceiptDialogCatering from '@/components/receipts/HistoryReceiptDialogCatering.vue';
-import { useCheckIngredientStore } from '@/stores/historyIngredientCheck.store';
-import { usePosStore } from '@/stores/pos.store';
-
-const receiptsStore = useReceiptsStore();
-const startDate = ref('');
-const endDate = ref('');
-const receiptType = ref<string>('ร้านจัดเลี้ยง');
-const receiptStore = useReceiptStore();
+import { useCheckIngredientStore } from "@/stores/historyIngredientCheck.store";
+import { onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
+import dialogImportItemCatering from "@/views/ingredient/check/dialogCheckCatering.vue";
+import { useSubIngredientStore } from "@/stores/ingredientSubInventory.store";
+import type { Checkingredient } from "@/types/checkingredientitem.type";
+import * as XLSX from "xlsx";
 const ingredientStore = useCheckIngredientStore();
+const subIngredientStore = useSubIngredientStore();
 
-const historyReceiptDialog = ref(false);
-const editDialog = ref(false); // New ref for edit dialog
-const posStore = usePosStore();
-
-const currentPage = ref(1);
-const itemsPerPage = ref(10);  // Default 10 items per page
-
-
-
-const fetchData = async () => {
-  await receiptsStore.fetchReceipts(startDate.value, endDate.value, receiptType.value);
-};
-
-const exportToExcel = () => {
-  fetchData();
-  const formattedReceipts = formatReceiptsForExcel(receiptsStore.receipts);
-  const worksheet = XLSX.utils.json_to_sheet(formattedReceipts, {
-    header: [
-      'receiptTotalPrice',
-      'receiptTotalDiscount',
-      'receiptNetPrice',
-      'receiptStatus',
-      'receiptType',
-      'queueNumber',
-      'paymentMethod',
-      'createdDate',
-      'updatedDate',
-      'receiptItems',
-      'userName',
-      'customer',
-      'receiptPromotions',
-    ]
-  });
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'Receipts');
-
-  const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'binary' });
-  const blob = new Blob([s2ab(wbout)], { type: 'application/octet-stream' });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = 'receipts.xlsx';
-  link.click();
-};
-
-const s2ab = (s: string) => {
-  const buf = new ArrayBuffer(s.length);
-  const view = new Uint8Array(buf);
-  for (let i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
-  return buf;
-};
-
-const receipts = receiptsStore.receipts;
-
+const router = useRouter();
+const historyCheckDialog = ref(false);
+const selectedCheck = ref<Checkingredient | null>(null);
 onMounted(async () => {
-  await receiptStore.getAllReceipts();
+  await subIngredientStore.findByShopTypeCateringHistory();
 });
 
-const openHistoryReceiptDialog = async (receipt: Receipt) => {
-  receiptStore.receipt = receipt;
-  await ingredientStore.getHistoryCheckById(receiptStore.receipt?.checkIngredientId!);
-
-  receiptStore.historyReceiptDialogCatering = true;
-};
-
-const openEditDialog = (receipt: Receipt) => {
-  posStore.receipt = { ...receipt };
-  editDialog.value = true;
-};
-
-const handleSearchKeydown = (event: KeyboardEvent) => {
-  if (event.key === 'Enter') {
-    // Optionally, you could trigger search here if needed
-  }
-};
-
-const filteredReceipts = computed(() => {
-  // Use dynamic type filtering based on the selected receipt type
-  const typeFilter = receiptType.value || 'ร้านจัดเลี้ยง';
-
-  // Filter receipts based on the selected receipt type
-  let filteredByType = receiptStore.receipts.filter(
-    (receipt) => receipt.receiptType === typeFilter
-  );
-
-  // If search query is provided, filter by customer name or receipt ID
-  if (receiptStore.searchQuery) {
-    filteredByType = filteredByType.filter(receipt =>
-      receipt.customer?.customerName?.toLowerCase().includes(receiptStore.searchQuery.toLowerCase()) ||
-      receipt.receiptId?.toString().includes(receiptStore.searchQuery)
-    );
-  }
-
-  // Sort filtered results by creation date (newest first)
-  filteredByType = filteredByType.sort((a, b) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime());
-
-  // Apply pagination: slice the filtered array to the current page
-  const start = (receiptStore.currentPage - 1) * receiptStore.itemsPerPage;
-  const end = start + receiptStore.itemsPerPage;
-
-  return filteredByType.slice(start, end);
-});
-
-
-
-const formatDate = (date: any) => {
-  if (!date) return ''; // Handle case where date is not provided
-
-  const jsDate = new Date(date.toString()); // Convert date to string and create Date object
-  const formattedDate = jsDate.toLocaleDateString('th-TH', { 
-    day: '2-digit', 
-    month: '2-digit', 
-    year: 'numeric', 
-    timeZone: 'Asia/Bangkok' 
-  }); // Format the date in the desired format
-  
-  const formattedTime = jsDate.toLocaleTimeString('th-TH', {
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone: 'Asia/Bangkok'
-  }); // Format the time in the desired format
-  
-  return `${formattedDate} เวลา ${formattedTime}`; // Combine date and time
-};
-
-const formatReceiptsForExcel = (receipts: Receipt[]) => {
-  return receipts.flatMap(receipt => {
-    return receipt.receiptItems.map(item => ({
-      receiptTotalPrice: receipt.receiptTotalPrice,
-      receiptTotalDiscount: receipt.receiptTotalDiscount,
-      receiptNetPrice: receipt.receiptNetPrice,
-      receiptStatus: receipt.receiptStatus,
-      receiptType: receipt.receiptType,
-      queueNumber: receipt.queueNumber,
-      paymentMethod: receipt.paymentMethod,
-      createdDate: receipt.createdDate,
-      updatedDate: receipt.updatedDate,
-      quantity: item.quantity,
-      receiptSubTotal: item.receiptSubTotal,
-      sweetnessLevel: item.sweetnessLevel,
-      productTypeName: item.productType.productTypeName,
-      productName: item.product.productName,
-      productPrice: item.product.productPrice,
-      categoryName: item.product.category.categoryName,
-      userName: receipt.user?.userName,
-      customer: receipt.customer,
-      discount: receipt.receiptPromotions.map(promo => promo.discount).join(', '),
-      promotionNames: receipt.receiptPromotions.map(promo => promo.promotion.promotionName).join(', ')
-    }));
-  });
-};
-
-const statusClass = (status: string) => {
-  return {
-    'text-success': status === 'paid',
-    'text-danger': status === 'cancel',
-    'text-warning': status === 'unpaid',
+const formatDate = (dateString: string) => {
+  const options = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    timeZone: "UTC",
   };
+  return new Date(dateString).toLocaleDateString("th-TH", options!);
 };
 
-const statusText = (status: string) => {
-  switch (status) {
-    case 'paid':
-      return 'สำเร็จ';
-    case 'cancel':
-      return 'ยกเลิก';
-    case 'unpaid':
-      return 'รอการดำเนินการ';
-    default:
-      return status;
-  }
+const navigateTo = (routeName: string) => {
+  router.push({ name: routeName });
 };
 
-// Update change amount based on receive and net price
-const updateChange = () => {
-  if (posStore.receipt) {
-    posStore.receipt.change = posStore.receipt.receive - posStore.receipt.receiptNetPrice;
-  }
+const openHistoryCheckDialog = (checkingredient: Checkingredient) => {
+  ingredientStore.checkingredient = checkingredient;
+  ingredientStore.dialogCheckItem = true;
 };
+function exportToExcel(checkingredient: Checkingredient) {
+  const basicData = {
+    วันที่: checkingredient.date,
+    รูปแบบ: checkingredient.actionType,
+    คำอธิบาย: checkingredient.checkDescription,
+    ผู้รับผิดชอบ: checkingredient.user.userName,
+  };
 
-// Save the changes made in the edit dialog
-const saveChanges = async () => {
-  if (posStore.receipt) {
-    // Call the update function in your store or API to save the changes
-    await posStore.updateReceiptCatering(posStore.receipt.receiptId, posStore.receipt);
+  const tableData = checkingredient.checkingredientitem.map((item, index) => ({
+    ลำดับ: index + 1,
+    ชื่อวัตถุดิบ: item.ingredient.ingredientName,
+    ผู้จัดจำหน่าย: item.ingredient.ingredientSupplier,
+    จำนวนเดิม: item.oldRemain,
+    จำนวนนับ: item.UsedQuantity,
+  }));
 
-    // Close the dialog and refresh the data
-    closeEditDialog();
-    await receiptStore.getAllReceipts();
-  }
-};
+  const wb = XLSX.utils.book_new();
+  const ws1 = XLSX.utils.json_to_sheet([basicData], {
+    header: Object.keys(basicData),
+  });
+  const ws2 = XLSX.utils.json_to_sheet(tableData, {
+    header: Object.keys(tableData[0]),
+  });
 
-const closeEditDialog = () => {
-  editDialog.value = false;
-  // posStore.receipt = null;
-};
+  XLSX.utils.book_append_sheet(wb, ws1, "Summary");
+  XLSX.utils.book_append_sheet(wb, ws2, "Details");
 
+  XLSX.writeFile(wb, `check_ingredient_${new Date().toISOString()}.xlsx`);
+}
 </script>
 
 <template>
-  <HistoryReceiptDialogCatering v-model:dialog="historyReceiptDialog" />
+  <dialogImportItemCatering
+    v-model:dialog="historyCheckDialog"
+    :checkingredient="selectedCheck"
+  />
+  <v-container>
 
-  <!-- Edit Receipt Dialog -->
-  <v-dialog v-model="editDialog" max-width="500px">
-  <v-card>
-    <v-card-title>
-      <span>แก้ไขใบเสร็จ</span>
-    </v-card-title>
-    <v-card-text>
-      <v-container>
-        <!-- Display the total net price as plain text -->
+    <v-card>
+      <v-card-title>
         <v-row>
-          <v-col cols="6">
-            <span>ราคารวมสุทธิ:</span>
-          </v-col>
-          <v-col cols="6" class="text-right">
-            <span>{{ posStore.receipt.receiptNetPrice }} บาท</span>
-          </v-col>
-        </v-row>
-
-        <!-- Input field for the received amount -->
-        <v-text-field
-          v-model="posStore.receipt.receive"
-          label="จำนวนเงินที่ได้รับ"
-          type="number"
-          @input="updateChange"
-          outlined
-          dense
-          :rules="[v => !!v || 'กรุณากรอกจำนวนเงินที่ได้รับ']"
-        />
-
-        <!-- Display the calculated change as plain text -->
-        <v-row>
-          <v-col cols="6">
-            <span>เงินทอน:</span>
-          </v-col>
-          <v-col cols="6" class="text-right">
-            <span>{{ posStore.receipt.change }} บาท</span>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-card-text>
-    <v-card-actions>
-      <v-spacer></v-spacer>
-      <v-btn 
-        color="primary" 
-        @click="saveChanges" 
-        :disabled="!posStore.receipt.receive"
-      >
-        บันทึก
-      </v-btn>
-      <v-btn color="secondary" @click="closeEditDialog">ยกเลิก</v-btn>
-    </v-card-actions>
-  </v-card>
-</v-dialog>
-
-
-<v-container>
-  <v-card class="flex-container">
-    <v-card-title>
-      <v-row>
-        <v-col cols="9" style="padding: 20px;">
-          <h3>ประวัติการขาย (ร้านจัดเลี้ยง)</h3>
-        </v-col>
-        <v-row>
-          <v-col cols="12" md="4" style="margin-left: 1%;">
+          <v-col cols="9"> ร้านเลี้ยงรับรอง </v-col>
+          <v-col cols="3">
             <v-text-field
-              v-model="startDate"
-              label="Start Date"
-              type="date"
-              outlined
-              dense
-              hide-details
               variant="solo"
-            ></v-text-field>
-          </v-col>
-          <v-col cols="12" md="4">
-            <v-text-field
-              v-model="endDate"
-              label="End Date"
-              type="date"
-              outlined
-              dense
+              label="ค้นหาประวัติการเช็ควัตถุดิบ"
+              append-inner-icon="mdi-magnify"
               hide-details
-              variant="solo"
+              dense
             ></v-text-field>
           </v-col>
         </v-row>
-        <v-row class="mt-4 mr-2" justify="end">
-          <v-btn @click="fetchData" color="primary" class="mr-2">
-            โหลดข้อมูล
-          </v-btn>
-          <v-btn @click="exportToExcel" color="success">
-            Export to Excel
-          </v-btn>
+        <v-row>
+          <v-col>
+            <v-btn
+              color="success"
+              class="button-full-width"
+              :to="{ name: 'ingredients' }"
+            >
+              <v-icon left>mdi-arrow-u-left-top-bold </v-icon> ย้อนกลับ
+            </v-btn>
+          </v-col>
         </v-row>
-      </v-row>
-      <v-spacer></v-spacer>
-    </v-card-title>
+      </v-card-title>
 
-    <v-table class="mx-auto" style="width: 97%">
-      <thead>
-        <tr>
-          <th class="text-center font-weight: bold;">#</th>
-          <th class="text-center font-weight: bold;">วันที่ออกใบเสร็จ</th>
-          <th class="text-center font-weight: bold;">สถานะใบเสร็จ</th>
-          <th class="text-center font-weight: bold;">ราคารวมสุทธิ</th>
-          <th class="text-center font-weight: bold;">ส่วนลด</th>
-          <th class="text-center font-weight: bold;">สมาชิก</th>
-          <th class="text-center">โปรโมชั่น</th>
-          <th class="text-center">รูปแบบการจ่ายเงิน</th>
-          <th class="text-center">พนักงาน</th>
-          <th class="text-center">ดู</th>
-          <th class="text-center">แก้ไข</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(receipt, index) in paginatedReceipts" :key="receipt.receiptId">
-          <td class="text-center">{{ (currentPage - 1) * itemsPerPage + index + 1 }}</td>
-          <td class="text-center">{{ formatDate(receipt.createdDate) }}</td>
-          <td class="text-center">
-            <span :class="statusClass(receipt.receiptStatus)">
-              {{ statusText(receipt.receiptStatus) }}
-            </span>
-          </td>
-          <td class="text-center">{{ receipt.receiptNetPrice }}</td>
-          <td class="text-center">{{ receipt.receiptTotalDiscount }}</td>
-          <td class="text-center">{{ receipt.customer?.customerName || '-' }}</td>
-          <td class="text-center">
-            <span v-if="receipt.receiptPromotions && receipt.receiptPromotions.length > 0">
-              มีการใช้โปรโมชั่น
-            </span>
-            <span v-else>-</span>
-          </td>
-          <td class="text-center">{{ receipt.paymentMethod || '-' }}</td>
-          <td class="text-center">{{ receipt.user?.userName }}</td>
-          <td class="text-center">
-            <v-btn
-              :disabled="receipt.receiptStatus === 'paid'"
-              color="warning"
-              icon="mdi-pencil"
-              @click="openEditDialog(receipt)"
-            ></v-btn>
-          </td>
-          <td class="text-center">
-            <v-btn
-              color="primary"
-              icon="mdi-eye"
-              @click="openHistoryReceiptDialog(receipt)"
-            ></v-btn>
-          </td>
-        </tr>
-        <tr v-if="!filteredReceipts.length">
-          <td colspan="10" class="text-center">No data</td>
-        </tr>
-      </tbody>
-    </v-table>
+      <v-table class="mx-auto" style="width: 97%">
+        <thead>
+          <tr>
+            <th style="text-align: center; font-weight: bold">
+              รหัสประวัติการเช็ควัตถุดิบ
+            </th>
+            <th style="text-align: center; font-weight: bold">วันที่</th>
+            <th style="text-align: center; font-weight: bold">รูปแบบ</th>
+            <th style="text-align: center; font-weight: bold">การกระทำ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(item, index) in subIngredientStore.HistoryCatering" :key="index">
+            <td>{{ index + 1 }}</td>
+            <td>{{ formatDate(item.date+'') }}</td>
+            <td>
+              <span v-if="item.actionType === 'withdrawal'">
+                เบิกเข้าร้านgเลี้ยงรับรอง
+              </span>
+              <span v-else-if="item.actionType === 'return'">
+                คืนคลังวัตถุดิบ
+              </span>
+              <span v-else>
+                {{ item.actionType }}
+              </span>
+            </td>
 
-    <v-pagination
-        justify="center"
-        v-model="receiptStore.currentPage"
-        :length="Math.ceil(receiptStore.totalReceipts / receiptStore.itemsPerPage)"
-        rounded="circle"
-    ></v-pagination>
-  </v-card>
-</v-container>
+            <td>
+              <v-btn
+                color="#ed8731 "
+                class="mr-2"
+                icon="mdi-pencil"
+                @click="openHistoryCheckDialog(item)"
+                ><v-icon color="white" style="font-size: 20px"
+                  >mdi-eye-circle</v-icon
+                ></v-btn
+              >
 
+              <v-btn color="#4CAF50" icon @click="exportToExcel(item)">
+                <v-icon color="white" style="font-size: 20px"
+                  >mdi-file-excel</v-icon
+                >
+              </v-btn>
+            </td>
+          </tr>
+        </tbody>
+        <tbody v-if="!subIngredientStore.HistoryRice || subIngredientStore.HistoryRice.length === 0">
+            <tr>
+              <td colspan="4" class="text-center">ไม่มีข้อมูล</td>
+            </tr>
+          </tbody>
+      </v-table>
+    </v-card>
+  </v-container>
 </template>
 
-
-
 <style scoped>
-.flex-container {
-  display: flex;
-  flex-direction: column;
-  height: 95vh;
+.red-text {
+  color: red;
 }
 
-.text-success {
-  color: #4caf50;
+.yellow-text {
+  color: #0d78f3;
 }
 
-.text-danger {
-  color: #f44336;
+.button-full-width {
+  width: 100%;
 }
 
-.table-container {
-  max-height: 70vh; 
-  overflow-y: auto;
-  margin-left: 2%;
-  margin-top: 3%;
+th,
+td {
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
+  text-align: center !important;
 }
 
+/* Responsive styles */
+@media (max-width: 1024px) {
+  th,
+  td {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  .button-full-width {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  th,
+  td {
+    font-size: 12px;
+    padding: 6px;
+  }
+
+  .button-full-width {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  th,
+  td {
+    font-size: 10px;
+    padding: 4px;
+  }
+
+  .button-full-width {
+    font-size: 10px;
+  }
+
+  th,
+  td {
+    white-space: nowrap;
+  }
+
+  v-container {
+    padding: 0;
+    /* ลด padding ของ container */
+  }
+
+  v-card {
+    margin: 0;
+    /* ลด margin ของ card */
+  }
+}
 </style>
