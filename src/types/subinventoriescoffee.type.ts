@@ -5,7 +5,7 @@ export interface SubInventoriesCoffee{
     ingredient: Ingredient;
     quantity: number;
     type?:string;
-    lastPrice:number;
+    lastPrice?:number;
 
 
 }

@@ -1,10 +1,9 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import Swal from 'sweetalert2';
 import { useIngredientStore } from '@/stores/Ingredient.store';
 import { useSubIngredientStore } from '@/stores/ingredientSubInventory.store';
 import type { SubInventoriesCoffee } from '@/types/subinventoriescoffee.type';
-import type { Ingredient } from '@/types/ingredient.type';
 
 // Stores
 const ingredientStore = useIngredientStore();
@@ -15,13 +14,14 @@ const type = ref('');
 const selectedTab = ref('วัตถุดิบร้านกาแฟ'); // Default selected tab
 const ingredientFilters = ref<SubInventoriesCoffee[]>([]); // Filtered ingredients based on selected tab
 const searchQuery = ref('');
+const totalPrice = ref(0); // Reactive reference for total price
 
-// Computed property to calculate total price
-const totalPrice = computed(() => {
-  return subIngredientStore.ingredientCheckList.reduce((sum, item) => {
+// Calculate the total price based on ingredientCheckList
+const calculateTotalPrice = () => {
+  totalPrice.value = subIngredientStore.ingredientCheckList.reduce((sum, item) => {
     return sum + (item.lastPrice! * item.count || 0);
   }, 0);
-});
+};
 
 // Fetch data on component mount
 onMounted(async () => {
@@ -29,6 +29,7 @@ onMounted(async () => {
   await subIngredientStore.getSubIngredients_coffee();
   await subIngredientStore.getSubIngredients_rice();
   filterIngredients(); // Filter ingredients after data is loaded
+  calculateTotalPrice(); // Calculate the initial total price
 });
 
 // Watch the selected tab and filter ingredients accordingly and set type
@@ -36,6 +37,15 @@ watch(selectedTab, () => {
   filterIngredients();
   type.value = selectedTab.value === 'วัตถุดิบร้านกาแฟ' ? 'coffee' : 'rice';
 });
+
+// Watch for changes in ingredientCheckList to recalculate total price
+watch(
+  () => subIngredientStore.ingredientCheckList,
+  () => {
+    calculateTotalPrice();
+  },
+  { deep: true }
+);
 
 // Filtering function for ingredients based on the selected tab
 function filterIngredients() {
@@ -74,7 +84,7 @@ const saveCheckData = async () => {
         }
       });
 
-      await subIngredientStore.createReturnWithdrawalIngredientsForCatering();
+      await subIngredientStore.createReturnWithdrawalIngredientsForCateringHistory(totalPrice.value);
       subIngredientStore.ingredientCheckList = [];
 
       Swal.fire({
@@ -94,8 +104,6 @@ const saveCheckData = async () => {
     });
   }
 };
-
-
 </script>
 
 <template>
@@ -103,7 +111,7 @@ const saveCheckData = async () => {
     <v-card-title>
       <v-row>
         <v-col cols="9" style="padding: 20px;">
-          <h3>เบิกวัตถุดิบ</h3>
+          <h3>บันทึกประวัติการเลี้ยงรับรอง</h3>
         </v-col>
       </v-row>
       <v-row>
@@ -137,7 +145,7 @@ const saveCheckData = async () => {
         <v-container>
           <v-row>
             <v-col cols="3" style="text-align: center; padding: 8px" v-for="(item, index) in ingredientFilters" :key="index">
-              <v-card width="100%" @click="subIngredientStore.addSubIngredients(item.ingredient, type, item.lastPrice)">
+              <v-card width="100%" @click="subIngredientStore.addSubIngredients(item.ingredient, type, item.lastPrice!)">
                 <v-img :src="`http://localhost:3000/ingredients/${item.ingredient.ingredientId}/image`" height="100"></v-img>
                 <v-card-title style="font-size: 14px">{{ item.ingredient.ingredientName }}</v-card-title>
                 <v-card-subtitle style="font-size: 12px">{{ item.ingredient.ingredientSupplier }}</v-card-subtitle>
@@ -178,10 +186,16 @@ const saveCheckData = async () => {
           </v-table>
         </v-card>
 
-        <!-- Total Price Display -->
+        <!-- Total Price Editable Field -->
         <v-row>
           <v-col cols="12">
-            <h4>ราคารวม: {{ totalPrice }}</h4>
+            <v-text-field
+              v-model.number="totalPrice"
+              label="ราคารวม"
+              dense
+              hide-details
+              variant="solo"
+            ></v-text-field>
           </v-col>
         </v-row>
 

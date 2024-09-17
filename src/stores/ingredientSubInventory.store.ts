@@ -31,7 +31,7 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
     { ingredientcheck: Ingredient; count: number; type: string,lastPrice?:number }[]
   >([]);
 
-  const ingredientcheckForRice = ref<Ingredient[]>([]);
+
 
   const findByShopType = async () => {
     try {
@@ -112,13 +112,12 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
       console.log(e);
     }
   }
-  const addSubIngredients = (item: Ingredient, type: string,lastPrice:number) => {
+  const addSubIngredients = (item: Ingredient, type: string,lastPrice?:number) => {
     const exists = ingredientCheckList.value.some(
       (ingredient) =>
         ingredient.ingredientcheck.ingredientId === item.ingredientId
     );
-    console.log("item", item);
-    console.log("type", type);
+  
 
     if (!exists) {
       ingredientCheckList.value.push({
@@ -129,6 +128,7 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
       });
     }
     if (exists) {
+     
       const index = ingredientCheckList.value.findIndex(
         (ingredient) =>
           ingredient.ingredientcheck.ingredientId === item.ingredientId
@@ -237,6 +237,34 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
       console.error("Error saving check data:", error);
     }
   }
+  // createReturnWithdrawalIngredientsForCateringHistory
+  function createReturnWithdrawalIngredientsForCateringHistory(totalPrice:number) {
+    const ingredientList1 = ingredientCheckList.value.map((item) => ({
+      ingredientId: item.ingredientcheck.ingredientId!,
+      UsedQuantity: item.count,
+      type: item.type,
+    }));
+
+    const checkIngredientsPayload = {
+      checkingredientitems: ingredientList1,
+      userId: userStore.currentUser?.userId || 1,
+      date: new Date().toISOString(),
+      checkDescription: "เลี้ยงรับรอง",
+      actionType: "withdrawalHistory",
+      shopType: "catering",
+      totalPrice:totalPrice
+    };
+    console.log("checkIngredientsPayload", checkIngredientsPayload);
+    try {
+      const response =
+        ingredientService.createReturnWithdrawalIngredientsForCatering(
+          checkIngredientsPayload
+        );
+      console.log("API response:", response);
+    } catch (error) {
+      console.error("Error saving check data:", error);
+    }
+  }
 
   // createReturnIngerdian
   async function createReturnIngredientsForCatering() {
@@ -300,6 +328,7 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
     addSubIngredients,
     removeCheckIngredient,
     findByShopTypeCatering,
-    HistoryCatering
+    HistoryCatering,
+    createReturnWithdrawalIngredientsForCateringHistory
   };
 });
