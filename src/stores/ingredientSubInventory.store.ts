@@ -28,7 +28,7 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
     { ingredientcheck: Ingredient; count: number; type: string }[]
   >([]);
   const ingredientCheckList = ref<
-    { ingredientcheck: Ingredient; count: number; type: string }[]
+    { ingredientcheck: Ingredient; count: number; type: string,lastPrice?:number }[]
   >([]);
 
   const ingredientcheckForRice = ref<Ingredient[]>([]);
@@ -112,7 +112,7 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
       console.log(e);
     }
   }
-  const addSubIngredients = (item: Ingredient, type: string) => {
+  const addSubIngredients = (item: Ingredient, type: string,lastPrice:number) => {
     const exists = ingredientCheckList.value.some(
       (ingredient) =>
         ingredient.ingredientcheck.ingredientId === item.ingredientId
@@ -125,6 +125,7 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
         ingredientcheck: item,
         count: 1,
         type: type,
+        lastPrice: lastPrice,
       });
     }
     if (exists) {
@@ -175,7 +176,7 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
   };
 
   // addSubIngredientsRiceCatering
-  const addSubIngredientsRiceCatering = (item: Ingredient) => {
+  const addSubIngredientsRiceCatering = (item: Ingredient,lastPrice:number) => {
     const exists = ingredientCheckListForRice.value.some(
       (ingredient) =>
         ingredient.ingredientcheck.ingredientId === item.ingredientId
@@ -190,6 +191,7 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
         ingredientcheck: item,
         count: 1,
         type: "rice",
+        lastPrice: lastPrice
       });
     }
     if (exists) {

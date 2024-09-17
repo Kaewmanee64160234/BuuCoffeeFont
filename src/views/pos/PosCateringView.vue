@@ -1,99 +1,70 @@
 <script lang="ts" setup>
 import { ref, onMounted, watch } from 'vue';
-import ProductCard from '@/components/pos/ProductCard.vue';
-import SelectedItemsList from '@/components/pos/SelectedItemsList.vue';
+import SelectedItemsListCatering from '@/components/pos/SelectedItemsListCatering.vue';
 import DrinkSelectionDialog from '@/components/pos/DrinkSelectionDialog.vue';
 import ReceiptDialog from '@/components/pos/ReceiptDialog.vue';
-import { useProductStore } from '@/stores/product.store';
 import { useCategoryStore } from '@/stores/category.store';
-import { useToppingStore } from '@/stores/topping.store';
-import { useUserStore } from '@/stores/user.store';
 import { usePosStore } from '@/stores/pos.store';
 import { useIngredientStore } from '@/stores/Ingredient.store';
-import Swal from 'sweetalert2';
-import type { Product } from '@/types/product.type';
-import SelectedItemsListCatering from '@/components/pos/SelectedItemsListCatering.vue';
 import subInventoryCard from '@/components/subInvertory/subInventoryCard.vue';
 import { useSubIngredientStore } from '@/stores/ingredientSubInventory.store';
-import type { Ingredient } from '@/types/ingredient.type';
 import type { SubInventoriesCoffee } from '@/types/subinventoriescoffee.type';
 
-const productStore = useProductStore();
 const categoryStore = useCategoryStore();
 const subInventoryStore = useSubIngredientStore();
 const posStore = usePosStore();
 const ingredientStore = useIngredientStore();
 const typeStock = ref<string>('');
 
-const selectedCategory = ref<string>(categoryStore.categoriesForCreate[0]?.categoryName || '');
-const productFilters = ref<Product[]>([]);
+const selectedCategory = ref<string>('วัตถุดิบร้านกาแฟ');
 const ingredientFilters = ref<SubInventoriesCoffee[]>([]);
 const searchQuery = ref('');
 
-
 onMounted(async () => {
-    productFilters.value = [];
     ingredientFilters.value = [];
     await categoryStore.getAllCategories();
     await subInventoryStore.getSubIngredients_coffee();
     await subInventoryStore.getSubIngredients_rice();
 
     // Ensure the additional categories are included
-    categoryStore.categoriesForCreate.push({
-        categoryId: 101,
-        categoryName: 'วัตถุดิบร้านกาแฟ',
-    });
-    categoryStore.categoriesForCreate.push({
-        categoryId: 100,
-        categoryName: 'วัตถุดิบร้านข้าว',
-    });
+    categoryStore.categoriesForCreate = [
+        {
+            categoryId: 101,
+            categoryName: 'วัตถุดิบร้านกาแฟ',
+        },
+        {
+            categoryId: 100,
+            categoryName: 'วัตถุดิบร้านข้าว',
+        },
+    ];
 
-    await productStore.getAllProducts();
     await ingredientStore.getIngredients();
-    filterProducts();
+    filterIngredients();
 });
 
-
 watch(selectedCategory, () => {
-    filterProducts();
+    filterIngredients();
 });
 
 watch(searchQuery, () => {
-    filterProducts();
+    filterIngredients();
 });
 
-const filterProducts = () => {
-
-    productFilters.value = productStore.products
-        .filter(product =>
-            product.category.categoryName === selectedCategory.value &&
-            product.productName.toLowerCase().includes(searchQuery.value.toLowerCase())
-        )
-        .reduce((uniqueProducts, currentProduct) => {
-            if (!uniqueProducts.some(product => product.productId === currentProduct.productId)) {
-                uniqueProducts.push(currentProduct);
-            }
-            return uniqueProducts;
-        }, [] as Product[]);
+const filterIngredients = () => {
     ingredientFilters.value = [];
     if (selectedCategory.value === 'วัตถุดิบร้านกาแฟ') {
         ingredientFilters.value = subInventoryStore.subingredients_coffee
             .filter((ingredient: SubInventoriesCoffee) => ingredient.ingredient.ingredientName!.toLowerCase().includes(searchQuery.value.toLowerCase()));
-            typeStock.value = 'coffee';
-        } else if (selectedCategory.value === 'วัตถุดิบร้านข้าว') {
+        typeStock.value = 'coffee';
+    } else if (selectedCategory.value === 'วัตถุดิบร้านข้าว') {
         ingredientFilters.value = subInventoryStore.subingredients_rice
             .filter((ingredient: SubInventoriesCoffee) => ingredient.ingredient.ingredientName!.toLowerCase().includes(searchQuery.value.toLowerCase()));
-            typeStock.value = 'rice';
-
+        typeStock.value = 'rice';
     }
-
-
 };
 
-const addToCart = (item: Product | any) => {
-
+const addToCart = (item: any) => {
     posStore.addToReceipt(item, null, [], 1, null);
-
 };
 </script>
 
@@ -120,24 +91,26 @@ const addToCart = (item: Product | any) => {
                                     {{ category.categoryName }}
                                 </v-tab>
                             </v-tabs>
-
                         </v-col>
                     </v-row>
                     <v-row class="full-width-row product-list-container" style="flex: 1; overflow-y: auto;">
                         <v-tabs-items v-model="selectedCategory" style="width: 100%;">
-                            <v-tab-item value="Products">
+                            <!-- Ingredient Tab for Coffee -->
+                            <v-tab-item value="วัตถุดิบร้านกาแฟ">
                                 <v-container fluid class="full-width-container">
                                     <v-row class="full-width-row">
-                                        <v-col v-for="product in productFilters" :key="product.productId" cols="12"
-                                            sm="6" md="4" lg="4" class="d-flex">
-                                            <product-card :product="product" class="product-card"></product-card>
+                                        <v-col v-for="ingredient in ingredientFilters" :key="ingredient.subInventoryId"
+                                            cols="12" sm="6" md="4" lg="4" class="d-flex">
+                                            <div class="ingredient-card">
+                                                <subInventoryCard :sub-inventory="ingredient" :type="typeStock" />
+                                            </div>
                                         </v-col>
                                     </v-row>
                                 </v-container>
                             </v-tab-item>
 
-                            <!-- Ingredient Tab for Coffee -->
-                            <v-tab-item value="วัตถุดิบร้านกาแฟ">
+                            <!-- Ingredient Tab for Rice -->
+                            <v-tab-item value="วัตถุดิบร้านข้าว">
                                 <v-container fluid class="full-width-container">
                                     <v-row class="full-width-row">
                                         <v-col v-for="ingredient in ingredientFilters" :key="ingredient.subInventoryId"
@@ -152,7 +125,6 @@ const addToCart = (item: Product | any) => {
                         </v-tabs-items>
                     </v-row>
 
-                    <drink-selection-dialog></drink-selection-dialog>
                 </v-container>
             </v-col>
             <v-col cols="5" class="d-flex flex-column" style="height: 100%; padding-top: 20px;">
@@ -184,7 +156,7 @@ const addToCart = (item: Product | any) => {
     scrollbar-color: #888 #f1f1f1;
 }
 
-.product-card {
+.ingredient-card {
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -194,13 +166,6 @@ const addToCart = (item: Product | any) => {
     border-radius: 10px;
     margin: 10px;
     background-color: #fff;
-}
-
-.product-image {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    border-radius: 10px;
 }
 
 .product-list-container::-webkit-scrollbar {

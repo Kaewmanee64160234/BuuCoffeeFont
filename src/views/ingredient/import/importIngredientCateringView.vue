@@ -1,26 +1,34 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref,watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import Swal from 'sweetalert2';
 import { useIngredientStore } from '@/stores/Ingredient.store';
 import { useSubIngredientStore } from '@/stores/ingredientSubInventory.store';
 import type { SubInventoriesCoffee } from '@/types/subinventoriescoffee.type';
+import type { Ingredient } from '@/types/ingredient.type';
 
 // Stores
 const ingredientStore = useIngredientStore();
 const subIngredientStore = useSubIngredientStore();
-const type = ref('')
+const type = ref('');
 
 // Local state
-const selectedTab = ref('วัตถุดิบร้านกาแฟ');  // Default selected tab
-const ingredientFilters = ref<SubInventoriesCoffee[]>([]);  // Filtered ingredients based on selected tab
+const selectedTab = ref('วัตถุดิบร้านกาแฟ'); // Default selected tab
+const ingredientFilters = ref<SubInventoriesCoffee[]>([]); // Filtered ingredients based on selected tab
 const searchQuery = ref('');
+
+// Computed property to calculate total price
+const totalPrice = computed(() => {
+  return subIngredientStore.ingredientCheckList.reduce((sum, item) => {
+    return sum + (item.lastPrice! * item.count || 0);
+  }, 0);
+});
 
 // Fetch data on component mount
 onMounted(async () => {
   await ingredientStore.getIngredients();
   await subIngredientStore.getSubIngredients_coffee();
   await subIngredientStore.getSubIngredients_rice();
-  filterIngredients();  // Filter ingredients after data is loaded
+  filterIngredients(); // Filter ingredients after data is loaded
 });
 
 // Watch the selected tab and filter ingredients accordingly and set type
@@ -66,7 +74,6 @@ const saveCheckData = async () => {
         }
       });
 
-      
       await subIngredientStore.createReturnWithdrawalIngredientsForCatering();
       subIngredientStore.ingredientCheckList = [];
 
@@ -87,6 +94,8 @@ const saveCheckData = async () => {
     });
   }
 };
+
+
 </script>
 
 <template>
@@ -128,10 +137,11 @@ const saveCheckData = async () => {
         <v-container>
           <v-row>
             <v-col cols="3" style="text-align: center; padding: 8px" v-for="(item, index) in ingredientFilters" :key="index">
-              <v-card width="100%" @click="subIngredientStore.addSubIngredients(item.ingredient,type,item.lastPrice)">
+              <v-card width="100%" @click="subIngredientStore.addSubIngredients(item.ingredient, type, item.lastPrice)">
                 <v-img :src="`http://localhost:3000/ingredients/${item.ingredient.ingredientId}/image`" height="100"></v-img>
                 <v-card-title style="font-size: 14px">{{ item.ingredient.ingredientName }}</v-card-title>
                 <v-card-subtitle style="font-size: 12px">{{ item.ingredient.ingredientSupplier }}</v-card-subtitle>
+                <v-card-subtitle style="font-size: 12px">{{ item.lastPrice }}</v-card-subtitle>
               </v-card>
             </v-col>
           </v-row>
@@ -146,6 +156,7 @@ const saveCheckData = async () => {
                 <th>ลำดับ</th>
                 <th>ชื่อสินค้า</th>
                 <th>แบรนด์</th>
+                <th>ราคา</th>
                 <th>จำนวน</th>
                 <th>แอคชั่น</th>
               </tr>
@@ -155,16 +166,24 @@ const saveCheckData = async () => {
                 <td>{{ index + 1 }}</td>
                 <td>{{ item.ingredientcheck.ingredientName }}</td>
                 <td>{{ item.ingredientcheck.ingredientSupplier }}</td>
+                <td>{{ item.lastPrice }}</td>
                 <td>
                   <input type="number" v-model.number="item.count" class="styled-input" />
                 </td>
                 <td>
-                  <button @click="subIngredientStore.removeCheckIngredient(item.ingredientcheck,item.type)" class="styled-button">ลบ</button>
+                  <button @click="subIngredientStore.removeCheckIngredient(item.ingredientcheck, item.type)" class="styled-button">ลบ</button>
                 </td>
               </tr>
             </tbody>
           </v-table>
         </v-card>
+
+        <!-- Total Price Display -->
+        <v-row>
+          <v-col cols="12">
+            <h4>ราคารวม: {{ totalPrice }}</h4>
+          </v-col>
+        </v-row>
 
         <!-- Note Field -->
         <v-row>

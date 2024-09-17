@@ -71,6 +71,13 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: "/importingredientCatering",
+      name: "importingredientCatering",
+      component: () =>
+        import("../views/ingredient/import/importIngredientCateringView.vue"),
+      meta: { requiresAuth: true },
+    },
+    {
       path: "/importingredient-history",
       name: "importingredientsHistory",
       component: () =>
