@@ -111,7 +111,7 @@ const saveCheckData = async () => {
     <v-card-title>
       <v-row>
         <v-col cols="9" style="padding: 20px;">
-          <h3>บันทึกประวัติการเลี้ยงรับรอง</h3>
+          <h3>การเลี้ยงรับรอง</h3>
         </v-col>
       </v-row>
       <v-row>

@@ -301,6 +301,8 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
       ingredientId: item.ingredientcheck.ingredientId!,
       UsedQuantity: item.count,
       type: item.type,
+      unitPrice: item.lastPrice,
+      subTotal: item.lastPrice! * item.count
     }));
 
     const checkIngredientsPayload = {
