@@ -7,6 +7,8 @@ import type { IngredientLog } from "@/types/IngredientLog.type";
 import type { ReportIngredientLog } from "@/types/pairsWithdrawalReturn.type";
 import type { Ingredient } from "@/types/ingredient.type";
 import { useUserStore } from "./user.store";
+import { useMessageStore } from './message'; // Update the path if necessary
+
 export const useSubIngredientStore = defineStore("subinventory", () => {
   const subingredients_coffee = ref<SubInventoriesCoffee[]>([]);
   const subIngredients_catering = ref<SubInventoriesCoffee[]>([]);
@@ -21,6 +23,8 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
   const IngredientLogitem = ref<IngredientLog[]>([]);
   const checkIngerdient = ref<Checkingredient>();
   const userStore = useUserStore();
+  const messageStore = useMessageStore();
+
   const ingredientCheckListForCofee = ref<
     { ingredientcheck: Ingredient; count: number; type: string }[]
   >([]);
@@ -32,6 +36,48 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
   >([]);
 
   const ingredientcheckForRice = ref<Ingredient[]>([]);
+
+  // about pagination
+  const page = ref(1);
+  const take = ref(5);
+  const keyword = ref("");
+  const order = ref("ASC");
+  const orderBy = ref("");
+  const lastPage = ref(0);
+  watch(page, async (newPage, oldPage) => {
+    await getAllIngredients();
+  });
+  watch(keyword, async (newKey, oldKey) => {
+    if (keyword.value.length >= 3) {
+      await getAllIngredients();
+    }
+    if (keyword.value.length === 0) {
+      await getAllIngredients();
+    }
+  });
+  watch(lastPage, async (newlastPage, oldlastPage) => {
+    if (newlastPage < page.value) {
+      page.value = 1;
+    }
+  });
+
+  async function getAllIngredients() {
+    try {
+      const res = await ingredientService.getAllIngredients({
+        page: page.value,
+        take: take.value,
+        keyword: keyword.value,
+        order: order.value,
+        orderBy: orderBy.value,
+      });
+      subingredients_coffee.value = res.data.data;
+
+      lastPage.value = res.data.lastPage;
+    } catch (e) {
+      console.log(e);
+      messageStore.showError("Oops!, cannot get ingredients.");
+    }
+  }
 
   const findByShopType = async () => {
     try {
@@ -270,6 +316,13 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
   }
 
   return {
+    page,
+    keyword,
+    take,
+    order,
+    orderBy,
+    lastPage,
+    getAllIngredients,
     subingredients_coffee,
     subingredients_rice,
     History,

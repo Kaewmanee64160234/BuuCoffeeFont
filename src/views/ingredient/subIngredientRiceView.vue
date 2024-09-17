@@ -8,12 +8,20 @@ const subIngredientStore = useSubIngredientStore();
 const router = useRouter(); 
 const menu1 = ref(false);
 const menu2 = ref(false);
+const paginate = ref(true);
+const page = computed(() => subIngredientStore.page);
+const take = computed(() => subIngredientStore.take);
 
 
 onMounted(async () => {
   await subIngredientStore.getSubIngredients_coffee();
 });
 
+watch(paginate, async (newValue, oldValue) => {
+  if (newValue !== oldValue) {
+    await subIngredientStore.getAllIngredients();
+  }
+})
 
 
 const navigateTo = (routeName: string) => {
@@ -68,7 +76,7 @@ const navigateTo = (routeName: string) => {
         </thead>
         <tbody>
           <tr v-for="(item, index) in subIngredientStore.subingredients_rice" :key="index">
-            <td>{{  index + 1 }}</td>
+            <td>{{ (page - 1) * take + index + 1 }}</td>
             <td>{{ item.ingredient.ingredientName }}</td>
             <td>{{ item.quantity }}</td>
           </tr>
@@ -79,6 +87,12 @@ const navigateTo = (routeName: string) => {
           </tr>
         </tbody>
       </v-table>
+      <v-pagination
+        justify="center"
+        v-model="subIngredientStore.page"
+        :length="subIngredientStore.lastPage"
+        rounded="circle"
+      ></v-pagination>
     </v-card>
   </v-container>
 </template>
