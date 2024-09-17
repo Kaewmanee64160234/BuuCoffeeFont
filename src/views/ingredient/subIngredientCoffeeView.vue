@@ -7,16 +7,23 @@ import Swal from 'sweetalert2';
 
 const subIngredientStore = useSubIngredientStore();
 const router = useRouter();
+const paginate = ref(true);
+const page = computed(() => subIngredientStore.page);
+const take = computed(() => subIngredientStore.take);
 
 onMounted(async () => {
   await subIngredientStore.getSubIngredients_coffee();
 });
 
-
-
 const navigateTo = (routeName: string) => {
   router.push({ name: routeName });
 };
+
+watch(paginate, async (newValue, oldValue) => {
+  if (newValue !== oldValue) {
+    await subIngredientStore.getAllIngredients();
+  }
+})
 
 </script>
 
@@ -64,7 +71,7 @@ const navigateTo = (routeName: string) => {
         </thead>
         <tbody>
           <tr v-for="(item, index) in subIngredientStore.subingredients_coffee" :key="index">
-            <td>{{ index + 1 }}</td>
+            <td>{{ (page - 1) * take + index + 1 }}</td>
             <td>{{ item.ingredient.ingredientName }}</td>
             <td>{{ item.quantity }}</td>
           </tr>
@@ -75,6 +82,12 @@ const navigateTo = (routeName: string) => {
           </tr>
         </tbody>
       </v-table>
+      <v-pagination
+        justify="center"
+        v-model="subIngredientStore.page"
+        :length="subIngredientStore.lastPage"
+        rounded="circle"
+      ></v-pagination>
     </v-card>
   </v-container>
 </template>

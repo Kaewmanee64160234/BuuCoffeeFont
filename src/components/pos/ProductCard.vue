@@ -231,22 +231,22 @@ function decreaseSweetness() {
 
 <style scoped>
 .product-card {
-  border-radius: 10px;
+  border-radius: 8px;
   width: 100%;
-  max-width: 350px;
-  padding: 10px;
-  margin: 10px;
+  max-width: 300px;
+  padding: 8px;
+  margin: 8px;
 }
 
 .product-image {
   width: 100%;
-  height: 150px;
+  height: 120px;
   object-fit: cover;
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
 .chip {
-  margin: 5px;
+  margin: 4px;
 }
 
 .topping-item {
@@ -262,8 +262,8 @@ function decreaseSweetness() {
 }
 
 .quantity-container span {
-  margin: 0 10px;
-  font-size: 20px;
+  margin: 0 8px;
+  font-size: 18px;
 }
 
 .quantity-controls {
@@ -272,6 +272,33 @@ function decreaseSweetness() {
 }
 
 .quantity-controls span {
-  margin: 0 10px;
+  margin: 0 8px;
+}
+
+/* Media queries for responsiveness */
+@media (max-width: 600px) {
+  .product-card {
+    max-width: 100%;
+    padding: 4px; /* Reduce padding on small screens */
+    margin: 4px;  /* Reduce margin on small screens */
+  }
+
+  .product-image {
+    height: 100px; /* Adjust height of image on small screens */
+  }
+
+  .quantity-container {
+    flex-direction: column; /* Stack quantity controls vertically on small screens */
+    align-items: flex-start;
+  }
+
+  .quantity-container span {
+    font-size: 16px; /* Smaller font size on small screens */
+  }
+
+  .quantity-controls {
+    flex-direction: column; /* Stack controls vertically */
+  }
 }
 </style>
+
