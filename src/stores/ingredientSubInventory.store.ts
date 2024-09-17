@@ -88,6 +88,8 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
       const response = await ingredientService.getAllHistoryCateringHistory();
       if (response.status === 200) {
         HistoryCatering.value = response.data;
+        console.log(response.data);
+        
       }
     } catch (error) {
       console.error(error);

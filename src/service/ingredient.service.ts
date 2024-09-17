@@ -184,6 +184,7 @@ const createReturnWithdrawalIngredientsForCatering = (ingredient: {
   checkDescription: string;
   actionType: string;
   shopType: string;
+  totalPrice?: number;
 }) => {
   return http.post("/checkingredients/catering", ingredient);
 };

@@ -17,4 +17,5 @@ export interface  Checkingredientitem {
   checkDescription: String;
   user: User;
   checkingredientitem: Checkingredientitem[];
+  totalPrice?: number;
 }

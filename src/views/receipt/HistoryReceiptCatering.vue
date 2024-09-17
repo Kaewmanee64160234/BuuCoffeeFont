@@ -6,14 +6,23 @@ import dialogImportItemCatering from "@/views/ingredient/check/dialogCheckCateri
 import { useSubIngredientStore } from "@/stores/ingredientSubInventory.store";
 import type { Checkingredient } from "@/types/checkingredientitem.type";
 import * as XLSX from "xlsx";
-const ingredientStore = useCheckIngredientStore();
+import { useIngredientStore } from "@/stores/Ingredient.store";
+const ingredientStore = useIngredientStore();
 const subIngredientStore = useSubIngredientStore();
+const checkingredientStore = useCheckIngredientStore();
 
 const router = useRouter();
 const historyCheckDialog = ref(false);
 const selectedCheck = ref<Checkingredient | null>(null);
 onMounted(async () => {
+  // await ingredientStore.getAllIngredients();
+  // await subIngredientStore.getSubIngredients_coffee();
+  // await subIngredientStore.getSubIngredients_rice();
   await subIngredientStore.findByShopTypeCateringHistory();
+  // order it to last created date first
+  subIngredientStore.HistoryCatering.sort((a, b) => {
+    return new Date(b.date).getTime() - new Date(a.date).getTime();
+  });
 });
 
 const formatDate = (dateString: string) => {
@@ -33,8 +42,8 @@ const navigateTo = (routeName: string) => {
 };
 
 const openHistoryCheckDialog = (checkingredient: Checkingredient) => {
-  ingredientStore.checkingredient = checkingredient;
-  ingredientStore.dialogCheckItem = true;
+  checkingredientStore.checkingredient = checkingredient;
+  checkingredientStore.dialogCheckItem = true;
 };
 function exportToExcel(checkingredient: Checkingredient) {
   const basicData = {
@@ -65,13 +74,27 @@ function exportToExcel(checkingredient: Checkingredient) {
 
   XLSX.writeFile(wb, `check_ingredient_${new Date().toISOString()}.xlsx`);
 }
+
+// gotoEditPageCatering
+const gotoEditPageCatering = (item: Checkingredient) => {
+  subIngredientStore.ingredientCheckList = item.checkingredientitem.map((item_) => {
+    const lastPrice = subIngredientStore.ingredientCheckList.find((item__) => item__.ingredientcheck.ingredientId === item_.ingredient.ingredientId)?.lastPrice;
+console.log(lastPrice);
+
+    return {
+      ingredientcheck: item_.ingredient, count: item_.UsedQuantity, type: item_.type, lastPrice: lastPrice
+    };
+  });
+  router.push('/importingredientCatering');
+  // set item to list for edit ingredientCheckList
+  console.log(subIngredientStore.ingredientCheckList);
+
+
+};
 </script>
 
 <template>
-  <dialogImportItemCatering
-    v-model:dialog="historyCheckDialog"
-    :checkingredient="selectedCheck"
-  />
+  <dialogImportItemCatering v-model:dialog="historyCheckDialog" :checkingredient="selectedCheck" />
   <v-container>
 
     <v-card>
@@ -79,22 +102,13 @@ function exportToExcel(checkingredient: Checkingredient) {
         <v-row>
           <v-col cols="9"> ร้านเลี้ยงรับรอง </v-col>
           <v-col cols="3">
-            <v-text-field
-              variant="solo"
-              label="ค้นหาประวัติการเช็ควัตถุดิบ"
-              append-inner-icon="mdi-magnify"
-              hide-details
-              dense
-            ></v-text-field>
+            <v-text-field variant="solo" label="ค้นหาประวัติการเช็ควัตถุดิบ" append-inner-icon="mdi-magnify"
+              hide-details dense></v-text-field>
           </v-col>
         </v-row>
         <v-row>
           <v-col>
-            <v-btn
-              color="success"
-              class="button-full-width"
-              :to="{ name: 'ingredients' }"
-            >
+            <v-btn color="success" class="button-full-width" :to="{ name: 'ingredients' }">
               <v-icon left>mdi-arrow-u-left-top-bold </v-icon> ย้อนกลับ
             </v-btn>
           </v-col>
@@ -108,6 +122,7 @@ function exportToExcel(checkingredient: Checkingredient) {
               รหัสประวัติการเช็ควัตถุดิบ
             </th>
             <th style="text-align: center; font-weight: bold">วันที่</th>
+            <th style="text-align: center; font-weight: bold">ราคารวม</th>
             <th style="text-align: center; font-weight: bold">รูปแบบ</th>
             <th style="text-align: center; font-weight: bold">การกระทำ</th>
           </tr>
@@ -115,7 +130,8 @@ function exportToExcel(checkingredient: Checkingredient) {
         <tbody>
           <tr v-for="(item, index) in subIngredientStore.HistoryCatering" :key="index">
             <td>{{ index + 1 }}</td>
-            <td>{{ formatDate(item.date+'') }}</td>
+            <td>{{ formatDate(item.date + '') }}</td>
+            <td>{{ item.totalPrice }}</td>
             <td>
               <span v-if="item.actionType === 'withdrawal'">
                 เบิกเข้าร้านgเลี้ยงรับรอง
@@ -124,34 +140,28 @@ function exportToExcel(checkingredient: Checkingredient) {
                 คืนคลังวัตถุดิบ
               </span>
               <span v-else>
-                {{ item.actionType }}
+                {{ item.actionType === 'withdrawalHistory' ? 'ใช้สินค้าในงานเลี้ยงรับรอง' : item.actionType }}
+
               </span>
             </td>
 
             <td>
-              <v-btn
-                color="#ed8731 "
-                class="mr-2"
-                icon="mdi-pencil"
-                @click="openHistoryCheckDialog(item)"
-                ><v-icon color="white" style="font-size: 20px"
-                  >mdi-eye-circle</v-icon
-                ></v-btn
-              >
+              <!-- add button edit -->
+             
+              <v-btn color="#0d78f3 " class="mr-2" icon="mdi-pencil" @click="openHistoryCheckDialog(item)"><v-icon
+                  color="white" style="font-size: 20px">mdi-eye-circle</v-icon></v-btn>
 
               <v-btn color="#4CAF50" icon @click="exportToExcel(item)">
-                <v-icon color="white" style="font-size: 20px"
-                  >mdi-file-excel</v-icon
-                >
+                <v-icon color="white" style="font-size: 20px">mdi-file-excel</v-icon>
               </v-btn>
             </td>
           </tr>
         </tbody>
         <tbody v-if="!subIngredientStore.HistoryRice || subIngredientStore.HistoryRice.length === 0">
-            <tr>
-              <td colspan="4" class="text-center">ไม่มีข้อมูล</td>
-            </tr>
-          </tbody>
+          <tr>
+            <td colspan="4" class="text-center">ไม่มีข้อมูล</td>
+          </tr>
+        </tbody>
       </v-table>
     </v-card>
   </v-container>
@@ -179,6 +189,7 @@ td {
 
 /* Responsive styles */
 @media (max-width: 1024px) {
+
   th,
   td {
     font-size: 14px;
@@ -191,6 +202,7 @@ td {
 }
 
 @media (max-width: 768px) {
+
   th,
   td {
     font-size: 12px;
@@ -203,6 +215,7 @@ td {
 }
 
 @media (max-width: 480px) {
+
   th,
   td {
     font-size: 10px;

@@ -124,7 +124,7 @@ function exportToExcel(checkingredient: Checkingredient) {
                 คืนคลังวัตถุดิบ
               </span>
               <span v-else>
-                {{ item.actionType }}
+                {{ item.actionType === 'withdrawalHistory' ?  'ใช้สินค้าในงานเลี้ยงรับรอง': item.actionType  }}
               </span>
             </td>
 
@@ -147,7 +147,7 @@ function exportToExcel(checkingredient: Checkingredient) {
             </td>
           </tr>
         </tbody>
-        <tbody v-if="!subIngredientStore.HistoryRice || subIngredientStore.HistoryRice.length === 0">
+        <tbody v-if="!subIngredientStore.HistoryCatering || subIngredientStore.HistoryCatering.length === 0">
             <tr>
               <td colspan="4" class="text-center">ไม่มีข้อมูล</td>
             </tr>
