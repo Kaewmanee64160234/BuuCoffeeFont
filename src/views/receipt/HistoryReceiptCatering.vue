@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { useCheckIngredientStore } from "@/stores/historyIngredientCheck.store";
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import dialogImportItemCatering from "@/views/ingredient/check/dialogCheckCatering.vue";
 import { useSubIngredientStore } from "@/stores/ingredientSubInventory.store";
@@ -12,6 +12,9 @@ const subIngredientStore = useSubIngredientStore();
 const checkingredientStore = useCheckIngredientStore();
 
 const router = useRouter();
+const paginate = ref(true);
+const page = computed(() => subIngredientStore.page);
+const take = computed(() => subIngredientStore.take);
 const historyCheckDialog = ref(false);
 const selectedCheck = ref<Checkingredient | null>(null);
 onMounted(async () => {
@@ -24,6 +27,12 @@ onMounted(async () => {
     return new Date(b.date).getTime() - new Date(a.date).getTime();
   });
 });
+
+watch(paginate, async (newValue, oldValue) => {
+  if (newValue !== oldValue) {
+    await subIngredientStore.getAllIngredients();
+  }
+})
 
 const formatDate = (dateString: string) => {
   const options = {
@@ -129,7 +138,7 @@ console.log(lastPrice);
         </thead>
         <tbody>
           <tr v-for="(item, index) in subIngredientStore.HistoryCatering" :key="index">
-            <td>{{ index + 1 }}</td>
+            <td>{{ (page - 1) * take + index + 1 }}</td>
             <td>{{ formatDate(item.date + '') }}</td>
             <td>{{ item.totalPrice }}</td>
             <td>
@@ -163,6 +172,12 @@ console.log(lastPrice);
           </tr>
         </tbody>
       </v-table>
+      <v-pagination
+        justify="center"
+        v-model="subIngredientStore.page"
+        :length="subIngredientStore.lastPage"
+        rounded="circle"
+      ></v-pagination>
     </v-card>
   </v-container>
 </template>
