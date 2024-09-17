@@ -44,15 +44,21 @@ export const useCustomerStore = defineStore('customer', () => {
     try {
       const response = await customerService.createCustomer(newCustomer);
       if (response.status === 201) {
-        customers.value.push(response.data);
+        customers.value.push(response.data); // Add new customer locally
+        totalCustomers.value += 1; // Update total customers count
         posStore.receipt.customer = response.data;
         console.log('Customer created:', response.data);
-        await getAllCustomers(); // Ensure that all customers are fetched again
+  
+        // If current page is the last page and adding a new customer causes overflow, adjust currentPage
+        if (customers.value.length > currentPage.value * itemsPerPage.value) {
+          currentPage.value = Math.ceil(customers.value.length / itemsPerPage.value);
+        }
       }
     } catch (error) {
       console.error('Error creating customer:', error);
     }
   };
+  
 
   const updateCustomer = async (id: number, updatedCustomer: any) => {
     try {
