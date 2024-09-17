@@ -16,46 +16,43 @@
             </v-col>
             <v-col cols="12" sm="6">
               <v-text-field variant="solo" v-model="productName" label="ชื่อสินค้า" :rules="nameRules"
-                :error-messages="!productName ? ['กรุณากรอกชื่อสินค้า'] : []" required />
+                :error-messages="submitAttempted && !productName ? ['กรุณากรอกชื่อสินค้า'] : []" required />
             </v-col>
 
             <v-col cols="12" sm="6">
               <v-select v-model="selectedCategory"
                 :items="categoryStore.categoriesForCreate.map(category => category.categoryName)" label="เลือกหมวดหมู่"
-                dense variant="solo" :error-messages="!selectedCategory ? ['กรุณาเลือก'] : []" />
+                dense variant="solo" :error-messages="submitAttempted && !selectedCategory ? ['กรุณาเลือก'] : []" />
             </v-col>
 
             <v-col cols="12" sm="6">
               <v-text-field variant="solo" v-model="barcode" label="บาร์โค้ด" />
             </v-col>
-  <!-- Checkbox for "เครื่องดื่มที่สามารถชงได้" -->
-  <v-col cols="12">
+
+            <v-col cols="12">
               <v-checkbox label="เครื่องดื่มที่สามารถชงได้" v-model="haveTopping" />
             </v-col>
-              <!-- Checkbox for "เครื่องดื่มที่สามารถชงได้" -->
-              <v-col cols="12">
-              <v-checkbox label="นับชแต้ม" v-model="countingPoint" />
+
+            <v-col cols="12">
+              <v-checkbox label="นับแต้ม" v-model="countingPoint" />
             </v-col>
+
             <v-col cols="12" sm="6">
               <v-select v-model="storeName" :items="storeNames" label="เลือกชื่อร้าน" dense variant="solo"
-                :error-messages="!storeName ? ['กรุณาเลือก'] : []" />
+                :error-messages="submitAttempted && !storeName ? ['กรุณาเลือก'] : []" />
             </v-col>
 
-            <v-col cols="12" sm="6" v-if="!haveTopping" >
+            <v-col cols="12" sm="6" v-if="!haveTopping">
               <v-text-field variant="solo" v-model="productPrice" label="ราคา" type="number" :rules="priceRules"
-                :error-messages="!productPrice ? ['กรุณากรอกราคาเริ่มต้น'] : []" required />
+                :error-messages="submitAttempted && !productPrice ? ['กรุณากรอกราคาเริ่มต้น'] : []" required />
             </v-col>
 
-          
-
-            <!-- Product Type Checkboxes (Only show if haveTopping is true) -->
             <v-col cols="12" v-if="haveTopping">
               <v-checkbox label="ร้อน" v-model="productTypes.hot" @change="handleProductTypeChange('ร้อน', productTypes.hot)" />
               <v-checkbox label="เย็น" v-model="productTypes.cold" @change="handleProductTypeChange('เย็น', productTypes.cold)" />
               <v-checkbox label="ปั่น" v-model="productTypes.blend" @change="handleProductTypeChange('ปั่น', productTypes.blend)" />
             </v-col>
 
-            <!-- Show Price TextFields Based on Selected Product Types -->
             <v-col cols="12" v-if="productTypes.hot && haveTopping">
               <v-text-field variant="solo" v-model="productTypesPrice.hot" label="ราคาสินค้าร้อน" type="number" required />
             </v-col>
@@ -78,14 +75,14 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onMounted, watch } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { useCategoryStore } from '@/stores/category.store';
 import { useProductStore } from '@/stores/product.store';
 import Swal from 'sweetalert2';
 import type { Product } from '@/types/product.type';
 
 const valid = ref(false);
-const haveTopping = ref(false); // Controls topping checkbox
+const haveTopping = ref(false);
 const productName = ref('');
 const productPrice = ref(0);
 const barcode = ref('');
@@ -97,8 +94,8 @@ const categoryStore = useCategoryStore();
 const storeName = ref('');
 const storeNames = ['ร้านข้าว', 'ร้านกาแฟ'];
 const countingPoint = ref(false);
+const submitAttempted = ref(false);
 
-// Define product types and their prices
 const productTypes = reactive({
   hot: false,
   cold: false,
@@ -134,42 +131,30 @@ const handleImageUpload = (event: Event) => {
   }
 };
 
-const handleProductTypeChange = (type: string, isChecked: boolean) => {
-  if (!isChecked) {
-    if (type === 'ร้อน') productTypesPrice.hot = 0;
-    if (type === 'เย็น') productTypesPrice.cold = 0;
-    if (type === 'ปั่น') productTypesPrice.blend = 0;
-  }
-};
-
 const submitForm = async () => {
-  const productData:Product = {
+  submitAttempted.value = true;
+
+  const category = categoryStore.categories.find(c => c.categoryName === selectedCategory.value);
+  const productData: Product = {
     productName: productName.value,
-    productPrice: productPrice.value,
+    productPrice: haveTopping.value ? 0 : productPrice.value,
     barcode: barcode.value,
     productImage: productImage.value,
-    categoryId: categoryStore.categories.find(c => c.categoryName === selectedCategory.value)?.categoryId,
+    categoryId: category ? category.categoryId : null,
     storeType: storeName.value,
-    category: categoryStore.categories.find(c => c.categoryName === selectedCategory.value)!,
+    category: category!,
     haveTopping: haveTopping.value,
     productTypes: [],
     file: productImage.value,
     countingPoint: countingPoint.value
   };
 
-  // Add selected product types and their prices
-  if (productTypes.hot) {
-    productData.productTypes.push({ productTypeName: 'ร้อน', productTypePrice: productTypesPrice.hot });
+  if (!category || !storeName.value || (haveTopping.value && !productData.productTypes.length)) {
+    showErrorDialog('กรุณากรอกข้อมูลให้ครบถ้วน');
+    return;
   }
-  if (productTypes.cold) {
-    productData.productTypes.push({ productTypeName: 'เย็น', productTypePrice: productTypesPrice.cold });
-  }
-  if (productTypes.blend) {
-    productData.productTypes.push({ productTypeName: 'ปั่น', productTypePrice: productTypesPrice.blend });
-  }
- productStore.product = {...productData};
 
-  await productStore.createProduct();
+  await productStore.createProduct(productData);
   clearData();
   showSuccessDialog('สินค้านี้ถูกสร้างเรียบร้อยแล้ว!');
 };
@@ -188,6 +173,9 @@ const clearData = () => {
   productTypesPrice.cold = 0;
   productTypesPrice.blend = 0;
   storeName.value = '';
+  haveTopping.value = false;
+  countingPoint.value = false;
+  submitAttempted.value = false;
   productStore.createProductDialog = false;
 };
 
@@ -196,6 +184,15 @@ const showSuccessDialog = (message: string) => {
     title: 'เสร็จสิ้น!',
     text: message,
     icon: 'success',
+    confirmButtonText: 'ตกลง'
+  });
+};
+
+const showErrorDialog = (message: string) => {
+  Swal.fire({
+    title: 'ข้อผิดพลาด!',
+    text: message,
+    icon: 'error',
     confirmButtonText: 'ตกลง'
   });
 };
