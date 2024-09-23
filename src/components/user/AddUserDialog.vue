@@ -1,11 +1,9 @@
 <script lang="ts" setup>
-import { defineProps, ref, watch, defineEmits  } from 'vue';
+import { ref, watch } from 'vue';
 import { useUserStore } from '@/stores/user.store';
 import type { VForm } from 'vuetify/components';
 import Swal from 'sweetalert2';
 
-const props = defineProps<{ dialog: boolean }>();
-const emit = defineEmits(['update:dialog']);
 const form = ref<VForm | null>(null);
 
 const userName = ref('');
@@ -13,55 +11,55 @@ const userPassword = ref('');
 const userEmail = ref('');
 const userRole = ref('');
 const userStatus = ref('');
-const userStore = useUserStore();
+const userStore = useUserStore();  // Use store for dialog state
 const show = ref(false);
 
 const rules = {
   required: (value: any) => !!value || 'กรุณากรอกข้อมูล',
   email: (value: string) => {
-  const isValidEmail = /.+@.+\..+/.test(value);
-  const hasThaiCharacters = /[ก-ฮ]/.test(value);
+    const isValidEmail = /.+@.+\..+/.test(value);
+    const hasThaiCharacters = /[ก-ฮ]/.test(value);
 
-  if (!isValidEmail) {
-    return 'กรุณากรอกอีเมลให้ถูกต้อง';
-  }
+    if (!isValidEmail) {
+      return 'กรุณากรอกอีเมลให้ถูกต้อง';
+    }
 
-  if (hasThaiCharacters) {
-    return 'อีเมลต้องไม่เป็นภาษาไทย';
-  }
+    if (hasThaiCharacters) {
+      return 'อีเมลต้องไม่เป็นภาษาไทย';
+    }
 
-  return true;
-},
-
+    return true;
+  },
   userName: (value: string) => /^[A-Za-zก-ฮะ-ๅๆ็่-๋์่-๋\s]+$/.test(value) || 'กรุณากรอกชื่อเป็นตัวอักษรเท่านั้น',
   userStatus: (value: string) => /^[A-Za-zก-ฮะ-ๅๆ็่-๋์่-๋\s]+$/.test(value) || 'กรุณากรอกสถานะผู้ใช้งานเป็นตัวอักษรเท่านั้น',
   password: (value: string) => {
-  const isValidLength = value.length >= 4;
-  const hasEnglishLetter = /[A-Za-z]/.test(value);
-  const hasNumber = /[0-9]/.test(value);
-  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
-  const hasThaiChar = /[ก-ฮ]/.test(value);
+    const isValidLength = value.length >= 4;
+    const hasEnglishLetter = /[A-Za-z]/.test(value);
+    const hasNumber = /[0-9]/.test(value);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
+    const hasThaiChar = /[ก-ฮ]/.test(value);
 
-  if (!isValidLength) {
-    return 'รหัสผ่านต้องมีความยาวมากกว่า 4 ตัว';
-  }
-  if (!hasEnglishLetter) {
-    return 'รหัสผ่านต้องประกอบด้วยอักขระและเป็นภาษาอังกฤษ';
-  }
-  if (!hasNumber) {
-    return 'รหัสผ่านต้องประกอบด้วยตัวเลข';
-  }
-  if (!hasSpecialChar) {
-    return 'รหัสผ่านต้องประกอบด้วยอักขระพิเศษ';
-  }
-  if (hasThaiChar) {
-    return 'รหัสผ่านต้องเป็นภาษาอังกฤษเท่านั้น';
-  }
-  return true;
-},
+    if (!isValidLength) {
+      return 'รหัสผ่านต้องมีความยาวมากกว่า 4 ตัว';
+    }
+    if (!hasEnglishLetter) {
+      return 'รหัสผ่านต้องประกอบด้วยอักขระและเป็นภาษาอังกฤษ';
+    }
+    if (!hasNumber) {
+      return 'รหัสผ่านต้องประกอบด้วยตัวเลข';
+    }
+    if (!hasSpecialChar) {
+      return 'รหัสผ่านต้องประกอบด้วยอักขระพิเศษ';
+    }
+    if (hasThaiChar) {
+      return 'รหัสผ่านต้องเป็นภาษาอังกฤษเท่านั้น';
+    }
+    return true;
+  },
 };
-// Watch the dialog prop to reset the form when dialog opens
-watch(() => props.dialog, (newVal) => {
+
+// Watch the dialog state in the store to reset the form when it opens
+watch(() => userStore.createUserDialog, (newVal) => {
   if (newVal) {
     resetForm();
   }
@@ -73,7 +71,7 @@ function resetForm() {
   userEmail.value = '';
   userRole.value = '';
   userStatus.value = '';
-  form.value?.resetValidation(); // รีเซ็ตการตรวจสอบ validation
+  form.value?.resetValidation(); // Reset form validation
 }
 
 async function saveUser() {
@@ -92,10 +90,10 @@ async function saveUser() {
       resetForm();
       showSuccessDialog('ผู้ใช้งานรายนี้ถูกสร้างเรียบร้อยแล้ว!');
       
-      // ปิด dialog หลังจากที่บันทึกเสร็จสิ้น
+      // Close the dialog after saving
       closeDialog();
 
-      // อัพเดตข้อมูลผู้ใช้งานทั้งหมด
+      // Update user list
       await userStore.getAllUsers();
     } catch (error) {
       console.error('Error creating user:', error);
@@ -103,7 +101,6 @@ async function saveUser() {
     }
   }
 }
-
 
 const showSuccessDialog = (message: string) => {
   Swal.fire({
@@ -114,20 +111,18 @@ const showSuccessDialog = (message: string) => {
   });
 };
 
-// watch(() => userStore.createUserDialog, (newVal) => {
-//   dialog.value = newVal;
-// });
-
-function closeDialog() {
-  emit('update:dialog', false);  // ปิด dialog โดยส่งค่าใหม่กลับไปยัง parent
-  resetForm();  // รีเซ็ตฟอร์มให้พร้อมสำหรับการใช้งานครั้งถัดไป
+function openDialog() {
+  userStore.createUserDialog = true;  // Open the dialog through the store
 }
 
+function closeDialog() {
+  userStore.createUserDialog = false;  // Close the dialog through the store
+  resetForm();  // Reset the form for the next use
+}
 
 </script>
 
 <template>
-
   <v-dialog v-model="userStore.createUserDialog" max-width="800px">
     <v-card>
       <v-card-title>
@@ -136,7 +131,8 @@ function closeDialog() {
       <v-card-subtitle>เกี่ยวกับผู้ใช้งาน</v-card-subtitle>
       <v-card-text>
         <v-container>
-          <v-form ref="form">
+          <!-- Add lazy-validation here -->
+          <v-form ref="form" lazy-validation>
             <v-row>
               <v-col cols="12" md="6">
                 <v-text-field
