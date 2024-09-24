@@ -32,8 +32,11 @@ const navigateTo = (routeName: string) => {
   router.push({ name: routeName });
 };
 
-const openHistoryCheckDialog = (checkingredient: Checkingredient) => {
+const openHistoryCheckDialog = async (checkingredient: Checkingredient) => {
+  await ingredientStore.getHistoryCheckById(checkingredient.CheckID);
   ingredientStore.checkingredient = checkingredient;
+console.log(ingredientStore.checkingredient);
+
   ingredientStore.dialogCheckItem = true;
 };
 function exportToExcel(checkingredient: Checkingredient) {
@@ -118,7 +121,7 @@ function exportToExcel(checkingredient: Checkingredient) {
             <td>{{ formatDate(item.date+'') }}</td>
             <td>
               <span v-if="item.actionType === 'withdrawal'">
-                เบิกเข้าร้านgเลี้ยงรับรอง
+                เบิกเข้าร้านเลี้ยงรับรอง
               </span>
               <span v-else-if="item.actionType === 'return'">
                 คืนคลังวัตถุดิบ

@@ -7,7 +7,7 @@
       </v-card-title>
       <v-card-text>
         <v-container>
-          <!-- แสดงข้อความเมื่อกดบันทึก -->
+          <!-- Display warning when form is submitted with invalid data -->
           <v-row v-if="formSubmitted && (!toppingName || toppingPrice <= 0)">
             <v-col cols="12">
               <v-alert type="warning" border="left" color="warning" elevation="2">
@@ -67,7 +67,7 @@ const form = ref<VForm | null>(null);
 const valid = ref(false);
 const toppingName = ref('');
 const toppingPrice = ref(0);
-const formSubmitted = ref(false);  // เพิ่มตัวแปรนี้เพื่อเก็บสถานะการกดบันทึก
+const formSubmitted = ref(false);
 
 const rules = {
   required: (value: any) => !!value || 'กรุณากรอกข้อมูล',
@@ -78,7 +78,7 @@ const rules = {
 const resetForm = () => {
   toppingName.value = '';
   toppingPrice.value = 0;
-  formSubmitted.value = false;  // reset formSubmitted เมื่อปิดฟอร์มหรือเปิดฟอร์มใหม่
+  formSubmitted.value = false;
   if (form.value) {
     form.value.reset();
     form.value.resetValidation();
@@ -92,7 +92,7 @@ const closeDialog = () => {
 };
 
 const submitForm = async () => {
-  formSubmitted.value = true;  // ตั้งค่าเป็น true เมื่อกดบันทึก
+  formSubmitted.value = true;
   if (form.value) {
     const isValid = await form.value.validate();
     if (isValid) {

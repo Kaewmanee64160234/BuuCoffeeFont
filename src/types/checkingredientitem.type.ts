@@ -8,6 +8,7 @@ export interface  Checkingredientitem {
     checkingredient: Checkingredient;
     ingredient: Ingredient;
     type?: string;
+    lastPrice?: number;
   }
 
   export interface  Checkingredient {

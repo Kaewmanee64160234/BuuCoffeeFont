@@ -163,14 +163,16 @@ export const useProductStore = defineStore("product", () => {
     }
   };
 
-  const createProduct = async () => {
+  const createProduct = async (productdata:any) => {
     try {
-      const response = await productService.createProduct(product.value!);
+      console.log("productdata", productdata);
+      
+      const response = await productService.createProduct(productdata);
       if (response.status === 201) {
         if (product.value.file !== null) {
           // await uploadImage(product.value.file, response.data.productId);
         }
-        window.location.reload();
+        // window.location.reload();
       }
       await getProductPaginate();
     } catch (error) {

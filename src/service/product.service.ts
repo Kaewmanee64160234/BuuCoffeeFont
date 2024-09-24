@@ -8,7 +8,7 @@ function getProductById(id: number) {
   return http.get(`/products/${id}`);
 }
 
-function createProduct(product: Product& { file: File }) {
+function createProduct(product: any& { file: File }) {
   console.log(product.file);
   
   const formData = new FormData();
@@ -16,7 +16,7 @@ function createProduct(product: Product& { file: File }) {
   // Append simple fields
   formData.append("productName", product.productName);
   formData.append("productPrice", product.productPrice.toString());
-  formData.append("categoryId", product.category.categoryId.toString());
+  formData.append("categoryId", product.categoryId);
   formData.append("barcode", product.barcode || '');
   formData.append("storeType", product.storeType);
   formData.append("countingPoint", product.countingPoint?.toString() || '');

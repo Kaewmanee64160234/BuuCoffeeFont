@@ -2,7 +2,7 @@
 import { useCheckIngredientStore } from "@/stores/historyIngredientCheck.store";
 import { computed, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
-import dialogImportItemCatering from "@/views/ingredient/check/dialogCheckCatering.vue";
+import dialogImportItemCateringHistory from "@/views/ingredient/check/dialogCheckCateringHistory.vue";
 import { useSubIngredientStore } from "@/stores/ingredientSubInventory.store";
 import type { Checkingredient } from "@/types/checkingredientitem.type";
 import * as XLSX from "xlsx";
@@ -103,7 +103,7 @@ console.log(lastPrice);
 </script>
 
 <template>
-  <dialogImportItemCatering v-model:dialog="historyCheckDialog" :checkingredient="selectedCheck" />
+  <dialogImportItemCateringHistory v-model:dialog="historyCheckDialog" :checkingredient="selectedCheck" />
   <v-container>
 
     <v-card>

@@ -179,6 +179,8 @@ const createReturnWithdrawalIngredientsForCatering = (ingredient: {
     ingredientId: number;
     UsedQuantity: number;
     type: string;
+    subTotal: number;
+    unitPrice: number;
   }[];
   userId: number;
   date: string;
