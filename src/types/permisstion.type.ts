@@ -3,4 +3,5 @@ export interface Permission {
   name: string;
   group: string;
   checked?: boolean;
+  description: string;
 }
