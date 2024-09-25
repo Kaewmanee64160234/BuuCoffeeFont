@@ -20,6 +20,11 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path:"/managementRole",
+      name:"managementRole",
+      component: () => import("@/views/user/permisstionManagement.vue"),
+    },
+    {
       path: "/productsManagement",
       name: "products",
       component: () => import("../views/product/ProductManagementView.vue"),
@@ -224,6 +229,7 @@ const router = createRouter({
       name: "NotFound",
       component: () => import("../views/NotFound.vue"),
     },
+    
   ],
 });
 router.beforeEach((to, from, next) => {

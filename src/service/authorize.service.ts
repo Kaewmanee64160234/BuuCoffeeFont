@@ -15,7 +15,7 @@ function getRoleById(id: number) {
 }
 // Assign permissions to an existing role
 
-function assignPermissionsToRole(roleId: number, permissionId: number) {
+function assignPermissionsToRole(roleId: number) {
   return http.post(`/roles/${roleId}/permissions`);
 }
 
