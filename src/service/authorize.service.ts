@@ -32,6 +32,11 @@ function getPermissionById(id: number) {
   return http.get(`/permissions/${id}`);
 }
 
+// update   @Patch('/:roleId/permissions')
+ function updateRole(role:Role) {
+  return http.patch(`/roles/${role.id}/permissions`, role);
+ }
+
 export default {
   createRole,
   getRoles,
@@ -40,4 +45,5 @@ export default {
   createPermission,
   getPermissions,
   getPermissionById,
+  updateRole
 };

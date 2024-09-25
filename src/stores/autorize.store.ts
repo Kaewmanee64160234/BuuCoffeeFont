@@ -40,6 +40,24 @@ export const useAuthorizeStore = defineStore("authorize", () => {
     }
   };
 
+  // update all roles
+  const updateRole = async (role: Role) => {
+    try {
+      
+        console.log("Role to update:", role);
+        
+      const res = await authorizeService.updateRole(role);
+      if (res.status === 200) {
+        console.log("Role updated successfully:", res.data);
+        
+      }
+      await getRoles();
+      await getPermissions();
+    } catch (error) {
+      console.error("Error updating role:", error);
+    }
+  };
+
   const getPermissions = async () => {
     try {
       const res = await authorizeService.getPermissions();
@@ -109,5 +127,6 @@ export const useAuthorizeStore = defineStore("authorize", () => {
     assignPermissionsToRole,
     getPermissions,
     groupPermissions,
+    updateRole
   };
 });

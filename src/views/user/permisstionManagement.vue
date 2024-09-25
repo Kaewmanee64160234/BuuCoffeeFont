@@ -1,11 +1,16 @@
 <template>
   <v-container>
-    <!-- Navigation Tabs for Categories -->
-    <v-tabs v-model="selectedTab">
-      <v-tab v-for="(role, index) in authorizeStore.roles" :key="index">
-        {{ role.name.toUpperCase() }}
-      </v-tab>
-    </v-tabs>
+    <!-- Dropdown for Role Selection -->
+    <v-select
+      v-model="selectedRoleName"
+      :items="authorizeStore.roles"
+      item-title="name"
+      label="User"
+    >
+      <template v-slot:item="{ props, item }">
+        <v-list-item v-bind="props" :subtitle="item.name"></v-list-item>
+      </template>
+    </v-select>
 
     <!-- Action buttons for Check All and Clear All -->
     <div class="action-buttons">
@@ -13,16 +18,15 @@
       <v-btn small color="orange" @click="clearAllPermissions">Clear All</v-btn>
     </div>
 
-    <!-- Content Based on Selected Tab -->
-    <v-tabs-items v-model="selectedTab">
-      <v-tab-item v-for="(group, index) in groupedPermissions" :key="index">
+    <!-- Display permissions if a role is selected -->
+    <v-row v-if="groupedPermissions.length > 0">
+      <v-col v-for="(group, index) in groupedPermissions" :key="index" cols="12">
         <v-card class="pa-4">
           <!-- Group Name as Header -->
           <v-card-title>{{ group.groupName }}</v-card-title>
-
           <v-divider class="my-4"></v-divider>
 
-          <!-- Dynamically Loop Through Group Permissions with 2 Columns -->
+          <!-- Loop Through Group Permissions with 2 Columns -->
           <v-row>
             <v-col
               cols="6"
@@ -41,43 +45,60 @@
             </v-col>
           </v-row>
         </v-card>
-      </v-tab-item>
-    </v-tabs-items>
+      </v-col>
+    </v-row>
+
+    <!-- button save and cancel -->
+    <div class="action-buttons">
+      <v-btn small color="primary" @click="saveChanges">Save Changes</v-btn>
+      <v-btn small color="red" @click="cancelChanges">Cancel Changes</v-btn>
+    </div>
   </v-container>
 </template>
-
 <script setup lang="ts">
 import { useAuthorizeStore } from "@/stores/autorize.store";
 import type { Permission } from "@/types/permisstion.type";
+import type { Role } from "@/types/role.type";
 import { ref, watch, onMounted } from "vue";
+import Swal from "sweetalert2";
 
 // Define the authorizeStore.roles and grouped permissions
-const groupedPermissions = ref<any[]>([]); // `any` because we need to handle grouped permissions structure
-const selectedTab = ref(0);
+const groupedPermissions = ref<any[]>([]); // Temporary store for permissions of the selected role
+const selectedRoleName = ref(""); // Track the currently selected role
+const selectedRole = ref<Role>(); // Track the currently selected rol
 const authorizeStore = useAuthorizeStore();
 
-// Fetch authorizeStore.roles and permissions from API and group permissions by group name
+// Fetch roles and permissions from API and group permissions by group name
 onMounted(async () => {
   await authorizeStore.getRoles();
   await authorizeStore.getPermissions();
 
-  // Initialize grouped permissions for the first role if roles are loaded
+  // Initialize permissions for the first role if roles are loaded
   if (authorizeStore.roles.length > 0) {
-    groupPermissionsForSelectedRole(selectedTab.value);
+    selectedRole.value = authorizeStore.roles[0]; // Select the first role by default
+    groupPermissionsForSelectedRole(selectedRole.value);
   }
 });
 
-// Watch for changes in selected tab and update grouped permissions accordingly
-watch(selectedTab, (newIndex) => {
-  groupPermissionsForSelectedRole(newIndex);
+// Watch for changes in selected role and update grouped permissions accordingly
+watch(selectedRoleName, (newRole) => {
+  console.log(`Selected Role Changed:`, newRole);
+  const currentRoleIndex = authorizeStore.roles.findIndex((role: Role) => role.name === newRole!);
+  if(currentRoleIndex === -1) {
+    console.warn(`Role not found in authorizeStore`);
+    return;
+  }else  {
+    selectedRole.value = authorizeStore.roles[currentRoleIndex];
+    groupPermissionsForSelectedRole(authorizeStore.roles[currentRoleIndex]); // Update permissions when role changes
+  }
 });
 
 // Group permissions by 'group' and set 'checked' for each permission
-const groupPermissionsForSelectedRole = (roleIndex: number) => {
-  // Defensive check to avoid undefined roleIndex or permissions
-  const role = authorizeStore.roles[roleIndex];
+const groupPermissionsForSelectedRole = (role: Role) => {
+  console.log(`Grouping permissions for role ${role.name}`);
+  
   if (!role || !role.permissions) {
-    console.warn(`Role or permissions not found for index: ${roleIndex}`);
+    console.warn(`Role or permissions not found`);
     return;
   }
 
@@ -89,7 +110,6 @@ const groupPermissionsForSelectedRole = (roleIndex: number) => {
 const groupPermissionsByGroup = (permissions: Permission[]) => {
   const grouped: any = [];
 
-  // Assuming `authorizeStore.permissions` contains all available permissions
   authorizeStore.permissions.forEach((permission: Permission) => {
     // Find or create the group
     let group = grouped.find((g: any) => g.groupName === permission.group);
@@ -111,21 +131,34 @@ const groupPermissionsByGroup = (permissions: Permission[]) => {
   return grouped;
 };
 
-// Handle Save Changes (send updated permissions to API)
-const saveChanges = () => {
+// Handle Save Changes (send updated permissions to store)
+const saveChanges = async () => {
+  if (!selectedRoleName.value) return;
+
+  // Gather updated permissions from groupedPermissions
   const updatedPermissions = groupedPermissions.value.flatMap((group) =>
     group.permissions.filter((permission: Permission) => permission.checked)
   );
-  
-  const currentRole = authorizeStore.roles[selectedTab.value];
-  currentRole.permissions = updatedPermissions; // Update current role's permissions in store
 
-  console.log("Updated Permissions:", updatedPermissions);
+  // Update the selected role's permissions
+  selectedRole!.value!.permissions = updatedPermissions;
+
+  // Update the roles in authorizeStore
+  authorizeStore.roles = authorizeStore.roles.map((role) =>
+    role.id === selectedRole.value?.id ? { ...role, permissions: updatedPermissions } : role
+  );
+
+  console.log(`Updated Permissions for Role ${selectedRole.value!.name}:`, updatedPermissions);
+  await authorizeStore.updateRole(selectedRole.value!);
+  // add sweet alert
+  Swal.fire(`Updated Permissions for Role ${selectedRole.value !.name}`);
 };
 
-// Handle Cancel Changes
+// Handle Cancel Changes (reset permissions to initial state for the selected role)
 const cancelChanges = () => {
-  groupPermissionsForSelectedRole(selectedTab.value);
+  if (selectedRole.value) {
+    groupPermissionsForSelectedRole(selectedRole.value); // Reset permissions for the selected role
+  }
 };
 
 // Check all permissions
@@ -148,7 +181,9 @@ const clearAllPermissions = () => {
 
 // Handle permission change when checkbox is clicked
 const handlePermissionChange = (permission: Permission) => {
-  const currentRole = authorizeStore.roles[selectedTab.value];
+  const currentRole = selectedRole.value;
+  if (!currentRole) return;
+
   // Add or remove the permission from the current role's permission array
   if (permission.checked) {
     // Add the permission if checked
@@ -165,21 +200,3 @@ const handlePermissionChange = (permission: Permission) => {
   console.log("Updated Role Permissions", currentRole.permissions);
 };
 </script>
-
-
-
-<style scoped>
-.permission-description {
-  margin-top: -8px;
-  font-size: 0.875rem;
-  color: gray;
-}
-
-.action-buttons {
-  margin: 5px;
-  margin-left: auto;
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-</style>
