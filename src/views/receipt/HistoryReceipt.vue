@@ -10,6 +10,14 @@ import ReceiptOld from '@/components/receipts/ReceiptOld.vue';
 const receiptsStore = useReceiptsStore();
 const receiptStore = useReceiptStore();
 
+
+const paginatedReceipts = computed(() => {
+  const start = (receiptStore.currentPage - 1) * receiptStore.itemsPerPage;
+  const end = start + receiptStore.itemsPerPage;
+  return filteredReceipts.value.slice(start, end);
+});
+
+
 // Date Range Setup
 const currentDate = new Date();
 const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
@@ -22,21 +30,6 @@ const receiptType = ref<string>('ร้านกาแฟ');
 const historyReceiptDialog = ref(false);
 const receiptOld = ref(false);
 const selectedReceipt = ref<Receipt | null>(null);
-
-// Pagination
-const currentPage = ref(1);
-const itemsPerPage = ref(8);
-
-// Pagination Calculations
-const totalPages = computed(() => {
-  return Math.ceil(filteredReceipts.value.length / itemsPerPage.value);
-});
-
-const paginatedReceipts = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage.value;
-  const end = start + itemsPerPage.value;
-  return filteredReceipts.value.slice(start, end);
-});
 
 // Fetching data for receipts
 const fetchData = async () => {
@@ -75,6 +68,7 @@ const s2ab = (s: string) => {
 // Lifecycle Hook - Fetch Receipts on Mount
 onMounted(async () => {
   await receiptStore.getAllReceipts();
+  // await receiptStore.getReceiptsPaginate();
 });
 
 // Open the receipt detail dialog
@@ -156,6 +150,7 @@ const statusText = (status: string) => {
       return status;
   }
 };
+
 </script>
 
 <template>
@@ -227,9 +222,8 @@ const statusText = (status: string) => {
 
   <!-- Pagination -->
   <v-pagination
-        justify="center"
-        v-model="receiptStore.currentPage"
-        :length="Math.ceil(receiptStore.totalReceipts / receiptStore.itemsPerPage)"
-        rounded="circle"
-  ></v-pagination>
+  v-model="receiptStore.currentPage"
+  :length="Math.ceil(filteredReceipts.length / receiptStore.itemsPerPage)"
+  rounded="circle"
+></v-pagination>
 </template>

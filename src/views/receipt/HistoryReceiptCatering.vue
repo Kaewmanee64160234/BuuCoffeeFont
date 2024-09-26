@@ -171,11 +171,12 @@ console.log(lastPrice);
             <td colspan="4" class="text-center">ไม่มีข้อมูล</td>
           </tr>
         </tbody>
+        <!-- :length="subIngredientStore.lastPage" -->
       </v-table>
       <v-pagination
         justify="center"
         v-model="subIngredientStore.page"
-        :length="subIngredientStore.lastPage"
+        :length="Math.ceil(subIngredientStore.HistoryCatering.length / subIngredientStore.take)"
         rounded="circle"
       ></v-pagination>
     </v-card>
