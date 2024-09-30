@@ -33,19 +33,22 @@ const router = createRouter({
       path: "/productsManagement",
       name: "products",
       component: () => import("../views/product/ProductManagementView.vue"),
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, roles: ["ผู้จัดการร้าน"] },
+
     },
     {
       path: "/customersManagement",
       name: "customers",
       component: () => import("../views/customer/customerManagement.vue"),
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, roles: ["ผู้จัดการร้าน"] },
+
     },
     {
       path: "/historyReceipt",
       name: "historyReceipt",
       component: () => import("../views/receipt/HistoryReceipt.vue"),
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, roles: ["ผู้จัดการร้าน","พนักงานบัญชี"] },
+
     },
     {
       path: "/ingredientList",
@@ -196,14 +199,16 @@ const router = createRouter({
       path: "/promotion",
       name: "promotion",
       component: () => import("../views/promotion/PromotionView.vue"),
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, roles: ["ผู้จัดการร้าน","พนักงานบัญชี"] },
+
     },
     //Edit
     {
       path: "/report",
       name: "report",
       component: () => import("../views/report/ReportFinance.vue"),
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, roles: ["ผู้จัดการร้าน","พนักงานบัญชี"] },
+
     },
     // pos
     {
