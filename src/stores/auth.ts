@@ -33,7 +33,12 @@ export const useAuthStore = defineStore("auth", () => {
         console.log(user__);
   
         // Redirect to the report page
-        router.push("/report");
+        if(userStore.currentUser.role.name === "ผู้จัดการร้าน"){
+          router.push("/report");
+
+        }else{
+          router.push("/pos");
+        }
       } else {
         console.error("User does not have an account");
         return null;

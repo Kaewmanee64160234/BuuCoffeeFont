@@ -2,7 +2,10 @@
   <v-app>
     <v-navigation-drawer
       v-if="shouldShowDrawer"
-
+      v-model="drawer"
+      :rail="rail"
+      permanent
+      app
     >
       <v-list-item class="drawer-header justify-end ml-9" >
         <template v-slot:append>

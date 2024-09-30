@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
+import { useUserStore } from "@/stores/user.store";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -17,12 +18,16 @@ const router = createRouter({
       // which is lazy-loaded when the route is visited.
 
       component: () => import("../views/user/userManagement.vue"),
-      meta: { requiresAuth: true },
+
+      meta: { requiresAuth: true, roles: ["ผู้จัดการร้าน"] },
+
     },
     {
       path:"/managementRole",
       name:"managementRole",
       component: () => import("@/views/user/permisstionManagement.vue"),
+      meta: { requiresAuth: true, roles: ["ผู้จัดการร้าน"] },
+
     },
     {
       path: "/productsManagement",
@@ -224,25 +229,39 @@ const router = createRouter({
       name: "historyReceiptCatering",
       component: () => import("../views/receipt/HistoryReceiptCatering.vue"),
     },
+    // forbidden
+    {
+      path: "/forbidden",
+      name: "forbidden",
+      component: () => import("../views/ForbiddenView.vue"),
+
+    },
     {
       path: "/:catchAll(.*)",
       name: "NotFound",
       component: () => import("../views/NotFound.vue"),
-    },
+    }
     
   ],
 });
+
+
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
+  const userStore = useUserStore();
+
+  // Check if the route requires authentication
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (!authStore.isLogin) {
+      // Redirect to login if not authenticated
       next({ name: "login" });
-    } else {
+    } else{
       next();
     }
   } else {
-    next();
+    next(); // If the route does not require authentication, proceed as normal
   }
 });
+
 
 export default router;
