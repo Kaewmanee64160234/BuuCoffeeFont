@@ -9,9 +9,11 @@ export const usePromotionStore = defineStore("promotion", () => {
   const searchQuery = ref<string>("");
   const createPromotionDialog = ref(false);
   const updatePromotionDialog = ref(false);
+
   const currentPage = ref(1);
   const itemsPerPage = ref(5);
   const totalItems = ref(0);
+  
   const promotionTypes = [
     { text: "ส่วนลดเป็นจำนวนเงิน", value: "discountPrice" },
     { text: "ซื้อ 1 แถม 1", value: "buy1get1" },

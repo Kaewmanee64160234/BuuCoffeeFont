@@ -1,4 +1,4 @@
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { defineStore } from "pinia";
 import type { Receipt } from "@/types/receipt.type";
 import receiptService from "@/service/receipt.service";
@@ -20,7 +20,7 @@ export const useReceiptStore = defineStore("receipt", () => {
   const posStore = usePosStore();
 
   const currentPage = ref(1); // Current page number
-  const itemsPerPage = ref(5); // Number of items per page
+  const itemsPerPage = ref(8); // Number of items per page
   const totalReceipts = ref(0); // Total number of users
 
   const getAllReceipts = async () => {
@@ -173,9 +173,34 @@ export const useReceiptStore = defineStore("receipt", () => {
     }
   };
 
+  const getReceiptsPaginate = async () => {
+    try {
+      const res = await receiptService.getReceiptsPaginate({
+        search: searchQuery.value, // Handle empty search query
+        page: currentPage.value > 0 ? currentPage.value : 1, // Ensure page is a positive number
+        limit: itemsPerPage.value > 0 ? itemsPerPage.value : 8, // Ensure limit is a positive number
+    });
+      if (res.status === 200) {
+        receipts.value = res.data.data;
+        totalReceipts.value = res.data.total;
+      } else {
+        throw new Error('Failed to fetch paginated receipts');
+      }
+    } catch (error) {
+      console.error(error);
+      errorMessage.value = 'Error fetching paginated receipts';
+    }
+  };
+
+  watch([searchQuery, currentPage], async () => {
+    await getReceiptsPaginate();
+  });
+
+  
   return {
     setReceiptForEdit,
     getCurrentReceipt,
+    getReceiptsPaginate,
     currentPage,
     itemsPerPage,
     totalReceipts,

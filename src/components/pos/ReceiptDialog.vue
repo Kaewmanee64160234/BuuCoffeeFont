@@ -97,8 +97,8 @@
             </p>
           </div>
           <div class="dashed-line"></div>
-          <div class="receipt-footer text-center" style="font-size: 35px;">
-            <p>THANK YOU</p>
+          <div class="receipt-footer text-center" style="font-size: 25px;">
+            <p>ขอบคุณค่ะ</p>
           </div>
           <div class="dashed-line"></div>
         </div>

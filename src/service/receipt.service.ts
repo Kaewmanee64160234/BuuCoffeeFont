@@ -46,6 +46,12 @@ function getRecieptCateringIn24Hours() {
   return http.get(`/receipts/receipt-catering-in-24-hours`);
 }
 
+function getReceiptsPaginate(params: { search: string; page: number; limit: number }) {
+  return http.get(`/receipts/paginate`, {
+    params,
+  });
+  
+}
 
 
 
@@ -57,5 +63,6 @@ export default {
   deleteReceipt,
   cancelReceipt,
   getRecieptIn30Min,
-  getRecieptCateringIn24Hours
+  getRecieptCateringIn24Hours,
+  getReceiptsPaginate
 };
