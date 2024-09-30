@@ -2,10 +2,7 @@
   <v-app>
     <v-navigation-drawer
       v-if="shouldShowDrawer"
-      v-model="drawer"
-      :rail="rail"
-      permanent
-      app
+
     >
       <v-list-item class="drawer-header justify-end ml-9" >
         <template v-slot:append>
@@ -98,6 +95,12 @@
                 <img src="../../src/components/img/user.png" alt="จัดการผู้ใช้งาน" class="nav-icon" />
               </template>
               จัดการผู้ใช้งาน
+            </v-list-item>
+            <v-list-item to="/managementRole">
+              <template v-slot:prepend>
+                <img src="../../src/components/img/user.png" alt="จัดการผู้ใช้งาน" class="nav-icon" />
+              </template>
+              จัดการสิทธิ์ผู้ใช้งาน
             </v-list-item>
         
             <v-list-item to="/customersManagement">
