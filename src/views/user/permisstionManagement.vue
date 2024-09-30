@@ -14,8 +14,8 @@
 
     <!-- Action buttons for Check All and Clear All -->
     <div class="action-buttons">
-      <v-btn small color="green" @click="checkAllPermissions">Check All</v-btn>
-      <v-btn small color="orange" @click="clearAllPermissions">Clear All</v-btn>
+      <v-btn small color="green" @click="checkAllPermissions" :disabled="!selectedRoleName">Check All</v-btn>
+      <v-btn small color="orange" @click="clearAllPermissions" :disabled="!selectedRoleName">Clear All</v-btn>
     </div>
 
     <!-- Display permissions if a role is selected -->
@@ -33,11 +33,12 @@
               v-for="permission in group.permissions"
               :key="permission.id"
             >
-              <!-- Checkbox for permission with @change event -->
+              <!-- Checkbox for permission with @change event, disabled if no role selected or if changes have been saved -->
               <v-checkbox
                 v-model="permission.checked"
                 :label="permission.name"
                 @change="handlePermissionChange(permission)"
+                :disabled="!selectedRoleName || isSaved"
               ></v-checkbox>
 
               <!-- Description below the checkbox -->
@@ -48,13 +49,14 @@
       </v-col>
     </v-row>
 
-    <!-- button save and cancel -->
+    <!-- Button save and cancel -->
     <div class="action-buttons">
-      <v-btn small color="primary" @click="saveChanges">Save Changes</v-btn>
-      <v-btn small color="red" @click="cancelChanges">Cancel Changes</v-btn>
+      <v-btn small color="primary" @click="saveChanges" :disabled="!selectedRoleName || isSaved">Save Changes</v-btn>
+      <v-btn small color="red" @click="cancelChanges" :disabled="!selectedRoleName">Cancel Changes</v-btn>
     </div>
   </v-container>
 </template>
+
 <script setup lang="ts">
 import { useAuthorizeStore } from "@/stores/autorize.store";
 import type { Permission } from "@/types/permisstion.type";
@@ -65,8 +67,9 @@ import Swal from "sweetalert2";
 // Define the authorizeStore.roles and grouped permissions
 const groupedPermissions = ref<any[]>([]); // Temporary store for permissions of the selected role
 const selectedRoleName = ref(""); // Track the currently selected role
-const selectedRole = ref<Role>(); // Track the currently selected rol
+const selectedRole = ref<Role>(); // Track the currently selected role
 const authorizeStore = useAuthorizeStore();
+const isSaved = ref(false); // Track if changes have been saved
 
 // Fetch roles and permissions from API and group permissions by group name
 onMounted(async () => {
@@ -82,12 +85,13 @@ onMounted(async () => {
 
 // Watch for changes in selected role and update grouped permissions accordingly
 watch(selectedRoleName, (newRole) => {
+  isSaved.value = false; // Reset the save status when the role changes
   console.log(`Selected Role Changed:`, newRole);
-  const currentRoleIndex = authorizeStore.roles.findIndex((role: Role) => role.name === newRole!);
-  if(currentRoleIndex === -1) {
+  const currentRoleIndex = authorizeStore.roles.findIndex((role: Role) => role.name === newRole);
+  if (currentRoleIndex === -1) {
     console.warn(`Role not found in authorizeStore`);
     return;
-  }else  {
+  } else {
     selectedRole.value = authorizeStore.roles[currentRoleIndex];
     groupPermissionsForSelectedRole(authorizeStore.roles[currentRoleIndex]); // Update permissions when role changes
   }
@@ -96,7 +100,7 @@ watch(selectedRoleName, (newRole) => {
 // Group permissions by 'group' and set 'checked' for each permission
 const groupPermissionsForSelectedRole = (role: Role) => {
   console.log(`Grouping permissions for role ${role.name}`);
-  
+
   if (!role || !role.permissions) {
     console.warn(`Role or permissions not found`);
     return;
@@ -150,14 +154,24 @@ const saveChanges = async () => {
 
   console.log(`Updated Permissions for Role ${selectedRole.value!.name}:`, updatedPermissions);
   await authorizeStore.updateRole(selectedRole.value!);
-  // add sweet alert
-  Swal.fire(`Updated Permissions for Role ${selectedRole.value !.name}`);
+  
+  // Set isSaved to true to disable checkboxes after saving
+  isSaved.value = true;
+
+  // Show success message
+  Swal.fire({
+    title: 'สำเร็จ!',
+    text: `Updated Permissions for Role ${selectedRole.value!.name}`,
+    icon: 'success',
+    confirmButtonText: 'ตกลง'
+  });
 };
 
 // Handle Cancel Changes (reset permissions to initial state for the selected role)
 const cancelChanges = () => {
   if (selectedRole.value) {
     groupPermissionsForSelectedRole(selectedRole.value); // Reset permissions for the selected role
+    isSaved.value = false; // Allow changes after cancel
   }
 };
 

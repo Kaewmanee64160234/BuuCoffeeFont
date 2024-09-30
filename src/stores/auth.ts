@@ -18,7 +18,8 @@ export const useAuthStore = defineStore("auth", () => {
   
       if (response && response.data) {
         // Extract user and token from the response
-        const token = response.data.token; // The JWT token sent by the backend
+        const token = response.data.access_token; // The JWT token sent by the backend
+        console.log(token);
   
         const user__: User = response.data.user;
   

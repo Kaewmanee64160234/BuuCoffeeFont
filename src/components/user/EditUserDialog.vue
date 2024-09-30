@@ -10,7 +10,13 @@
           <v-form ref="form">
             <v-row>
               <v-col cols="12" md="6">
-                <v-text-field v-model="userName" label="ชื่อผู้ใช้" variant="solo" required></v-text-field>
+                <v-text-field 
+                  v-model="userName" 
+                  label="ชื่อผู้ใช้" 
+                  :rules="[rules.required]" 
+                  variant="solo" 
+                  required
+                ></v-text-field>
               </v-col>
               <v-col cols="12" md="6">
                 <v-text-field 
@@ -20,31 +26,37 @@
                   :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
                   variant="solo"
                   @click:append="show = !show"
-                  required
                   :disabled="true"
+                  required
                 ></v-text-field>
               </v-col>
               
               <v-col cols="12" md="6">
-                <v-text-field v-model="userEmail" label="อีเมล" variant="solo" required></v-text-field>
+                <v-text-field 
+                  v-model="userEmail" 
+                  label="อีเมล" 
+                  :rules="[rules.required, rules.email]" 
+                  variant="solo" 
+                  required
+                ></v-text-field>
               </v-col>
               <v-col cols="12" md="6">
-                <v-select v-model="userStatus" 
+                <v-select 
+                  v-model="userStatus" 
                   label="สถานะผู้ใช้งาน" 
-                  :items="['ลาออกแล้ว', 'ยังไม่ลาออก']"
-                  variant="solo"
-                  required>
-                </v-select>
+                  :items="['ลาออกแล้ว', 'ยังไม่ลาออก']" 
+                  :rules="[rules.required]" 
+                  variant="solo" 
+                  required
+                ></v-select>
               </v-col>
               <v-col cols="12" md="6">
-                <v-select
-                  v-model="userRole"
-                  label="ตำแหน่งงาน"
-                  :items="[
-                    'พนักงานขายกาแฟ',
-                    'พนักงานขายข้าว',
-                  ]"
-                  variant="solo"
+                <v-select 
+                  v-model="userRole" 
+                  label="ตำแหน่งงาน" 
+                  :items="roles" 
+                  :rules="[rules.required]" 
+                  variant="solo" 
                   required
                 ></v-select>
               </v-col>
@@ -66,25 +78,40 @@ import { ref, watch } from 'vue';
 import { useUserStore } from '@/stores/user.store';
 import type { VForm } from 'vuetify/components';
 import Swal from 'sweetalert2';
+import { useAuthorizeStore } from '@/stores/autorize.store';
 
 const form = ref<VForm | null>(null);
-  const userStore = useUserStore();
-
+const userStore = useUserStore();
+const authorizeStore = useAuthorizeStore();  // Use authorizeStore to fetch roles
 const show = ref(false);
 
+// Pre-fill user data
 const userName = ref(userStore.user?.userName || '');
 const userPassword = ref(userStore.user?.userPassword || '');
 const userEmail = ref(userStore.user?.userEmail || '');
 const userRole = ref(userStore.user?.userRole || '');
 const userStatus = ref(userStore.user?.userStatus || '');
 
+// Load roles from authorizeStore
+const roles = ref<string[]>([]);
+
+watch(() => authorizeStore.roles, (newRoles) => {
+  roles.value = newRoles.map(role => role.name);  // Get role names from authorizeStore
+});
+
 // Validation rules
-// const statusRules = [
-//   (v: string) => !!v || 'สถานะผู้ใช้งานจำเป็นต้องระบุ',
-//   (v: string) => /^[A-Za-zก-ฮะ-ๅๆ็่-๋์่-๋\s]+$/.test(v) || 'กรุณากรอกสถานะผู้ใช้งานเป็นตัวอักษรเท่านั้น'
-// ];
+const rules = {
+  required: (value: any) => !!value || 'กรุณากรอกข้อมูล',
+  email: (value: string) => {
+    const isValidEmail = /.+@.+\..+/.test(value);
+    const hasThaiCharacters = /[ก-ฮ]/.test(value);
+    if (!isValidEmail) return 'กรุณากรอกอีเมลให้ถูกต้อง';
+    if (hasThaiCharacters) return 'อีเมลต้องไม่เป็นภาษาไทย';
+    return true;
+  },
+};
 
-
+// Update form data when selected user changes
 watch(() => userStore.user, (newVal) => {
   userName.value = newVal?.userName || '';
   userPassword.value = newVal?.userPassword || '';
@@ -116,9 +143,8 @@ async function saveUser() {
           icon: 'success',
           confirmButtonText: 'ตกลง'
         });
-   
         userStore.updateUserDialog = false;
-        await userStore.getAllUsers();
+        await userStore.getAllUsers();  // Refresh user list
       }
     } catch (error) {
       console.error('Failed to update user:', error);

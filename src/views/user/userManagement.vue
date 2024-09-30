@@ -6,15 +6,17 @@ import EditUserDialog from '@/components/user/EditUserDialog.vue';
 import DetailUserDialog from '@/components/user/DetailUserDialog.vue';
 import type { User } from '@/types/user.type';
 import { watch } from 'vue';
+import { useAuthorizeStore } from '@/stores/autorize.store';
 
 const userStore = useUserStore();
-
+const authorizeStore = useAuthorizeStore();
 watch(() => userStore.searchQuery, async (newQuery) => {
   await userStore.getAllUsers();
 });
 
 onMounted(async () => {
   await userStore.getAllUsers();
+  await authorizeStore.getRoles();
 });
 
 const openEditUserDialog = (user: User) => {

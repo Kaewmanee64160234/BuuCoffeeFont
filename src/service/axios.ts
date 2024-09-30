@@ -8,21 +8,25 @@ const http = axios.create({
   },
 });
 
-// Add a request interceptor to include the token in the Authorization header
-http.interceptors.request.use(
-  (config) => {
-    // Get the token from localStorage
-    const token = localStorage.getItem("token");
-    if (token) {
-      http.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    }
-
-    return config;
-  },
-  (error) => {
-    // Handle request error here
-    return Promise.reject(error);
+// Add an interceptor to include the Bearer token
+http.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token"); // Get the token from localStorage
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
-);
+  return config;
+}, (error) => {
+  console.error("Error in request: ", error);
+  return Promise.reject(error);
+});
+
+// Add response interceptor to log each response
+http.interceptors.response.use((response) => {
+  console.log(`Received response from ${response.config.url}`, response);
+  return response;
+}, (error) => {
+  console.error("Error in response: ", error);
+  return Promise.reject(error);
+});
 
 export default http;
