@@ -25,6 +25,7 @@ const openEditUserDialog = (user: User) => {
 };
 
 const openDetailUserDialog = (user: User) => {
+  console.log(user)
   userStore.user = user;
   userStore.detailUserDialog = true;
 };
