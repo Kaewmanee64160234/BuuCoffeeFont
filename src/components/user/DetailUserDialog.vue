@@ -83,6 +83,9 @@ const cancelChanges = () => {
 // Close the dialog
 const closeDialog = () => {
   userStore.detailUserDialog = false;
+  userStore.user = null;
+  permissions.value = [];
+
 };
 </script>
 
