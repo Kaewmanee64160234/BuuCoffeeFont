@@ -137,12 +137,7 @@ const closeDialog = () => {
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primary" @click="saveChanges" :disabled="isSaved">
-          Save Changes
-        </v-btn>
-        <v-btn color="red" @click="cancelChanges">
-          Cancel Changes
-        </v-btn>
+       
         <v-btn color="red" @click="closeDialog">ปิด</v-btn>
       </v-card-actions>
     </v-card>
