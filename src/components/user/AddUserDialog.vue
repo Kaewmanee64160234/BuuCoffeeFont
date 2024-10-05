@@ -1,11 +1,13 @@
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { useUserStore } from '@/stores/user.store';
 import type { VForm } from 'vuetify/components';
 import Swal from 'sweetalert2';
+import { useAuthorizeStore } from '@/stores/autorize.store';
+
 
 const form = ref<VForm | null>(null);
-
+const authorizeStore = useAuthorizeStore();
 const userName = ref('');
 const userPassword = ref('');
 const userEmail = ref('');
@@ -13,6 +15,7 @@ const userRole = ref('');
 const userStatus = ref('');
 const userStore = useUserStore();  // Use store for dialog state
 const show = ref(false);
+const roles = ref<string[]>([]);
 
 const rules = {
   required: (value: any) => !!value || 'กรุณากรอกข้อมูล',
@@ -65,6 +68,21 @@ watch(() => userStore.createUserDialog, (newVal) => {
   }
 });
 
+// Load roles from authorizeStore when component is mounted
+onMounted(async () => {
+  await authorizeStore.getRoles(); // Assuming getRoles() fetches available roles
+  roles.value = authorizeStore.roles.map(role => role.name); // Extract role names
+});
+
+// Watch for changes in authorizeStore.roles to update the roles available in the form
+watch(
+  () => authorizeStore.roles,
+  (newRoles) => {
+    roles.value = newRoles.map(role => role.name); // Update roles with new role names
+  },
+  { immediate: true }
+);
+
 function resetForm() {
   userName.value = '';
   userPassword.value = '';
@@ -84,8 +102,10 @@ async function saveUser() {
         userPassword: userPassword.value,
         userEmail: userEmail.value,
         userRole: userRole.value,
-        userStatus: userStatus.value
+        userStatus: userStatus.value,
+        role: authorizeStore.roles.find(role => role.name === userRole.value) || null,
       });
+
       userStore.user = null;
       resetForm();
       showSuccessDialog('ผู้ใช้งานรายนี้ถูกสร้างเรียบร้อยแล้ว!');
@@ -178,7 +198,7 @@ function closeDialog() {
                 <v-select
                   v-model="userRole"
                   label="ตำแหน่งงาน"
-                  :items="['พนักงานขายกาแฟ', 'พนักงานขายข้าว', 'ผู้จัดการร้าน', 'พนักงานบัญชี']"
+                  :items="roles"
                   :rules="[rules.required]"
                   variant="solo"
                   required

@@ -1,5 +1,8 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
+import { useUserStore } from "@/stores/user.store";
+import { useLoadingStore } from "@/stores/loading.store";
+import Swal from "sweetalert2";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -17,25 +20,37 @@ const router = createRouter({
       // which is lazy-loaded when the route is visited.
 
       component: () => import("../views/user/userManagement.vue"),
-      meta: { requiresAuth: true },
+
+      meta: { requiresAuth: true, roles: ["ผู้จัดการร้าน"] },
+
+    },
+    {
+      path:"/managementRole",
+      name:"managementRole",
+      component: () => import("@/views/user/permisstionManagement.vue"),
+      meta: { requiresAuth: true, roles: ["ผู้จัดการร้าน"] },
+
     },
     {
       path: "/productsManagement",
       name: "products",
       component: () => import("../views/product/ProductManagementView.vue"),
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, roles: ["ผู้จัดการร้าน"] },
+
     },
     {
       path: "/customersManagement",
       name: "customers",
       component: () => import("../views/customer/customerManagement.vue"),
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, roles: ["ผู้จัดการร้าน"] },
+
     },
     {
       path: "/historyReceipt",
       name: "historyReceipt",
       component: () => import("../views/receipt/HistoryReceipt.vue"),
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, roles: ["ผู้จัดการร้าน","พนักงานบัญชี"] },
+
     },
     {
       path: "/ingredientList",
@@ -186,14 +201,16 @@ const router = createRouter({
       path: "/promotion",
       name: "promotion",
       component: () => import("../views/promotion/PromotionView.vue"),
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, roles: ["ผู้จัดการร้าน","พนักงานบัญชี"] },
+
     },
     //Edit
     {
       path: "/report",
       name: "report",
       component: () => import("../views/report/ReportFinance.vue"),
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, roles: ["ผู้จัดการร้าน","พนักงานบัญชี"] },
+
     },
     // pos
     {
@@ -219,23 +236,79 @@ const router = createRouter({
       name: "historyReceiptCatering",
       component: () => import("../views/receipt/HistoryReceiptCatering.vue"),
     },
+    // forbidden
+    {
+      path: "/forbidden",
+      name: "forbidden",
+      component: () => import("../views/ForbiddenView.vue"),
+
+    },
     {
       path: "/:catchAll(.*)",
       name: "NotFound",
       component: () => import("../views/NotFound.vue"),
-    },
+    }
+    
   ],
 });
+
+
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
+  const userStore = useUserStore();
+
+  // Check if the route requires authentication
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (!authStore.isLogin) {
+      // Redirect to login if not authenticated
       next({ name: "login" });
-    } else {
+    } else{
       next();
     }
   } else {
-    next();
+    next(); // If the route does not require authentication, proceed as normal
+  }
+});
+let timer: number | null = null;
+router.beforeEach((to, from, next) => {
+  const loadingStore = useLoadingStore();
+  loadingStore.setLoading(true); // Start loading
+
+  // Set a timeout to handle long navigation
+  timer = window.setTimeout(() => {
+    // If still navigating after 5 seconds, show error dialog
+    loadingStore.setLoading(false);
+
+    Swal.fire({
+      title: 'Navigation Timeout',
+      text: 'Navigation is taking too long. Do you want to go to POS?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, take me there!',
+      cancelButtonText: 'Cancel',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        next('/pos'); // Redirect to `/pos` route if user confirms
+      } else {
+        // Continue without redirecting, or handle as per your needs
+        next(false); // Cancel navigation
+      }
+    });
+  }, 10000);
+
+  next();
+});
+
+router.afterEach(() => {
+  const loadingStore = useLoadingStore();
+
+  // Clear the loading state
+  loadingStore.setLoading(false);
+
+  // Clear the timeout if the navigation was successful
+  if (timer) {
+    clearTimeout(timer);
+    timer = null;
   }
 });
 

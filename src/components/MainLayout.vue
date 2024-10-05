@@ -99,6 +99,12 @@
               </template>
               จัดการผู้ใช้งาน
             </v-list-item>
+            <v-list-item to="/managementRole">
+              <template v-slot:prepend>
+                <img src="../../src/components/img/user.png" alt="จัดการผู้ใช้งาน" class="nav-icon" />
+              </template>
+              จัดการสิทธิ์ผู้ใช้งาน
+            </v-list-item>
         
             <v-list-item to="/customersManagement">
               <template v-slot:prepend>

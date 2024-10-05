@@ -3,10 +3,10 @@ import { defineStore } from "pinia";
 import type { Ingredient } from "@/types/ingredient.type";
 import ingredientService from "@/service/ingredient.service";
 import type { Importingredient } from "@/types/importIngredient.type";
-import { useLoadingStore } from "./loading";
 import { useMessageStore } from "./message";
 import type { Importingredientitem } from "@/types/importIngredientItem.type";
 import type { Checkingredient } from "@/types/checkingredientitem.type";
+import { useLoadingStore } from "./loading.store";
 
 export const useIngredientStore = defineStore("ingredient", () => {
   const loadingStore = useLoadingStore();
@@ -306,7 +306,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
 
  
   async function saveIngredient() {
-    loadingStore.isLoading = true;
+    loadingStore.loading = true;
 
     try {
       let res;
@@ -331,7 +331,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
       console.log(e);
       messageStore.showError("Cannot save product");
     } finally {
-      loadingStore.isLoading = false; // ให้ isLoading เป็น false ทุกรอบ
+      loadingStore.loading = false; // ให้ isLoading เป็น false ทุกรอบ
     }
   }
 

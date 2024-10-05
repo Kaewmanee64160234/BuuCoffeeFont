@@ -13,7 +13,7 @@ const router = useRouter();
 const historyCheckDialog = ref(false);
 const selectedCheck = ref<Checkingredient | null>(null);
 onMounted(async () => {
-  await subIngredientStore.findByShopTypeCatering();
+  // await subIngredientStore.findByShopTypeCatering();
 });
 
 const formatDate = (dateString: string) => {

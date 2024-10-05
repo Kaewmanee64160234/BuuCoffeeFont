@@ -1,6 +1,9 @@
 <template>
-  <MainMenu v-if="showMainMenu" />
   <router-view v-if="!showMainMenu" />
+
+  <MainMenu v-if="showMainMenu" />
+  <LoadingDialog :loading="loadingStore.loading" />
+
 </template>
 
 <script setup lang="ts">
@@ -9,8 +12,11 @@ import { useRouter } from 'vue-router';
 import { computed, ref, onMounted } from 'vue';
 import { useUserStore } from './stores/user.store';
 import type { User } from './types/user.type';
+import LoadingDialog from './components/LoadingDialog.vue';
+import { useLoadingStore } from './stores/loading.store';
 
 const router = useRouter();
+const loadingStore = useLoadingStore();
 const userStore = useUserStore();
 const user = ref<User>({
   userId: null,

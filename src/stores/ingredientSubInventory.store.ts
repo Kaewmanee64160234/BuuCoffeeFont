@@ -144,7 +144,8 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
   async function getSubIngredients_coffee() {
     try {
       const res = await ingredientService.getSubIngredients_Coffee();
-      subingredients_coffee.value = res.data;
+      const filteredSubIngredients = res.data.filter(item => item.quantity > 0);
+      subingredients_coffee.value = filteredSubIngredients;
       // console.log(subingredients_coffee.value)
     } catch (e) {
       console.log(e);
@@ -153,7 +154,8 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
   async function getSubIngredients_rice() {
     try {
       const res = await ingredientService.getSubIngredients_Rice();
-      subingredients_rice.value = res.data;
+      const filteredSubIngredients = res.data.filter(item => item.quantity > 0);
+      subingredients_rice.value = filteredSubIngredients;
       // console.log(subingredients_coffee.value)
     } catch (e) {
       console.log(e);

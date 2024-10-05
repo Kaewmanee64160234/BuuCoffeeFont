@@ -12,33 +12,49 @@ export const useAuthStore = defineStore("auth", () => {
 
   const login = async (userEmail: string, userPassword: string) => {
     try {
+      // Send login request to the backend
       const response = await auth.login(userEmail, userPassword);
+      console.log(response);
+  
       if (response && response.data) {
-        const user__: User = {
-          userId: response.data.userId,
-          userName: response.data.userName,
-          userPassword: response.data.userPassword,
-          userRole: response.data.userRole,
-          userEmail: response.data.userEmail,
-          userStatus: response.data.userStatus,
-        };
-
-        localStorage.setItem("user", JSON.stringify(user__));
+        // Extract user and token from the response
+        const token = response.data.access_token; // The JWT token sent by the backend
+        console.log(token);
+  
+        const user__: User = response.data.user;
+  
+        // Store user and token in localStorage
+        localStorage.setItem("user", JSON.stringify(user__)); // Store the user data
+        localStorage.setItem("token", token); // Store the token
+  
+        // Update the user in the store
         userStore.setUser(user__);
+  
         console.log(user__);
-        router.push("/report");
+  
+        // Redirect to the report page
+        if(userStore.currentUser.role.name === "ผู้จัดการร้าน"){
+          router.push("/report");
+
+        }else{
+          router.push("/pos");
+        }
       } else {
-        console.error("User does not have account");
+        console.error("User does not have an account");
         return null;
       }
-
+  
+      // Set the authName from localStorage
       authName.value = JSON.parse(localStorage.getItem("user") as string);
     } catch (e) {
       console.error("Error in login method:", e);
-      throw e; // ส่งต่อ error ไปยัง caller หรือที่ใดก็ได้ที่จะจัดการต่อ
+      throw e; // Forward the error for further handling
     }
+  
+    // Set login status to true
     isLogin.value = true;
   };
+  
   const logout = () => {
     localStorage.removeItem("user");
 
