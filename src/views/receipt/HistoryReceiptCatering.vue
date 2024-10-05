@@ -1,5 +1,28 @@
 <script lang="ts" setup>
+import { onMounted } from 'vue';
+import { useCateringEventStore } from '@/stores/historycatering.store';
 
+const cateringEventStore = useCateringEventStore();
+
+onMounted(async () => {
+  try {
+    await cateringEventStore.fetchCateringEvents();
+  } catch (error) {
+    console.error('Failed to load catering events:', error);
+  }
+});
+const translateStatus = (status: any) => {
+  switch (status) {
+    case 'pending':
+      return 'รอดำเนินการ'
+    case 'paid':
+      return 'รายการสำเร็จ'
+    case 'canceled':
+      return 'ยกเลิก'
+    default:
+      return status
+  }
+}
 </script>
 
 <template>
@@ -9,7 +32,7 @@
     <v-card>
       <v-card-title>
         <v-row>
-          <v-col cols="9"> จัดเลี้ยงรับรอง </v-col>
+          <v-col cols="9"> ประวัติจัดเลี้ยงรับรอง </v-col>
           <v-col cols="3">
             <v-text-field variant="solo" label="ค้นหาประวัติการเช็ควัตถุดิบ" append-inner-icon="mdi-magnify"
               hide-details dense></v-text-field>
@@ -17,10 +40,18 @@
         </v-row>
 
       </v-card-title>
+      <v-row class="mt-5 mx-4">
+        <v-text-field label="เริ่มวันที่" type="date" dense hide-details variant="solo" class="mr-4" />
+        <v-text-field label="ถึงวันที่" type="date" dense hide-details variant="solo" class="mr-4" />
 
-      <v-table class="mx-auto" style="width: 97%">
+      </v-row>
+
+      <v-table class="mt-5 mx-auto" style="width: 97%">
         <thead>
           <tr>
+            <th style="text-align: center; font-weight: bold">
+              ลำดับ
+            </th>
             <th style="text-align: center; font-weight: bold">
               ชื่อการจัดเลี้ยง
             </th>
@@ -34,11 +65,29 @@
           </tr>
         </thead>
         <tbody>
-         
-        </tbody>
-       
+          <tr v-for="(catering, index) in cateringEventStore.historyCateringEvent" :key="catering.eventId">
+            <!-- @click="openMealDialog(receipt)" -->
+            <td style="text-align: center">{{ index + 1 }}</td>
+            <td>{{ catering.eventName }}</td>
+            <td>{{ catering.eventDate }}</td>
+            <td>{{ catering.eventLocation }}</td>
+            <td style="text-align: center">{{ catering.attendeeCount }}</td>
+            <td style="text-align: right">{{ catering.totalBudget }} บาท</td>
+            <td style="text-align: center">
+              {{ translateStatus(catering.status) }}
+            </td>
+            <td>{{ catering.user.userName }}</td>
+            <td>
+  
+              <v-btn v-if="catering.status !== 'canceled'" color="#ed8731" class="mr-2" icon="mdi-pencil">
+                <v-icon color="white" style="font-size: 20px">mdi-eye-circle</v-icon>
+              </v-btn>
+            </td>
 
-        <!-- :length="subIngredientStore.lastPage" -->
+          </tr>
+        </tbody>
+
+
       </v-table>
 
     </v-card>

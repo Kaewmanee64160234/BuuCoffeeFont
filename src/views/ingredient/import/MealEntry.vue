@@ -1,7 +1,7 @@
 <template>
     <v-card class="mb-5">
         <v-card-text>
-            <v-btn color="primary" @click="cateringStore.addMeal" class="button-full-width"> <v-icon left></v-icon> <strong>เพิ่มมื้อการจัดเลี้ยง</strong>
+            <v-btn color="primary" @click="cateringStore.addMeal" class="button-full-width" rounded> <v-icon left></v-icon> <strong>เพิ่มมื้อการจัดเลี้ยง</strong>
             </v-btn>
             <v-expansion-panels class="mb-5">
                 <v-expansion-panel v-for="(meal, index) in cateringStore.meals" :key="index">

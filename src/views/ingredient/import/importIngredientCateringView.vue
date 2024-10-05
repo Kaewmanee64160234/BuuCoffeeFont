@@ -25,9 +25,9 @@
         </div>
       </v-card-text>
       <v-card-actions>
-        <v-row>
+        <v-row  >
       <v-col>
-        <v-btn   class="custom-button button-full-width" @click="cateringStore.saveCheckData(1, cateringStore.eventData)">
+        <v-btn    class="custom-button button-full-width"  rounded @click="cateringStore.saveCheckData(1, cateringStore.eventData)">
           <v-icon left>mdi-plus</v-icon>
          <strong>บันทึกข้อมูล</strong> 
         </v-btn>
@@ -78,12 +78,12 @@ const totalBudget = computed(() => {
 
 <style scoped>
 .custom-button {
-  background-color: #4CAF50; /* เปลี่ยนเป็นสีที่คุณต้องการ */
+  background-color: #FF9642; /* เปลี่ยนเป็นสีที่คุณต้องการ */
   color: white; /* สีตัวอักษร */
 }
 
 .custom-button:hover {
-  background-color: #45a049; /* สีเมื่อเลื่อนเมาส์ไปที่ปุ่ม */
+  background-color: #2e1d10; /* สีเมื่อเลื่อนเมาส์ไปที่ปุ่ม */
 }
 .button-full-width {
   width: 100%;

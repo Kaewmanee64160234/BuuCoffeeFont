@@ -177,13 +177,6 @@
               </template>
               คลังร้านข้าว
             </v-list-item>
-
-            <v-list-item to="/ingredientCateringList">
-              <template v-slot:prepend>
-                <img src="../../src/components/img/buffet.png" alt="รายการเลี้ยงรับรอง" class="nav-icon" />
-              </template>
-              คลังวัตถุดิบร้านเลี้ยงรับรอง
-            </v-list-item>
           </v-list>
         </v-expand-transition>
 
