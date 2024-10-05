@@ -95,7 +95,7 @@
         
             <v-list-item to="/userManagement">
               <template v-slot:prepend>
-                <img src="../../src/components/img/user.png" alt="จัดการผู้ใช้งาน" class="nav-icon" />
+                <img src="../../src/components/img/man.png" alt="จัดการผู้ใช้งาน" class="nav-icon" />
               </template>
               จัดการผู้ใช้งาน
             </v-list-item>
