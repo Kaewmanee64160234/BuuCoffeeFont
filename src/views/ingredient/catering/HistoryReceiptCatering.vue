@@ -1,9 +1,11 @@
 <script lang="ts" setup>
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useCateringEventStore } from '@/stores/historycatering.store';
-
+import type { HistoryCateringEvent } from '@/types/catering/history_catering.type';
+import dialogHistoryCatering from "@/views/ingredient/catering/dialogHistoryCatering.vue";
 const cateringEventStore = useCateringEventStore();
-
+const historyCheckDialog = ref(false);
+const selectedCheck = ref<HistoryCateringEvent | null>(null);
 onMounted(async () => {
   try {
     await cateringEventStore.fetchCateringEvents();
@@ -23,10 +25,15 @@ const translateStatus = (status: any) => {
       return status
   }
 }
+const openHistoryCheckDialog = async (checkcatering: HistoryCateringEvent) => {
+  await cateringEventStore.getHistoryCateringById(checkcatering.eventId);
+  cateringEventStore.historyCateringitem = checkcatering;
+  cateringEventStore.dialogCateringItem = true;
+};
 </script>
 
 <template>
-  <!-- <dialogImportItemCateringHistory v-model:dialog="historyCheckDialog" :checkingredient="selectedCheck" /> -->
+  <dialogHistoryCatering v-model:dialog="historyCheckDialog" :checkcatering="selectedCheck" />
   <v-container>
 
     <v-card>
@@ -34,8 +41,8 @@ const translateStatus = (status: any) => {
         <v-row>
           <v-col cols="9"> ประวัติจัดเลี้ยงรับรอง </v-col>
           <v-col cols="3">
-            <v-text-field variant="solo" label="ค้นหาประวัติ" append-inner-icon="mdi-magnify"
-              hide-details dense></v-text-field>
+            <v-text-field variant="solo" label="ค้นหาประวัติ" append-inner-icon="mdi-magnify" hide-details
+              dense></v-text-field>
           </v-col>
         </v-row>
 
@@ -57,29 +64,41 @@ const translateStatus = (status: any) => {
             </th>
             <th style="text-align: center; font-weight: bold">วันที่จัดเลี้ยง</th>
             <th style="text-align: center; font-weight: bold">สถานที่จัดเลี้ยง</th>
-            <th style="text-align: center; font-weight: bold">จำนวนคน</th>
             <th style="text-align: center; font-weight: bold">งบประมาณ</th>
             <th style="text-align: center; font-weight: bold">สถานะ</th>
-            <th style="text-align: center; font-weight: bold">ผู้รับผิดชอบ</th>
+            <th style="text-align: center; font-weight: bold">แก้ไขสถานะ</th>
             <th style="text-align: center; font-weight: bold">แอคชั่น</th>
           </tr>
         </thead>
         <tbody>
+          <tr v-if="cateringEventStore.historyCateringEvent.length === 0">
+    <td colspan="8" style="text-align: center;">ไม่มีข้อมูล</td>
+  </tr>
           <tr v-for="(catering, index) in cateringEventStore.historyCateringEvent" :key="catering.eventId">
-            <!-- @click="openMealDialog(receipt)" -->
             <td style="text-align: center">{{ index + 1 }}</td>
             <td>{{ catering.eventName }}</td>
             <td>{{ catering.eventDate }}</td>
             <td>{{ catering.eventLocation }}</td>
-            <td style="text-align: center">{{ catering.attendeeCount }}</td>
             <td style="text-align: right">{{ catering.totalBudget }} บาท</td>
             <td style="text-align: center">
               {{ translateStatus(catering.status) }}
             </td>
-            <td>{{ catering.user.userName }}</td>
+            <td style="text-align: center">
+              <v-btn v-if="catering.status === 'pending'" color="#ed8731" class="mr-2"
+                @click="cateringEventStore.updateStatus(catering.eventId, 'paid')">
+                สำเร็จ
+              </v-btn>
+
+              <v-btn v-if="catering.status === 'pending'" color="red"
+                @click="cateringEventStore.cancelEvent(catering.eventId)">
+                ยกเลิก
+              </v-btn>
+            </td>
+
             <td>
-  
-              <v-btn v-if="catering.status !== 'canceled'" color="#ed8731" class="mr-2" icon="mdi-pencil">
+
+              <v-btn v-if="catering.status !== 'canceled'" color="#ed8731" class="mr-2" icon="mdi-pencil"
+                @click="openHistoryCheckDialog(catering)">
                 <v-icon color="white" style="font-size: 20px">mdi-eye-circle</v-icon>
               </v-btn>
             </td>
