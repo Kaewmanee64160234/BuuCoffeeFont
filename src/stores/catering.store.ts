@@ -26,6 +26,7 @@ export const useCateringStore = defineStore('catering', () => {
   async function saveCheckData(userId: number, eventData: any) {
     const totalBudget = meals.value.reduce((sum, meal) => sum + meal.totalPrice, 0);
     eventData.totalBudget = totalBudget; // อัปเดต eventData ด้วย totalBudget
+
     const data = {
         userId,
         eventName: eventData.eventName,
@@ -48,17 +49,32 @@ export const useCateringStore = defineStore('catering', () => {
     };
 
     try {
-        const response = await axios.post('http://localhost:3000/checkingredients/create-catering', data);
-        console.log('Data saved successfully:', response.data);
-
-        await Swal.fire({
-            icon: 'success',
-            title: 'สำเร็จ!',
-            text: 'ข้อมูลของคุณถูกบันทึกเรียบร้อยแล้ว.',
+        const confirmation = await Swal.fire({
+            title: 'ยืนยันการบันทึก?',
+            text: 'คุณต้องการบันทึกข้อมูลนี้หรือไม่?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'ใช่, บันทึกเลย!',
+            cancelButtonText: 'ยกเลิก'
         });
 
-        clearForm(); 
-        return response.data;
+        if (confirmation.isConfirmed) {
+            const response = await axios.post('http://localhost:3000/checkingredients/create-catering', data);
+            console.log('Data saved successfully:', response.data);
+
+            await Swal.fire({
+                icon: 'success',
+                title: 'สำเร็จ!',
+                text: 'ข้อมูลของคุณถูกบันทึกเรียบร้อยแล้ว.',
+            });
+
+            clearForm();
+            return response.data;
+        } else {
+            console.log('User canceled the data save.');
+        }
     } catch (error) {
         console.error('Error saving data:', error);
 
@@ -69,6 +85,7 @@ export const useCateringStore = defineStore('catering', () => {
         });
     }
 }
+
 function clearForm() {
   eventData.value = {
       eventName: '',
@@ -77,7 +94,7 @@ function clearForm() {
       attendeeCount: 0,
       totalBudget: 0,
   };
-  meals.value = []; // เคลียร์รายการอาหาร
+  meals.value = []; 
 }
 
   async function saveMeals() {

@@ -34,7 +34,7 @@ const translateStatus = (status: any) => {
         <v-row>
           <v-col cols="9"> ประวัติจัดเลี้ยงรับรอง </v-col>
           <v-col cols="3">
-            <v-text-field variant="solo" label="ค้นหาประวัติการเช็ควัตถุดิบ" append-inner-icon="mdi-magnify"
+            <v-text-field variant="solo" label="ค้นหาประวัติ" append-inner-icon="mdi-magnify"
               hide-details dense></v-text-field>
           </v-col>
         </v-row>
@@ -114,7 +114,6 @@ td {
   text-align: center !important;
 }
 
-/* Responsive styles */
 @media (max-width: 1024px) {
 
   th,
@@ -160,12 +159,10 @@ td {
 
   v-container {
     padding: 0;
-    /* ลด padding ของ container */
   }
 
   v-card {
     margin: 0;
-    /* ลด margin ของ card */
   }
 }
 </style>
