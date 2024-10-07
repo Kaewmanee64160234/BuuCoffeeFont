@@ -10,7 +10,7 @@ const page = computed(() => subIngredientStore.page);
 const take = computed(() => subIngredientStore.take);
 
 const paginatedItems = computed(() => {
-  const start = (page.value - 1) * take.value; // ใช้ .value ที่นี่เพราะ page เป็น computed
+  const start = (page.value - 1) * take.value; 
   const end = start + take.value;
   return subIngredientStore.subingredients_coffee.slice(start, end);
 });
@@ -28,7 +28,11 @@ const navigateTo = (routeName: string) => {
 watch(() => subIngredientStore.page, async (newValue) => {
   await subIngredientStore.getSubIngredients_coffee();
 });
-
+watch(paginate, async (newValue, oldValue) => {
+  if (newValue !== oldValue) {
+    await subIngredientStore.getAllIngredients();
+  }
+})
 </script>
 
 <template>
@@ -78,7 +82,7 @@ watch(() => subIngredientStore.page, async (newValue) => {
         </thead>
         <tbody>
           <tr v-for="(item, index) in paginatedItems" :key="index">
-            <td>{{ (page - 1) * take + index + 1 }}</td> <!-- ใช้ .value ที่นี่ -->
+            <td>{{ (page - 1) * take + index + 1 }}</td>
             <td>{{ item.ingredient.ingredientName }}</td>
             <td>{{ item.quantity }}</td>
           </tr>

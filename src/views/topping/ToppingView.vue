@@ -55,8 +55,12 @@
             </tr>
           </tbody>
         </v-table>
-        <v-pagination justify="center" v-model="toppingStore.currentPage" :length="Math.ceil(toppingStore.totalToppings / toppingStore.itemsPerPage)" 
-        rounded="circle"></v-pagination>
+        <v-pagination 
+          justify="center" 
+          v-model="toppingStore.currentPage" 
+          :length="Math.ceil(toppingStore.totalToppings / toppingStore.itemsPerPage)" 
+          rounded="circle">
+        </v-pagination>
       </v-card-text>
     </v-card>
     <CreateToppingDialog />
