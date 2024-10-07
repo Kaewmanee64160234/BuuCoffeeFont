@@ -1,4 +1,4 @@
-src/views/ingredient/check/dialogCheck.vue<script lang="ts" setup>
+<script lang="ts" setup>
 import { useCheckIngredientStore } from '@/stores/historyIngredientCheck.store';
 import { computed, ref } from 'vue';
 
