@@ -89,7 +89,7 @@ const router = createRouter({
       path: "/importingredientCatering",
       name: "importingredientCatering",
       component: () =>
-        import("../views/ingredient/import/importIngredientCateringView.vue"),
+        import("../views/ingredient/catering/importIngredientCateringView.vue"),
       meta: { requiresAuth: true },
     },
     {
@@ -240,7 +240,7 @@ const router = createRouter({
     {
       path: "/historyReceiptCatering",
       name: "historyReceiptCatering",
-      component: () => import("../views/receipt/HistoryReceiptCatering.vue"),
+      component: () => import("../views/ingredient/catering/HistoryReceiptCatering.vue"),
     },
     // forbidden
     {

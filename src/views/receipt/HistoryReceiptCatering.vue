@@ -1,186 +1,74 @@
 <script lang="ts" setup>
-import { useCheckIngredientStore } from "@/stores/historyIngredientCheck.store";
-import { computed, onMounted, ref, watch } from "vue";
-import { useRouter } from "vue-router";
-import dialogImportItemCateringHistory from "@/views/ingredient/check/dialogCheckCateringHistory.vue";
-import { useSubIngredientStore } from "@/stores/ingredientSubInventory.store";
-import type { Checkingredient } from "@/types/checkingredientitem.type";
-import * as XLSX from "xlsx";
-import { useIngredientStore } from "@/stores/Ingredient.store";
-const ingredientStore = useIngredientStore();
-const subIngredientStore = useSubIngredientStore();
-const checkingredientStore = useCheckIngredientStore();
+import { useReceiptStore } from '@/stores/receipt.store';
+import { useReceiptsStore } from '@/stores/report/receiptsStore';
+import { computed} from 'vue';
 
-const router = useRouter();
-const paginate = ref(true);
-const page = computed(() => subIngredientStore.page);
-const take = computed(() => subIngredientStore.take);
-const historyCheckDialog = ref(false);
-const selectedCheck = ref<Checkingredient | null>(null);
-onMounted(async () => {
-  // await ingredientStore.getAllIngredients();
-  // await subIngredientStore.getSubIngredients_coffee();
-  // await subIngredientStore.getSubIngredients_rice();
-  await subIngredientStore.findByShopTypeCateringHistory();
-  // order it to last created date first
-  subIngredientStore.HistoryCatering.sort((a, b) => {
-    return new Date(b.date).getTime() - new Date(a.date).getTime();
-  });
+const receiptsStore = useReceiptsStore();
+const receiptStore = useReceiptStore();
+
+const paginatedReceipts = computed(() => {
+  const start = (receiptStore.currentPage - 1) * receiptStore.itemsPerPage;
+  const end = start + receiptStore.itemsPerPage;
+  return filteredReceipts.value.slice(start, end);
 });
 
-watch(paginate, async (newValue, oldValue) => {
-  if (newValue !== oldValue) {
-    await subIngredientStore.getAllIngredients();
+const filteredReceipts = computed(() => {
+  if (!receiptStore.searchQuery) {
+    return receiptStore.receipts.slice().sort((a, b) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime());
   }
-})
-
-const formatDate = (dateString: string) => {
-  const options = {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-    timeZone: "UTC",
-  };
-  return new Date(dateString).toLocaleDateString("th-TH", options!);
-};
-
-const navigateTo = (routeName: string) => {
-  router.push({ name: routeName });
-};
-
-const openHistoryCheckDialog = (checkingredient: Checkingredient) => {
-  checkingredientStore.checkingredient = checkingredient;
-  checkingredientStore.dialogCheckItem = true;
-};
-function exportToExcel(checkingredient: Checkingredient) {
-  const basicData = {
-    วันที่: checkingredient.date,
-    รูปแบบ: checkingredient.actionType,
-    คำอธิบาย: checkingredient.checkDescription,
-    ผู้รับผิดชอบ: checkingredient.user.userName,
-  };
-
-  const tableData = checkingredient.checkingredientitem.map((item, index) => ({
-    ลำดับ: index + 1,
-    ชื่อวัตถุดิบ: item.ingredient.ingredientName,
-    ผู้จัดจำหน่าย: item.ingredient.ingredientSupplier,
-    จำนวนเดิม: item.oldRemain,
-    จำนวนนับ: item.UsedQuantity,
-  }));
-
-  const wb = XLSX.utils.book_new();
-  const ws1 = XLSX.utils.json_to_sheet([basicData], {
-    header: Object.keys(basicData),
-  });
-  const ws2 = XLSX.utils.json_to_sheet(tableData, {
-    header: Object.keys(tableData[0]),
-  });
-
-  XLSX.utils.book_append_sheet(wb, ws1, "Summary");
-  XLSX.utils.book_append_sheet(wb, ws2, "Details");
-
-  XLSX.writeFile(wb, `check_ingredient_${new Date().toISOString()}.xlsx`);
-}
-
-// gotoEditPageCatering
-const gotoEditPageCatering = (item: Checkingredient) => {
-  subIngredientStore.ingredientCheckList = item.checkingredientitem.map((item_) => {
-    const lastPrice = subIngredientStore.ingredientCheckList.find((item__) => item__.ingredientcheck.ingredientId === item_.ingredient.ingredientId)?.lastPrice;
-console.log(lastPrice);
-
-    return {
-      ingredientcheck: item_.ingredient, count: item_.UsedQuantity, type: item_.type, lastPrice: lastPrice
-    };
-  });
-  router.push('/importingredientCatering');
-  // set item to list for edit ingredientCheckList
-  console.log(subIngredientStore.ingredientCheckList);
-
-
-};
+  return receiptStore.receipts.filter(receipt =>
+    receipt.customer?.customerName?.toLowerCase().includes(receiptStore.searchQuery.toLowerCase()) ||
+    receipt.receiptId?.toString().includes(receiptStore.searchQuery)
+  ).sort((a, b) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime());
+});
 </script>
 
 <template>
-  <dialogImportItemCateringHistory v-model:dialog="historyCheckDialog" :checkingredient="selectedCheck" />
+  <!-- <dialogImportItemCateringHistory v-model:dialog="historyCheckDialog" :checkingredient="selectedCheck" /> -->
   <v-container>
 
     <v-card>
       <v-card-title>
         <v-row>
-          <v-col cols="9"> ร้านเลี้ยงรับรอง </v-col>
+          <v-col cols="9"> จัดเลี้ยงรับรอง </v-col>
           <v-col cols="3">
             <v-text-field variant="solo" label="ค้นหาประวัติการเช็ควัตถุดิบ" append-inner-icon="mdi-magnify"
               hide-details dense></v-text-field>
           </v-col>
         </v-row>
-        <v-row>
-          <v-col>
-            <v-btn color="success" class="button-full-width" :to="{ name: 'ingredients' }">
-              <v-icon left>mdi-arrow-u-left-top-bold </v-icon> ย้อนกลับ
-            </v-btn>
-          </v-col>
-        </v-row>
+
       </v-card-title>
 
       <v-table class="mx-auto" style="width: 97%">
         <thead>
           <tr>
             <th style="text-align: center; font-weight: bold">
-              รหัสประวัติการเช็ควัตถุดิบ
+              ชื่อการจัดเลี้ยง
             </th>
-            <th style="text-align: center; font-weight: bold">วันที่</th>
-            <th style="text-align: center; font-weight: bold">ราคารวม</th>
-            <th style="text-align: center; font-weight: bold">รูปแบบ</th>
-            <th style="text-align: center; font-weight: bold">การกระทำ</th>
+            <th style="text-align: center; font-weight: bold">วันที่จัดเลี้ยง</th>
+            <th style="text-align: center; font-weight: bold">สถานที่จัดเลี้ยง</th>
+            <th style="text-align: center; font-weight: bold">จำนวนคน</th>
+            <th style="text-align: center; font-weight: bold">งบประมาณ</th>
+            <th style="text-align: center; font-weight: bold">สถานะ</th>
+            <th style="text-align: center; font-weight: bold">ผู้รับผิดชอบ</th>
+            <th style="text-align: center; font-weight: bold">แอคชั่น</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(item, index) in subIngredientStore.HistoryCatering" :key="index">
-            <td>{{ (page - 1) * take + index + 1 }}</td>
-            <td>{{ formatDate(item.date + '') }}</td>
-            <td>{{ item.totalPrice }}</td>
-            <td>
-              <span v-if="item.actionType === 'withdrawal'">
-                เบิกเข้าร้านgเลี้ยงรับรอง
-              </span>
-              <span v-else-if="item.actionType === 'return'">
-                คืนคลังวัตถุดิบ
-              </span>
-              <span v-else>
-                {{ item.actionType === 'withdrawalHistory' ? 'ใช้สินค้าในงานเลี้ยงรับรอง' : item.actionType }}
-
-              </span>
-            </td>
-
-            <td>
-              <!-- add button edit -->
-             
-              <v-btn color="#0d78f3 " class="mr-2" icon="mdi-pencil" @click="openHistoryCheckDialog(item)"><v-icon
-                  color="white" style="font-size: 20px">mdi-eye-circle</v-icon></v-btn>
-
-              <v-btn color="#4CAF50" icon @click="exportToExcel(item)">
-                <v-icon color="white" style="font-size: 20px">mdi-file-excel</v-icon>
-              </v-btn>
-            </td>
-          </tr>
+         
         </tbody>
-        <tbody v-if="!subIngredientStore.HistoryRice || subIngredientStore.HistoryRice.length === 0">
-          <tr>
-            <td colspan="4" class="text-center">ไม่มีข้อมูล</td>
-          </tr>
-        </tbody>
+       
+
         <!-- :length="subIngredientStore.lastPage" -->
       </v-table>
-      <v-pagination
-        justify="center"
-        v-model="subIngredientStore.page"
-        :length="Math.ceil(subIngredientStore.HistoryCatering.length / subIngredientStore.take)"
-        rounded="circle"
-      ></v-pagination>
+
     </v-card>
   </v-container>
+  <v-pagination
+  v-model="receiptStore.currentPage"
+  :length="Math.ceil(filteredReceipts.length / receiptStore.itemsPerPage)"
+  rounded="circle"
+></v-pagination>
 </template>
 
 <style scoped>
