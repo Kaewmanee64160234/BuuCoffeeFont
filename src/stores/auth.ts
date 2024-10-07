@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 import auth from "@/service/auth";
 import router from "@/router";
 import { useUserStore } from "./user.store";
-import type { User } from '@/types/user.type';
+import type { User } from "@/types/user.type";
 
 export const useAuthStore = defineStore("auth", () => {
   const authName = ref<User | null>(null);
@@ -15,46 +15,49 @@ export const useAuthStore = defineStore("auth", () => {
       // Send login request to the backend
       const response = await auth.login(userEmail, userPassword);
       console.log(response);
-  
+
       if (response && response.data) {
         // Extract user and token from the response
         const token = response.data.access_token; // The JWT token sent by the backend
         console.log(token);
-  
+
         const user__: User = response.data.user;
-  
+
         // Store user and token in localStorage
         localStorage.setItem("user", JSON.stringify(user__)); // Store the user data
         localStorage.setItem("token", token); // Store the token
-  
+
         // Update the user in the store
         userStore.setUser(user__);
-  
-        console.log(user__);
-  
-        // Redirect to the report page
-        if(userStore.currentUser.role.name === "ผู้จัดการร้าน"){
-          router.push("/report");
 
-        }else{
-          router.push("/pos");
+        console.log(user__);
+
+        // Redirect to the report page
+        if (userStore.currentUser.role.name === "ผู้จัดการร้าน") {
+          router.push("/report");
+        } else {
+          if (userStore.currentUser.role.name === "พนักงานขายข้าว") {
+            router.push("/pos-coffee");
+          } else {
+            router.push("/pos-rice");
+          }
         }
       } else {
         console.error("User does not have an account");
         return null;
       }
-  
+
       // Set the authName from localStorage
       authName.value = JSON.parse(localStorage.getItem("user") as string);
     } catch (e) {
       console.error("Error in login method:", e);
       throw e; // Forward the error for further handling
     }
-  
+
     // Set login status to true
     isLogin.value = true;
   };
-  
+
   const logout = () => {
     localStorage.removeItem("user");
 

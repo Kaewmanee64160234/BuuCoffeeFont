@@ -3,6 +3,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user.store";
 import { useLoadingStore } from "@/stores/loading.store";
 import Swal from "sweetalert2";
+import { useAuthorizeStore } from "@/stores/autorize.store";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -21,7 +22,7 @@ const router = createRouter({
 
       component: () => import("../views/user/userManagement.vue"),
 
-      meta: { requiresAuth: true },
+     meta: { requiresAuth: true, roles: ["ผู้จัดการร้าน"]}
 
     },
     {
@@ -167,7 +168,7 @@ const router = createRouter({
       name: "history-coffee-store",
       component: () =>
         import("../views/ingredient/history/histotyRWCoffeeView.vue"),
-      // meta: { requiresAuth: true },
+      meta: { requiresAuth: true },
     },
     {
       path: "/history-rice-store",
@@ -217,13 +218,14 @@ const router = createRouter({
       path: "/pos-rice",
       name: "pos-rice",
       component: () => import("../views/pos/PosViewRice.vue"),
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, roles: ["ผู้จัดการร้าน","พนักงานขายข้าว"] },
     },
     {
       path: "/pos-coffee",
       name: "pos-coffee",
       component: () => import("../views/pos/PosViewCoffee.vue"),
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, roles: ["ผู้จัดการร้าน","พนักงานขายกาแฟ"] },
+
     },
     {
       path: "/login",
@@ -268,13 +270,29 @@ router.beforeEach((to, from, next) => {
     if (!authStore.isLogin) {
       // Redirect to login if not authenticated
       next({ name: "login" });
-    } else{
-      next();
+    } else {
+      // Check if the route has role requirements
+      if (to.meta.roles) {
+        console.log("Role requirements:", to.meta.roles);
+        console.log("Role requirements:", userStore.currentUser.role.name);
+        const userRole = userStore.currentUser.role.name; // Assuming `userStore.currentUser.role.name` contains the current user's role name
+
+        // Check if user's role is included in the route's allowed roles
+        if (to.meta.roles.includes(userRole)) {
+          next(); // Proceed if the user's role matches the allowed roles
+        } else {
+          next({ name: "forbidden" }); // Redirect to forbidden page if the user lacks permissions
+        }
+      } else {
+        next(); // If no specific role requirements, proceed normally
+      }
     }
   } else {
     next(); // If the route does not require authentication, proceed as normal
   }
 });
+
+
 let timer: number | null = null;
 router.beforeEach((to, from, next) => {
   const loadingStore = useLoadingStore();
