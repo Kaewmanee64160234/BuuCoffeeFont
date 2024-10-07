@@ -97,16 +97,10 @@ export const useReceiptStore = defineStore("receipt", () => {
       posStore.saveQueueListToLocalStorage();
     }
   };
-  const getRecieptIn30Min = async () => {
+  const getRecieptIn30Min = async (typeOfStore:string) => {
     try {
       isLoading.value = true;
-      let typeOfStore = "";
-      if (userStore.currentUser.userRole == "พนักงานขายข้าว") {
-        typeOfStore = "ร้านข้าว";
-      } else {
-        typeOfStore = "ร้านกาแฟ";
-      }
-
+     
       const response = await receiptService.getRecieptIn30Min(typeOfStore);
       if (response.status === 200) {
 

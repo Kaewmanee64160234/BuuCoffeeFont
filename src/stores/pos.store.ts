@@ -335,14 +335,8 @@ export const usePosStore = defineStore("pos", () => {
   };
 
   // create function create recipt
-  const createReceipt = async () => {
-    let receiptStatus = "";
-  
-    if (userStore.currentUser?.userRole == "พนักงานขายกาแฟ") {
-      receiptStatus = "ร้านกาแฟ";
-    } else {
-      receiptStatus = "ร้านข้าว";
-    }
+  const createReceipt = async (receiptStatus:string) => {
+    
   
     if (currentReceipt.value?.queueNumber !== undefined) {
       receipt.value.receiptItems = selectedItems.value;
@@ -374,7 +368,7 @@ export const usePosStore = defineStore("pos", () => {
       await customerStore.getAllCustomers();
     }
     
-    await receiptStore.getRecieptIn30Min();
+    await receiptStore.getRecieptIn30Min(receiptStatus);
   };
   
 

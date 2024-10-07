@@ -23,7 +23,7 @@ const url = import.meta.env.VITE_URL_PORT
 
 
 onMounted(async () => {
-  await receiptStore.getRecieptIn30Min();
+  await receiptStore.getRecieptIn30Min('ร้านกาแฟ');
   await loadQueueListFromLocalStorage();
   const currentDate = new Date().toLocaleDateString(); // Get current date as a string
   posStore.receipt.paymentMethod = 'cash';
@@ -158,7 +158,7 @@ async function save() {
   if (posStore.receipt.receiptId) {
     posStore.updateReceipt(posStore.receipt.receiptId, posStore.receipt);
   } else {
-    posStore.createReceipt();
+    posStore.createReceipt('ร้านกาแฟ');
   }
 
   // Save the current state of the queue after updating/creating the receipt
@@ -343,7 +343,7 @@ const selectReceipt = (receipt: Receipt) => {
                       <v-row no-gutters>
                         <v-col cols="6" class="product-name">{{ item.product?.productName }}</v-col>
                         <v-col cols="6" class="text-right product-price">
-                          <p>{{ item.receiptSubTotal.toFixed(2) }}</p>
+                          <p>{{ item.receiptSubTotal }}</p>
                         </v-col>
                       </v-row>
                       <v-row no-gutters>
@@ -450,7 +450,7 @@ const selectReceipt = (receipt: Receipt) => {
             <div class="ma-2">
               <p class="d-flex justify-space-between pr-6 my-2">
                 <span>ทั้งหมด:</span>
-                <span class="info-value">{{ posStore.receipt.receiptTotalPrice.toFixed(2) }}</span>
+                <span class="info-value">{{ posStore.receipt.receiptTotalPrice }}</span>
               </p>
 
               <div v-if="posStore.receipt.paymentMethod === 'cash'">
@@ -464,7 +464,7 @@ const selectReceipt = (receipt: Receipt) => {
               <p class="d-flex justify-space-between pr-6 my-2">
                 <span>ทอน:</span>
                 <span :class="posStore.receipt.receive < 0 || posStore.receipt.receive < posStore.receipt.receiptNetPrice ? 'red--text' : 'black'" class="info-value">
-                  {{ parseFloat(posStore.receipt.change.toFixed(2)) < 0 ? 'จำนวนเงินไม่พอ' : posStore.receipt.change.toFixed(2) }}
+                  {{ parseFloat(posStore.receipt.change) < 0 ? 'จำนวนเงินไม่พอ' : posStore.receipt.change }}
                 </span>
               </p>
 
