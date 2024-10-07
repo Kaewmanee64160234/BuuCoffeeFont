@@ -50,7 +50,7 @@ const deleteIngredient = async (id?: number) => {
 };
 
 const navigateTo = (routeName: string) => {
-  router.push({ name: routeName });
+  router.push( '/'+routeName) ;
 };
 
 watch(paginate, async (newValue, oldValue) => {

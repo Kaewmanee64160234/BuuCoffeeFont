@@ -21,35 +21,35 @@ const router = createRouter({
 
       component: () => import("../views/user/userManagement.vue"),
 
-      meta: { requiresAuth: true, roles: ["ผู้จัดการร้าน"] },
+      meta: { requiresAuth: true },
 
     },
     {
       path:"/managementRole",
       name:"managementRole",
       component: () => import("@/views/user/permisstionManagement.vue"),
-      meta: { requiresAuth: true, roles: ["ผู้จัดการร้าน"] },
+      meta: { requiresAuth: true },
 
     },
     {
       path: "/productsManagement",
       name: "products",
       component: () => import("../views/product/ProductManagementView.vue"),
-      meta: { requiresAuth: true, roles: ["ผู้จัดการร้าน"] },
+      meta: { requiresAuth: true },
 
     },
     {
       path: "/customersManagement",
       name: "customers",
       component: () => import("../views/customer/customerManagement.vue"),
-      meta: { requiresAuth: true, roles: ["ผู้จัดการร้าน"] },
+      meta: { requiresAuth: true },
 
     },
     {
       path: "/historyReceipt",
       name: "historyReceipt",
       component: () => import("../views/receipt/HistoryReceipt.vue"),
-      meta: { requiresAuth: true, roles: ["ผู้จัดการร้าน","พนักงานบัญชี"] },
+      meta: { requiresAuth: true },
 
     },
     {
@@ -167,7 +167,7 @@ const router = createRouter({
       name: "history-coffee-store",
       component: () =>
         import("../views/ingredient/history/histotyRWCoffeeView.vue"),
-      meta: { requiresAuth: true },
+      // meta: { requiresAuth: true },
     },
     {
       path: "/history-rice-store",
@@ -214,9 +214,15 @@ const router = createRouter({
     },
     // pos
     {
-      path: "/pos",
-      name: "pos",
-      component: () => import("../views/pos/PosView.vue"),
+      path: "/pos-rice",
+      name: "pos-rice",
+      component: () => import("../views/pos/PosViewRice.vue"),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/pos-coffee",
+      name: "pos-coffee",
+      component: () => import("../views/pos/PosViewCoffee.vue"),
       meta: { requiresAuth: true },
     },
     {
