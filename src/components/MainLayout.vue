@@ -373,41 +373,40 @@ const showIngredients = ref(false);
 const showOthers = ref(false);
 
 const toggleSale = () => {
-  // ตรวจสอบว่า rail อยู่ในสถานะ true หรือ false
-  if (rail.value) {
-    showSale.value = false; // ปิดเมนูการขายเมื่อ rail เป็น true
-  } else {
-    showSale.value = !showSale.value; // ทำให้เมนูการขายสลับสถานะเมื่อ rail เป็น false
-  }
+  showSale.value = rail.value ? false : !showSale.value; // ปิดเมนูถ้า rail เป็น true, สลับสถานะถ้า rail เป็น false
+}
+
+const toggleCatering = () => {
+  showCatering.value = rail.value ? false : !showCatering.value; // ปิดเมนูถ้า rail เป็น true, สลับสถานะถ้า rail เป็น false
+}
+
+const toggleProductUserManagement = () => {
+  showProductUserManagement.value = rail.value ? false : !showProductUserManagement.value; // ปิดเมนูถ้า rail เป็น true, สลับสถานะถ้า rail เป็น false
+}
+
+const togglePromotionCategory = () => {
+  showPromotionCategory.value = rail.value ? false : !showPromotionCategory.value; // ปิดเมนูถ้า rail เป็น true, สลับสถานะถ้า rail เป็น false
+}
+
+const toggleIngredients = () => {
+  showIngredients.value = rail.value ? false : !showIngredients.value; // ปิดเมนูถ้า rail เป็น true, สลับสถานะถ้า rail เป็น false
+}
+
+const toggleOthers = () => {
+  showOthers.value = rail.value ? false : !showOthers.value; // ปิดเมนูถ้า rail เป็น true, สลับสถานะถ้า rail เป็น false
 }
 
 const toggleRail = () => {
   rail.value = !rail.value;
   if (rail.value) {
-    showSale.value = false; // ปิดเมนูการขายเมื่อ rail ถูกเปิด
+    showSale.value = false;
+    showCatering.value = false;
+    showProductUserManagement.value = false;
+    showPromotionCategory.value = false;
+    showIngredients.value = false;
+    showOthers.value = false;
   }
 }
-
-
-const toggleCatering = () => {
-  showCatering.value = !showCatering.value;
-};
-
-const toggleProductUserManagement = () => {
-  showProductUserManagement.value = !showProductUserManagement.value;
-};
-
-const togglePromotionCategory = () => {
-  showPromotionCategory.value = !showPromotionCategory.value;
-};
-
-const toggleIngredients = () => {
-  showIngredients.value = !showIngredients.value;
-};
-
-const toggleOthers = () => {
-  showOthers.value = !showOthers.value;
-};
 
 const getUserFromLocalStorage = () => {
   const userString = localStorage.getItem("user");

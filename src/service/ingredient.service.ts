@@ -147,9 +147,6 @@ function searchIngredientsByName(name: string) {
 function getHistoryCheckById(id: number) {
   return http.get(`/checkingredients/${id}`);
 }
-function getHistoryCateringById(id: number) {
-  return http.get(`/catering-event/${id}`);
-}
 function getHistoryImportById(id: number) {
   return http.get(`/importingredients/${id}`);
 }
@@ -207,7 +204,6 @@ export default {
   getAllHistoryImportIngredients,
   getLog,
   saveIngredient,
-  getHistoryCateringById,
   updateIngredient,
   getIngredients,
   deleteIngredient,
