@@ -1,9 +1,7 @@
 <script lang="ts" setup>
 import { useSubIngredientStore } from '@/stores/ingredientSubInventory.store';
-import IngredientDialog from "@/views/ingredient/IngredientDialog.vue";
 import { computed, onMounted, ref, watch } from "vue";
 import { useRouter } from 'vue-router';
-import Swal from 'sweetalert2';
 
 const subIngredientStore = useSubIngredientStore();
 const router = useRouter();
@@ -11,19 +9,25 @@ const paginate = ref(true);
 const page = computed(() => subIngredientStore.page);
 const take = computed(() => subIngredientStore.take);
 
+const paginatedItems = computed(() => {
+  const start = (page.value - 1) * take.value; // ใช้ .value ที่นี่เพราะ page เป็น computed
+  const end = start + take.value;
+  return subIngredientStore.subingredients_coffee.slice(start, end);
+});
+
 onMounted(async () => {
   await subIngredientStore.getSubIngredients_coffee();
 });
 
+// Navigate to a different route
 const navigateTo = (routeName: string) => {
   router.push({ name: routeName });
 };
 
-watch(paginate, async (newValue, oldValue) => {
-  if (newValue !== oldValue) {
-    await subIngredientStore.getAllIngredients();
-  }
-})
+// Watch for changes in the page and fetch new data
+watch(() => subIngredientStore.page, async (newValue) => {
+  await subIngredientStore.getSubIngredients_coffee();
+});
 
 </script>
 
@@ -36,14 +40,18 @@ watch(paginate, async (newValue, oldValue) => {
             <h3>คลังวัตถุดิบร้านกาแฟ</h3>
           </v-col>
           <v-col cols="3">
-            <v-text-field label="ค้นหารายการวัตถุดิบ" append-inner-icon="mdi-magnify" dense hide-details variant="solo"
-              outlined></v-text-field>
+            <v-text-field
+              label="ค้นหารายการวัตถุดิบ"
+              append-inner-icon="mdi-magnify"
+              dense
+              hide-details
+              variant="solo"
+              outlined
+            ></v-text-field>
           </v-col>
         </v-row>
 
         <v-row>
-
-
           <v-col>
             <v-btn color="success" class="button-full-width" @click="navigateTo('importingredientscoffee')">
               <v-icon left>mdi-arrow-down-thick</v-icon>
@@ -56,7 +64,6 @@ watch(paginate, async (newValue, oldValue) => {
               <v-icon left>mdi-arrow-up-thick</v-icon>
               คืนวัตถุดิบ
             </v-btn>
-
           </v-col>
         </v-row>
       </v-card-title>
@@ -70,18 +77,17 @@ watch(paginate, async (newValue, oldValue) => {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(item, index) in subIngredientStore.subingredients_coffee" :key="index">
-            <td>{{ (page - 1) * take + index + 1 }}</td>
+          <tr v-for="(item, index) in paginatedItems" :key="index">
+            <td>{{ (page - 1) * take + index + 1 }}</td> <!-- ใช้ .value ที่นี่ -->
             <td>{{ item.ingredient.ingredientName }}</td>
             <td>{{ item.quantity }}</td>
           </tr>
-        </tbody>
-        <tbody v-if="!subIngredientStore.subingredients_coffee.length">
-          <tr>
-            <td colspan="9" class="text-center">No data</td>
+          <tr v-if="paginatedItems.length === 0">
+            <td colspan="3" class="text-center">ไม่มีข้อมูล</td>
           </tr>
         </tbody>
       </v-table>
+
       <v-pagination
         justify="center"
         v-model="subIngredientStore.page"

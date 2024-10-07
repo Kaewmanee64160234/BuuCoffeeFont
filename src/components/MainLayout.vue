@@ -12,7 +12,7 @@
           <v-btn
             icon="mdi-chevron-left"
             variant="text"
-            @click.stop="rail = !rail"
+            @click.stop="toggleRail"
           ></v-btn>
         </template>
       </v-list-item>
@@ -243,7 +243,19 @@ const showIngredients = ref(false)
 const showOthers = ref(false)
 
 const toggleSale = () => {
-  showSale.value = !showSale.value
+  // ตรวจสอบว่า rail อยู่ในสถานะ true หรือ false
+  if (rail.value) {
+    showSale.value = false; // ปิดเมนูการขายเมื่อ rail เป็น true
+  } else {
+    showSale.value = !showSale.value; // ทำให้เมนูการขายสลับสถานะเมื่อ rail เป็น false
+  }
+}
+
+const toggleRail = () => {
+  rail.value = !rail.value;
+  if (rail.value) {
+    showSale.value = false; // ปิดเมนูการขายเมื่อ rail ถูกเปิด
+  }
 }
 
 const toggleCatering = () => {

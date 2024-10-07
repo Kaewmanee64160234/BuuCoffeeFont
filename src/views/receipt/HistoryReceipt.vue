@@ -13,7 +13,7 @@ const receiptStore = useReceiptStore();
 
 const paginatedReceipts = computed(() => {
   const start = (receiptStore.currentPage - 1) * receiptStore.itemsPerPage;
-  const end = start + receiptStore.itemsPerPage;
+  const end = staFrt + receiptStore.itemsPerPage;
   return filteredReceipts.value.slice(start, end);
 });
 

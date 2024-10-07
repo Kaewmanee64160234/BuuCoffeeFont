@@ -1,5 +1,26 @@
 <script lang="ts" setup>
+import { useReceiptStore } from '@/stores/receipt.store';
+import { useReceiptsStore } from '@/stores/report/receiptsStore';
+import { computed} from 'vue';
 
+const receiptsStore = useReceiptsStore();
+const receiptStore = useReceiptStore();
+
+const paginatedReceipts = computed(() => {
+  const start = (receiptStore.currentPage - 1) * receiptStore.itemsPerPage;
+  const end = start + receiptStore.itemsPerPage;
+  return filteredReceipts.value.slice(start, end);
+});
+
+const filteredReceipts = computed(() => {
+  if (!receiptStore.searchQuery) {
+    return receiptStore.receipts.slice().sort((a, b) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime());
+  }
+  return receiptStore.receipts.filter(receipt =>
+    receipt.customer?.customerName?.toLowerCase().includes(receiptStore.searchQuery.toLowerCase()) ||
+    receipt.receiptId?.toString().includes(receiptStore.searchQuery)
+  ).sort((a, b) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime());
+});
 </script>
 
 <template>
@@ -43,6 +64,11 @@
 
     </v-card>
   </v-container>
+  <v-pagination
+  v-model="receiptStore.currentPage"
+  :length="Math.ceil(filteredReceipts.length / receiptStore.itemsPerPage)"
+  rounded="circle"
+></v-pagination>
 </template>
 
 <style scoped>
