@@ -36,19 +36,18 @@ export const useAuthStore = defineStore("auth", () => {
         if (userStore.currentUser.role.name === "ผู้จัดการร้าน") {
           router.push("/report");
         } else {
-          if (userStore.currentUser.role.name === "พนักงานขายข้าว") {
+          if (userStore.currentUser.role.name === "พนักงานขายกาแฟ") {
             router.push("/pos-coffee");
-          } else {
+          } else if (userStore.currentUser.role.name === "พนักงานขายข้าว") {
             router.push("/pos-rice");
+          }else{
+            router.push("/report");
           }
         }
       } else {
         console.error("User does not have an account");
         return null;
       }
-
-      // Set the authName from localStorage
-      authName.value = JSON.parse(localStorage.getItem("user") as string);
     } catch (e) {
       console.error("Error in login method:", e);
       throw e; // Forward the error for further handling

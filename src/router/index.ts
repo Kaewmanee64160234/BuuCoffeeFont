@@ -22,36 +22,31 @@ const router = createRouter({
 
       component: () => import("../views/user/userManagement.vue"),
 
-     meta: { requiresAuth: true, roles: ["ผู้จัดการร้าน"]}
-
+      meta: { requiresAuth: true, roles: ["ผู้จัดการร้าน"] },
     },
     {
-      path:"/managementRole",
-      name:"managementRole",
+      path: "/managementRole",
+      name: "managementRole",
       component: () => import("@/views/user/permisstionManagement.vue"),
       meta: { requiresAuth: true },
-
     },
     {
       path: "/productsManagement",
       name: "products",
       component: () => import("../views/product/ProductManagementView.vue"),
       meta: { requiresAuth: true },
-
     },
     {
       path: "/customersManagement",
       name: "customers",
       component: () => import("../views/customer/customerManagement.vue"),
       meta: { requiresAuth: true },
-
     },
     {
       path: "/historyReceipt",
       name: "historyReceipt",
       component: () => import("../views/receipt/HistoryReceipt.vue"),
       meta: { requiresAuth: true },
-
     },
     {
       path: "/ingredientList",
@@ -109,7 +104,7 @@ const router = createRouter({
         ),
       meta: { requiresAuth: true },
     },
-    
+
     {
       path: "/importingredientcatering",
       name: "importingredientscatering",
@@ -139,7 +134,9 @@ const router = createRouter({
       path: "/returningredientcatering",
       name: "returningredientcatering",
       component: () =>
-        import("../views/ingredient/check/return/subInventoryCateringRView.vue"),
+        import(
+          "../views/ingredient/check/return/subInventoryCateringRView.vue"
+        ),
       meta: { requiresAuth: true },
     },
     {
@@ -202,30 +199,27 @@ const router = createRouter({
       path: "/promotion",
       name: "promotion",
       component: () => import("../views/promotion/PromotionView.vue"),
-      meta: { requiresAuth: true, roles: ["ผู้จัดการร้าน","พนักงานบัญชี"] },
-
+      meta: { requiresAuth: true, roles: ["ผู้จัดการร้าน", "พนักงานบัญชี"] },
     },
     //Edit
     {
       path: "/report",
       name: "report",
       component: () => import("../views/report/ReportFinance.vue"),
-      meta: { requiresAuth: true, roles: ["ผู้จัดการร้าน","พนักงานบัญชี"] },
-
+      meta: { requiresAuth: true, roles: ["ผู้จัดการร้าน", "พนักงานบัญชี"] },
     },
     // pos
     {
       path: "/pos-rice",
       name: "pos-rice",
       component: () => import("../views/pos/PosViewRice.vue"),
-      meta: { requiresAuth: true, roles: ["ผู้จัดการร้าน","พนักงานขายข้าว"] },
+      meta: { requiresAuth: true, roles: ["ผู้จัดการร้าน", "พนักงานขายข้าว"] },
     },
     {
       path: "/pos-coffee",
       name: "pos-coffee",
       component: () => import("../views/pos/PosViewCoffee.vue"),
-      meta: { requiresAuth: true, roles: ["ผู้จัดการร้าน","พนักงานขายกาแฟ"] },
-
+      meta: { requiresAuth: true, roles: ["ผู้จัดการร้าน", "พนักงานขายกาแฟ"] },
     },
     {
       path: "/login",
@@ -242,24 +236,22 @@ const router = createRouter({
     {
       path: "/historyReceiptCatering",
       name: "historyReceiptCatering",
-      component: () => import("../views/ingredient/catering/HistoryReceiptCatering.vue"),
+      component: () =>
+        import("../views/ingredient/catering/HistoryReceiptCatering.vue"),
     },
     // forbidden
     {
       path: "/forbidden",
       name: "forbidden",
       component: () => import("../views/ForbiddenView.vue"),
-
     },
     {
       path: "/:catchAll(.*)",
       name: "NotFound",
       component: () => import("../views/NotFound.vue"),
-    }
-    
+    },
   ],
 });
-
 
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
@@ -292,10 +284,10 @@ router.beforeEach((to, from, next) => {
   }
 });
 
-
 let timer: number | null = null;
 router.beforeEach((to, from, next) => {
   const loadingStore = useLoadingStore();
+  const userStore = useUserStore();
   loadingStore.setLoading(true); // Start loading
 
   // Set a timeout to handle long navigation
@@ -304,15 +296,25 @@ router.beforeEach((to, from, next) => {
     loadingStore.setLoading(false);
 
     Swal.fire({
-      title: 'Navigation Timeout',
-      text: 'Navigation is taking too long. Do you want to go to POS?',
-      icon: 'warning',
+      title: "Navigation Timeout",
+      text: "Navigation is taking too long. Do you want to go to POS?",
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonText: 'Yes, take me there!',
-      cancelButtonText: 'Cancel',
+      confirmButtonText: "Yes, take me there!",
+      cancelButtonText: "Cancel",
     }).then((result) => {
       if (result.isConfirmed) {
-        next('/pos'); // Redirect to `/pos` route if user confirms
+        if (userStore.currentUser.role.name === "ผู้จัดการร้าน") {
+          next("/"); // Redirect to `/pos` route if user confirms
+        } else {
+          if (userStore.currentUser.role.name === "พนักงานขายข้าว") {
+            next("/pos-rice");
+          } else if (userStore.currentUser.role.name === "พนักงานขายกาแฟ") {
+            next("/pos-coffee");
+          } else {
+            next("/report");
+          }
+        }
       } else {
         // Continue without redirecting, or handle as per your needs
         next(false); // Cancel navigation
