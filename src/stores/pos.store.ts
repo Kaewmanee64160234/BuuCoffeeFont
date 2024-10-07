@@ -335,9 +335,7 @@ export const usePosStore = defineStore("pos", () => {
   };
 
   // create function create recipt
-  const createReceipt = async (receiptStatus:string) => {
-    
-  
+  const createReceipt = async (receiptStatus: string) => {
     if (currentReceipt.value?.queueNumber !== undefined) {
       receipt.value.receiptItems = selectedItems.value;
       receipt.value.receiptStatus = receiptStatus;
@@ -351,14 +349,14 @@ export const usePosStore = defineStore("pos", () => {
       receipt.value.createdDate = new Date();
       receipt.value.queueNumber = queueNumber.value;
     }
-  
+
     queueNumber.value++;
     saveQueueNumber();
-  
+
     if (receipt.value.receiptTotalDiscount === 0) {
       receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice;
     }
-  
+
     const res = await receiptService.createReceipt(receipt.value);
     if (res.status === 201) {
       console.log("Receipt created successfully", res.data);
@@ -367,17 +365,15 @@ export const usePosStore = defineStore("pos", () => {
       saveQueueListToLocalStorage();
       await customerStore.getAllCustomers();
     }
-    
+
     await receiptStore.getRecieptIn30Min(receiptStatus);
   };
-  
 
-  
   // Function to save the queue list to local storage
   const saveQueueListToLocalStorage = () => {
-    localStorage.setItem('queueReceipt', JSON.stringify(queueReceipt.value));
+    localStorage.setItem("queueReceipt", JSON.stringify(queueReceipt.value));
   };
-  
+
   const createReceiptForCatering = async (checkStockId?: number) => {
     const receiptStatus = "ร้านจัดเลี้ยง";
     if (currentReceipt.value?.queueNumber !== undefined) {
@@ -409,7 +405,7 @@ export const usePosStore = defineStore("pos", () => {
       receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice;
     }
 
-    const res = await receiptService.createReceipt(receipt.value, checkStockId );
+    const res = await receiptService.createReceipt(receipt.value, checkStockId);
     if (res.status === 201) {
       console.log("Receipt created successfully", res.data);
       currentReceipt.value = res.data;
@@ -705,7 +701,11 @@ export const usePosStore = defineStore("pos", () => {
       parseFloat(receipt.value.receiptTotalDiscount + "");
   };
 
-  const updateReceipt = async (id: number, receipt: Receipt) => {
+  const updateReceipt = async (
+    id: number,
+    receipt: Receipt,
+    storeTypre: string
+  ) => {
     console.log("updateReceipt", JSON.stringify(receipt));
     const res = await receiptService.updateReceipt(id, receipt);
     if (res.status === 200) {
@@ -714,12 +714,17 @@ export const usePosStore = defineStore("pos", () => {
       await customerStore.getAllCustomers();
       if (currentReceipt.value?.receiptStatus !== "cancel") {
         updateReceiptInLocalStorage(res.data);
+      await receiptStore.getRecieptIn30Min(storeTypre);
+
       } else {
         receiptStore.deleteReceiptFromLocalStorage(res.data.receiptId);
+      await receiptStore.getRecieptIn30Min(storeTypre);
+
       }
-      // await receiptStore.getRecieptIn30Min();
+      console.log("storeTypre", storeTypre);
+
+      await receiptStore.getRecieptIn30Min(storeTypre);
     }
-    await receiptStore.getRecieptIn30Min();
   };
 
   // ipdateReceiptCatering
@@ -739,7 +744,6 @@ export const usePosStore = defineStore("pos", () => {
     }
   };
 
- 
   const updateReceiptInLocalStorage = (updatedReceipt: Receipt) => {
     const receiptIndex = queueReceipt.value.findIndex(
       (receipt) => receipt.receiptId === updatedReceipt.receiptId
@@ -749,7 +753,6 @@ export const usePosStore = defineStore("pos", () => {
       saveQueueListToLocalStorage();
     }
   };
-
 
   const setReceiptForEdit = (receiptToEdit: Receipt) => {
     receipt.value = receiptToEdit;

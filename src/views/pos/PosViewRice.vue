@@ -17,6 +17,7 @@ import Swal from 'sweetalert2';
 import PromotionUsePointDialog from '@/components/pos/PromotionUsePointDialog.vue';
 import type { Recipe } from '@/types/recipe.type';
 import SelectedItemsListRice from '@/components/pos/SelectedItemsListRice.vue';
+import { useReceiptStore } from '@/stores/receipt.store';
 
 const productStore = useProductStore();
 const categoryStore = useCategoryStore();
@@ -29,6 +30,7 @@ const selectedCategory = ref('');
 const productFilters = ref<Product[]>([]);
 const searchQuery = ref('');
 const barcode = ref('');
+const receiptStore = useReceiptStore();
 
 // Load products, categories, promotions, and customers on mount
 onMounted(async () => {
@@ -44,6 +46,8 @@ onMounted(async () => {
   await categoryStore.getAllCategories();
   await toppingStore.getAllToppings();
   await customerStore.getAllCustomers();
+  await receiptStore.getRecieptIn30Min('ร้านข้าว');
+
 
   userStore.getCurrentUser();
 

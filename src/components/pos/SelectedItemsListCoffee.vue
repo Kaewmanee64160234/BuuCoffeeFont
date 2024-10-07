@@ -156,7 +156,7 @@ async function save() {
     return;
   }
   if (posStore.receipt.receiptId) {
-    posStore.updateReceipt(posStore.receipt.receiptId, posStore.receipt);
+    posStore.updateReceipt(posStore.receipt.receiptId, posStore.receipt,'ร้านกาแฟ');
   } else {
     posStore.createReceipt('ร้านกาแฟ');
   }
@@ -175,6 +175,8 @@ async function save() {
   posStore.receipt.customer = null;
   posStore.receipt.receiptStatus = 'รอชำระเงิน';
   selectedCustomer.value = '';
+ await receiptStore.getRecieptIn30Min('ร้านกาแฟ');
+
 }
 
 function openCreateCustomerDialog() {

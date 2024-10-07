@@ -99,6 +99,7 @@ export const useReceiptStore = defineStore("receipt", () => {
   };
   const getRecieptIn30Min = async (typeOfStore:string) => {
     try {
+      console.log(typeOfStore)
       isLoading.value = true;
      
       const response = await receiptService.getRecieptIn30Min(typeOfStore);
