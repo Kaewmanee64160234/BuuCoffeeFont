@@ -10,14 +10,6 @@ import ReceiptOld from '@/components/receipts/ReceiptOld.vue';
 const receiptsStore = useReceiptsStore();
 const receiptStore = useReceiptStore();
 
-
-const paginatedReceipts = computed(() => {
-  const start = (receiptStore.currentPage - 1) * receiptStore.itemsPerPage;
-  const end = staFrt + receiptStore.itemsPerPage;
-  return filteredReceipts.value.slice(start, end);
-});
-
-
 // Date Range Setup
 const currentDate = new Date();
 const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
@@ -68,7 +60,6 @@ const s2ab = (s: string) => {
 // Lifecycle Hook - Fetch Receipts on Mount
 onMounted(async () => {
   await receiptStore.getAllReceipts();
-  // await receiptStore.getReceiptsPaginate();
 });
 
 // Open the receipt detail dialog
@@ -97,13 +88,11 @@ const filteredReceipts = computed(() => {
 // Format the date for display
 const formatDate = (date: string) => {
   const jsDate = new Date(date);
-  const formattedDate = jsDate.toLocaleDateString('th-TH', {
+  return jsDate.toLocaleDateString('th-TH', {
     day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Asia/Bangkok'
-  });
-  const formattedTime = jsDate.toLocaleTimeString('th-TH', {
+  }) + ' เวลา ' + jsDate.toLocaleTimeString('th-TH', {
     hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok'
   });
-  return `${formattedDate} เวลา ${formattedTime}`;
 };
 
 // Format receipts for Excel export
@@ -150,7 +139,6 @@ const statusText = (status: string) => {
       return status;
   }
 };
-
 </script>
 
 <template>
@@ -203,7 +191,7 @@ const statusText = (status: string) => {
         </thead>
 
         <tbody>
-          <tr v-for="(receipt, index) in paginatedReceipts" :key="receipt.receiptId" @click="openHistoryReceiptDialog(receipt)">
+          <tr v-for="(receipt, index) in filteredReceipts" :key="receipt.receiptId" @click="openHistoryReceiptDialog(receipt)">
             <td class="text-center">{{ index + 1 }}</td>
             <td class="text-center">{{ formatDate(receipt.createdDate) }}</td>
             <td :class="statusClass(receipt.receiptStatus)" class="text-center">{{ statusText(receipt.receiptStatus) }}</td>
@@ -219,11 +207,4 @@ const statusText = (status: string) => {
       </v-table>
     </v-card>
   </v-container>
-
-  <!-- Pagination -->
-  <v-pagination
-  v-model="receiptStore.currentPage"
-  :length="Math.ceil(filteredReceipts.length / receiptStore.itemsPerPage)"
-  rounded="circle"
-></v-pagination>
 </template>

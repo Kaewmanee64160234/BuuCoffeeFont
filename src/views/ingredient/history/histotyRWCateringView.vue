@@ -6,16 +6,20 @@ import dialogImportItemCatering from "@/views/ingredient/check/dialogCheckCateri
 import { useSubIngredientStore } from "@/stores/ingredientSubInventory.store";
 import type { Checkingredient } from "@/types/checkingredientitem.type";
 import * as XLSX from "xlsx";
+
 const ingredientStore = useCheckIngredientStore();
 const subIngredientStore = useSubIngredientStore();
 
 const router = useRouter();
 const historyCheckDialog = ref(false);
 const selectedCheck = ref<Checkingredient | null>(null);
+
 onMounted(async () => {
+  // Fetching required data for catering shop type, if needed
   // await subIngredientStore.findByShopTypeCatering();
 });
 
+// Function to format the date for display
 const formatDate = (dateString: string) => {
   const options = {
     year: "numeric",
@@ -25,28 +29,40 @@ const formatDate = (dateString: string) => {
     minute: "numeric",
     timeZone: "UTC",
   };
-  return new Date(dateString).toLocaleDateString("th-TH", options!);
+  return new Date(dateString).toLocaleDateString("th-TH", options);
 };
 
+// Navigation helper function
 const navigateTo = (routeName: string) => {
   router.push({ name: routeName });
 };
 
+// Function to open the history check dialog for a specific ingredient
 const openHistoryCheckDialog = async (checkingredient: Checkingredient) => {
   await ingredientStore.getHistoryCheckById(checkingredient.CheckID);
   ingredientStore.checkingredient = checkingredient;
-console.log(ingredientStore.checkingredient);
+  console.log(ingredientStore.checkingredient);
 
   ingredientStore.dialogCheckItem = true;
 };
-function exportToExcel(checkingredient: Checkingredient) {
-  const basicData = {
-    วันที่: checkingredient.date,
-    รูปแบบ: checkingredient.actionType,
-    คำอธิบาย: checkingredient.checkDescription,
-    ผู้รับผิดชอบ: checkingredient.user.userName,
-  };
 
+// Function to export ingredient check details to Excel
+function exportToExcel(checkingredient: Checkingredient) {
+  // Format summary data
+  const basicData = [
+    {
+      วันที่: formatDate(checkingredient.date + ''),
+      รูปแบบ: checkingredient.actionType === 'withdrawal'
+        ? 'เบิกเข้าร้านอาหาร'
+        : checkingredient.actionType === 'return'
+        ? 'คืนคลังวัตถุดิบ'
+        : checkingredient.actionType,
+      คำอธิบาย: checkingredient.checkDescription,
+      ผู้รับผิดชอบ: checkingredient.user.userName,
+    }
+  ];
+
+  // Format detailed table data
   const tableData = checkingredient.checkingredientitem.map((item, index) => ({
     ลำดับ: index + 1,
     ชื่อวัตถุดิบ: item.ingredient.ingredientName,
@@ -55,20 +71,45 @@ function exportToExcel(checkingredient: Checkingredient) {
     จำนวนนับ: item.UsedQuantity,
   }));
 
+  // Create a new workbook
   const wb = XLSX.utils.book_new();
-  const ws1 = XLSX.utils.json_to_sheet([basicData], {
-    header: Object.keys(basicData),
-  });
-  const ws2 = XLSX.utils.json_to_sheet(tableData, {
-    header: Object.keys(tableData[0]),
-  });
 
-  XLSX.utils.book_append_sheet(wb, ws1, "Summary");
-  XLSX.utils.book_append_sheet(wb, ws2, "Details");
+  // Add headers to the summary and details worksheets
+  const projectHeader = ['โครงการร้านค้า Café@Library สำนักหอสมุด'];
+  const subHeader = ['นำเข้าสินค้าร้านข้าว'];
 
-  XLSX.writeFile(wb, `check_ingredient_${new Date().toISOString()}.xlsx`);
+  // Create a worksheet for the summary data
+  const summaryDataWithHeader = [
+    projectHeader,
+    subHeader,
+    [],
+    Object.keys(basicData[0]), // Column headers based on keys of basicData
+    ...basicData.map((item) => Object.values(item)), // Summary data rows
+  ];
+  const ws1 = XLSX.utils.aoa_to_sheet(summaryDataWithHeader);
+
+  // Create a worksheet for the detailed ingredient data
+  const detailedDataWithHeader = [
+    projectHeader,
+    subHeader,
+    [],
+    Object.keys(tableData[0]), // Column headers based on keys of tableData
+    ...tableData.map((item) => Object.values(item)), // Detailed data rows
+  ];
+  const ws2 = XLSX.utils.aoa_to_sheet(detailedDataWithHeader);
+
+  // Append both sheets to the workbook
+  XLSX.utils.book_append_sheet(wb, ws1, "สรุปข้อมูล"); // "Summary" in Thai
+  XLSX.utils.book_append_sheet(wb, ws2, "รายละเอียดวัตถุดิบ"); // "Details" in Thai
+
+  // Generate the filename
+  const filename = `check_ingredient_${new Date().toISOString().substring(0, 10)}.xlsx`;
+
+  // Write the workbook to a file
+  XLSX.writeFile(wb, filename);
 }
 </script>
+
 
 <template>
   <dialogImportItemCatering

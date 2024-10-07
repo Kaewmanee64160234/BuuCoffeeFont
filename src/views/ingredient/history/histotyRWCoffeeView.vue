@@ -1,17 +1,20 @@
 <script lang="ts" setup>
+import { Workbook } from 'exceljs';
+import { saveAs } from 'file-saver'; // Make sure this is imported
 import { useCheckIngredientStore } from "@/stores/historyIngredientCheck.store";
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import dialogImportItem from "@/views/ingredient/check/dialogCheck.vue";
 import { useSubIngredientStore } from "@/stores/ingredientSubInventory.store";
 import type { Checkingredient } from "@/types/checkingredientitem.type";
-import * as XLSX from "xlsx";
+
 const ingredientStore = useCheckIngredientStore();
 const subIngredientStore = useSubIngredientStore();
 
 const router = useRouter();
 const historyCheckDialog = ref(false);
 const selectedCheck = ref<Checkingredient | null>(null);
+
 onMounted(async () => {
   await subIngredientStore.findByShopType();
 });
@@ -36,34 +39,84 @@ const openHistoryCheckDialog = (checkingredient: Checkingredient) => {
   ingredientStore.checkingredient = checkingredient;
   ingredientStore.dialogCheckItem = true;
 };
-function exportToExcel(checkingredient: Checkingredient) {
-  const basicData = {
-    วันที่: checkingredient.date,
-    รูปแบบ: checkingredient.actionType,
-    คำอธิบาย: checkingredient.checkDescription,
-    ผู้รับผิดชอบ: checkingredient.user.userName,
-  };
 
-  const tableData = checkingredient.checkingredientitem.map((item, index) => ({
-    ลำดับ: index + 1,
-    ชื่อวัตถุดิบ: item.ingredient.ingredientName,
-    ผู้จัดจำหน่าย: item.ingredient.ingredientSupplier,
-    จำนวนเดิม: item.oldRemain,
-    จำนวนนับ: item.UsedQuantity,
-  }));
+// Export to Excel with ExcelJS and File-Saver
+async function exportToExcel(checkingredient: Checkingredient) {
+  // Create a new workbook and worksheet
+  const workbook = new Workbook();
+  const worksheet = workbook.addWorksheet('Check Ingredient Details');
 
-  const wb = XLSX.utils.book_new();
-  const ws1 = XLSX.utils.json_to_sheet([basicData], {
-    header: Object.keys(basicData),
+  // Add the first header row: "โครงการร้านค้า Café@Library สำนักหอสมุด"
+  worksheet.mergeCells('A1:G1');
+  const projectHeaderCell = worksheet.getCell('A1');
+  projectHeaderCell.value = 'โครงการร้านค้า Café@Library สำนักหอสมุด';
+  projectHeaderCell.alignment = { vertical: 'middle', horizontal: 'center' };
+  projectHeaderCell.font = { name: 'Sarabun', size: 18, bold: true };
+
+  // Add the second header row: "นำเข้าสินค้าร้านกาแฟ"
+  worksheet.mergeCells('A2:G2');
+  const importHeaderCell = worksheet.getCell('A2');
+  importHeaderCell.value = 'นำเข้าสินค้าร้านกาแฟ';
+  importHeaderCell.alignment = { vertical: 'middle', horizontal: 'center' };
+  importHeaderCell.font = { name: 'Sarabun', size: 16, bold: true };
+
+  // Add an empty row for spacing
+  worksheet.addRow([]);
+
+  // Add column headers
+  const headerRowValues = ['ลำดับ', 'วันที่', 'รายการ', 'ประเภท', 'จำนวน', 'หน่วย', 'ผู้รับผิดชอบ'];
+  const headerRow = worksheet.addRow(headerRowValues);
+
+  // Apply styles to the column headers for better visibility
+  headerRow.font = { name: 'Sarabun', bold: true };
+  headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+  headerRow.eachCell((cell) => {
+    cell.border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      bottom: { style: 'thin' },
+      right: { style: 'thin' },
+    };
   });
-  const ws2 = XLSX.utils.json_to_sheet(tableData, {
-    header: Object.keys(tableData[0]),
+
+  // Add data rows
+  checkingredient.checkingredientitem.forEach((item, index) => {
+    const rowData = [
+      index + 1,
+      formatDate(checkingredient.date + ''),
+      item.ingredient.ingredientName,
+      checkingredient.actionType === 'withdrawal'
+        ? 'เบิกเข้าร้านกาแฟ'
+        : checkingredient.actionType === 'return'
+        ? 'คืนคลังวัตถุดิบ'
+        : checkingredient.actionType,
+      item.UsedQuantity,
+      item.ingredient.ingredientUnit,
+      checkingredient.user.userName,
+    ];
+    const dataRow = worksheet.addRow(rowData);
+
+    // Apply border and alignment to data rows for better presentation
+    dataRow.alignment = { vertical: 'middle', horizontal: 'center' };
+    dataRow.eachCell((cell) => {
+      cell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' },
+      };
+    });
   });
 
-  XLSX.utils.book_append_sheet(wb, ws1, "Summary");
-  XLSX.utils.book_append_sheet(wb, ws2, "Details");
+  // Adjust column widths for better readability
+  worksheet.columns.forEach((column) => {
+    column.width = 20; // Set a default width for each column
+  });
 
-  XLSX.writeFile(wb, `check_ingredient_${new Date().toISOString()}.xlsx`);
+  // Write to a file
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  saveAs(blob, `check_ingredient_${new Date().toISOString().substring(0, 10)}.xlsx`);
 }
 </script>
 
