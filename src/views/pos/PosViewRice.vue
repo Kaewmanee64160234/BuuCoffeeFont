@@ -2,7 +2,7 @@
 import { computed, onMounted, ref, watch } from 'vue';
 import PromotionCardsCarousel from '@/components/pos/PromotionCardsCarousel.vue';
 import ProductCard from '@/components/pos/ProductCard.vue';
-import SelectedItemsList from '@/components/pos/SelectedItemsList.vue';
+import SelectedItemsList from '@/components/pos/SelectedItemsListRice.vue';
 import DrinkSelectionDialog from '@/components/pos/DrinkSelectionDialog.vue';
 import ReceiptDialog from '@/components/pos/ReceiptDialog.vue';
 import { useProductStore } from '@/stores/product.store';
@@ -16,6 +16,7 @@ import type { Product } from '@/types/product.type';
 import Swal from 'sweetalert2';
 import PromotionUsePointDialog from '@/components/pos/PromotionUsePointDialog.vue';
 import type { Recipe } from '@/types/recipe.type';
+import SelectedItemsListRice from '@/components/pos/SelectedItemsListRice.vue';
 
 const productStore = useProductStore();
 const categoryStore = useCategoryStore();
@@ -470,7 +471,7 @@ const showQueue = computed(() => {
         style="height: 100%; padding-top: 20px"
       >
         <v-sheet style="height: 100%">
-          <selected-items-list></selected-items-list>
+          <SelectedItemsListRice />
         </v-sheet>
       </v-col>
     </v-row>

@@ -9,7 +9,7 @@ import type { Promotion } from '../../types/promotion.type';
 import { useUserStore } from '@/stores/user.store';
 import { useReceiptStore } from '@/stores/receipt.store';
 import ReceiptDetailsDialogPos from '../receipts/ReceiptDialogPos.vue';
-import DrinkSelectionDialog from '../pos/DrinkSelectionDialog.vue';
+import DrinkSelectionDialog from './DrinkSelectionDialog.vue';
 
 const step = ref(1);
 const posStore = usePosStore();
@@ -293,35 +293,13 @@ const selectReceipt = (receipt: Receipt) => {
 
             <v-divider></v-divider>
 
-            <!-- Customer Info -->
-            <div v-if="userStore.currentUser?.userRole !== 'พนักงานขายข้าว'" class="customer-info pa-3">
-              <p class="d-flex justify-space-between pr-10 my-2">
-                <span>สมาชิก</span>
-                <span class="info-value">
-                  {{ posStore.receipt.customer?.customerName == null ? 'ไม่มี' : posStore.receipt.customer?.customerName
-                  }}
-                </span>
-              </p>
-              <p class="d-flex justify-space-between pr-10 my-2">
-                <span>แต้มสะสม</span>
-                <span class="info-value">
-                  {{ posStore.receipt.customer == null ? '0' : posStore.receipt.customer?.customerNumberOfStamp }} Point
-                </span>
-              </p>
-              <p>เบอร์โทรลูกค้า</p>
-            </div>
+          
 
             <!-- Customer Actions -->
             <v-row class="d-flex align-center justify-start mt-4">
-              <v-col v-if="userStore.currentUser?.userRole !== 'พนักงานขายข้าว'" cols="12" md="6">
-                <v-autocomplete v-model="selectedCustomer" :items="customerStore.customers.map(c => c.customerPhone)"
-                  item-text="phone" item-value="phone" label="เบอร์โทรลูกค้า" variant="solo" dense
-                  append-inner-icon="mdi-magnify" style="border-radius: 8px; background-color: #fff;"></v-autocomplete>
-              </v-col>
+           
               <v-col cols="12" md="6" class="d-flex align-center justify-end">
-                <v-btn v-if="userStore.currentUser?.userRole !== 'พนักงานขายข้าว'" class="mr-3" icon="mdi-account-plus"
-                  color="#ff9800" @click="openCreateCustomerDialog()"
-                  style="border-radius: 8px; background-color: #FF9642"></v-btn>
+
                 <v-btn class="mb-2" color="#ff9800" @click="openReceiptDialog()"
                   style="border-radius: 8px; background-color: #FF9642;">
                   ประวัติการสั่งซื้อ
@@ -350,7 +328,7 @@ const selectReceipt = (receipt: Receipt) => {
 
             <!-- Selected Items List -->
             <div
-              :class="userStore.currentUser?.userRole === 'พนักงานขายข้าว' ? 'selected-items-list-50' : 'selected-items-list-40'">
+              class="selected-items-list-50">
               <v-list class="full-width" style="height: 20vh;">
                 <v-list-item-group>
                   <div v-for="(item, index) in selectedItems" :key="index" class="selected-item full-width my-2">
@@ -413,12 +391,12 @@ const selectReceipt = (receipt: Receipt) => {
 
             <!-- Order Summary -->
             <div
-              :class="userStore.currentUser?.userRole === 'พนักงานขายข้าว' ? 'summary-section-30' : 'summary-section-25'"
+              class="summary-section-30"
               style="width: 100%;">
               <v-divider></v-divider>
               <h3>สรุปรายการ</h3>
               <v-card-subtitle>โปรโมชั่น:</v-card-subtitle>
-              <div :class="userStore.currentUser?.userRole === 'พนักงานขายข้าว' ? 'promotion-30' : 'promotion-20'"
+              <div class="promotion-30"
                 style="height: 10vh;">
                 <div class="sub-promotion" style="height: 100%; overflow-y: auto;">
                   <div v-for="(promotion) in posStore.receipt.receiptPromotions" :key="promotion.receiptPromotionId"
@@ -470,35 +448,12 @@ const selectReceipt = (receipt: Receipt) => {
 
             <v-divider></v-divider>
 
-            <!-- Customer Info -->
-            <div v-if="userStore.currentUser?.userRole !== 'พนักงานขายข้าว'" class="customer-info pa-3">
-              <p class="d-flex justify-space-between pr-10 my-2">
-                <span>สมาชิก</span>
-                <span class="info-value">
-                  {{ posStore.receipt.customer?.customerName == null ? 'ไม่มี' : posStore.receipt.customer?.customerName
-                  }}
-                </span>
-              </p>
-              <p class="d-flex justify-space-between pr-10 my-2">
-                <span>แต้มสะสม</span>
-                <span class="info-value">
-                  {{ posStore.receipt.customer == null ? '0' : posStore.receipt.customer?.customerNumberOfStamp }} Point
-                </span>
-              </p>
-              <p>เบอร์โทรลูกค้า</p>
-            </div>
-
+       
             <!-- Customer Actions -->
             <v-row class="d-flex align-center justify-start mt-4">
-              <v-col v-if="userStore.currentUser?.userRole !== 'พนักงานขายข้าว'" cols="12" md="6">
-                <v-autocomplete v-model="selectedCustomer" :items="customerStore.customers.map(c => c.customerPhone)"
-                  item-text="phone" item-value="phone" label="เบอร์โทรลูกค้า" variant="solo" dense
-                  append-inner-icon="mdi-magnify" style="border-radius: 8px; background-color: #fff;"></v-autocomplete>
-              </v-col>
+           
               <v-col cols="12" md="6" class="d-flex align-center justify-end">
-                <v-btn v-if="userStore.currentUser?.userRole !== 'พนักงานขายข้าว'" class="mr-3" icon="mdi-account-plus"
-                  color="#ff9800" @click="openCreateCustomerDialog()"
-                  style="border-radius: 8px; background-color: #FF9642;"></v-btn>
+             
                 <v-btn class="mb-2" color="#ff9800" @click="openReceiptDialog()"
                   style="border-radius: 8px; background-color: #FF9642;">
                   ประวัติการสั่งซื้อ
@@ -535,9 +490,7 @@ const selectReceipt = (receipt: Receipt) => {
           <div class="summary-section-2" style="width: 100%;padding: 20px;">
             <div class="ma-2">
               <p class="d-flex justify-space-between pr-6">
-                <span>สมาชิก:</span>
-                <span class="info-value">{{ posStore.receipt.customer?.customerName == null ? 'ไม่มี' :
-                  posStore.receipt.customer?.customerName }}</span>
+              
               </p>
 
               <!-- Total Amount -->
