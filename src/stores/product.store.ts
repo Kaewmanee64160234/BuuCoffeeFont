@@ -130,7 +130,7 @@ export const useProductStore = defineStore("product", () => {
       console.error(error);
     }
   };
-  // getproduct pageginate
+
   const getProductPaginate = async () => {
     try {
       const response = await productService.getProductPaginate(

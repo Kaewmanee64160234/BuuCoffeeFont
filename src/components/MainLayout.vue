@@ -48,7 +48,7 @@
               รายงานสรุปผล
             </v-list-item>
 
-            <v-list-item to="/pos-coffee"  v-if="userStore.currentUser.role.name !== 'พนักงานขายข้าว'">
+            <v-list-item to="/pos-coffee" >
               <template v-slot:prepend>
                 <img
                   src="../../src/components/img/store.png"
@@ -58,7 +58,7 @@
               </template>
               POSร้านกาแฟ
             </v-list-item>
-            <v-list-item to="/pos-rice" v-if="userStore.currentUser.role.name !== 'พนักงานขายกาแฟ'" >
+            <v-list-item to="/pos-rice"  >
               <template v-slot:prepend>
                 <img
                   src="../../src/components/img/store.png"
@@ -78,6 +78,70 @@
                 />
               </template>
               ประวัติการขาย
+            </v-list-item>
+          </v-list>
+        </v-expand-transition>
+
+        <!-- วัตถุดิบ -->
+        <v-subheader
+          @click="toggleIngredients"
+          class="menu-item d-flex align-center"
+        >
+          <img
+            src="../../src/components/img/ingredients.png"
+            alt="วัตถุดิบ"
+            class="nav-icon"
+          />
+          <span v-if="!rail">วัตถุดิบ</span>
+          <v-icon class="menu-icon">{{
+            showIngredients ? "mdi-chevron-up" : "mdi-chevron-down"
+          }}</v-icon>
+        </v-subheader>
+
+        <v-expand-transition>
+          <v-list v-show="showIngredients" style="padding-left: 33px">
+            <v-list-item to="/ingredientList">
+              <template v-slot:prepend>
+                <img
+                  src="../../src/components/img/groceries.png"
+                  alt="รายการวัตถุดิบ"
+                  class="nav-icon"
+                />
+              </template>
+              คลังวัตถุดิบ
+            </v-list-item>
+
+            <v-list-item to="/ingredientCoffeeList">
+              <template v-slot:prepend>
+                <img
+                  src="../../src/components/img/coffee-beans.png"
+                  alt="รายการวัตถุดิบ"
+                  class="nav-icon"
+                />
+              </template>
+              คลังร้านกาแฟ
+            </v-list-item>
+
+            <v-list-item to="/ingredientRiceList">
+              <template v-slot:prepend>
+                <img
+                  src="../../src/components/img/rice.png"
+                  alt="รายการวัตถุดิบ"
+                  class="nav-icon"
+                />
+              </template>
+              คลังร้านข้าว
+            </v-list-item>
+
+            <v-list-item to="/ingredientCateringList">
+              <template v-slot:prepend>
+                <img
+                  src="../../src/components/img/buffet.png"
+                  alt="รายการเลี้ยงรับรอง"
+                  class="nav-icon"
+                />
+              </template>
+              คลังวัตถุดิบร้านเลี้ยงรับรอง
             </v-list-item>
           </v-list>
         </v-expand-transition>
@@ -237,69 +301,7 @@
           </v-list>
         </v-expand-transition>
 
-        <!-- วัตถุดิบ -->
-        <v-subheader
-          @click="toggleIngredients"
-          class="menu-item d-flex align-center"
-        >
-          <img
-            src="../../src/components/img/ingredients.png"
-            alt="วัตถุดิบ"
-            class="nav-icon"
-          />
-          <span v-if="!rail">วัตถุดิบ</span>
-          <v-icon class="menu-icon">{{
-            showIngredients ? "mdi-chevron-up" : "mdi-chevron-down"
-          }}</v-icon>
-        </v-subheader>
-
-        <v-expand-transition>
-          <v-list v-show="showIngredients" style="padding-left: 33px">
-            <v-list-item to="/ingredientList">
-              <template v-slot:prepend>
-                <img
-                  src="../../src/components/img/groceries.png"
-                  alt="รายการวัตถุดิบ"
-                  class="nav-icon"
-                />
-              </template>
-              คลังวัตถุดิบ
-            </v-list-item>
-
-            <v-list-item to="/ingredientCoffeeList">
-              <template v-slot:prepend>
-                <img
-                  src="../../src/components/img/coffee-beans.png"
-                  alt="รายการวัตถุดิบ"
-                  class="nav-icon"
-                />
-              </template>
-              คลังร้านกาแฟ
-            </v-list-item>
-
-            <v-list-item to="/ingredientRiceList">
-              <template v-slot:prepend>
-                <img
-                  src="../../src/components/img/rice.png"
-                  alt="รายการวัตถุดิบ"
-                  class="nav-icon"
-                />
-              </template>
-              คลังร้านข้าว
-            </v-list-item>
-
-            <v-list-item to="/ingredientCateringList">
-              <template v-slot:prepend>
-                <img
-                  src="../../src/components/img/buffet.png"
-                  alt="รายการเลี้ยงรับรอง"
-                  class="nav-icon"
-                />
-              </template>
-              คลังวัตถุดิบร้านเลี้ยงรับรอง
-            </v-list-item>
-          </v-list>
-        </v-expand-transition>
+        
 
         <!-- อื่นๆ -->
         <v-subheader
@@ -408,7 +410,9 @@ const toggleRail = () => {
   }
 }
 
-const getUserFromLocalStorage = () => {
+
+
+onMounted(() => {
   const userString = localStorage.getItem("user");
   if (userString) {
     try {
@@ -427,10 +431,6 @@ const getUserFromLocalStorage = () => {
     router.push("/login");
     console.log("Redirect to login page");
   }
-};
-
-onMounted(() => {
-  getUserFromLocalStorage();
 });
 
 const logout = () => {

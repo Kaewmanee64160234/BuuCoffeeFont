@@ -41,3 +41,35 @@ export interface Receipt {
   createdDate: Date;
   updatedDate: Date;
 }
+
+export function mapToReceipt(data: any): Receipt {
+  return {
+    receiptId: data.receiptId,
+    receiptTotalPrice: data.receiptTotalPrice,
+    receiptType: data.receiptType,
+    receiptTotalDiscount: data.receiptTotalDiscount,
+    receiptNetPrice: data.receiptNetPrice,
+    receiptStatus: data.receiptStatus,
+    queueNumber: data.queueNumber,
+    receive: data.receive,
+    change: data.change,
+    customer: data.customer, // หรือนิยาม mapToCustomer ถ้าจำเป็น
+    user: data.user, // หรือนิยาม mapToUser ถ้าจำเป็น
+    receiptItems: data.receiptItems.map((item: any) => ({
+      productTypeToppings: item.productTypeToppings,
+      quantity: item.quantity,
+      receiptSubTotal: item.receiptSubTotal,
+      product: item.product,
+      sweetnessLevel: item.sweetnessLevel,
+      receiptItemId: item.receiptItemId,
+      productType: item.productType,
+    })),
+    promotion: data.promotion, // หรือนิยาม mapToPromotion ถ้าจำเป็น
+    paymentMethod: data.paymentMethod,
+    checkIngredientId: data.checkIngredientId,
+    receiptNumber: data.receiptNumber,
+    receiptPromotions: data.receiptPromotions, // หรือนิยาม mapToReceiptPromotion ถ้าจำเป็น
+    createdDate: new Date(data.createdDate), // แปลงเป็น Date object
+    updatedDate: new Date(data.updatedDate), // แปลงเป็น Date object
+  };
+}
