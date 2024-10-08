@@ -2,6 +2,7 @@
   <router-view v-if="!showMainMenu" />
 
   <MainMenu v-if="showMainMenu" />
+
   <LoadingDialog :loading="loadingStore.loading" />
 
 </template>

@@ -99,7 +99,7 @@ export const useProductStore = defineStore("product", () => {
         console.log("selectedCategory====");
         getProductPaginate();
       }
-      if (newCategory !== 1) {
+      if (Number(newCategory) !== 1) {
         console.log(" selectedCategory___", newCategory);
         getProductsByCategory(newCategory);
       }

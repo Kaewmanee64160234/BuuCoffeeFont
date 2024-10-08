@@ -1,6 +1,6 @@
 import type { Category } from "./category.type";
-import type { ProductType } from "./productType.type";
 import type { ProductTypeTopping } from "./productTypeTopping.type";
+import type { Recipe } from "./recipe.type";
 
 export interface Product {
   productId: number;
@@ -66,4 +66,9 @@ export function mapToProduct(data: any): Product {
       };
     }) : [],
   };
+}
+export interface ProductType {
+  productTypeName: string;
+  productTypePrice: number;
+  recipes?: Recipe[];
 }

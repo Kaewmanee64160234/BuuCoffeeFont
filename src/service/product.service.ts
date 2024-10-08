@@ -29,7 +29,7 @@ function createProduct(product: any& { file: File }) {
 
   // If product types exist, map them and append to FormData
   if (product.productTypes!.length > 0) {
-    product.productTypes!.forEach((productType, index) => {
+    product.productTypes!.forEach((productType: { productTypeName: string | Blob; productTypePrice: { toString: () => string | Blob; }; }, index: any) => {
       formData.append(`productTypes[${index}][productTypeName]`, productType.productTypeName);
       formData.append(`productTypes[${index}][productTypePrice]`, productType.productTypePrice.toString());
 

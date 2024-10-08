@@ -59,7 +59,7 @@ const loadProductData = () => {
         productStore.isCold = true;
         // productStore.selectedIngredientsCold = productType.recipes?.map(recipeItem => recipeItem.ingredient.IngredientId) || [];
         // productStore.ingredientQuantitiesCold = productType.recipes?.reduce((acc, recipeItem) => {
-        //   acc[recipeItem.ingredient.IngredientId] = recipeItem.quantity;
+        //   acc[recipeItem.ingredient.IngredientId] = re                                                                             ipeItem.quantity;
         //   return acc;
         // }, {} as IngredientQuantities) || {};
       }
