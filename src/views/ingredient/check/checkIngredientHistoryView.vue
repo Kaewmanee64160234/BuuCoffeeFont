@@ -5,6 +5,8 @@ import { useRouter } from "vue-router";
 import dialogImportItem from "./dialogCheck.vue";
 import type { Checkingredient } from "@/types/checkingredientitem.type";
 import * as XLSX from "xlsx";
+import { Workbook } from "exceljs";
+import saveAs from "file-saver";
 const ingredientStore = useCheckIngredientStore();
 const router = useRouter();
 const historyCheckDialog = ref(false);
@@ -13,17 +15,17 @@ onMounted(async () => {
   await ingredientStore.getAllHistortIngredients();
 });
 
-const formatDate = (dateString: string) => {
-  const options = {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-    timeZone: "UTC",
-  };
-  return new Date(dateString).toLocaleDateString("th-TH", options);
-};
+// const formatDate = (dateString: string) => {
+//   const options = {
+//     year: "numeric",
+//     month: "long",
+//     day: "numeric",
+//     hour: "numeric",
+//     minute: "numeric",
+//     timeZone: "UTC",
+//   };
+//   return new Date(dateString).toLocaleDateString("th-TH", options);
+// };
 
 const navigateTo = (routeName: string) => {
   router.push({ name: routeName });
@@ -33,35 +35,92 @@ const openHistoryCheckDialog = (checkingredient: Checkingredient) => {
   ingredientStore.checkingredient = checkingredient;
   ingredientStore.dialogCheckItem = true;
 };
-function exportToExcel(checkingredient: Checkingredient) {
-  const basicData = {
-    วันที่: checkingredient.date,
-    รูปแบบ: checkingredient.actionType,
-    คำอธิบาย: checkingredient.checkDescription,
-    ผู้รับผิดชอบ: checkingredient.user.userName,
-  };
-
-  const tableData = checkingredient.checkingredientitem.map((item, index) => ({
-    ลำดับ: index + 1,
-    ชื่อวัตถุดิบ: item.ingredient.ingredientName,
-    ผู้จัดจำหน่าย: item.ingredient.ingredientSupplier,
-    จำนวนเดิม: item.oldRemain,
-    จำนวนนับ: item.UsedQuantity,
-  }));
-
-  const wb = XLSX.utils.book_new();
-  const ws1 = XLSX.utils.json_to_sheet([basicData], {
-    header: Object.keys(basicData),
-  });
-  const ws2 = XLSX.utils.json_to_sheet(tableData, {
-    header: Object.keys(tableData[0]),
-  });
-
-  XLSX.utils.book_append_sheet(wb, ws1, "Summary");
-  XLSX.utils.book_append_sheet(wb, ws2, "Details");
-
-  XLSX.writeFile(wb, `check_ingredient_${new Date().toISOString()}.xlsx`);
+function formatDate(date: Date): string {
+  const d = new Date(date);
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const year = d.getFullYear();
+  const hours = String(d.getHours()).padStart(2, '0');
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  return `${day}/${month}/${year} ${hours}:${minutes}`;
 }
+
+async function exportToExcel(checkingredient: Checkingredient) {
+  // Create a new workbook and worksheet
+  const workbook = new Workbook();
+  const worksheet = workbook.addWorksheet('Check Ingredient Details');
+
+  // Add the first header row: "โครงการร้านค้า Café@Library สำนักหอสมุด"
+  worksheet.mergeCells('A1:H1');
+  const projectHeaderCell = worksheet.getCell('A1');
+  projectHeaderCell.value = 'โครงการร้านค้า Café@Library สำนักหอสมุด';
+  projectHeaderCell.alignment = { vertical: 'middle', horizontal: 'center' };
+  projectHeaderCell.font = { name: 'Sarabun', size: 16, bold: true };
+
+  // Add the second header row: "ประวัติการนำสินค้าหมดอายุ"
+  worksheet.mergeCells('A2:H2');
+  const importHeaderCell = worksheet.getCell('A2');
+  importHeaderCell.value = 'ประวัติการนำสินค้าหมดอายุ';
+  importHeaderCell.alignment = { vertical: 'middle', horizontal: 'center' };
+  importHeaderCell.font = { name: 'Sarabun', size: 16, bold: true };
+
+  // Add an empty row for spacing
+  worksheet.addRow([]);
+
+  // Add column headers
+  const headerRowValues = ['ลำดับ', 'วันที่', 'ชื่อวัตถุดิบ', 'ผู้จัดจำหน่าย', 'จำนวนเดิม', 'จำนวน', 'คงเหลือ', 'ผู้รับผิดชอบ'];
+  const headerRow = worksheet.addRow(headerRowValues);
+
+  // Apply styles to the column headers for better visibility
+  headerRow.font = { name: 'Sarabun', bold: true };
+  headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+  headerRow.eachCell((cell) => {
+    cell.border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      bottom: { style: 'thin' },
+      right: { style: 'thin' },
+    };
+  });
+
+  // Add data rows
+  checkingredient.checkingredientitem.forEach((item, index) => {
+    const remaining = item.oldRemain - item.UsedQuantity; // Calculate remaining quantity
+    const rowData = [
+      index + 1,
+      formatDate(new Date(checkingredient.date)),
+      item.ingredient?.ingredientName,
+      item.ingredient?.ingredientSupplier,
+      item.oldRemain,
+      item.UsedQuantity,
+      remaining,
+      checkingredient.user.userName,
+    ];
+    const dataRow = worksheet.addRow(rowData);
+
+    // Apply border and alignment to data rows for better presentation
+    dataRow.alignment = { vertical: 'middle', horizontal: 'center' };
+    dataRow.eachCell((cell) => {
+      cell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' },
+      };
+    });
+  });
+
+  // Adjust column widths for better readability
+  worksheet.columns.forEach((column) => {
+    column.width = 20; // Set a default width for each column
+  });
+
+  // Write to a file
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  saveAs(blob, `ประวัติการนำสินค้าหมดอายุ_${new Date().toISOString().substring(0, 10)}.xlsx`);
+}
+
 </script>
 
 <template>

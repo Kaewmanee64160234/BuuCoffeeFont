@@ -58,7 +58,8 @@
               </template>
               POSร้านกาแฟ
             </v-list-item>
-            <v-list-item to="/pos-rice"  >
+
+            <v-list-item to="/pos-rice" v-if="userStore.currentUser.role.name !== 'พนักงานขายกาแฟ'  " >
               <template v-slot:prepend>
                 <img
                   src="../../src/components/img/store.png"

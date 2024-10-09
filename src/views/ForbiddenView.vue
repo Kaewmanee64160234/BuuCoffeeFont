@@ -13,9 +13,16 @@ import { useUserStore } from '@/stores/user.store';
   const userStore = useUserStore();
   const goToPage = ()=>{
     if(userStore.currentUser.role.name === 'ผู้จัดการร้าน'){
-        router.push('/report');
+      router.push('/report');
+    }
+    if(userStore.currentUser.role.name === 'พนักงานขายกาแฟ'){
+      router.push('/pos-coffee');
+    }
+    if(userStore.currentUser.role.name === 'พนักงานขายข้าว'){
+      router.push('/pos-rice');
     }else{
-        router.push('/pos');
+      router.push('/report');
+
     }
 
   }

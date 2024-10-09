@@ -40,6 +40,8 @@ export const useReportFinnceStore = defineStore("cashier", () => {
         cashiers.value = res.data;
       }
     } catch (error) {
+      createCashierDialog.value = true;
+
       console.error(error);
     }
   };

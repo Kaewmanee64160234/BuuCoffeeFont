@@ -79,7 +79,7 @@ const router = createRouter({
       name: "importingredients",
       component: () =>
         import("../views/ingredient/import/importIngredientView.vue"),
-      meta: { requiresAuth: true },
+      // meta: { requiresAuth: true },
     },
     {
       path: "/importingredientCatering",
