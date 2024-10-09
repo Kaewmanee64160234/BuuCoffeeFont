@@ -4,15 +4,9 @@ import axios, { AxiosError } from 'axios';
 import http from "../axios";
 
 async function getfindToday() {
-  try {
+
     return await http.get("/cashiers/today");
-  } catch (error) {
-    if (error instanceof Error && error.response && error.response.status === 404) {
-      return { data: null }; 
-    } else {
-      throw error; 
-    }
-  }
+ 
 }
 export function createCashier(cashier: Cashier) {
   return http.post("/cashiers", cashier);
