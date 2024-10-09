@@ -97,6 +97,10 @@ export const useCateringEventStore = defineStore("cateringEvent", () => {
       const response = await financeService.cateringEventPaginate(page, limit);
       historyCateringEvent.value = response.data.data;
       totalItems.value = response.data.meta.total; // Make sure meta contains the total count
+      currentPage.value = response.data.meta.page;
+      itemsPerPage.value = response.data.meta.limit;
+
+
     } catch (error) {
       console.error('Failed to fetch catering events:', error);
     }

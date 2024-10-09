@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref,watch } from 'vue';
 import { useCateringEventStore } from '@/stores/historycatering.store';
 import type { HistoryCateringEvent } from '@/types/catering/history_catering.type';
 import dialogHistoryCatering from "@/views/ingredient/catering/dialogHistoryCatering.vue";
@@ -50,6 +50,12 @@ const onPageChange = async (page: number) => {
   currentPage.value = page;
   await loadCateringEvents(page); // Fetch data for the selected page
 };
+// watch when chnage page 
+watch(currentPage, async (newValue, oldValue) => {
+  if (newValue !== oldValue) {
+    await loadCateringEvents(newValue);
+  }
+});
 </script>
 
 
@@ -119,7 +125,6 @@ const onPageChange = async (page: number) => {
       <v-pagination
         v-model:page="currentPage"
         :length="Math.ceil(cateringEventStore.totalItems / itemsPerPage)"
-        @input="onPageChange"
         :total-visible="7"
         rounded="circle"
       />
