@@ -18,18 +18,26 @@ const selectedCheck = ref<Checkingredient | null>(null);
 onMounted(async () => {
   await subIngredientStore.findByShopType();
 });
-
-const formatDate = (dateString: string) => {
-  const options = {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-    timeZone: "UTC",
-  };
-  return new Date(dateString).toLocaleDateString("th-TH", options);
-};
+function formatDate(date: string | Date): string {
+  const d = new Date(date);
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const year = d.getFullYear();
+  const hours = String(d.getHours()).padStart(2, '0');
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  return `${day}/${month}/${year} ${hours}:${minutes}`;
+}
+// const formatDate = (dateString: string) => {
+//   const options = {
+//     year: "numeric",
+//     month: "long",
+//     day: "numeric",
+//     hour: "numeric",
+//     minute: "numeric",
+//     timeZone: "UTC",
+//   };
+//   return new Date(dateString).toLocaleDateString("th-TH", options);
+// };
 
 const navigateTo = (routeName: string) => {
   router.push({ name: routeName });
@@ -51,7 +59,7 @@ async function exportToExcel(checkingredient: Checkingredient) {
   const projectHeaderCell = worksheet.getCell('A1');
   projectHeaderCell.value = 'โครงการร้านค้า Café@Library สำนักหอสมุด';
   projectHeaderCell.alignment = { vertical: 'middle', horizontal: 'center' };
-  projectHeaderCell.font = { name: 'Sarabun', size: 18, bold: true };
+  projectHeaderCell.font = { name: 'Sarabun', size: 16, bold: true };
 
   // Add the second header row: "นำเข้าสินค้าร้านกาแฟ"
   worksheet.mergeCells('A2:G2');
@@ -116,7 +124,7 @@ async function exportToExcel(checkingredient: Checkingredient) {
   // Write to a file
   const buffer = await workbook.xlsx.writeBuffer();
   const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-  saveAs(blob, `check_ingredient_${new Date().toISOString().substring(0, 10)}.xlsx`);
+  saveAs(blob, `นำเข้ารายการสินค้าร้านกาแฟ${new Date().toISOString().substring(0, 10)}.xlsx`);
 }
 </script>
 

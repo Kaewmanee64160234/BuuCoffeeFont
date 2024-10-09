@@ -2,9 +2,12 @@
 import { useHistoryIngredientImportStore } from '@/stores/historyIngredientimport.store';
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router'
+import { saveAs } from 'file-saver'; // Make sure this is imported
+
 import dialogCheckItem from './dialogImport.vue';
 import type { Importingredient } from '@/types/importIngredient.type';
 import * as XLSX from 'xlsx';
+import { Workbook } from 'exceljs';
 const historyImportDialog = ref(false);
 const ingredientStore = useHistoryIngredientImportStore();
 const router = useRouter();
@@ -16,10 +19,10 @@ onMounted(async () => {
 const navigateTo = (routeName: string) => {
   router.push({ name: routeName });
 };
-const formatDate = (dateString: string) => {
-  const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', timeZone: 'UTC' };
-  return new Date(dateString).toLocaleDateString('th-TH', options);
-};
+// const formatDate = (dateString: string) => {
+//   const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', timeZone: 'UTC' };
+//   return new Date(dateString).toLocaleDateString('th-TH', options);
+// };
 // const formatDate = (date: any) => {
 //   if (!date) return ''; // กรณีไม่มีข้อมูลวันที่
 
@@ -43,29 +46,93 @@ const openHistoryCheckDialog = (importingredient: Importingredient) => {
   ingredientStore.importingredient = importingredient;
   ingredientStore.dialoImportItem = true;
 };
-function exportToExcel(importingredient: Importingredient) {
-  const basicData = {
-    วันที่: importingredient.date,
-    ประเภทร้านค้า: importingredient.importStoreType,
-    คำอธิบาย: importingredient.importDescription,
-    ผู้รับผิดชอบ: importingredient.user.userName,
-  };
+function formatDate(date: Date): string {
+  const d = new Date(date);
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const year = d.getFullYear();
+  const hours = String(d.getHours()).padStart(2, '0');
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  return `${day}/${month}/${year} ${hours}:${minutes}`;
+}
 
+function handleNullValue(value: any): string {
+  return value !== null && value !== undefined ? value.toString() : '-';
+}
 
-  const tableData = importingredient.importingredientitem.map((item, index) => ({
-    ลำดับ: index + 1,
-    ชื่อวัตถุดิบ: item.ingredient?.ingredientName,
-    ซัพพาย: item.ingredient?.ingredientSupplier,
-    จำนวน: item.Quantity,
-    ราคาต่อขิ้น: item.unitPrice,
-    ราคารวม: item.pricePerUnit,
-  }));
-  const wb = XLSX.utils.book_new();
-  const ws1 = XLSX.utils.json_to_sheet([basicData], { header: Object.keys(basicData) });
-  const ws2 = XLSX.utils.json_to_sheet(tableData, { header: Object.keys(tableData[0]) });
-  XLSX.utils.book_append_sheet(wb, ws1, 'Summary');
-  XLSX.utils.book_append_sheet(wb, ws2, 'Details');
-  XLSX.writeFile(wb, `Import_ingredient_${new Date().toISOString()}.xlsx`);
+async function exportToExcel(importingredient: Importingredient) {
+  // Create a new workbook and worksheet
+  const workbook = new Workbook();
+  const worksheet = workbook.addWorksheet('Import Ingredient Details');
+
+  // Add the first header row: "โครงการร้านค้า Café@Library สำนักหอสมุด"
+  worksheet.mergeCells('A1:H1');
+  const projectHeaderCell = worksheet.getCell('A1');
+  projectHeaderCell.value = 'โครงการร้านค้า Café@Library สำนักหอสมุด';
+  projectHeaderCell.alignment = { vertical: 'middle', horizontal: 'center' };
+  projectHeaderCell.font = { name: 'Sarabun', size: 16, bold: true };
+
+  // Add the second header row: "นำเข้าสินค้าร้านกาแฟ"
+  worksheet.mergeCells('A2:H2');
+  const importHeaderCell = worksheet.getCell('A2');
+  importHeaderCell.value = 'รายการสั่งซื้อสิค้า';
+  importHeaderCell.alignment = { vertical: 'middle', horizontal: 'center' };
+  importHeaderCell.font = { name: 'Sarabun', size: 16, bold: true };
+
+  // Add an empty row for spacing
+  worksheet.addRow([]);
+
+  // Add column headers
+  const headerRowValues = ['ลำดับ', 'วันที่', 'ชื่อวัตถุดิบ', 'ผู้ขาย', 'จำนวน', 'ราคาต่อชิ้น', 'ราคารวม', 'ผู้รับผิดชอบ'];
+  const headerRow = worksheet.addRow(headerRowValues);
+
+  // Apply styles to the column headers for better visibility
+  headerRow.font = { name: 'Sarabun', bold: true };
+  headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+  headerRow.eachCell((cell) => {
+    cell.border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      bottom: { style: 'thin' },
+      right: { style: 'thin' },
+    };
+  });
+
+  // Add data rows
+  importingredient.importingredientitem.forEach((item, index) => {
+    const rowData = [
+      index + 1,
+      formatDate(new Date(importingredient.date)),
+      handleNullValue(item.ingredient?.ingredientName),
+      handleNullValue(item.ingredient?.ingredientSupplier),
+      handleNullValue(item.Quantity),
+      handleNullValue(item.unitPrice),
+      handleNullValue(item.pricePerUnit),
+      handleNullValue(importingredient.user.userName),
+    ];
+    const dataRow = worksheet.addRow(rowData);
+
+    // Apply border and alignment to data rows for better presentation
+    dataRow.alignment = { vertical: 'middle', horizontal: 'center' };
+    dataRow.eachCell((cell) => {
+      cell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' },
+      };
+    });
+  });
+
+  // Adjust column widths for better readability
+  worksheet.columns.forEach((column) => {
+    column.width = 20; // Set a default width for each column
+  });
+
+  // Write to a file
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  saveAs(blob, `นำเข้ารายการนำเข้าวตถุดิบ_${new Date().toISOString().substring(0, 10)}.xlsx`);
 }
 </script>
 

@@ -94,10 +94,10 @@ watch(paginate, async (newValue, oldValue) => {
                 </v-btn>
               </template>
               <v-list>
-                <v-list-item @click="navigateTo('importingredients')">
+                <v-list-item @click="navigateTo('importingredient')">
                   <v-list-item-title>นำเข้าวัตถุดิบ</v-list-item-title>
                 </v-list-item>
-                <v-list-item @click="navigateTo('importingredientsHistory')">
+                <v-list-item @click="navigateTo('importingredient-history')">
                   <v-list-item-title>ประวัติการนำเข้าวัตถุดิบ</v-list-item-title>
                 </v-list-item>
               </v-list>
@@ -116,7 +116,7 @@ watch(paginate, async (newValue, oldValue) => {
                 <v-list-item @click="navigateTo('checkingredient')">
                   <v-list-item-title> นำออกวัตถุดิบ </v-list-item-title>
                 </v-list-item>
-                <v-list-item @click="navigateTo('checkingredientHistory')">
+                <v-list-item @click="navigateTo('checkingredient-history')">
                   <v-list-item-title>ประวัตินำออกวัตถุดิบ </v-list-item-title>
                 </v-list-item>
               </v-list>

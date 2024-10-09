@@ -19,17 +19,17 @@ onMounted(async () => {
   await subIngredientStore.findByShopTypeRice();
 });
 
-const formatDate = (dateString: string) => {
-  const options = {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-    timeZone: "UTC",
-  };
-  return new Date(dateString).toLocaleDateString("th-TH", options);
-};
+// const formatDate = (dateString: string) => {
+//   const options = {
+//     year: "numeric",
+//     month: "long",
+//     day: "numeric",
+//     hour: "numeric",
+//     minute: "numeric",
+//     timeZone: "UTC",
+//   };
+//   return new Date(dateString).toLocaleDateString("th-TH", options);
+// };
 
 const navigateTo = (routeName: string) => {
   router.push({ name: routeName });
@@ -40,7 +40,16 @@ const openHistoryCheckDialog = (checkingredient: Checkingredient) => {
   ingredientStore.dialogCheckItem = true;
 };
 
-// Export to Excel function using exceljs for more styling control
+function formatDate(date: string | Date): string {
+  const d = new Date(date);
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const year = d.getFullYear();
+  const hours = String(d.getHours()).padStart(2, '0');
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  return `${day}/${month}/${year} ${hours}:${minutes}`;
+}
+
 async function exportToExcel(checkingredient: Checkingredient) {
   // Create a new workbook and worksheet
   const workbook = new Workbook();
@@ -84,7 +93,7 @@ async function exportToExcel(checkingredient: Checkingredient) {
   checkingredient.checkingredientitem.forEach((item, index) => {
     const rowData = [
       index + 1,
-      formatDate(checkingredient.date + ''),
+      formatDate(checkingredient.date),
       item.ingredient.ingredientName,
       checkingredient.actionType === 'withdrawal'
         ? 'เบิกเข้าร้านข้าว'
@@ -117,7 +126,7 @@ async function exportToExcel(checkingredient: Checkingredient) {
   // Write to a file
   const buffer = await workbook.xlsx.writeBuffer();
   const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-  saveAs(blob, `check_ingredient_${new Date().toISOString().substring(0, 10)}.xlsx`);
+  saveAs(blob, `นำเข้ารายการสินค้าร้านข้าว_${new Date().toISOString().substring(0, 10)}.xlsx`);
 }
 </script>
 
