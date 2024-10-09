@@ -4,16 +4,24 @@ import type { HistoryCateringEvent } from "@/types/catering/history_catering.typ
 import axios from "axios";
 import Swal from "sweetalert2";
 import ingredientService from "@/service/ingredient.service";
-
+import financeService from "@/service/report/finance.service";
 export const useCateringEventStore = defineStore("cateringEvent", () => {
   const historyCateringEvent = ref<HistoryCateringEvent[]>([]);
   const historyCateringitem = ref<HistoryCateringEvent | null>(null);
   const dialogCateringItem = ref(false);
+  const totalItems = ref(0);
+  const itemsPerPage = ref(10);
+  const currentPage = ref(1);
+  const meta = ref({
+    total: 0,
+    page: 1,
+    last_page: 1,
+  });
+
+
   const fetchCateringEvents = async () => {
     try {
-      const response = await axios.get<HistoryCateringEvent[]>(
-        "http://localhost:3000/catering-event"
-      );
+      const response = await financeService.cateringEvent()
       historyCateringEvent.value = response.data;
       console.log(historyCateringEvent.value);
     } catch (error) {
@@ -84,14 +92,29 @@ export const useCateringEventStore = defineStore("cateringEvent", () => {
       console.error(error);
     }
   };
+  const cateringEventPaginate = async (page: number, limit: number) => {
+    try {
+      const response = await financeService.cateringEventPaginate(page, limit);
+      historyCateringEvent.value = response.data.data;
+      totalItems.value = response.data.meta.total; // Make sure meta contains the total count
+    } catch (error) {
+      console.error('Failed to fetch catering events:', error);
+    }
+  };
+  
+
   return {
     historyCateringEvent,
-    dialogCateringItem,
     historyCateringitem,
+    dialogCateringItem,
+    meta,
     fetchCateringEvents,
     updateStatus,
     cancelEvent,
     getHistoryCateringById,
-    
+    cateringEventPaginate,
+    totalItems ,
+    itemsPerPage ,
+    currentPage ,
   };
 });
