@@ -94,7 +94,7 @@ export const useToppingStore = defineStore("topping", () => {
         } catch (error) {
           console.error('Error getting toppings:', error);
         }
-      };
+    };
 
 
     return {

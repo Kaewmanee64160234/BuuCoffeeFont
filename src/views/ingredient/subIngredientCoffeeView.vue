@@ -5,15 +5,7 @@ import { useRouter } from 'vue-router';
 
 const subIngredientStore = useSubIngredientStore();
 const router = useRouter();
-const paginate = ref(true);
-const page = computed(() => subIngredientStore.page);
-const take = computed(() => subIngredientStore.take);
 
-const paginatedItems = computed(() => {
-  const start = (page.value - 1) * take.value; 
-  const end = start + take.value;
-  return subIngredientStore.subingredients_coffee.slice(start, end);
-});
 
 onMounted(async () => {
   await subIngredientStore.getSubIngredients_coffee();
@@ -28,11 +20,7 @@ const navigateTo = (routeName: string) => {
 watch(() => subIngredientStore.page, async (newValue) => {
   await subIngredientStore.getSubIngredients_coffee();
 });
-watch(paginate, async (newValue, oldValue) => {
-  if (newValue !== oldValue) {
-    await subIngredientStore.getAllIngredients();
-  }
-})
+
 </script>
 
 <template>
@@ -81,15 +69,16 @@ watch(paginate, async (newValue, oldValue) => {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(item, index) in paginatedItems" :key="index">
-            <td>{{ (page - 1) * take + index + 1 }}</td>
+          <tr v-for="(item, index) in subIngredientStore.subingredients_coffee" :key="item.ingredient.ingredientId" style="text-align: center;">
+            <td>{{ index+1 }}</td>
             <td>{{ item.ingredient.ingredientName }}</td>
             <td>{{ item.quantity }}</td>
           </tr>
-          <tr v-if="paginatedItems.length === 0">
+          <tr v-if="subIngredientStore.subingredients_coffee.length === 0">
             <td colspan="3" class="text-center">ไม่มีข้อมูล</td>
           </tr>
         </tbody>
+        
       </v-table>
 
       <v-pagination
