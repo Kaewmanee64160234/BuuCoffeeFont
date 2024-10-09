@@ -418,6 +418,8 @@ const getUserFromLocalStorage = () => {
     } catch (e) {
       console.error("Failed to parse user from localStorage:", e);
       authStore.isLogin = false;
+    router.push("/login");
+
     }
   } else {
     console.log("No user found in localStorage.");

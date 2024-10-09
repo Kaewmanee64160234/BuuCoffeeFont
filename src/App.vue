@@ -14,10 +14,12 @@ import { useUserStore } from './stores/user.store';
 import type { User } from './types/user.type';
 import LoadingDialog from './components/LoadingDialog.vue';
 import { useLoadingStore } from './stores/loading.store';
+import { useAuthStore } from './stores/auth';
 
 const router = useRouter();
 const loadingStore = useLoadingStore();
 const userStore = useUserStore();
+const authStore = useAuthStore();
 const user = ref<User>({
   userId: null,
   name: null,
@@ -28,14 +30,30 @@ const user = ref<User>({
 const showMainMenu = computed(() => {
   return user.value !== null && router.currentRoute.value.path !== '/login';
 });
+const getUserFromLocalStorage = () => {
+  const userString = localStorage.getItem("user");
+  if (userString) {
+    try {
+      const userObject = JSON.parse(userString);
+      userStore.setUser(userObject);
+      authStore.isLogin = true;
+    } catch (e) {
+      console.error("Failed to parse user from localStorage:", e);
+      authStore.isLogin = false;
+    router.push("/login");
+
+    }
+  } else {
+    console.log("No user found in localStorage.");
+    authStore.isLogin = false;
+    router.push("/login");
+    console.log("Redirect to login page");
+  }
+};
+
 
 onMounted(() => {
-  const storedUser = localStorage.getItem('user'); // Get user from local storage
-  if (storedUser) {
-    user.value = JSON.parse(storedUser);
-    userStore.currentUser = user.value;
-    console.log('User from local storage:', user.value);
-  }
+  getUserFromLocalStorage();
 });
 </script>
 
