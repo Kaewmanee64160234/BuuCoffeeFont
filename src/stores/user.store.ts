@@ -153,10 +153,10 @@ export const useUserStore = defineStore("user", () => {
       );
       console.log("getUserPaginate", response.data);
       if (response.status === 200) {
-        users.value = response.data.data.map((customer: any) =>
-          mapToUser(customer)
+        users.value = response.data.data.map((user: any) =>
+          mapToUser(user)
         );
-        console.log("products", users.value);
+        console.log("users", users.value);
         totalUsers.value = response.data.total;
       }
     } catch (error) {

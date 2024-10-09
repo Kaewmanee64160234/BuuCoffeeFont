@@ -31,14 +31,15 @@ function deleteTopping(id: number)
   return http.delete(`/toppings/${id}`);
 }
 
-// paginate
-function getToppingPaginate(page: number, limit: number, search: string) {
+
+//  getProductPaginate by add query page and size
+function getToppingPaginate(page: number, size: number,search : string) {
   return http.get(`/toppings/paginate`, {
     params: {
-      page: page.toString(),
-      limit: limit.toString(),
-      search,
-    },
+      page,
+      limit: size,
+      search
+    }
   });
 
 }

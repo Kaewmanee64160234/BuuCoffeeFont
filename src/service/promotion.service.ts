@@ -32,11 +32,15 @@ function getAllPromotions() {
   }
 
   // getPromotionsPaginate
-  function getPromotionsPaginate(params: { search: string; page: number; limit: number }) {
+  function getPromotionPaginate(page: number, size: number,search : string) {
     return http.get(`/promotions/paginate`, {
-      params,
+      params: {
+        page,
+        limit: size,
+        search
+      }
     });
-    
+  
   }
   // get promotion by type
   function getPromotionByType(type: string) {
@@ -50,6 +54,6 @@ function getAllPromotions() {
     updatePromotion,
     deletePromotion,
     searchPromotions,
-    getPromotionsPaginate,
+    getPromotionPaginate,
     getPromotionByType
   };

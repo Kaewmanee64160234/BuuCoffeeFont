@@ -1,5 +1,5 @@
 import promotionService from "@/service/promotion.service";
-import type { Promotion } from "@/types/promotion.type";
+import { mapToPromotion, type Promotion } from "@/types/promotion.type";
 import { defineStore } from "pinia";
 import { ref, watch } from "vue";
 
@@ -12,7 +12,7 @@ export const usePromotionStore = defineStore("promotion", () => {
 
   const currentPage = ref(1);
   const itemsPerPage = ref(5);
-  const totalItems = ref(0);
+  const totalPromotions = ref(0);
   
   const promotionTypes = [
     { text: "ส่วนลดเป็นจำนวนเงิน", value: "discountPrice" },
@@ -31,47 +31,62 @@ export const usePromotionStore = defineStore("promotion", () => {
     }
   });
 
-  watch([searchQuery, currentPage], async () => {
-    await getPromotionsPaginate();
+  watch([searchQuery, currentPage,itemsPerPage], async () => {
+    await getPromotionPaginate();
   });
 
   // Fetch all promotions
   const getAllPromotions = async () => {
     try {
-      const res = await promotionService.getAllPromotions();
-      if (res.data) {
-        promotions.value = res.data;
+      const response = await promotionService.getAllPromotions();
+      if (response.status === 200) {
+        promotions.value = response.data;
+        totalPromotions.value = promotions.value.length; // Update total users count
       }
     } catch (error) {
       console.error(error);
     }
   };
 
-  const getPromotionsPaginate = async () => {
+  const getPromotionPaginate = async () => {
     try {
-      const res = await promotionService.getPromotionsPaginate({
-        search: searchQuery.value,
-        page: currentPage.value,
-        limit: itemsPerPage.value,
-      });
-      if (res.data) {
-        promotions.value = res.data.data;
-        totalItems.value = res.data.total;
-
-        console.log(res.data);
+      const response = await promotionService.getPromotionPaginate(
+        currentPage.value,
+        itemsPerPage.value,
+        searchQuery.value
+      );
+      console.log("getPromotionPaginate", response.data);
+      if (response.status === 200) {
+        promotions.value = response.data.data.map((promotion: any) =>
+          mapToPromotion(promotion)
+        );
+        console.log("promotions", promotions.value);
+        totalPromotions.value = response.data.total;
       }
     } catch (error) {
-      console.error(error);
+      // console.error(error);
+      console.log("error", error);
     }
   };
 
   // Create a new promotion
   const createPromotion = async (promotion: Promotion) => {
     try {
-      const res = await promotionService.createPromotion(promotion);
-      if (res.data) {
-        promotions.value.push(res.data);
-        getPromotionsPaginate();
+      const response = await promotionService.createPromotion(promotion);
+      if (response.status === 201) {
+        promotions.value.push(response.data); // เพิ่มผู้ใช้ใหม่เข้าในลิสต์โดยตรง
+        totalPromotions.value += 1; // อัปเดตจำนวนผู้ใช้ทั้งหมด
+  
+        // ตรวจสอบว่ามีผู้ใช้เกินจำนวนที่แสดงต่อหน้าได้หรือไม่
+        const totalPages = Math.ceil(totalPromotions.value / itemsPerPage.value);
+        if (currentPage.value < totalPages) {
+          currentPage.value = totalPages; // เปลี่ยนไปยังหน้าสุดท้าย
+        }
+  
+        // ตรวจสอบถ้าเราอยู่ในหน้าสุดท้าย ให้เรียกเพจจิเนชันเพื่อโหลดข้อมูลผู้ใช้ทั้งหมดใหม่
+        if (promotions.value.length > currentPage.value * itemsPerPage.value) {
+          await getPromotionPaginate();
+        }
       }
     } catch (error) {
       console.error(error);
@@ -86,7 +101,7 @@ export const usePromotionStore = defineStore("promotion", () => {
       if (res.data) {
         const index = promotions.value.findIndex((p) => p.promotionId === id);
         promotions.value[index] = res.data;
-        await getPromotionsPaginate();
+        await getPromotionPaginate();
       }
     } catch (error) {
       console.error(error);
@@ -96,8 +111,11 @@ export const usePromotionStore = defineStore("promotion", () => {
   // Delete a promotion
   const deletePromotion = async (id: number) => {
     try {
-      await promotionService.deletePromotion(id);
-      promotions.value = promotions.value.filter((p) => p.promotionId !== id);
+      const response = await promotionService.deletePromotion(id);
+      if (response.status === 200) {
+        promotions.value = promotions.value.filter((promotion) => promotion.promotionId !== id);
+        totalPromotions.value = promotions.value.length; // Update total users count
+      }
     } catch (error) {
       console.error(error);
     }
@@ -127,6 +145,7 @@ export const usePromotionStore = defineStore("promotion", () => {
     }
   };
 
+  
   // get promotion by type
   const getPromotionByType = async (type: string) => {
     try {
@@ -153,8 +172,8 @@ export const usePromotionStore = defineStore("promotion", () => {
     searchPromotion,
     currentPage,
     itemsPerPage,
-    getPromotionsPaginate,
-    totalItems,
+    getPromotionPaginate,
+    totalPromotions,
     promotionTypes,
     getPromotionByType,
   };
