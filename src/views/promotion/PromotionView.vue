@@ -14,7 +14,7 @@
               hide-details 
               dense 
               variant="solo"
-              @input="getPromotionPaginate"
+              @input="promotionStore.getPromotionsPaginate"
             ></v-text-field>
           </v-col>
           <v-spacer></v-spacer>
@@ -62,7 +62,7 @@
         <v-pagination
           v-model="promotionStore.currentPage"
           :length="Math.ceil(promotionStore.totalPromotions / promotionStore.itemsPerPage)"
-          @input="promotionStore.getPromotionPaginate "
+          @input="promotionStore.getPromotionsPaginate "
           rounded="circle"
         ></v-pagination>
       </v-card-text>
@@ -88,14 +88,8 @@ const headers = ref([
   { text: 'Actions', value: 'actions', sortable: false },
 ]);
 
-const getPromotionPaginate = promotionStore.getPromotionPaginate;
-
 onMounted(async () => {
-  await getPromotionPaginate();
-});
-
-onMounted(async () => {
-  await promotionStore.getPromotionPaginate();
+  await promotionStore.getPromotionsPaginate();
 });
 
 const openCreateDialog = () => {

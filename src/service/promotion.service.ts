@@ -32,16 +32,13 @@ function getAllPromotions() {
   }
 
   // getPromotionsPaginate
-  function getPromotionPaginate(page: number, size: number,search : string) {
-    return http.get(`/promotions/paginate`, {
-      params: {
-        page,
-        limit: size,
-        search
-      }
+  const getPromotionsPaginate = (pageNumber: number, pageSize: number, searchTerm: string) => {
+    return http.get('/promotions/paginate', {
+      params: { search: searchTerm, page: pageNumber, limit: pageSize },
     });
+  };
   
-  }
+
   // get promotion by type
   function getPromotionByType(type: string) {
     return http.get(`/promotions/type/${type}`);
@@ -54,6 +51,6 @@ function getAllPromotions() {
     updatePromotion,
     deletePromotion,
     searchPromotions,
-    getPromotionPaginate,
+    getPromotionsPaginate,
     getPromotionByType
   };
