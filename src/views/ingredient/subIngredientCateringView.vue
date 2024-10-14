@@ -8,8 +8,8 @@ import Swal from 'sweetalert2';
 const subIngredientStore = useSubIngredientStore();
 const router = useRouter();
 onMounted(async () => {
-  await subIngredientStore.getIngredientsCateringPaginate(); 
   await subIngredientStore.getSubIngredients_catering();
+  await subIngredientStore.getIngredientsCateringPaginate(); 
 });
 
 

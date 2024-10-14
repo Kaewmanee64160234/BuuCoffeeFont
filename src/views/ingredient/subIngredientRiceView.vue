@@ -7,6 +7,7 @@ import Swal from 'sweetalert2';
 const subIngredientStore = useSubIngredientStore();
 const router = useRouter(); 
 onMounted(async () => {
+  await subIngredientStore.getSubIngredients_rice();
   await subIngredientStore.getIngredientsRicePaginate(); // โหลดข้อมูลเมื่อคอมโพเนนต์ถูกสร้าง
 });
 
@@ -19,12 +20,12 @@ onMounted(async () => {
 //   await subIngredientStore.getSubIngredients_coffee();
 // });
 
-watch(
-  () => subIngredientStore.currentPage, 
-  async () => {
-    await subIngredientStore.getIngredientsRicePaginate();
-  }
-);
+// watch(
+//   () => subIngredientStore.currentPage, 
+//   async () => {
+//     await subIngredientStore.getIngredientsRicePaginate();
+//   }
+// );
 
 
 const navigateTo = (routeName: string) => {

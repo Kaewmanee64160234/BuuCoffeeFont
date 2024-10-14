@@ -193,7 +193,7 @@ const createReturnWithdrawalIngredientsForCatering = (ingredient: {
 };
 
 function getIngredientsCateringPaginate(page: number, size: number,search : string) {
-  return http.get(`/sub-inventories-coffee/paginate`, {
+  return http.get(`/sub-inventories-catering/paginate`, {
     params: {
       page,
       limit: size,
