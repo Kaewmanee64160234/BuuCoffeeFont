@@ -192,7 +192,38 @@ const createReturnWithdrawalIngredientsForCatering = (ingredient: {
   return http.post("/checkingredients/catering", ingredient);
 };
 
+function getIngredientsCateringPaginate(page: number, size: number,search : string) {
+  return http.get(`/sub-inventories-coffee/paginate`, {
+    params: {
+      page,
+      limit: size,
+      search
+    }
+  });
 
+}
+
+function getIngredientsRicePaginate(page: number, size: number,search : string) {
+  return http.get(`/sub-inventories-rice/paginate`, {
+    params: {
+      page,
+      limit: size,
+      search
+    }
+  });
+
+}
+
+function getIngredientsCoffeePaginate(page: number, size: number,search : string) {
+  return http.get(`/sub-inventories-coffee/paginate`, {
+    params: {
+      page,
+      limit: size,
+      search
+    }
+  });
+
+}
 
 export default {
   getAllIngredients,
@@ -219,5 +250,8 @@ export default {
   createReturnWithdrawalIngredientsForCatering,
   getSubIngredients_Catering,
   getAllHistoryCatering,
-  getAllHistoryCateringHistory
+  getAllHistoryCateringHistory,
+  getIngredientsCoffeePaginate,
+  getIngredientsCateringPaginate,
+  getIngredientsRicePaginate
 };

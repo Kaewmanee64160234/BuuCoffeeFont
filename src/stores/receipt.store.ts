@@ -65,7 +65,7 @@ export const useReceiptStore = defineStore("receipt", () => {
         if (currentPage.value < totalPages) {
           currentPage.value = totalPages; // เปลี่ยนไปยังหน้าสุดท้าย
         }
-  
+        
         // โหลดข้อมูลผู้ใช้ใหม่
         await getReceiptPaginate();
       }
@@ -177,23 +177,30 @@ export const useReceiptStore = defineStore("receipt", () => {
   };
 
   const getReceiptPaginate = async () => {
+    // console.log(currentPage.value)
+    // console.log(itemsPerPage.value)
     try {
+      // Call the promotion service to fetch paginated data
       const response = await receiptService.getReceiptPaginate(
-        currentPage.value,
-        itemsPerPage.value,
-        searchQuery.value
+        // 15,
+        // 0,
+        // ''
+        currentPage.value,   // Current page
+        itemsPerPage.value,  // Items per page
+        searchQuery.value    // Search term
       );
-      console.log("getReceiptPaginate", response.data);
+  
+      // Log the response for debugging
+      console.log('getReceiptPaginate', response.data);
+  
       if (response.status === 200) {
-        receipts.value = response.data.data.map((receipt: any) =>
-          mapToReceipt(receipt)
-        );
-        console.log("receipts", receipts.value);
-        totalReceipts.value = response.data.total;
+        // Update receipts and total receipts in the store
+        receipts.value = response.data.data;   // Assign fetched receipt data
+        totalReceipts.value = response.data.total;  // Total number of receipts
       }
     } catch (error) {
-      // console.error(error);
-      console.log("error", error);
+      // Handle errors and log them
+      console.error('Error getting receipts:', error);
     }
   };
 

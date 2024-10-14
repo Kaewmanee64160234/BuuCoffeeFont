@@ -8,12 +8,14 @@ import type { ReportIngredientLog } from "@/types/pairsWithdrawalReturn.type";
 import type { Ingredient } from "@/types/ingredient.type";
 import { useUserStore } from "./user.store";
 import { useMessageStore } from './message'; // Update the path if necessary
+import type { SubInventoriesRice } from "@/types/subinventoriesrice.type";
+import type { SubInventoriesCatering } from "@/types/subinventoriescateringtype";
 
 export const useSubIngredientStore = defineStore("subinventory", () => {
   const subingredients_coffee = ref<SubInventoriesCoffee[]>([]);
   const subIngredients_catering = ref<SubInventoriesCoffee[]>([]);
-  const subingredients_rice = ref<SubInventoriesCoffee[]>([]);
-  const subingredientsRiceCatering = ref<SubInventoriesCoffee[]>([]);
+  const subingredients_rice = ref<SubInventoriesRice[]>([]);
+  const subingredientsRiceCatering = ref<SubInventoriesCatering[]>([]);
   const subingredientsCoffeeCatering = ref<SubInventoriesCoffee[]>([]);
   const dialoglog = ref(false);
   const History = ref<Checkingredient[]>([]);
@@ -31,6 +33,9 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
   const ingredientCheckListForRice = ref<
     { ingredientcheck: Ingredient; count: number; type: string }[]
   >([]);
+  const ingredientCheckListForCatering = ref<
+    { ingredientcheck: Ingredient; count: number; type: string }[]
+  >([]);
   const ingredientCheckList = ref<
     { ingredientcheck: Ingredient; count: number; type: string,lastPrice?:number }[]
   >([]);
@@ -42,25 +47,62 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
   const totalIngredients = ref(0);
   const currentPage = ref(1);
   const itemsPerPage = ref(5);
+  
+
 
   // watch for pagination
   watch([currentPage, itemsPerPage, searchQuery], () => {
     getIngredientsCoffeePaginate();
   });
+  watch([currentPage, itemsPerPage, searchQuery], () => {
+    getIngredientsRicePaginate();
+  });
+  watch([currentPage, itemsPerPage, searchQuery], () => {
+    getIngredientsCateringPaginate();
+  });
 
   // getToppingsPaginate
   const getIngredientsCoffeePaginate = async () => {
     try {
-      const response = await ingredientService.getIngredientsCoffeePaginate(currentPage.value, itemsPerPage.value, searchQuery.value);
-      console.log('getIngredientsCoffeePaginate', response.data);
-      if (response.status === 200) {
-        ingredientCheckListForCofee.value = response.data.data;
-        totalIngredients.value = response.data.total;
-      }
+        const response = await ingredientService.getIngredientsCoffeePaginate(currentPage.value, itemsPerPage.value, searchQuery.value);
+        console.log('getIngredientsCoffeePaginate', response.data);
+        if (response.status === 200) {
+            ingredientCheckListForCofee.value = response.data.data;
+            totalIngredients.value = response.data.total; // ตรวจสอบให้แน่ใจว่ามีค่าที่ถูกต้อง
+            console.log('Total Ingredients:', totalIngredients.value); // ตรวจสอบค่า total
+        }
     } catch (error) {
-      console.error('Error getting ingredientsCoffeePaginate:', error);
+        console.error('Error getting ingredientsCoffeePaginate:', error);
     }
-};
+  };
+
+  const getIngredientsRicePaginate = async () => {
+    try {
+        const response = await ingredientService.getIngredientsRicePaginate(currentPage.value, itemsPerPage.value, searchQuery.value);
+        console.log('getIngredientsRicePaginate', response.data);
+        if (response.status === 200) {
+            ingredientCheckListForRice.value = response.data.data;
+            totalIngredients.value = response.data.total;
+        }
+    } catch (error) {
+        console.error('Error getting ingredientsRicePaginate:', error);
+    }
+  };
+  
+  
+  const getIngredientsCateringPaginate = async () => {
+    try {
+        const response = await ingredientService.getIngredientsCateringPaginate(currentPage.value, itemsPerPage.value, searchQuery.value);
+        console.log('getIngredientsCateringPaginate', response.data);
+        if (response.status === 200) {
+            ingredientCheckListForCatering.value = response.data.data;
+            totalIngredients.value = response.data.total; // ตรวจสอบให้แน่ใจว่ามีค่าที่ถูกต้อง
+            console.log('Total Ingredients:', totalIngredients.value); // ตรวจสอบค่า total
+        }
+    } catch (error) {
+        console.error('Error getting ingredientsCateringPaginate:', error);
+    }
+  };
   
 
   const findByShopType = async () => {
@@ -73,6 +115,8 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
       console.error(error);
     }
   };
+
+
   const getLog = async () => {
     try {
       const response = await ingredientService.getLog();
@@ -378,8 +422,11 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
     createReturnWithdrawalIngredientsForCateringHistory,
     findByShopTypeCateringHistory,
     getIngredientsCoffeePaginate,
+    getIngredientsRicePaginate,
+    getIngredientsCateringPaginate,
     totalIngredients,
     currentPage,
-    itemsPerPage
+    itemsPerPage,
+    ingredientCheckListForCatering
   };
 });

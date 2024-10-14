@@ -8,6 +8,10 @@ const router = useRouter();
 
 
 onMounted(async () => {
+  await subIngredientStore.getIngredientsCoffeePaginate(); // โหลดข้อมูลเมื่อคอมโพเนนต์ถูกสร้าง
+});
+
+onMounted(async () => {
   await subIngredientStore.getSubIngredients_coffee();
 });
 
@@ -17,9 +21,15 @@ const navigateTo = (routeName: string) => {
 };
 
 // Watch for changes in the page and fetch new data
-watch(() => subIngredientStore.page, async (newValue) => {
-  await subIngredientStore.getSubIngredients_coffee();
-});
+watch(
+  () => subIngredientStore.currentPage, 
+  async () => {
+    await subIngredientStore.getIngredientsCoffeePaginate();
+  }
+);
+
+
+
 
 </script>
 
@@ -69,24 +79,27 @@ watch(() => subIngredientStore.page, async (newValue) => {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(item, index) in subIngredientStore.subingredients_coffee" :key="item.ingredient.ingredientId" style="text-align: center;">
-            <td>{{ index+1 }}</td>
-            <td>{{ item.ingredient.ingredientName }}</td>
-            <td>{{ item.quantity }}</td>
+          <tr v-for="(item, index) in subIngredientStore.subingredients_coffee.slice((subIngredientStore.currentPage - 1) * subIngredientStore.itemsPerPage, subIngredientStore.currentPage * subIngredientStore.itemsPerPage)" 
+              :key="item.ingredient.ingredientId" 
+              style="text-align: center;">
+              <td>{{ (subIngredientStore.currentPage - 1) * subIngredientStore.itemsPerPage + index + 1 }}</td>
+              <td>{{ item.ingredient.ingredientName }}</td>
+              <td>{{ item.quantity }}</td>
           </tr>
           <tr v-if="subIngredientStore.subingredients_coffee.length === 0">
-            <td colspan="3" class="text-center">ไม่มีข้อมูล</td>
+              <td colspan="3" class="text-center">ไม่มีข้อมูล</td>
           </tr>
-        </tbody>
+      </tbody>
         
       </v-table>
 
-      <v-pagination
-        justify="center"
-        v-model="subIngredientStore.page"
-        :length="subIngredientStore.lastPage"
-        rounded="circle"
-      ></v-pagination>
+      <v-pagination 
+        justify="center" 
+        v-model="subIngredientStore.currentPage" 
+        :length="Math.ceil(subIngredientStore.totalIngredients / subIngredientStore.itemsPerPage)">
+        rounded="circle">
+      </v-pagination>
+
     </v-card>
   </v-container>
 </template>

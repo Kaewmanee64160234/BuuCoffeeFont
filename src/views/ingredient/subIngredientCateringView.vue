@@ -7,24 +7,22 @@ import Swal from 'sweetalert2';
 
 const subIngredientStore = useSubIngredientStore();
 const router = useRouter();
-const paginate = ref(true);
-const page = computed(() => subIngredientStore.page);
-const take = computed(() => subIngredientStore.take);
-
 onMounted(async () => {
+  await subIngredientStore.getIngredientsCateringPaginate(); 
   await subIngredientStore.getSubIngredients_catering();
 });
+
 
 const navigateTo = (routeName: string) => {
   router.push({ name: routeName });
 };
 
-watch(paginate, async (newValue, oldValue) => {
-  if (newValue !== oldValue) {
-    await subIngredientStore.getAllIngredients();
-  }
-})
-
+watch(
+    () => subIngredientStore.currentPage, 
+    async () => {
+        await subIngredientStore.getIngredientsCateringPaginate(); // เรียกฟังก์ชันดึงข้อมูลเมื่อ currentPage เปลี่ยน
+    }
+);
 </script>
 
 <template>
@@ -69,24 +67,26 @@ watch(paginate, async (newValue, oldValue) => {
             <th style="text-align: center;font-weight: bold;">จำนวนคงเหลือ</th>
           </tr>
         </thead>
-        <tbody>
-          <tr v-for="(item, index) in subIngredientStore.subIngredients_catering" :key="index">
-            <td>{{ (page - 1) * take + index + 1 }}</td>
+        <tbody v-if="subIngredientStore.subIngredients_catering.length">
+          <tr v-for="(item, index) in subIngredientStore.subIngredients_catering.slice((subIngredientStore.currentPage - 1) * subIngredientStore.itemsPerPage, subIngredientStore.currentPage * subIngredientStore.itemsPerPage)" 
+              :key="item.ingredient.ingredientId" 
+              style="text-align: center;">
+            <td>{{ (subIngredientStore.currentPage - 1) * subIngredientStore.itemsPerPage + index + 1 }}</td>
             <td>{{ item.ingredient.ingredientName }}</td>
             <td>{{ item.quantity }}</td>
           </tr>
-        </tbody>
-        <tbody v-if="!subIngredientStore.subIngredients_catering.length">
+        </tbody>        
+        <tbody v-else>
           <tr>
-            <td colspan="9" class="text-center">No data</td>
+            <td colspan="3" class="text-center">No data</td>
           </tr>
         </tbody>
       </v-table>
       <v-pagination
-        justify="center"
-        v-model="subIngredientStore.page"
-        :length="subIngredientStore.lastPage"
-        rounded="circle"
+      justify="center" 
+      v-model="subIngredientStore.currentPage" 
+      :length="Math.ceil(subIngredientStore.totalIngredients / subIngredientStore.itemsPerPage)">
+      rounded="circle">
       ></v-pagination>
     </v-card>
   </v-container>
