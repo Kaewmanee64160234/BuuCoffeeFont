@@ -65,7 +65,10 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
   const getIngredientsCoffeePaginate = async () => {
     try {
         const response = await ingredientService.getIngredientsCoffeePaginate(currentPage.value, itemsPerPage.value, searchQuery.value);
-        console.log('getIngredientsCoffeePaginate', response.data);
+        console.log('getIngredientsCoffeePaginatexxxx', response.data);
+        currentPage.value,   // Current page
+        itemsPerPage.value,  // Items per page
+        searchQuery.value    // Search term
         if (response.status === 200) {
             ingredientCheckListForCofee.value = response.data.data;
             totalIngredients.value = response.data.total; // ตรวจสอบให้แน่ใจว่ามีค่าที่ถูกต้อง

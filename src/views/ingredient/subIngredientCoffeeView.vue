@@ -7,12 +7,13 @@ const subIngredientStore = useSubIngredientStore();
 const router = useRouter();
 
 
-onMounted(async () => {
-  await subIngredientStore.getIngredientsCoffeePaginate(); // โหลดข้อมูลเมื่อคอมโพเนนต์ถูกสร้าง
-});
+// onMounted(async () => {
+//   await subIngredientStore.getIngredientsCoffeePaginate(); // โหลดข้อมูลเมื่อคอมโพเนนต์ถูกสร้าง
+// });
 
 onMounted(async () => {
   await subIngredientStore.getSubIngredients_coffee();
+  await subIngredientStore.getIngredientsCoffeePaginate();
 });
 
 // Navigate to a different route
@@ -21,12 +22,12 @@ const navigateTo = (routeName: string) => {
 };
 
 // Watch for changes in the page and fetch new data
-watch(
-  () => subIngredientStore.currentPage, 
-  async () => {
-    await subIngredientStore.getIngredientsCoffeePaginate();
-  }
-);
+// watch(
+//   () => subIngredientStore.currentPage, 
+//   async () => {
+//     await subIngredientStore.getIngredientsCoffeePaginate();
+//   }
+// );
 
 
 
@@ -93,12 +94,19 @@ watch(
         
       </v-table>
 
-      <v-pagination 
+      <!-- <v-pagination 
         justify="center" 
         v-model="subIngredientStore.currentPage" 
         :length="Math.ceil(subIngredientStore.totalIngredients / subIngredientStore.itemsPerPage)">
         rounded="circle">
-      </v-pagination>
+      </v-pagination> -->
+      <v-pagination
+        justify="center"
+        v-model="subIngredientStore.currentPage"
+        :length="Math.ceil(subIngredientStore.totalIngredients / subIngredientStore.itemsPerPage)"
+        @input="subIngredientStore.getIngredientsCoffeePaginate "
+        rounded="circle"
+      ></v-pagination>
 
     </v-card>
   </v-container>
