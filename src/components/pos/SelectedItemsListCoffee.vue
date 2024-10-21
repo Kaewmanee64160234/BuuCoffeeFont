@@ -278,7 +278,7 @@ const selectReceipt = (receipt: Receipt) => {
 <template>
   <ReceiptDetailsDialogPos />
   <DrinkSelectionDialog />
-  <div class="h-screen app">
+  <div >
     <AddCustomerDialog />
 
     <v-window v-model="step" transition="fade" class="h-screen">
@@ -293,27 +293,27 @@ const selectReceipt = (receipt: Receipt) => {
             <v-divider class="divider" />
 
             <!-- Customer Info -->
-            <div class="customer-info pa-2">
+            <div class="customer-info pa-2" style="width: 96%;">
               <p class="customer-detail">
                 <span>สมาชิก</span>
                 <span class="info-value">{{ posStore.receipt.customer?.customerName ?? 'ไม่มี' }}</span>
               </p>
-              <p class="customer-detail">
+              <p class="customer-detail mr-4">
                 <span>แต้มสะสม</span>
                 <span class="info-value">{{ posStore.receipt.customer?.customerNumberOfStamp ?? 0 }} Point</span>
               </p>
             </div>
 
             <!-- Customer Actions -->
-            <v-row class="customer-actions mt-2">
+            <v-row class="customer-actions">
               <v-col cols="12" md="6">
                 <v-autocomplete v-model="selectedCustomer" :items="customerStore.customers.map(c => c.customerPhone)"
                   item-text="phone" item-value="phone" label="เบอร์โทรลูกค้า" variant="solo" dense
                   class="customer-phone-input" append-inner-icon="mdi-magnify" />
               </v-col>
-              <v-col cols="12" md="6" class="actions-end">
-                <v-btn class="add-customer-btn" icon="mdi-account-plus" @click="openCreateCustomerDialog()" />
-                <v-btn class="history-btn" @click="openReceiptDialog()">ประวัติการสั่งซื้อ</v-btn>
+              <v-col cols="12" md="3" class="actions-end mr-8">
+                <v-btn class="add-customer-btn" style="width: 40px; height: 40px;" icon="mdi-account-plus" @click="openCreateCustomerDialog()" />
+                <v-btn class="history-btn" style="width: 150px; height: 40px;" @click="openReceiptDialog()">ประวัติการสั่งซื้อ</v-btn>
               </v-col>
             </v-row>
 
@@ -324,7 +324,7 @@ const selectReceipt = (receipt: Receipt) => {
                 <v-col cols="12" md="6">
                   <h3 class="order-summary-title">สรุปรายการ</h3>
                 </v-col>
-                <v-col cols="12" md="6" class="text-end">
+                <v-col cols="12" md="5" class="text-end ml-5" >
                   <p @click="cancelReceipt()" class="cancel-order">ยกเลิกรายการ</p>
                 </v-col>
               </v-row>
@@ -386,8 +386,8 @@ const selectReceipt = (receipt: Receipt) => {
             <div class="order-summary">
               <v-divider class="divider" />
               <h3 class="order-summary-title">สรุปรายการ</h3>
-              <v-card-subtitle>โปรโมชั่น:</v-card-subtitle>
-              <div class="promotion-section">
+              <v-card-subtitle class="mt-2">โปรโมชั่น:</v-card-subtitle>
+              <div class="promotion-section mt-2">
                 <div class="promotion-list">
                   <div v-for="promotion in posStore.receipt.receiptPromotions" :key="promotion.receiptPromotionId" class="promotion-item">
                     <span class="promotion-name">{{ promotion.promotion.promotionName }}:</span>
@@ -410,7 +410,7 @@ const selectReceipt = (receipt: Receipt) => {
             </div>
           </div>
 
-          <div class="footer-buttons">
+          <div class="footer-buttons mt-10">
             <v-row class="d-flex justify-center">
               <v-btn class="next-step-btn" rounded @click="nextStep">ชำระเงิน</v-btn>
             </v-row>
@@ -519,6 +519,7 @@ const selectReceipt = (receipt: Receipt) => {
 .queue-number {
   color: #333;
   font-weight: 600;
+  margin-right: 10px;
 }
 
 .divider {
@@ -529,6 +530,7 @@ const selectReceipt = (receipt: Receipt) => {
 .customer-info {
   background-color: #ffffff;
   padding: 15px;
+  margin: 2px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -537,7 +539,7 @@ const selectReceipt = (receipt: Receipt) => {
   display: flex;
   justify-content: space-between;
   color: #333;
-  margin-bottom: 5px;
+  margin-bottom: 1px;
 }
 
 .customer-phone {
@@ -545,7 +547,8 @@ const selectReceipt = (receipt: Receipt) => {
 }
 
 .customer-actions {
-  margin-top: 10px;
+  margin-top: 8px;
+  margin-left: 1px;
   display: flex;
   align-items: center;
   justify-content: space-between;

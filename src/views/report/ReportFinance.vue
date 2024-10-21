@@ -23,7 +23,7 @@ function reloadData() {
       </v-card-title>
       <v-card-text>
         <v-row>
-          <v-col cols="12" md="4" class="my-2">
+          <v-col cols="12" md="4" class="my-1">
             <v-btn
               color="success"
               class="button-full-width"
@@ -34,7 +34,7 @@ function reloadData() {
               รายงานยอดขาย
             </v-btn>
           </v-col>
-          <v-col cols="12" md="4" class="my-2">
+          <v-col cols="12" md="4" class="my-1">
             <v-btn
               color="success"
               class="button-full-width"
@@ -45,7 +45,7 @@ function reloadData() {
               รายงานวัตถุดิบ
             </v-btn>
           </v-col>
-          <v-col cols="12" md="4" class="my-2">
+          <v-col cols="12" md="4" class="my-1">
             <v-btn
               color="success"
               class="button-full-width"
@@ -58,8 +58,8 @@ function reloadData() {
           </v-col>
         </v-row>
 
-        <v-row class="mt-4">
-          <v-col>
+        <v-row class="mt-1">
+          <!-- <v-col> -->
             <component 
               :is="activeComponent === 'finance' ? ReportFinanceComponant : null" 
               @reloadData="reloadData" 
@@ -70,7 +70,7 @@ function reloadData() {
             <component
               :is="activeComponent === 'product' ? ReportProductComponant : null"
             />
-          </v-col>
+          <!-- </v-col> -->
         </v-row>
       </v-card-text>
     </v-card>
@@ -79,7 +79,7 @@ function reloadData() {
 
 <style scoped>
 .fill-height {
-  height: 100%;
+  min-height: 100vh;
 }
 
 .fill-width {
@@ -88,6 +88,13 @@ function reloadData() {
 
 .button-full-width {
   width: 100%;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
 }
 
 @media (max-width: 768px) {

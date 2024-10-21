@@ -369,15 +369,16 @@ const showQueue = computed(() => {
               <v-text-field
                 v-model="barcode"
                 append-icon="mdi-barcode"
-                label="สแกนบาร์โค้ด"
+                label="แสกนบาร์โค้ด"
                 variant="solo"
                 dense
                 hide-details
                 @change="handleBarcodeInput"
                 style="background-color: #f1f1f1; border-radius: 8px"
+                class="ml-6"
               ></v-text-field>
             </v-col>
-            <v-col cols="12" md="6" class="d-flex justify-end align-center">
+            <v-col cols="12" md="5" class="d-flex justify-end align-center">
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
@@ -524,7 +525,7 @@ const showQueue = computed(() => {
 .product-card {
   width: 90%;
   max-width: 350px; /* Optional: Set a max-width for larger screens */
-  height: ; /* Adjust height */
+  height: fit-content; /* Adjust height */
   display: flex;
   flex-direction: column;
   align-items: start;
@@ -533,10 +534,12 @@ const showQueue = computed(() => {
   border-radius: 10px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   margin: 10px;
+  margin-left: 32px;
   transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
   background-color: #fff;
   position: relative; /* Enable positioning adjustments */
   top: -20px; /* Adjust to move the card further up */
+  margin-bottom: 73px;
 }
 
 .product-card:hover {

@@ -104,7 +104,7 @@ function getButtonClass(promotion: Promotion) {
 <template>
   <v-container>
     <v-carousel hide-delimiter-background hide-delimiters height="180"
-      style="background-color: #80715E; border-radius: 20px;">
+      style="background-color: #80715E; border-radius: 20px;" class="ml-1">
       <template v-if="userStore.currentUser.userRole == 'พนักงานขายข้าว'">
         <v-carousel-item v-for="(chunk, index) in promotionChunks" :key="chunk[index]">
 

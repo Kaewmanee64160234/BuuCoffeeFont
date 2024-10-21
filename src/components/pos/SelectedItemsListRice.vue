@@ -298,13 +298,13 @@ const selectReceipt = (receipt: Receipt) => {
 <template>
   <ReceiptDetailsDialogPos />
   <DrinkSelectionDialog />
-  <div class="h-screen app">
+  <div>
     <AddCustomerDialog />
 
     <v-window
       v-model="step"
       transition="fade"
-      class="h-screen window-container"
+      class="h-screen"
     >
       <!-- Order Details View -->
       <v-window-item :value="1" class="full-height">
@@ -318,7 +318,7 @@ const selectReceipt = (receipt: Receipt) => {
 
             <!-- Customer Actions -->
             <v-row class="d-flex align-center justify-end customer-actions">
-              <v-col cols="12" md="6" class="d-flex align-center justify-end">
+              <v-col cols="12" md="3" class="d-flex align-center justify-end mr-8">
                 <v-btn class="receipt-history-btn" @click="openReceiptDialog()">
                   ประวัติการสั่งซื้อ
                 </v-btn>
@@ -332,7 +332,7 @@ const selectReceipt = (receipt: Receipt) => {
                 <v-col cols="12" md="6">
                   <h3 class="order-summary-title">สรุปรายการ</h3>
                 </v-col>
-                <v-col cols="12" md="6" class="text-end">
+                <v-col cols="12" md="5" class="text-end ml-5">
                   <p @click="cancelReceipt()" class="cancel-receipt">
                     ยกเลิกรายการ
                   </p>
@@ -347,7 +347,7 @@ const selectReceipt = (receipt: Receipt) => {
             </div>
 
             <!-- Selected Items List -->
-            <div class="selected-items-list-50">
+            <div class="selected-items-list">
               <v-list class="full-width" style="height: 25vh">
                 <v-list-item-group>
                   <div
@@ -448,10 +448,10 @@ const selectReceipt = (receipt: Receipt) => {
             </div>
 
             <!-- Order Summary -->
-            <div class="summary-section-30">
-              <v-divider></v-divider>
+            <div >
+              <v-divider class="divider"></v-divider>
               <h3 class="order-summary-title">สรุปรายการ</h3>
-              <v-card-subtitle>โปรโมชั่น:</v-card-subtitle>
+              <v-card-subtitle class="mt-2">โปรโมชั่น:</v-card-subtitle>
               <div class="promotion-30">
                 <div class="sub-promotion">
                   <div
@@ -489,7 +489,7 @@ const selectReceipt = (receipt: Receipt) => {
           </div>
           <div class="footer-buttons">
             <v-row class="d-flex justify-center pr-6">
-              <v-btn class="next-step-btn" rounded @click="nextStep">
+              <v-btn class="next-step-btn mt-2" rounded @click="nextStep">
                 ชำระเงิน
               </v-btn>
             </v-row>
@@ -652,11 +652,12 @@ const selectReceipt = (receipt: Receipt) => {
   font-weight: bold;
 }
 
-.promotions-section {
+.promotions-section,
+.selected-items-list {
   overflow-y: auto;
-  max-height: 40vh;
-  margin-bottom: 20px;
-  padding-right: 15px;
+  max-height: 20vh;
+  margin-bottom: 10px;
+  padding-right: 10px;
 }
 
 .selected-items-list-50 {
@@ -818,5 +819,10 @@ const selectReceipt = (receipt: Receipt) => {
     width: 90%;
     margin-bottom: 10px;
   }
+}
+
+.divider {
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 </style>

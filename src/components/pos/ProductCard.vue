@@ -157,7 +157,7 @@ function decreaseSweetness() {
         กรุณาเลือกประเภทสินค้า
       </v-alert>
 
-      <v-row v-if="props.product.productTypes && props.product.productTypes.length > 0" class="mt-3">
+      <v-row v-if="props.product.productTypes && props.product.productTypes.length > 0" class="mt-1">
         <div class="d-flex flex-column " v-if="props.product.haveTopping == true">
           <span>ตัวเลือก</span>
           <div class="d-flex flex-wrap">
@@ -211,7 +211,7 @@ function decreaseSweetness() {
         </v-list>
       </div>
 
-      <div class="quantity-container d-flex justify-space-between align-center mt-4"
+      <div class="quantity-container d-flex justify-space-between align-center mt-2"
         v-if="props.product.haveTopping == true">
         <p class="pa-2">จำนวนสินค้า</p>
         <v-btn variant="elevated" color="#C5C5C5" @click="decreaseQuantity" icon="mdi-minus" size="x-small"></v-btn>
@@ -233,9 +233,9 @@ function decreaseSweetness() {
 .product-card {
   border-radius: 8px;
   width: 100%;
-  max-width: 300px;
-  padding: 8px;
-  margin: 8px;
+  max-width: fit-content;
+  padding: 4px;
+  margin: 4px;
 }
 
 .product-image {
