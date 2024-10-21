@@ -9,7 +9,12 @@ import ReceiptOld from '@/components/receipts/ReceiptOld.vue';
 
 const receiptsStore = useReceiptsStore();
 const receiptStore = useReceiptStore();
+// console.log(receiptStore.itemsPerPage)
+// console.log(receiptStore.totalReceipts)
+// console.log(receiptStore.totalReceipts / receiptStore.itemsPerPage)
+// console.log(receiptStore.getReceiptPaginate)
 
+// console.log(receiptStore.receipts)
 // Date Range Setup
 const currentDate = new Date();
 const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
@@ -27,6 +32,7 @@ const selectedReceipt = ref<Receipt | null>(null);
 const fetchData = async () => {
   await receiptsStore.fetchReceipts(startDate.value, endDate.value, receiptType.value);
 };
+
 
 // Export receipts to Excel
 const exportToExcel = async () => {
@@ -60,6 +66,7 @@ const s2ab = (s: string) => {
 // Lifecycle Hook - Fetch Receipts on Mount
 onMounted(async () => {
   await receiptStore.getAllReceipts();
+  await receiptStore.getReceiptPaginate();
 });
 
 // Open the receipt detail dialog
@@ -191,20 +198,34 @@ const statusText = (status: string) => {
         </thead>
 
         <tbody>
-          <tr v-for="(receipt, index) in filteredReceipts" :key="receipt.receiptId" @click="openHistoryReceiptDialog(receipt)">
-            <td class="text-center">{{ index + 1 }}</td>
+          <tr
+            v-for="(receipt, index) in receiptStore.receipts"
+            :key="receipt.receiptId"
+            style="text-align: center;"
+          >
+            <!-- Properly calculate the row number considering pagination -->
+            <td class="text-center">{{ index + 1 + (receiptStore.currentPage - 1) * receiptStore.itemsPerPage }}</td>
             <td class="text-center">{{ formatDate(receipt.createdDate) }}</td>
             <td :class="statusClass(receipt.receiptStatus)" class="text-center">{{ statusText(receipt.receiptStatus) }}</td>
             <td class="text-center">{{ receipt.receiptNetPrice }}</td>
             <td class="text-center">{{ receipt.receiptTotalDiscount }}</td>
             <td class="text-center">{{ receipt.customer?.customerName }}</td>
-            <td class="text-center">{{ receipt.receiptPromotions.map(promo => promo.promotion.promotionName).join(', ') }}</td>
+            <td class="text-center">{{ receipt.receiptPromotions?.map(promo => promo.promotionName).join(', ') || '-' }}</td>
             <td class="text-center">{{ receipt.paymentMethod }}</td>
             <td class="text-center">{{ receipt.user?.userName }}</td>
             <td class="text-center">{{ receipt.receiptType }}</td>
           </tr>
         </tbody>
+        
       </v-table>
+      <v-pagination
+        justify="center"
+        v-model="receiptStore.currentPage"
+        :length="Math.ceil(receiptStore.totalReceipts / receiptStore.itemsPerPage)"
+        @input="receiptStore.getReceiptPaginate "
+        rounded="circle"
+      ></v-pagination>
     </v-card>
   </v-container>
+  
 </template>

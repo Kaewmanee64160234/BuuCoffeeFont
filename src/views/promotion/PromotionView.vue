@@ -14,7 +14,7 @@
               hide-details 
               dense 
               variant="solo"
-              @input="getPromotionsPaginate"
+              @input="promotionStore.getPromotionsPaginate"
             ></v-text-field>
           </v-col>
           <v-spacer></v-spacer>
@@ -61,7 +61,7 @@
       
         <v-pagination
           v-model="promotionStore.currentPage"
-          :length="Math.ceil(promotionStore.totalItems / promotionStore.itemsPerPage)"
+          :length="Math.ceil(promotionStore.totalPromotions / promotionStore.itemsPerPage)"
           @input="promotionStore.getPromotionsPaginate "
           rounded="circle"
         ></v-pagination>

@@ -32,12 +32,13 @@ function getAllPromotions() {
   }
 
   // getPromotionsPaginate
-  function getPromotionsPaginate(params: { search: string; page: number; limit: number }) {
-    return http.get(`/promotions/paginate`, {
-      params,
+  const getPromotionsPaginate = (pageNumber: number, pageSize: number, searchTerm: string) => {
+    return http.get('/promotions/paginate', {
+      params: { search: searchTerm, page: pageNumber, limit: pageSize },
     });
-    
-  }
+  };
+  
+
   // get promotion by type
   function getPromotionByType(type: string) {
     return http.get(`/promotions/type/${type}`);

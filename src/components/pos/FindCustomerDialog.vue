@@ -64,11 +64,18 @@ const filteredCustomers = computed(() => {
 </template>
 
 <style scoped>
+.rounded-card .v-card {
+  border-radius: 30px;
+}
+
+.card-actions {
+  background-color: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+}
+
 .scroll {
-  max-height: 45vh;
-  /* สูงสุดสำหรับการมองเห็น */
-  overflow: scroll;
-  /* สำหรับการแสดงอุปกรณ์เลื่อน*/
+  max-height: 45vh; /* สูงสุดสำหรับการมองเห็น */
+  overflow-y: auto; /* สำหรับการแสดงอุปกรณ์เลื่อน */
 }
 
 .scroll::-webkit-scrollbar {
@@ -81,14 +88,11 @@ const filteredCustomers = computed(() => {
   border-radius: 999px;
 }
 
-.rounded-card .v-card {
-  border-radius: 30px;
+/* สำหรับการปรับขนาด dialog */
+.v-dialog {
+  max-width: 90vw; /* จำกัดความกว้างของ dialog */
+  max-height: 80vh; /* จำกัดความสูงของ dialog */
+  overflow: hidden; /* ซ่อน overflow ของ dialog */
 }
 
-.card-actions {
-  background-color: rgba(255, 255, 255, 0.9);
-  /* กำหนดสีพื้นหลัง */
-  backdrop-filter: blur(10px);
-  /* ใช้ filter */
-}
 </style>

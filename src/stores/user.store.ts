@@ -1,6 +1,7 @@
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { defineStore } from "pinia";
-import type { User } from "@/types/user.type";
+import { mapToUser, type User } from "@/types/user.type";
+import type { Role } from "@/types/role.type";
 import userService from "@/service/user.service";
 
 export const useUserStore = defineStore("user", () => {
@@ -64,14 +65,27 @@ export const useUserStore = defineStore("user", () => {
     try {
       const response = await userService.createUser(newUser);
       if (response.status === 201) {
-        users.value.push(response.data);
-        await getAllUsers(); // Ensure that all users are fetched again
-        user.value = null;
+        users.value.push(response.data); // เพิ่มผู้ใช้ใหม่เข้าในลิสต์โดยตรง
+        totalUsers.value += 1; // อัปเดตจำนวนผู้ใช้ทั้งหมด
+  
+        // ตรวจสอบว่ามีผู้ใช้เกินจำนวนที่แสดงต่อหน้าได้หรือไม่
+        const totalPages = Math.ceil(totalUsers.value / itemsPerPage.value);
+        if (currentPage.value < totalPages) {
+          currentPage.value = totalPages; // เปลี่ยนไปยังหน้าสุดท้าย
+        }
+  
+        // ตรวจสอบถ้าเราอยู่ในหน้าสุดท้าย ให้เรียกเพจจิเนชันเพื่อโหลดข้อมูลผู้ใช้ทั้งหมดใหม่
+        if (users.value.length > currentPage.value * itemsPerPage.value) {
+          await getUserPaginate();
+        }
       }
     } catch (error) {
       console.error("Error creating user:", error);
     }
   };
+  
+  
+  
 
   const updateUser = async (id: number, updatedUser: User) => {
     try {
@@ -85,6 +99,7 @@ export const useUserStore = defineStore("user", () => {
         user.value = null;
         return updatedUser;
       }
+      await getUserPaginate();
     } catch (error) {
       console.error("Failed to update user:", error);
       throw error;
@@ -123,6 +138,32 @@ export const useUserStore = defineStore("user", () => {
     userRole.value = "พนักงานขายกาแฟ"; // Default role
   };
 
+  // watch productStore.currentPage
+  watch([currentPage, itemsPerPage, searchQuery], () => {
+    getUserPaginate();
+  });
+
+  // getuser pageginate
+  const getUserPaginate = async () => {
+    try {
+      const response = await userService.getUserPaginate(
+        currentPage.value,
+        itemsPerPage.value,
+        searchQuery.value
+      );
+      console.log("getUserPaginate", response.data);
+      if (response.status === 200) {
+        users.value = response.data.data.map((user: any) =>
+          mapToUser(user)
+        );
+        console.log("users", users.value);
+        totalUsers.value = response.data.total;
+      }
+    } catch (error) {
+      // console.error(error);
+      console.log("error", error);
+    }
+  };
   return {
     users,
     user,
@@ -144,6 +185,7 @@ export const useUserStore = defineStore("user", () => {
     currentPage,
     itemsPerPage,
     totalUsers,
-    detailUserDialog
+    detailUserDialog,
+    getUserPaginate
   };
 });

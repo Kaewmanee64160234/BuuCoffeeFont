@@ -8,12 +8,14 @@ import type { ReportIngredientLog } from "@/types/pairsWithdrawalReturn.type";
 import type { Ingredient } from "@/types/ingredient.type";
 import { useUserStore } from "./user.store";
 import { useMessageStore } from './message'; // Update the path if necessary
+import type { SubInventoriesRice } from "@/types/subinventoriesrice.type";
+import type { SubInventoriesCatering } from "@/types/subinventoriescateringtype";
 
 export const useSubIngredientStore = defineStore("subinventory", () => {
   const subingredients_coffee = ref<SubInventoriesCoffee[]>([]);
   const subIngredients_catering = ref<SubInventoriesCoffee[]>([]);
-  const subingredients_rice = ref<SubInventoriesCoffee[]>([]);
-  const subingredientsRiceCatering = ref<SubInventoriesCoffee[]>([]);
+  const subingredients_rice = ref<SubInventoriesRice[]>([]);
+  const subingredientsRiceCatering = ref<SubInventoriesCatering[]>([]);
   const subingredientsCoffeeCatering = ref<SubInventoriesCoffee[]>([]);
   const dialoglog = ref(false);
   const History = ref<Checkingredient[]>([]);
@@ -31,6 +33,9 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
   const ingredientCheckListForRice = ref<
     { ingredientcheck: Ingredient; count: number; type: string }[]
   >([]);
+  const ingredientCheckListForCatering = ref<
+    { ingredientcheck: Ingredient; count: number; type: string }[]
+  >([]);
   const ingredientCheckList = ref<
     { ingredientcheck: Ingredient; count: number; type: string,lastPrice?:number }[]
   >([]);
@@ -38,46 +43,70 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
 
 
   // about pagination
-  const page = ref(1);
-  const take = ref(5);
-  const keyword = ref("");
-  const order = ref("ASC");
-  const orderBy = ref("");
-  const lastPage = ref(0);
-  watch(page, async (newPage, oldPage) => {
-    await getAllIngredients();
+  const searchQuery = ref<string>("");
+  const totalIngredients = ref(0);
+  const currentPage = ref(1);
+  const itemsPerPage = ref(5);
+  
+
+
+  // watch for pagination
+  watch([currentPage, itemsPerPage, searchQuery], () => {
+    getIngredientsCoffeePaginate();
   });
-  watch(keyword, async (newKey, oldKey) => {
-    if (keyword.value.length >= 3) {
-      await getAllIngredients();
-    }
-    if (keyword.value.length === 0) {
-      await getAllIngredients();
-    }
+  watch([currentPage, itemsPerPage, searchQuery], () => {
+    getIngredientsRicePaginate();
   });
-  watch(lastPage, async (newlastPage, oldlastPage) => {
-    if (newlastPage < page.value) {
-      page.value = 1;
-    }
+  watch([currentPage, itemsPerPage, searchQuery], () => {
+    getIngredientsCateringPaginate();
   });
 
-  async function getAllIngredients() {
+  // getToppingsPaginate
+  const getIngredientsCoffeePaginate = async () => {
     try {
-      const res = await ingredientService.getAllIngredients({
-        page: page.value,
-        take: take.value,
-        keyword: keyword.value,
-        order: order.value,
-        orderBy: orderBy.value,
-      });
-      subingredients_coffee.value = res.data.data;
-
-      lastPage.value = res.data.lastPage;
-    } catch (e) {
-      console.log(e);
-      messageStore.showError("Oops!, cannot get ingredients.");
+        const response = await ingredientService.getIngredientsCoffeePaginate(currentPage.value, itemsPerPage.value, searchQuery.value);
+        console.log('getIngredientsCoffeePaginatexxxx', response.data);
+        currentPage.value,   // Current page
+        itemsPerPage.value,  // Items per page
+        searchQuery.value    // Search term
+        if (response.status === 200) {
+            ingredientCheckListForCofee.value = response.data.data;
+            totalIngredients.value = response.data.total; // ตรวจสอบให้แน่ใจว่ามีค่าที่ถูกต้อง
+            console.log('Total Ingredients:', totalIngredients.value); // ตรวจสอบค่า total
+        }
+    } catch (error) {
+        console.error('Error getting ingredientsCoffeePaginate:', error);
     }
-  }
+  };
+
+  const getIngredientsRicePaginate = async () => {
+    try {
+        const response = await ingredientService.getIngredientsRicePaginate(currentPage.value, itemsPerPage.value, searchQuery.value);
+        console.log('getIngredientsRicePaginate', response.data);
+        if (response.status === 200) {
+            ingredientCheckListForRice.value = response.data.data;
+            totalIngredients.value = response.data.total;
+        }
+    } catch (error) {
+        console.error('Error getting ingredientsRicePaginate:', error);
+    }
+  };
+  
+  
+  const getIngredientsCateringPaginate = async () => {
+    try {
+        const response = await ingredientService.getIngredientsCateringPaginate(currentPage.value, itemsPerPage.value, searchQuery.value);
+        console.log('getIngredientsCateringPaginate', response.data);
+        if (response.status === 200) {
+            ingredientCheckListForCatering.value = response.data.data;
+            totalIngredients.value = response.data.total; // ตรวจสอบให้แน่ใจว่ามีค่าที่ถูกต้อง
+            console.log('Total Ingredients:', totalIngredients.value); // ตรวจสอบค่า total
+        }
+    } catch (error) {
+        console.error('Error getting ingredientsCateringPaginate:', error);
+    }
+  };
+  
 
   const findByShopType = async () => {
     try {
@@ -89,6 +118,8 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
       console.error(error);
     }
   };
+
+
   const getLog = async () => {
     try {
       const response = await ingredientService.getLog();
@@ -362,13 +393,6 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
   }
 
   return {
-    page,
-    keyword,
-    take,
-    order,
-    orderBy,
-    lastPage,
-    getAllIngredients,
     subingredients_coffee,
     subingredients_rice,
     History,
@@ -399,6 +423,13 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
     findByShopTypeCatering,
     HistoryCatering,
     createReturnWithdrawalIngredientsForCateringHistory,
-    findByShopTypeCateringHistory
+    findByShopTypeCateringHistory,
+    getIngredientsCoffeePaginate,
+    getIngredientsRicePaginate,
+    getIngredientsCateringPaginate,
+    totalIngredients,
+    currentPage,
+    itemsPerPage,
+    ingredientCheckListForCatering
   };
 });

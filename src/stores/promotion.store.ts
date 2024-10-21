@@ -12,7 +12,7 @@ export const usePromotionStore = defineStore("promotion", () => {
 
   const currentPage = ref(1);
   const itemsPerPage = ref(5);
-  const totalItems = ref(0);
+  const totalPromotions = ref(0);
   
   const promotionTypes = [
     { text: "ส่วนลดเป็นจำนวนเงิน", value: "discountPrice" },
@@ -49,21 +49,27 @@ export const usePromotionStore = defineStore("promotion", () => {
 
   const getPromotionsPaginate = async () => {
     try {
-      const res = await promotionService.getPromotionsPaginate({
-        search: searchQuery.value,
-        page: currentPage.value,
-        limit: itemsPerPage.value,
-      });
-      if (res.data) {
-        promotions.value = res.data.data;
-        totalItems.value = res.data.total;
-
-        console.log(res.data);
+      // Call the promotion service to fetch paginated data
+      const response = await promotionService.getPromotionsPaginate(
+        currentPage.value,   // Current page
+        itemsPerPage.value,  // Items per page
+        searchQuery.value    // Search term
+      );
+  
+      // Log the response for debugging
+      console.log('getPromotionsPaginate', response.data);
+  
+      if (response.status === 200) {
+        // Update promotions and total promotions in the store
+        promotions.value = response.data.data;   // Assign fetched promotion data
+        totalPromotions.value = response.data.total;  // Total number of promotions
       }
     } catch (error) {
-      console.error(error);
+      // Handle errors and log them
+      console.error('Error getting promotions:', error);
     }
   };
+  
 
   // Create a new promotion
   const createPromotion = async (promotion: Promotion) => {
@@ -154,7 +160,7 @@ export const usePromotionStore = defineStore("promotion", () => {
     currentPage,
     itemsPerPage,
     getPromotionsPaginate,
-    totalItems,
+    totalPromotions,
     promotionTypes,
     getPromotionByType,
   };

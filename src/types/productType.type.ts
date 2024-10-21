@@ -9,7 +9,7 @@ export interface ProductType {
   selectedIngredients?: number[];
   ingredientQuantities?: IngredientQuantities;
   product?: Product;
-  disable: boolean;
+  disable?: boolean;
 }
 
 export interface IngredientQuantities {

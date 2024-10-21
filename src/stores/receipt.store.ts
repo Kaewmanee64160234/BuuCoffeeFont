@@ -1,6 +1,6 @@
 import { ref, computed, watch } from "vue";
 import { defineStore } from "pinia";
-import type { Receipt } from "@/types/receipt.type";
+import { mapToReceipt, type Receipt } from "@/types/receipt.type";
 import receiptService from "@/service/receipt.service";
 import { useUserStore } from "./user.store";
 import { usePosStore } from "./pos.store";
@@ -19,9 +19,9 @@ export const useReceiptStore = defineStore("receipt", () => {
   const currentReceipt = ref({});
   const posStore = usePosStore();
 
-  const currentPage = ref(1); // Current page number
-  const itemsPerPage = ref(8); // Number of items per page
-  const totalReceipts = ref(0); // Total number of users
+  const currentPage = ref(1);
+  const itemsPerPage = ref(5); 
+  const totalReceipts = ref(0); 
 
   const getAllReceipts = async () => {
     try {
@@ -55,17 +55,22 @@ export const useReceiptStore = defineStore("receipt", () => {
 
   const createReceipt = async (newReceipt: Receipt) => {
     try {
-      isLoading.value = true;
       const response = await receiptService.createReceipt(newReceipt);
       if (response.status === 201) {
-        receipts.value.push(response.data);
-        await getAllReceipts();
+        receipts.value.push(response.data); // เพิ่มผู้ใช้ใหม่เข้าในลิสต์โดยตรง
+        totalReceipts.value += 1; // อัปเดตจำนวนผู้ใช้ทั้งหมด
+  
+        // ตรวจสอบว่ามีผู้ใช้เกินจำนวนที่แสดงต่อหน้าได้หรือไม่
+        const totalPages = Math.ceil(totalReceipts.value / itemsPerPage.value);
+        if (currentPage.value < totalPages) {
+          currentPage.value = totalPages; // เปลี่ยนไปยังหน้าสุดท้าย
+        }
+        
+        // โหลดข้อมูลผู้ใช้ใหม่
+        await getReceiptPaginate();
       }
     } catch (error) {
       console.error("Error creating receipt:", error);
-      errorMessage.value = "เกิดข้อผิดพลาดในการสร้างใบเสร็จ";
-    } finally {
-      isLoading.value = false;
     }
   };
 
@@ -108,6 +113,7 @@ export const useReceiptStore = defineStore("receipt", () => {
         receipts.value = response.data;
         console.log("receipts getRecieptIn30Min", receipts.value);
       }
+      await getReceiptPaginate();
     } catch (error) {
       console.error(error);
       errorMessage.value = "ไม่สามารถโหลดข้อมูลใบเสร็จใน 30 นาทีได้";
@@ -124,6 +130,7 @@ export const useReceiptStore = defineStore("receipt", () => {
         receipts.value = response.data;
         console.log("receipts", receipts.value);
       }
+      await getReceiptPaginate();
     } catch (error) {
       console.error(error);
       errorMessage.value = "ไม่สามารถโหลดข้อมูลใบเสร็จรับรองใน 24 ชั่วโมงได้";
@@ -163,39 +170,49 @@ export const useReceiptStore = defineStore("receipt", () => {
       if (receipt) {
         currentReceipt.value = JSON.parse(receipt); // Use = for assignment
       }
+      await getReceiptPaginate();
     } catch (error) {
-      console.error('Error getting current user:', error);
+      console.error('Error getting current receipt:', error);
     }
   };
 
-  const getReceiptsPaginate = async () => {
+  const getReceiptPaginate = async () => {
+    // console.log(currentPage.value)
+    // console.log(itemsPerPage.value)
     try {
-      const res = await receiptService.getReceiptsPaginate({
-        search: searchQuery.value, // Handle empty search query
-        page: currentPage.value > 0 ? currentPage.value : 1, // Ensure page is a positive number
-        limit: itemsPerPage.value > 0 ? itemsPerPage.value : 8, // Ensure limit is a positive number
-    });
-      if (res.status === 200) {
-        receipts.value = res.data.data;
-        totalReceipts.value = res.data.total;
-      } else {
-        throw new Error('Failed to fetch paginated receipts');
+      // Call the promotion service to fetch paginated data
+      const response = await receiptService.getReceiptPaginate(
+        // 15,
+        // 0,
+        // ''
+        currentPage.value,   // Current page
+        itemsPerPage.value,  // Items per page
+        searchQuery.value    // Search term
+      );
+  
+      // Log the response for debugging
+      console.log('getReceiptPaginate', response.data);
+  
+      if (response.status === 200) {
+        // Update receipts and total receipts in the store
+        receipts.value = response.data.data;   // Assign fetched receipt data
+        totalReceipts.value = response.data.total;  // Total number of receipts
       }
     } catch (error) {
-      console.error(error);
-      errorMessage.value = 'Error fetching paginated receipts';
+      // Handle errors and log them
+      console.error('Error getting receipts:', error);
     }
   };
 
-  watch([searchQuery, currentPage], async () => {
-    await getReceiptsPaginate();
+
+   watch([currentPage, itemsPerPage, searchQuery], async () => {
+    await getReceiptPaginate();
   });
 
-  
   return {
     setReceiptForEdit,
     getCurrentReceipt,
-    getReceiptsPaginate,
+    getReceiptPaginate,
     currentPage,
     itemsPerPage,
     totalReceipts,

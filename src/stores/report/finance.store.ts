@@ -87,7 +87,7 @@ export const useReportFinnceStore = defineStore("cashier", () => {
     try {
       const res = await financeService.getcoffeeSummary();
       if (res.data) {
-        coffeeSummary.value = res.data;
+        coffeeSummary.value = res.data.toFixed(2);
       }
     } catch (error) {
       console.error(error);

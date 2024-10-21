@@ -1,6 +1,6 @@
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { defineStore } from 'pinia';
-import type { Customer } from '@/types/customer.type';
+import { mapToCustomer, type Customer } from '@/types/customer.type';
 import customerService from '@/service/customer.service';
 import { usePosStore } from './pos.store';
 
@@ -44,7 +44,7 @@ export const useCustomerStore = defineStore('customer', () => {
     try {
       const response = await customerService.createCustomer(newCustomer);
       if (response.status === 201) {
-        customers.value.push(response.data); // Add new customer locally
+        customers.value = customers.value.concat(response.data); // Add new customer locally
         totalCustomers.value += 1; // Update total customers count
         posStore.receipt.customer = response.data;
         console.log('Customer created:', response.data);
@@ -54,6 +54,7 @@ export const useCustomerStore = defineStore('customer', () => {
           currentPage.value = Math.ceil(customers.value.length / itemsPerPage.value);
         }
       }
+      await getCustomerPaginate();
     } catch (error) {
       console.error('Error creating customer:', error);
     }
@@ -71,6 +72,7 @@ export const useCustomerStore = defineStore('customer', () => {
         }
         return updatedCustomer;
       }
+      await getCustomerPaginate();
     } catch (error) {
       console.error('Failed to update customer:', error);
       throw error;
@@ -98,6 +100,33 @@ export const useCustomerStore = defineStore('customer', () => {
     openDialogFindCustomer.value = false;
   };
 
+  // watch productStore.currentPage
+  watch([currentPage, itemsPerPage, searchQuery], () => {
+    getCustomerPaginate();
+  });
+
+  // getcustomer pageginate
+  const getCustomerPaginate = async () => {
+    try {
+      const response = await customerService.getCustomerPaginate(
+        currentPage.value,
+        itemsPerPage.value,
+        searchQuery.value
+      );
+      console.log("getCustomerPaginate", response.data);
+      if (response.status === 200) {
+        customers.value = response.data.data.map((customer: any) =>
+          mapToCustomer(customer)
+        );
+        console.log("products", customers.value);
+        totalCustomers.value = response.data.total;
+      }
+    } catch (error) {
+      // console.error(error);
+      console.log("error", error);
+    }
+  };
+
   return {
     customers,
     customer,
@@ -115,6 +144,7 @@ export const useCustomerStore = defineStore('customer', () => {
     openDialogRegisterCustomer,
     currentPage,
     itemsPerPage,
-    totalCustomers
+    totalCustomers,
+    getCustomerPaginate,
   };
 });

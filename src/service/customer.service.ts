@@ -24,11 +24,23 @@ function searchCustomers(query: string) {
   });
 }
 
+//  getProductPaginate by add query page and size
+function getCustomerPaginate(page: number, size: number,search : string) {
+  return http.get(`/customers/paginate`, {
+    params: {
+      page,
+      limit: size,
+      search
+    }
+  });
+
+}
 export default {
   getAllCustomers,
   getCustomerById,
   createCustomer,
   updateCustomer,
   deleteCustomer,
-  searchCustomers
+  searchCustomers,
+  getCustomerPaginate
 };

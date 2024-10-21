@@ -24,11 +24,24 @@ function searchUsers(query: string) {
   });
 }
 
+//  getProductPaginate by add query page and size
+function getUserPaginate(page: number, size: number,search : string) {
+  return http.get(`/users/paginate`, {
+    params: {
+      page,
+      limit: size,
+      search
+    }
+  });
+
+}
+
 export default {
   getAllUsers,
   getUserById,
   createUser,
   updateUser,
   deleteUser,
-  searchUsers
+  searchUsers,
+  getUserPaginate
 };

@@ -98,27 +98,25 @@ const loginHandler = async () => {
 </script>
 
 <style scoped>
-.headline {
-  text-align: center;
-  font-size: 24px;
-  margin-top: 10px;
+/* Default styles for large screens */
+.v-card {
+  width: 450px; /* Keep the original card width */
 }
 
-.logo {
-  width: 80px;
-  height: 80px;
+.character-top-left {
+  position: absolute;
+  left: 460px;
+  top: 50px;
+  width: 200px;
+  height: auto;
 }
 
-.v-btn {
-  width: 100%;
-}
-
-.fill-height {
-  height: 100vh;
-}
-
-.white--text {
-  color: #fff !important;
+.character-bottom-right {
+  position: absolute;
+  right: 450px;
+  bottom: 60px;
+  width: 180px;
+  height: auto;
 }
 
 .background-image {
@@ -132,34 +130,59 @@ const loginHandler = async () => {
   z-index: -1; /* Ensure the background is behind other elements */
 }
 
-.character-top-left {
-  position: absolute;
-  top: 50px; /* Adjust position */
-  left: 460px; /* Adjust position */
-  width: 200px; /* Adjust size as needed */
-  height: auto;
-  z-index: 1; /* Ensure it is above the card */
+/* For screens with a max width of 1024px (Tablets) */
+@media (max-width: 1024px) {
+  .v-card {
+    width: 70%; /* Adjust the card width */
+  }
+
+  .character-top-left {
+    left: 55%; /* Adjust character positioning */
+    top: -10px;
+    width: 150px; /* Scale down character */
+  }
+
+  .character-bottom-right {
+    right: 55%;
+    bottom: -10px;
+    width: 150px; /* Scale down character */
+  }
+
+  .logo {
+    width: 60%; /* Adjust logo size */
+    height: auto;
+  }
 }
 
-.character-bottom-right {
-  position: absolute;
-  bottom: 60px; /* Adjust position */
-  right: 450px; /* Adjust position */
-  width: 180px; /* Adjust size as needed */
-  height: auto;
-  z-index: 1; /* Ensure it is above the card */
+/* For screens with a max width of 600px (Mobile) */
+@media (max-width: 600px) {
+  .v-card {
+    width: 90%; /* Make card width larger for small screens */
+  }
+
+  .character-top-left {
+    position: fixed;
+    left: 10%; /* เปอร์เซ็นต์จากขอบซ้าย */
+    top: 10%; /* เปอร์เซ็นต์จากขอบบน */
+    transform: translate(-50%, -50%); /* ปรับตำแหน่งให้ตรงกลาง */
+    width: 15vw; /* ขนาดของรูป */
+    height: auto;
+  }
+  
+  .character-bottom-right {
+    position: fixed;
+    right: 10%; /* เปอร์เซ็นต์จากขอบขวา */
+    bottom: 10%; /* เปอร์เซ็นต์จากขอบล่าง */
+    transform: translate(50%, 50%); /* ปรับตำแหน่งให้ตรงกลาง */
+    width: 15vw; /* ขนาดของรูป */
+    height: auto;
+  }
+  
+
+  .logo {
+    width: 50%; /* Adjust logo size for mobile */
+    height: auto;
+  }
 }
 
-.v-btn.login-btn {
-  width: 50%;
-  border: 2px solid #C5C5C5; /* เพิ่มเส้นขอบให้ปุ่ม */
-  color: #2B28A3;
-  text-transform: uppercase;
-  font-weight: bold;
-}
-
-.v-btn.login-btn:hover {
-  background-color: #C5C5C5;
-  color: white;
-}
 </style>

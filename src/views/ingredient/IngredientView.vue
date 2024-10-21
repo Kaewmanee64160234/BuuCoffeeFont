@@ -66,11 +66,11 @@ watch(paginate, async (newValue, oldValue) => {
     <v-card>
       <v-card-title>
         <v-row>
-          <v-col cols="9" style="padding: 20px;">
+          <v-col cols="9" style="padding: 10px;">
           <h3>คลังวัตถุดิบ</h3>
           </v-col>
           <v-col cols="3">
-            <v-text-field label="ค้นหารายการวัตถุดิบ" append-inner-icon="mdi-magnify" dense hide-details variant="solo"
+            <v-text-field style="height: fit-content;" label="ค้นหารายการวัตถุดิบ" append-inner-icon="mdi-magnify" dense hide-details variant="solo"
             outlined v-model="ingredientStore.keyword"></v-text-field>
           </v-col>
         </v-row>
@@ -86,7 +86,7 @@ watch(paginate, async (newValue, oldValue) => {
 
 
           <v-col>
-            <v-menu v-model="menu1" offset-y>
+            <v-menu v-model="menu1" >
               <template v-slot:activator="{ props }">
                 <v-btn color="success" class="button-full-width" v-bind="props">
                   <v-icon left>mdi-arrow-down-thick</v-icon>
@@ -105,7 +105,7 @@ watch(paginate, async (newValue, oldValue) => {
           </v-col>
 
           <v-col>
-            <v-menu v-model="menu2" offset-y>
+            <v-menu v-model="menu2" >
               <template v-slot:activator="{ props }">
                 <v-btn color="red" class="button-full-width" v-bind="props">
                   <v-icon left>mdi-arrow-up-thick</v-icon>
@@ -123,7 +123,7 @@ watch(paginate, async (newValue, oldValue) => {
             </v-menu>
           </v-col>
           <v-col>
-            <v-menu v-model="menu3" offset-y>
+            <v-menu v-model="menu3" >
               <template v-slot:activator="{ props }">
                 <v-btn color="red" class="button-full-width" v-bind="props">
                   <v-icon left>mdi-swap-vertical-bold</v-icon>
@@ -161,7 +161,7 @@ watch(paginate, async (newValue, oldValue) => {
           <tr v-for="(item, index) in ingredientStore.ingredients" :key="index">
             <td>{{ (page - 1) * take + index + 1 }}</td>
             <td>
-              <v-img :src="`http://localhost:3000/ingredients/${item.ingredientId}/image`" height="100"></v-img>
+              <v-img :src="`http://localhost:3000/ingredients/${item.ingredientId}/image`" height="73"></v-img>
             </td>
             <td>{{ item.ingredientName }}</td>
             <td>{{ item.ingredientSupplier }}</td>
@@ -201,8 +201,8 @@ watch(paginate, async (newValue, oldValue) => {
 }
 
 th, td {
-  padding-top: 12px !important; 
-  padding-bottom: 12px !important; 
+  padding-top: 9px !important; 
+  padding-bottom: 9px !important; 
   text-align: center !important; 
 }
 
