@@ -486,8 +486,8 @@ const selectReceipt = (receipt: Receipt) => {
 
           <div class="footer-buttons">
             <v-row class="d-flex justify-center pr-6">
-              <v-btn class="prev-step-btn" rounded @click="prevStep">ย้อนกลับ</v-btn>
-              <v-btn class="save-btn" rounded @click="save">ยืนยันการชำระเงิน</v-btn>
+              <v-btn class="prev-step-btn mt-5" rounded @click="prevStep">ย้อนกลับ</v-btn>
+              <v-btn class="save-btn ml-3 mt-5" rounded @click="save">ยืนยันการชำระเงิน</v-btn>
             </v-row>
           </div>
         </div>
