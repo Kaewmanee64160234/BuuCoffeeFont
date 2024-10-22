@@ -9,6 +9,7 @@ import type {
   ProductType,
 } from "@/types/productType.type";
 import { useUserStore } from "./user.store";
+import type { Meal } from "@/types/catering/meal.type";
 
 export const useProductStore = defineStore("product", () => {
   const products = ref<Product[]>([]);
@@ -17,6 +18,7 @@ export const useProductStore = defineStore("product", () => {
   const searchQuery = ref<string>("");
   const searchQueryPos = ref<string>("");
   const ProductTypes = ref<ProductType[]>([]);
+  const meals = ref<Meal[]>([]);
   const editedProduct = ref<Product & { file: File }>({
     productId: 0,
     productName: "",
@@ -296,5 +298,6 @@ export const useProductStore = defineStore("product", () => {
     storeName,
     countingPoint,
     getProductByStoreType,
+    meals
   };
 });

@@ -134,7 +134,7 @@
               คลังร้านข้าว
             </v-list-item>
 
-            <v-list-item to="/ingredientCateringList">
+            <v-list-item to="/รท">
               <template v-slot:prepend>
                 <img
                   src="../../src/components/img/buffet.png"
@@ -165,7 +165,7 @@
 
         <v-expand-transition>
           <v-list v-show="showCatering" style="padding-left: 33px">
-            <v-list-item to="/importingredientcatering">
+            <v-list-item to="/pos-catering">
               <template v-slot:prepend>
                 <img
                   src="../../src/components/img/catering.png"

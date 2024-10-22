@@ -81,12 +81,18 @@ const router = createRouter({
         import("../views/ingredient/import/importIngredientView.vue"),
       // meta: { requiresAuth: true },
     },
+    // {
+    //   path: "/importingredientCatering",
+    //   name: "importingredientCatering",
+    //   component: () =>
+    //     import("../views/ingredient/catering/importIngredientCateringView.vue"),
+    //   meta: { requiresAuth: true },
+    // },
     {
-      path: "/importingredientCatering",
-      name: "importingredientCatering",
-      component: () =>
-        import("../views/ingredient/catering/importIngredientCateringView.vue"),
-      meta: { requiresAuth: true },
+      path: "/pos-catering",
+      name: "pos-catering",
+      component: () => import("../views/pos/PosCateringView.vue"),
+
     },
     {
       path: "/importingredient-history",
@@ -227,11 +233,11 @@ const router = createRouter({
       component: () => import("../views/LoginView.vue"),
     },
     // PosCateringView
-    {
-      path: "/pos-catering",
-      name: "posCatering",
-      component: () => import("../views/pos/PosCateringView.vue"),
-    },
+    // {
+    //   path: "/pos-catering",
+    //   name: "posCatering",
+    //   component: () => import("../views/pos/PosCateringView.vue"),
+    // },
     // historyReceiptCatering
     {
       path: "/historyReceiptCatering",

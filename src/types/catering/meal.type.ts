@@ -1,16 +1,17 @@
 import type { Ingredient } from "../ingredient.type";
+import type { Product } from "../product.type";
 
 export interface Meal {
     mealName: string;
     totalPrice: number;
     mealTime: string;
     cateringEventId: number;
-    mealIngredient: MealIngredient[];
+    mealProducts: MealProduct[];
     
  }
- export interface MealIngredient {
+ export interface MealProduct {
     mealId: number;
-    ingredient: Ingredient;
+    product: Product;
     quantity: number;
     totalPrice: number;
     type: string; // riceShop coffeeShop
