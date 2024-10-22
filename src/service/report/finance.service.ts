@@ -53,6 +53,21 @@ function getRevenue() {
 function getExpenditure() {
   return http.get("/importingredients/expenditure");
 }
+
+// http://localhost:3000/catering-event
+function cateringEvent() {
+  return http.get(`/catering-event`);
+}
+// catering event pageinate
+function cateringEventPaginate(page: number, limit: number) {
+  return http.get(`/catering-event/paginate`, {
+    params: {
+      page,
+      limit
+    }
+  });
+}
+
 export default {
   getfindToday,
   getGroupedFinanceFood,
@@ -69,6 +84,8 @@ export default {
   getRevenue,
   getExpenditure,
   getTopSellingProducts,
-  getIngradientsUsage
+  getIngradientsUsage,
+  cateringEvent,
+  cateringEventPaginate
 
 };

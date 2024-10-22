@@ -1,23 +1,23 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from 'vue';
-import PromotionCardsCarousel from '@/components/pos/PromotionCardsCarousel.vue';
-import ProductCard from '@/components/pos/ProductCard.vue';
-import SelectedItemsList from '@/components/pos/SelectedItemsListRice.vue';
-import DrinkSelectionDialog from '@/components/pos/DrinkSelectionDialog.vue';
-import ReceiptDialog from '@/components/pos/ReceiptDialog.vue';
-import { useProductStore } from '@/stores/product.store';
-import { useCategoryStore } from '@/stores/category.store';
-import { usePromotionStore } from '@/stores/promotion.store';
-import { useToppingStore } from '@/stores/topping.store';
-import { useUserStore } from '@/stores/user.store';
-import { useCustomerStore } from '@/stores/customer.store';
-import { usePosStore } from '@/stores/pos.store';
-import type { Product } from '@/types/product.type';
-import Swal from 'sweetalert2';
-import PromotionUsePointDialog from '@/components/pos/PromotionUsePointDialog.vue';
-import type { Recipe } from '@/types/recipe.type';
-import SelectedItemsListRice from '@/components/pos/SelectedItemsListRice.vue';
-import { useReceiptStore } from '@/stores/receipt.store';
+import { computed, onMounted, ref, watch } from "vue";
+import PromotionCardsCarousel from "@/components/pos/PromotionCardsCarousel.vue";
+import ProductCard from "@/components/pos/ProductCard.vue";
+import SelectedItemsList from "@/components/pos/SelectedItemsListRice.vue";
+import DrinkSelectionDialog from "@/components/pos/DrinkSelectionDialog.vue";
+import ReceiptDialog from "@/components/pos/ReceiptDialog.vue";
+import { useProductStore } from "@/stores/product.store";
+import { useCategoryStore } from "@/stores/category.store";
+import { usePromotionStore } from "@/stores/promotion.store";
+import { useToppingStore } from "@/stores/topping.store";
+import { useUserStore } from "@/stores/user.store";
+import { useCustomerStore } from "@/stores/customer.store";
+import { usePosStore } from "@/stores/pos.store";
+import type { Product } from "@/types/product.type";
+import Swal from "sweetalert2";
+import PromotionUsePointDialog from "@/components/pos/PromotionUsePointDialog.vue";
+import type { Recipe } from "@/types/recipe.type";
+import SelectedItemsListRice from "@/components/pos/SelectedItemsListRice.vue";
+import { useReceiptStore } from "@/stores/receipt.store";
 
 const productStore = useProductStore();
 const categoryStore = useCategoryStore();
@@ -26,60 +26,51 @@ const toppingStore = useToppingStore();
 const userStore = useUserStore();
 const customerStore = useCustomerStore();
 const posStore = usePosStore();
-const selectedCategory = ref('');
+const selectedCategory = ref("");
 const productFilters = ref<Product[]>([]);
-const searchQuery = ref('');
-const barcode = ref('');
+const searchQuery = ref("");
+const barcode = ref("");
 const receiptStore = useReceiptStore();
 
 // Load products, categories, promotions, and customers on mount
 onMounted(async () => {
   promotionStore.promotions = [];
-  if (userStore.currentUser?.userRole === "พนักงานขายข้าว") {
-    await productStore.getProductByStoreType("ร้านข้าว");
-  } else if (userStore.currentUser?.userRole === "พนักงานขายกาแฟ") {
-    await productStore.getProductByStoreType("ร้านกาแฟ");
-  } else {
-    await productStore.getAllProducts();
-  }
-
+  await productStore.getProductByStoreType("ร้านข้าว");
   await categoryStore.getAllCategories();
   await toppingStore.getAllToppings();
   await customerStore.getAllCustomers();
-  await receiptStore.getRecieptIn30Min('ร้านข้าว');
-
+  await receiptStore.getRecieptIn30Min("ร้านข้าว");
 
   userStore.getCurrentUser();
 
-    promotionStore.getPromotionByType("ร้านข้าว");
-    selectedCategory.value = "กับข้าว";
+  promotionStore.getPromotionByType("ร้านข้าว");
+  selectedCategory.value = "กับข้าว";
 
-    // Filter categories to show only "กับข้าว"
-    categoryStore.categoriesForCreate = categoryStore.categoriesForCreate.filter(
-      category => category.categoryName === "กับข้าว"
-    );
+  // Filter categories to show only "กับข้าว"
+  categoryStore.categoriesForCreate = categoryStore.categoriesForCreate.filter(
+    (category) => category.categoryName === "กับข้าว"
+  );
 
-    // Filter products to show only those without toppings and in the "กับข้าว" category
-    productFilters.value = productStore.products.filter(
-      product => product.category.categoryName === "กับข้าว" && !product.category.haveTopping
-    );
+  // Filter products to show only those without toppings and in the "กับข้าว" category
+  productFilters.value = productStore.products.filter(
+    (product) =>
+      product.category.categoryName === "กับข้าว" &&
+      !product.category.haveTopping
+  );
 
-    // Filter promotions to show only those for "ร้านข้าว"
-    promotionStore.promotions = promotionStore.promotions.filter(
-      promotion => promotion.promotionForStore === "ร้านข้าว"
-    );
-  
-
+  // Filter promotions to show only those for "ร้านข้าว"
+  promotionStore.promotions = promotionStore.promotions.filter(
+    (promotion) => promotion.promotionForStore === "ร้านข้าว"
+  );
 
   // Load queue list from local storage
   loadQueueListFromLocalStorage();
   loadFullscreenStateFromLocalStorage();
-
 });
 
 // Load queue list from local storage
 const loadQueueListFromLocalStorage = () => {
-  const storedQueueList = localStorage.getItem('queueReceipt');
+  const storedQueueList = localStorage.getItem("queueReceipt");
   console.log(storedQueueList);
 
   if (storedQueueList) {
@@ -90,17 +81,18 @@ const loadQueueListFromLocalStorage = () => {
   }
 };
 const loadFullscreenStateFromLocalStorage = () => {
-  const storedFullscreenState = localStorage.getItem('fullscreenState');
+  const storedFullscreenState = localStorage.getItem("fullscreenState");
   if (storedFullscreenState !== null) {
     posStore.hideNavigation = JSON.parse(storedFullscreenState);
   }
 };
 
 const saveFullscreenStateToLocalStorage = () => {
-  localStorage.setItem('fullscreenState', JSON.stringify(posStore.hideNavigation));
+  localStorage.setItem(
+    "fullscreenState",
+    JSON.stringify(posStore.hideNavigation)
+  );
 };
-
-
 
 // Remove an item from the queue
 const removeFromQueue = (index: number) => {
@@ -111,15 +103,28 @@ const removeFromQueue = (index: number) => {
 // Watchers for selectedCategory and searchQuery
 watch(selectedCategory, (newCategory) => {
   if (newCategory) {
-    productFilters.value = productStore.products.filter(product => product.category.categoryName.toLowerCase() === newCategory.toLowerCase());
+    productFilters.value = productStore.products.filter(
+      (product) =>
+        product.category.categoryName.toLowerCase() ===
+        newCategory.toLowerCase()
+    );
   }
 });
 
 watch(searchQuery, (newQuery) => {
-  if (newQuery === '') {
-    productFilters.value = productStore.products.filter(product => product.category.categoryName.toLowerCase() === selectedCategory.value.toLowerCase());
+  if (newQuery === "") {
+    productFilters.value = productStore.products.filter(
+      (product) =>
+        product.category.categoryName.toLowerCase() ===
+        selectedCategory.value.toLowerCase()
+    );
   } else {
-    productFilters.value = productStore.products.filter(product => product.productName.toLowerCase().includes(newQuery.toLowerCase()) && product.category.categoryName.toLowerCase() === selectedCategory.value.toLowerCase());
+    productFilters.value = productStore.products.filter(
+      (product) =>
+        product.productName.toLowerCase().includes(newQuery.toLowerCase()) &&
+        product.category.categoryName.toLowerCase() ===
+          selectedCategory.value.toLowerCase()
+    );
   }
 });
 
@@ -132,7 +137,9 @@ const toggleNavigationDrawer = () => {
 // Handles barcode input for searching products
 const handleBarcodeInput = async () => {
   if (barcode.value) {
-    const foundProduct = productStore.products.find(product => product.barcode === barcode.value);
+    const foundProduct = productStore.products.find(
+      (product) => product.barcode === barcode.value
+    );
     if (foundProduct) {
       productStore.selectedProduct = foundProduct; // Set the selected product
       if (foundProduct.haveTopping) {
@@ -143,12 +150,12 @@ const handleBarcodeInput = async () => {
       }
     } else {
       Swal.fire({
-        icon: 'error',
-        title: 'ไม่พบสินค้า',
-        text: 'ไม่พบสินค้าที่มีบาร์โค้ดนี้',
+        icon: "error",
+        title: "ไม่พบสินค้า",
+        text: "ไม่พบสินค้าที่มีบาร์โค้ดนี้",
       });
     }
-    barcode.value = '';
+    barcode.value = "";
   }
 };
 
@@ -167,7 +174,7 @@ const selectReceipt = (receipt: Recipe) => {
 
 // Computed property to determine margin based on navigation state
 const marginLeft = computed(() => {
-  return posStore.hideNavigation ? '0' : '3%';
+  return posStore.hideNavigation ? "0" : "3%";
 });
 
 // Computed property to determine the column size for the main interface
@@ -204,7 +211,7 @@ const showQueue = computed(() => {
               >
                 <v-card-title
                   class="d-flex"
-                  style=" position: relative; padding-left: 8px;"
+                  style="position: relative; padding-left: 8px"
                 >
                   <div
                     class="queue-title"
