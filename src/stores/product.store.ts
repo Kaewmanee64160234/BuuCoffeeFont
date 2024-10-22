@@ -18,7 +18,6 @@ export const useProductStore = defineStore("product", () => {
   const searchQuery = ref<string>("");
   const searchQueryPos = ref<string>("");
   const ProductTypes = ref<ProductType[]>([]);
-  const meals = ref<Meal[]>([]);
   const editedProduct = ref<Product & { file: File }>({
     productId: 0,
     productName: "",
@@ -298,6 +297,5 @@ export const useProductStore = defineStore("product", () => {
     storeName,
     countingPoint,
     getProductByStoreType,
-    meals
   };
 });

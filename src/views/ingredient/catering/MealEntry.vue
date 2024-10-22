@@ -1,91 +1,131 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from 'vue';
-import { useProductStore } from '@/stores/product.store'; // Updated to use Product Store
-import type { Product } from '@/types/product.type';
-import { useCateringStore } from '@/stores/catering.store';
+import { computed, onMounted, ref, watch } from "vue";
+import { useProductStore } from "@/stores/product.store"; // Updated to use Product Store
+import type { Product } from "@/types/product.type";
+import { useCateringStore } from "@/stores/catering.store";
+import type { MealProduct } from "@/types/catering/meal.type";
 const productStore = useProductStore(); // New product store
 const activePanelIndex = ref(0);
-const searchQuery = ref('');
-const selectedTab = ref('coffee');
+const searchQuery = ref("");
+const selectedTab = ref("coffee");
 const productFilters = ref<Product[]>([]); // Updated to handle products
 const totalPrice = ref(0);
-const type = ref('');
+const type = ref("");
 const cateringStore = useCateringStore();
 
 const removeProductFromMeal = (index: number, itemIndex: number) => {
-    const mealIndex = activePanelIndex.value;
-    productStore.meals[mealIndex].mealProducts.splice(index, 1); // Adjusted for product
-    calculateTotalPrice();
+  const mealIndex = activePanelIndex.value;
+  cateringStore.meals[mealIndex].mealProducts.splice(index, 1); // Adjusted for product
+  calculateTotalPrice();
 };
 
-const addProductToMeal = (item: any) => {
-    const mealIndex = productStore.meals.length - 1;
-    const existingProduct = productStore.meals[mealIndex].mealProducts.find(
-        product => product.product.productId === item.product.productId
-    );
+const addProductToMeal = (item: Product) => {
+  const mealIndex = cateringStore.meals.length - 1;
+  const existingProduct = cateringStore.meals[mealIndex].mealProducts.find(
+    (product) => product.product.productId === item.productId
+  );
 
-    let count = 1;
+  let count = 1;
 
-    if (existingProduct) {
-        count = existingProduct.quantity + 1;
-        existingProduct.quantity = count;
-        existingProduct.totalPrice = item.lastPrice * count;
+  if (existingProduct) {
+    count = existingProduct.quantity + 1;
+    existingProduct.quantity = count;
+    if (item.haveTopping) {
+      existingProduct.totalPrice =
+        item.productTypes![0].productTypePrice * count;
     } else {
-        productStore.meals[mealIndex].mealProducts.push({
-            mealId: mealIndex,
-            product: { ...item.product },
-            quantity: count,
-            totalPrice: item.lastPrice * count,
-            type: type.value,
-        });
+      existingProduct.totalPrice = item.productPrice * count;
     }
+  } else {
+    if (item.haveTopping) {
+      cateringStore.meals[mealIndex].mealProducts.push({
+        mealId: mealIndex,
+        product: { ...item },
+        quantity: count,
+        totalPrice: item.productTypes![0].productTypePrice * count,
+        type: type.value,
+      });
+    } else {
+      cateringStore.meals[mealIndex].mealProducts.push({
+        mealId: mealIndex,
+        product: { ...item },
+        quantity: count,
+        totalPrice: item.productPrice * count,
+        type: type.value,
+      });
+    }
+  }
 
-    const total = productStore.meals[mealIndex].mealProducts.reduce((sum, product) => {
-        return sum + product.totalPrice;
-    }, 0);
+  const total = cateringStore.meals[mealIndex].mealProducts.reduce(
+    (sum, product) => {
+      return sum + product.totalPrice;
+    },
+    0
+  );
 
-    productStore.meals[mealIndex].totalPrice = total;
+  cateringStore.meals[mealIndex].totalPrice = total;
 };
-
+// incress number of product quantity
+const increaseProductQuantity = (item: MealProduct) => {
+  item.quantity++;
+  if (item.product.haveTopping) {
+    item.totalPrice =
+      item.product.productTypes![0].productTypePrice * item.quantity;
+  } else {
+    item.totalPrice = item.product.productPrice * item.quantity;
+  }
+  calculateTotalPrice();
+};
+// decress number of product quantity
+const decreaseProductQuantity = (item: MealProduct) => {
+  if (item.quantity > 1) {
+    item.quantity--;
+    if (item.product.haveTopping) {
+      item.totalPrice =
+        item.product.productTypes![0].productTypePrice * item.quantity;
+    } else {
+      item.totalPrice = item.product.productPrice * item.quantity;
+    }
+    calculateTotalPrice();
+  }
+};
 watch(selectedTab, () => {
-    filterProducts();
-    type.value = selectedTab.value === 'coffee' ? 'coffee' : 'rice';
+  filterProducts();
+  type.value = selectedTab.value === "coffee" ? "coffee" : "rice";
 });
 
 async function filterProducts() {
-  console.log('selectedTab.value', selectedTab.value);
-  
-    if (selectedTab.value === 'coffee') {
-      
-        await productStore.getProductByStoreType('ร้านกาแฟ'); // Fetch coffee products
-        productFilters.value = productStore.products;
-        type.value = 'coffee';
-    } else if (selectedTab.value === 'rice') {
-        await productStore.getProductByStoreType('ร้านข้าว'); // Fetch rice products
-        productFilters.value = productStore.products;
-        type.value = 'rice';
-    }
+  console.log("selectedTab.value", selectedTab.value);
+
+  if (selectedTab.value === "coffee") {
+    await productStore.getProductByStoreType("ร้านกาแฟ"); // Fetch coffee products
+    productFilters.value = productStore.products;
+    type.value = "coffee";
+  } else if (selectedTab.value === "rice") {
+    await productStore.getProductByStoreType("ร้านข้าว"); // Fetch rice products
+    productFilters.value = productStore.products;
+    type.value = "rice";
+  }
 }
 
 onMounted(async () => {
-    await productStore.getProductByStoreType('ร้านกาแฟ'); // Fetch coffee products
-    await productStore.getProductByStoreType('ร้านข้าว'); // Fetch rice products
-    filterProducts();
-    calculateTotalPrice();
+  await productStore.getProductByStoreType("ร้านกาแฟ"); // Fetch coffee products
+  filterProducts();
+  calculateTotalPrice();
 });
 
 const calculateTotalPrice = () => {
-    totalPrice.value = cateringStore.mealProducts.reduce((sum, item) => {
-        return sum + (item.totalPrice! * item.quantity || 0);
-    }, 0);
+  totalPrice.value = cateringStore.mealProducts.reduce((sum, item) => {
+    return sum + (item.totalPrice! * item.quantity || 0);
+  }, 0);
 };
 
 watch(
-    () => cateringStore.mealProducts,
-    () => {
-        calculateTotalPrice();
-    },
-    { deep: true }
+  () => cateringStore.mealProducts,
+  () => {
+    calculateTotalPrice();
+  },
+  { deep: true }
 );
 </script>
 
@@ -179,60 +219,108 @@ watch(
               <v-tab value="rice">วัตถุดิบร้านข้าว</v-tab>
             </v-tabs>
 
-            <v-row class="mt-4"> <!-- Updated to show products -->
-    <v-col cols="6">
-        <v-container>
-            <v-row>
-                <v-col cols="3" style="text-align: center; padding: 8px"
-                    v-for="(item, index) in productFilters" :key="index">
-                    <v-card width="100%" @click="addProductToMeal(item)">
+            <v-row class="mt-4">
+              <!-- Updated to show products -->
+              <v-col cols="6">
+                <v-container>
+                  <v-row>
+                    <v-col
+                      cols="3"
+                      style="text-align: center; padding: 8px"
+                      v-for="(item, index) in productFilters"
+                      :key="index"
+                    >
+                      <v-card width="100%" @click="addProductToMeal(item)">
                         <v-img
-                            :src="`http://localhost:3000/products/${item.productId}/image`"
-                            height="100">
+                          :src="`http://localhost:3000/products/${item.productId}/image`"
+                          height="100"
+                        >
                         </v-img>
-                        <v-card-title style="font-size: 14px">{{ item.productName }}</v-card-title>
+                        <v-card-title style="font-size: 14px">{{
+                          item.productName
+                        }}</v-card-title>
                         <!-- <v-card-subtitle style="font-size: 12px">{{ item.productSupplier }}</v-card-subtitle> -->
-                        <v-card-subtitle style="font-size: 12px">ราคาต้นทุน {{ item.haveTopping ? item.productTypes![0].productTypePrice : item.productPrice }} บาท</v-card-subtitle>
-                    </v-card>
-                </v-col>
-            </v-row>
-        </v-container>
-    </v-col>
+                        <v-card-subtitle style="font-size: 12px"
+                          >ราคาต้นทุน
+                          {{
+                            item.haveTopping
+                              ? item.productTypes![0].productTypePrice
+                              : item.productPrice
+                          }}
+                          บาท</v-card-subtitle
+                        >
+                      </v-card>
+                    </v-col>
+                  </v-row>
+                </v-container>
+              </v-col>
 
-    <v-col cols="6">
-        <v-card style="height: 400px; overflow-y: auto;">
-            <v-table>
-                <thead>
-                    <tr>
-                        <th>ลำดับ</th>
-                        <th>ชื่อสินค้า</th>
-                        <th>คลัง</th>
-                        <th>ราคารวม</th>
-                        <th>จำนวน</th>
-                        <th>แอคชั่น</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(item, itemIndex) in meal.mealProducts" :key="itemIndex">
+              <v-col cols="6">
+                <v-card style="height: 400px; overflow-y: auto">
+                  <v-table>
+                    <thead>
+                      <tr>
+                        <th class="text-center" >ลำดับ</th>
+                        <th class="text-center" >ชื่อสินค้า</th>
+                        <th class="text-center" >คลัง</th>
+                        <th class="text-center" >ราคารวม</th>
+                        <th class="text-center" >จำนวน</th>
+                        <th class="text-center" >แอคชั่น</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        v-for="(item, itemIndex) in meal.mealProducts"
+                        :key="itemIndex"
+                      >
                         <td>{{ itemIndex + 1 }}</td>
                         <td>{{ item.product.productName }}</td>
                         <td>{{ item.type }}</td>
                         <td>{{ item.totalPrice }}</td>
                         <td>
-                            <input type="number" v-model.number="item.quantity" class="styled-input" />
+                          <!-- add button increaes and decesss -->
+
+                          <!-- add button increases and decreases -->
+                          <v-row justify="center" align="center">
+                            <v-col cols="4" class="text-center">
+                              <v-btn
+                                icon
+                                @click="decreaseProductQuantity(item)"
+                                size="small"
+                                class="styled-button"
+                              >
+                                -
+                              </v-btn>
+                            </v-col>
+                            <v-col cols="4" class="text-center">
+                              {{ item.quantity }}
+                            </v-col>
+                            <v-col cols="4" class="text-center">
+                              <v-btn
+                                icon
+                                @click="increaseProductQuantity(item)"
+                                size="small"
+                                class="styled-button"
+                              >
+                                +
+                              </v-btn>
+                            </v-col>
+                          </v-row>
                         </td>
                         <td>
-                            <button @click="removeProductFromMeal(index, itemIndex)" class="styled-button">
-                                ลบ
-                            </button>
+                          <button
+                            @click="removeProductFromMeal(index, itemIndex)"
+                            class="styled-button"
+                          >
+                            ลบ
+                          </button>
                         </td>
-                    </tr>
-                </tbody>
-            </v-table>
-        </v-card>
-    </v-col>
-</v-row>
-
+                      </tr>
+                    </tbody>
+                  </v-table>
+                </v-card>
+              </v-col>
+            </v-row>
           </v-expansion-panel-content>
         </v-expansion-panel>
       </v-expansion-panels>
