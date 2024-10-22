@@ -28,6 +28,8 @@ export const usePosStore = defineStore("pos", () => {
   const countingPromotion = ref<number>(0);
   const updateReceiptDialog = ref(false);
   const selectedItemForEdit = ref<ReceiptItem>();
+  const receiptItemsRice = ref<ReceiptItem[]>([]);
+  const receiptItemsCoffee = ref<ReceiptItem[]>([]);
   const receipt = ref<Receipt>({
     receiptType: "",
     receiptTotalDiscount: 0,
@@ -275,6 +277,7 @@ export const usePosStore = defineStore("pos", () => {
       receipt.value.receiptNetPrice =
         receipt.value.receiptTotalPrice - receipt.value.receiptTotalDiscount;
     }
+
   };
 
   const calculateTotal = (selectedItems: ReceiptItem[]) => {
@@ -812,5 +815,6 @@ export const usePosStore = defineStore("pos", () => {
     selectedItemForEdit,
     calculateTotal,
     updateReceiptItem,
+
   };
 });

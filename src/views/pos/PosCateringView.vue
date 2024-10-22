@@ -7,7 +7,7 @@
   const cateringStore = useCateringStore();
   
   const totalBudget = computed(() => {
-    return cateringStore.meals.reduce((total, meal) => total + meal.totalPrice, 0);
+    return cateringStore.cateringEvent.meals!.reduce((total, meal) => total + meal.totalPrice, 0);
   });
   
   const scrollToTop = () => {
@@ -31,12 +31,12 @@
           <v-card-title>สรุปจัดเลี้ยงรับรอง</v-card-title>
           <v-card-text>
             <p style="color: red;">ตรวจสอบรายละเอียดของของคุณก่อนที่จะส่ง</p>
-            <p><strong>Event Name:</strong> {{ cateringStore.eventData.eventName }}</p>
-            <p><strong>Event Date:</strong> {{ cateringStore.eventData.eventDate }}</p>
-            <p><strong>Event Location:</strong> {{ cateringStore.eventData.eventLocation }}</p>
-            <p><strong>Attendee Count:</strong> {{ cateringStore.eventData.attendeeCount }} คน</p>
+            <p><strong>Event Name:</strong> {{ cateringStore.cateringEvent.eventName }}</p>
+            <p><strong>Event Date:</strong> {{ cateringStore.cateringEvent.eventDate }}</p>
+            <p><strong>Event Location:</strong> {{ cateringStore.cateringEvent.eventLocation }}</p>
+            <p><strong>Attendee Count:</strong> {{ cateringStore.cateringEvent.attendeeCount }} คน</p>
             <p><strong>Total Budget:</strong> {{ totalBudget }} บาท</p>
-            <div v-for="(meal, index) in cateringStore.meals" :key="index">
+            <div v-for="(meal, index) in cateringStore.cateringEvent.meals!" :key="index">
               <p>
                 <strong>Meal {{ index + 1 }}:</strong> {{ meal.mealName }} เวลา : {{ meal.mealTime }},
                 งบประมาณต่อมื้อรวม: {{ meal.totalPrice }} บาท,
@@ -51,7 +51,7 @@
             <v-row>
               <v-col>
                 <v-btn class="custom-button button-full-width" rounded
-                  @click="cateringStore.saveCheckData(1, cateringStore.eventData)">
+                  @click="cateringStore.createCateringEvent()">
                   <v-icon left>mdi-plus</v-icon>
                   <strong>บันทึกข้อมูล</strong>
                 </v-btn>
@@ -61,20 +61,20 @@
           <v-card-text style="background-color: #f6d3bb;">
             <v-row>
               <v-col cols="6">
-                <v-text-field label="Event Name" v-model="cateringStore.eventData.eventName" dense hide-details
+                <v-text-field label="Event Name" v-model="cateringStore.cateringEvent.eventName" dense hide-details
                   variant="solo"></v-text-field>
               </v-col>
               <v-col cols="6">
-                <v-text-field label="Event Location" v-model="cateringStore.eventData.eventLocation" dense hide-details
+                <v-text-field label="Event Location" v-model="cateringStore.cateringEvent.eventLocation" dense hide-details
                   variant="solo"></v-text-field>
               </v-col>
               <v-col cols="4">
-                <v-text-field label="Event Date" v-model="cateringStore.eventData.eventDate" type="date" dense
+                <v-text-field label="Event Date" v-model="cateringStore.cateringEvent.eventDate" type="date" dense
                   hide-details variant="solo"></v-text-field>
               </v-col>
   
               <v-col cols="4">
-                <v-text-field label="Attendee Count" v-model.number="cateringStore.eventData.attendeeCount" type="number"
+                <v-text-field label="Attendee Count" v-model.number="cateringStore.cateringEvent.attendeeCount" type="number"
                   dense hide-details variant="solo"></v-text-field>
               </v-col>
               <v-col cols="4">

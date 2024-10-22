@@ -68,6 +68,7 @@ export function mapToProduct(data: any): Product {
   };
 }
 export interface ProductType {
+  productTypeId?: number;
   productTypeName: string;
   productTypePrice: number;
   recipes?: Recipe[];

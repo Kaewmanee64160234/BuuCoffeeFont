@@ -4,6 +4,8 @@ import { useProductStore } from "@/stores/product.store"; // Updated to use Prod
 import type { Product } from "@/types/product.type";
 import { useCateringStore } from "@/stores/catering.store";
 import type { MealProduct } from "@/types/catering/meal.type";
+import DrinkSelectionDialog from "@/components/pos/DrinkSelectionDialog.vue";
+import { useToppingStore } from "@/stores/topping.store";
 const productStore = useProductStore(); // New product store
 const activePanelIndex = ref(0);
 const searchQuery = ref("");
@@ -12,59 +14,15 @@ const productFilters = ref<Product[]>([]); // Updated to handle products
 const totalPrice = ref(0);
 const type = ref("");
 const cateringStore = useCateringStore();
+const toppingStore = useToppingStore();
 
 const removeProductFromMeal = (index: number, itemIndex: number) => {
   const mealIndex = activePanelIndex.value;
-  cateringStore.meals[mealIndex].mealProducts.splice(index, 1); // Adjusted for product
+  cateringStore.cateringEvent.meals![mealIndex].mealProducts.splice(index, 1); // Adjusted for product
   calculateTotalPrice();
 };
 
-const addProductToMeal = (item: Product) => {
-  const mealIndex = cateringStore.meals.length - 1;
-  const existingProduct = cateringStore.meals[mealIndex].mealProducts.find(
-    (product) => product.product.productId === item.productId
-  );
 
-  let count = 1;
-
-  if (existingProduct) {
-    count = existingProduct.quantity + 1;
-    existingProduct.quantity = count;
-    if (item.haveTopping) {
-      existingProduct.totalPrice =
-        item.productTypes![0].productTypePrice * count;
-    } else {
-      existingProduct.totalPrice = item.productPrice * count;
-    }
-  } else {
-    if (item.haveTopping) {
-      cateringStore.meals[mealIndex].mealProducts.push({
-        mealId: mealIndex,
-        product: { ...item },
-        quantity: count,
-        totalPrice: item.productTypes![0].productTypePrice * count,
-        type: type.value,
-      });
-    } else {
-      cateringStore.meals[mealIndex].mealProducts.push({
-        mealId: mealIndex,
-        product: { ...item },
-        quantity: count,
-        totalPrice: item.productPrice * count,
-        type: type.value,
-      });
-    }
-  }
-
-  const total = cateringStore.meals[mealIndex].mealProducts.reduce(
-    (sum, product) => {
-      return sum + product.totalPrice;
-    },
-    0
-  );
-
-  cateringStore.meals[mealIndex].totalPrice = total;
-};
 // incress number of product quantity
 const increaseProductQuantity = (item: MealProduct) => {
   item.quantity++;
@@ -110,6 +68,8 @@ async function filterProducts() {
 
 onMounted(async () => {
   await productStore.getProductByStoreType("ร้านกาแฟ"); // Fetch coffee products
+  await toppingStore.getAllToppings();
+  
   filterProducts();
   calculateTotalPrice();
 });
@@ -134,7 +94,7 @@ watch(
     <v-card-text>
       <v-expansion-panels class="mb-5">
         <v-expansion-panel
-          v-for="(meal, index) in cateringStore.meals"
+          v-for="(meal, index) in cateringStore.cateringEvent.meals"
           :key="index"
           class="mb-4"
         >
@@ -230,7 +190,8 @@ watch(
                       v-for="(item, index) in productFilters"
                       :key="index"
                     >
-                      <v-card width="100%" @click="addProductToMeal(item)">
+                    
+                      <v-card width="100%" @click="cateringStore.addProduct(item,type)">
                         <v-img
                           :src="`http://localhost:3000/products/${item.productId}/image`"
                           height="100"
@@ -334,6 +295,7 @@ watch(
       </v-btn>
     </v-card-text>
   </v-card>
+  <DrinkSelectionDialog />
 </template>
 
 <style scoped>
