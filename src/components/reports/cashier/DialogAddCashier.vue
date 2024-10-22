@@ -48,7 +48,7 @@ const rules = {
             </v-row>
           <v-row>
            
-            <v-col cols="9">
+            <v-col cols="10">
               <v-text-field
                 v-model="cashierAmount"
                 label="จำนวนเงินสด"
@@ -57,7 +57,7 @@ const rules = {
                 required
               ></v-text-field>
             </v-col>
-            <v-col cols="3" class="d-flex align-center">
+            <v-col cols="2" class="d-flex align-center">
               <span>บาท</span>
             </v-col>
           </v-row>
