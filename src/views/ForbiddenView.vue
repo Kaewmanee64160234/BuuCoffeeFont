@@ -1,10 +1,25 @@
 <template>
-    <div class="forbidden-page">
-      <h1>403 - Access Denied</h1>
-      <p>You do not have permission to view this page.</p>
-      <v-btn @click="goToPage()" >Go to Home</v-btn>
-    </div>
-  </template>
+  <v-container>
+    <v-row>
+      <v-col class="mt-10">
+        <div class="forbidden-page"  >
+          <h1 class="mt-50" style="font-size: 50px;">ขออภัย</h1>
+          <p style="font-size: 30px;">คุณไม่ได้รับอนุญาตให้เข้าสู่หน้าจอนี้</p>
+          <!-- ใส่ปุ่มกลับสู่หน้าหลักหากต้องการ -->
+          <!-- <v-btn @click="goToPage()" class="mt-3">กลับสู่หน้าหลัก</v-btn> -->
+          <!-- รูปภาพ -->
+          <v-img 
+            src="../../src/components/img/rejectedWomen.png"
+            width="280" 
+            height="280"
+            class="rounded-card mt-8 ml-50">
+          </v-img>
+        </div>
+      </v-col>
+    </v-row>
+  </v-container>
+  
+</template>
   
   <script setup lang="ts">
 import router from '@/router';
@@ -31,7 +46,11 @@ import { useUserStore } from '@/stores/user.store';
   <style scoped>
   .forbidden-page {
     text-align: center;
-    margin-top: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
   }
   </style>
   
