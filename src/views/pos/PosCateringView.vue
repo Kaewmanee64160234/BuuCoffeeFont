@@ -3,6 +3,7 @@
   import { computed, ref } from 'vue';
   import { useCateringStore } from '@/stores/catering.store';
   import MealEntry from '@/views/ingredient/catering/MealEntry.vue';
+import Swal from 'sweetalert2';
   
   const cateringStore = useCateringStore();
   
@@ -15,6 +16,121 @@
       top: 0,
       behavior: 'smooth'
     });
+  };
+
+  const createCateringEvent = () => {
+    // validate the catering event
+    if (!cateringStore.cateringEvent.eventName) {
+      Swal.fire({
+        icon: 'error',
+        title: 'กรุณาใส่ชื่องานจัดเลี้ยง',
+        showConfirmButton: false,
+        timer: 1500
+      });
+      return;
+    }
+    // charrecter not lessthant 3
+    if (cateringStore.cateringEvent.eventName.length < 3) {
+      Swal.fire({
+        icon: 'error',
+        title: 'ชื่องานจัดเลี้ยงต้องมีอย่างน้อย 3 ตัวอักษร',
+        showConfirmButton: false,
+        timer: 1500
+      });
+      return;
+    }
+    if (!cateringStore.cateringEvent.eventDate) {
+      Swal.fire({
+        icon: 'error',
+        title: 'กรุณาใส่วันที่จัดงาน',
+        showConfirmButton: false,
+        timer: 1500
+      });
+      return;
+    }
+    // check if event date is not more than or equal to 2 days from today ago
+    const eventDate = new Date(cateringStore.cateringEvent.eventDate);
+    const today = new Date();
+    const diffTime = Math.abs(eventDate.getTime() - today.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    if (diffDays < 2) {
+      Swal.fire({
+        icon: 'error',
+        title: 'วันที่จัดงานต้องต้องไม่เกิน 2 วันหลังจากจัดงาน',
+        showConfirmButton: false,
+        timer: 1500
+      });
+      return;
+    }
+    if (!cateringStore.cateringEvent.eventLocation) {
+      Swal.fire({
+        icon: 'error',
+        title: 'กรุณาใส่สถานที่จัดงาน',
+        showConfirmButton: false,
+        timer: 1500
+      });
+      return;
+    }
+    // charrecter not lessthant 3
+    if (cateringStore.cateringEvent.eventLocation.length < 3) {
+      Swal.fire({
+        icon: 'error',
+        title: 'สถานที่จัดงานต้องมีอย่างน้อย 3 ตัวอักษร',
+        showConfirmButton: false,
+        timer: 1500
+      });
+      return;
+    }
+    if (!cateringStore.cateringEvent.attendeeCount) {
+      Swal.fire({
+        icon: 'error',
+        title: 'กรุณาใส่จำนวนคนที่เข้าร่วมงาน',
+        showConfirmButton: false,
+        timer: 1500
+      });
+      return;
+    }
+    // morethan 1
+    if (cateringStore.cateringEvent.attendeeCount < 1) {
+      Swal.fire({
+        icon: 'error',
+        title: 'จำนวนคนที่เข้าร่วมงานต้องมากกว่า 1 คน',
+        showConfirmButton: false,
+        timer: 1500
+      });
+      return;
+    }
+    // morethan or equal 1
+    if (cateringStore.cateringEvent.meals!.length === 0) {
+      Swal.fire({
+        icon: 'error',
+        title: 'กรุณาเพิ่มอาหาร',
+        showConfirmButton: false,
+        timer: 1500
+      });
+      return;
+    }
+    if(cateringStore.cateringEvent.meals!.reduce((total, meal) => total + meal.totalPrice, 0) <= 0) {
+      Swal.fire({
+        icon: 'error',
+        title: 'กรุณาเพิ่มรายการอาหาร',
+        showConfirmButton: false,
+        timer: 1500
+      });
+      return;
+    }
+    if (cateringStore.cateringEvent.attendeeCount < 1) {
+      Swal.fire({
+        icon: 'error',
+        title: 'จำนวนคนที่เข้าร่วมงานต้องมากกว่า 1 คน',
+        showConfirmButton: false,
+        timer: 1500
+      });
+      return;
+    }
+    
+
+    cateringStore.createCateringEvent();
   };
   </script>
 <template>
@@ -51,7 +167,7 @@
             <v-row>
               <v-col>
                 <v-btn class="custom-button button-full-width" rounded
-                  @click="cateringStore.createCateringEvent()">
+                  @click="createCateringEvent()">
                   <v-icon left>mdi-plus</v-icon>
                   <strong>บันทึกข้อมูล</strong>
                 </v-btn>

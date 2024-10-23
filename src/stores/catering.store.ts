@@ -161,8 +161,26 @@ const addMeal = () => {
       cateringEvent.value.user = userStore.currentUser;
       console.log("Creating catering event:", JSON.stringify(cateringEvent.value));
       // create recipt status catering 
+     
     
       for (const meal of cateringEvent.value.meals!) {
+        if (!meal.receipt) {
+          // กรัณาใส่รายการอาหารอย่างน้อย 1
+          Swal.fire("Error", "กรุณาใส่รายการอาหารอย่างน้อย 1 อย่าง", "error");
+          return;
+        }
+        // meal name charactor morthat 3
+        if (meal.mealName.length < 3) {
+          Swal.fire("Error", "ชื่ออาหารต้องมีอย่างน้อย 3 ตัวอักษร", "error");
+          return;
+
+        }
+        // input time
+        if (meal.mealTime.length < 1) {
+          Swal.fire("Error", "กรุณาใส่เวลา", "error");
+          return;
+
+        }
         const reciptItemCoffee = ref<ReceiptItem[]>([]);
         const reciptItemRice = ref<ReceiptItem[]>([]);
         for(const item of meal.receipt.receiptItems){
@@ -227,6 +245,7 @@ const addMeal = () => {
       const responseEvent = await cateringService.createCateringEvent(cateringEvent.value);
       if (responseEvent.status === 201) {
         console.log("Catering event created successfully", responseEvent.data);
+        clearData();
       }
 
       
@@ -237,25 +256,7 @@ const addMeal = () => {
     }
   };
 
-  const calculateTotal = (receiptItems: ReceiptItem[]) => {
-    return receiptItems.reduce((total, item) => {
-      let itemTotal = item.receiptSubTotal;
-      if (item.productTypeToppings.length > 0) {
-        const toppingsTotal = item.productTypeToppings.reduce(
-          (toppingTotal, toppingItem) => {
-            return (
-              toppingTotal +
-              parseFloat(toppingItem.topping.toppingPrice.toString()) *
-                parseFloat(toppingItem.quantity.toString())
-            );
-          },
-          0
-        );
-        itemTotal += toppingsTotal;
-      }
-      return total + itemTotal;
-    }, 0);
-  };
+
 
   const addProduct = (item: Product, mealIndex: number, type: string) => {
     // If the product has toppings, open the topping dialog
@@ -455,8 +456,31 @@ const addMeal = () => {
   
     console.log("Updated catering event:", cateringEvent.value);
   };
-  
 
+  // clear data catering
+  const clearData = () => {
+    cateringEvent.value = {
+      cashierId: 0,
+      cashierAmount: 0,
+      createdDate: new Date(),
+      deletedAt: "",
+      meals: [],
+      user: {
+        role: {
+          id: 0,
+          name: "",
+          permissions: [],
+        },
+        userId: 0,
+        userEmail: "",
+        userName: "",
+        userPassword: "",
+        userRole: "",
+        userStatus: "",
+      },
+    };
+  
+  };
   return {
     fetchMeals,
     saveMeals,
