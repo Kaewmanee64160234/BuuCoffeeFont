@@ -16,37 +16,40 @@ const totalPrice = ref(0);
 const type = ref("");
 const cateringStore = useCateringStore();
 const toppingStore = useToppingStore();
+const visibleDetails = ref<number | null>(null); // Stores the index of the visible details row
 
-// Remove a product from the meal
-const removeProductFromMeal = (mealIndex: number, itemIndex: number) => {
-  cateringStore.cateringEvent.meals![mealIndex].mealProducts.splice(itemIndex, 1); // Adjusted for product removal
-  calculateTotalPrice();
-};
 
-// Increase the number of products in a meal
-const increaseProductQuantity = (item: MealProduct) => {
-  item.quantity++;
-  if (item.product.haveTopping) {
-    item.totalPrice =
-      item.product.productTypes![0].productTypePrice * item.quantity;
+// Toggle the visibility of the product details row
+const toggleDetails = (index: number) => {
+  if (visibleDetails.value === index) {
+    visibleDetails.value = null; // Collapse if already open
   } else {
-    item.totalPrice = item.product.productPrice * item.quantity;
+    visibleDetails.value = index; // Expand the selected row
   }
-  calculateTotalPrice();
 };
 
-// Decrease the number of products in a meal
-const decreaseProductQuantity = (item: MealProduct) => {
+// Check if the details for a specific row are visible
+const isDetailsVisible = (index: number) => {
+  return visibleDetails.value === index;
+};
+
+// Handle quantity increase
+const increaseProductQuantity = (item: any) => {
+  item.quantity++;
+  item.totalPrice = item.product.productPrice * item.quantity;
+};
+
+// Handle quantity decrease
+const decreaseProductQuantity = (item: any) => {
   if (item.quantity > 1) {
     item.quantity--;
-    if (item.product.haveTopping) {
-      item.totalPrice =
-        item.product.productTypes![0].productTypePrice * item.quantity;
-    } else {
-      item.totalPrice = item.product.productPrice * item.quantity;
-    }
-    calculateTotalPrice();
+    item.totalPrice = item.product.productPrice * item.quantity;
   }
+};
+
+// Handle removing the product from the meal
+const removeProductFromMeal = (mealIndex: number, productIndex: number) => {
+  cateringStore.cateringEvent.meals![mealIndex].mealProducts.splice(productIndex, 1);
 };
 
 // Watch for tab selection changes and update product filters accordingly
@@ -77,9 +80,12 @@ onMounted(async () => {
 // Calculate total price for all products in all meals
 const calculateTotalPrice = () => {
   totalPrice.value = cateringStore.cateringEvent.meals!.reduce((sum, meal) => {
-    return sum + meal.mealProducts.reduce((productSum, item) => {
-      return productSum + (item.totalPrice! * item.quantity || 0);
-    }, 0);
+    return (
+      sum +
+      meal.mealProducts.reduce((productSum, item) => {
+        return productSum + (item.totalPrice! * item.quantity || 0);
+      }, 0)
+    );
   }, 0);
 };
 
@@ -193,7 +199,9 @@ watch(
                     >
                       <v-card
                         width="100%"
-                        @click="cateringStore.addProduct(item, indexMeals,type)"
+                        @click="
+                          cateringStore.addProduct(item, indexMeals, type)
+                        "
                       >
                         <v-img
                           :src="`http://localhost:3000/products/${item.productId}/image`"
@@ -235,8 +243,12 @@ watch(
                         v-for="(item, itemIndex) in meal.mealProducts"
                         :key="itemIndex"
                       >
+                    
                         <td>{{ itemIndex + 1 }}</td>
-                        <td>{{ item.product.productName }}</td>
+                        <td @click="toggleDetails(itemIndex)">
+                          {{ item.product.productName }}
+                        </td>
+                        <!-- Clicking toggles details -->
                         <td>{{ item.type }}</td>
                         <td>{{ item.totalPrice }}</td>
                         <td>
@@ -244,7 +256,7 @@ watch(
                             <v-col cols="4" class="text-center">
                               <v-btn
                                 icon
-                                @click="decreaseProductQuantity(item)"
+                                @click.stop="decreaseProductQuantity(item)"
                                 size="small"
                                 class="styled-button"
                               >
@@ -257,7 +269,7 @@ watch(
                             <v-col cols="4" class="text-center">
                               <v-btn
                                 icon
-                                @click="increaseProductQuantity(item)"
+                                @click.stop="increaseProductQuantity(item)"
                                 size="small"
                                 class="styled-button"
                               >
@@ -267,14 +279,37 @@ watch(
                           </v-row>
                         </td>
                         <td>
-                          <button
-                            @click="removeProductFromMeal(indexMeals, itemIndex)"
+                          <v-btn
+                            icon
+                            @click.stop="
+                              removeProductFromMeal(indexMeals, itemIndex)
+                            "
                             class="styled-button"
                           >
-                            ลบ
-                          </button>
+                            <v-icon>mdi-delete</v-icon>
+                          </v-btn>
                         </td>
+                        <v-row> 
+                          <br>
+                          {{ meal.receipt.receiptItems }}
+                          <!-- Expandable row for showing product details -->
+                           <v-row v-if="item.product.haveTopping" >
+                             <v-row v-for="(itemReciept,indexItemReceipt) in meal.receipt.receiptItems.filter(
+                               (receiptItem) => receiptItem.product!.productId === item.product.productId
+                             )" :key="indexItemReceipt" >
+                             <v-col>{{ itemReciept.product?.productName }}</v-col>
+                             <v-col>{{ itemReciept.quantity }}</v-col>
+                             <v-col>{{ itemReciept.productType?.productTypeName }}</v-col>
+ 
+                             </v-row>
+ 
+                           </v-row>
+                     
+                       </v-row>
+                    
                       </tr>
+
+                     
                     </tbody>
                   </v-table>
                 </v-card>

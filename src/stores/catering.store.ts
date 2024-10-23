@@ -301,6 +301,8 @@ const addMeal = () => {
     const receiptItem = receipt.receiptItems.find(
       (ri) => ri.product?.productId === item.productId
     );
+    console.log("Receipt item:", receiptItem);
+    
   
     if (receiptItem) {
       // Update existing receipt item
@@ -351,7 +353,7 @@ const addMeal = () => {
     );
   
     // Update total price for the catering event
-    const totalEventPrice = cateringEvent.value.meals.reduce(
+    const totalEventPrice = cateringEvent.value.meals!.reduce(
       (sum, meal) => sum + meal.totalPrice,
       0
     );
@@ -369,47 +371,67 @@ const addMeal = () => {
   ) => {
     const parsedQuantity = parseInt(quantity.toString(), 10);
     const productPrice = parseInt(productType.productTypePrice.toString(), 10);
-    let receiptItems;
+  
+    // Use selected meal index
+    const mealIndex = selectedMealIndex.value; // Assuming currentMealIndex holds the selected meal index
 
-    // Determine whether the product belongs to coffee or rice store
-    if (product.storeType === "ร้านกาแฟ") {
-      receiptItems = coffeeReceipt.value.receiptItems;
-    } else if (product.storeType === "ร้านข้าว") {
-      receiptItems = riceReceipt.value.receiptItems;
-    } else {
-      console.error("Invalid store type for product:", product.storeType);
-      return;
+  
+    // Initialize receipt in meal if not present
+    if (!cateringEvent.value.meals![mealIndex].receipt) {
+      cateringEvent.value.meals![mealIndex].receipt = {
+        receiptItems: [],
+        receiptTotalPrice: 0,
+        receiptNetPrice: 0,
+        receiptTotalDiscount: 0,
+        paymentMethod: "",
+        change: 0,
+        receive: 0,
+        receiptStatus: "",
+        createdReceipt: new Date(),
+        receiptPromotions: [],
+      };
     }
-
-    // Find an existing item in the receipt
+  
+    // Access receipt items from the selected meal's receipt
+    const receiptItems = cateringEvent.value.meals![mealIndex].receipt.receiptItems;
+  
+    // Find an existing item in the receipt based on product ID, sweetness, and toppings
     const existingItem = receiptItems.find(
       (item) =>
         item.product?.productId === product.productId &&
         item.sweetnessLevel === sweetness &&
-        JSON.stringify(item.productTypeToppings) ===
-          JSON.stringify(productTypeToppings) &&
+        JSON.stringify(item.productTypeToppings) === JSON.stringify(productTypeToppings) &&
         item.productType?.productTypeName === productType.productTypeName
     );
-
-    // If the product has toppings, calculate the topping prices
-    const toppingsTotal = productTypeToppings.reduce(
-      (toppingTotal, toppingItem) => {
-        return (
-          toppingTotal +
-          parseFloat(toppingItem.topping.toppingPrice.toString()) *
-            parseFloat(toppingItem.quantity.toString())
-        );
-      },
-      0
-    );
-
+  
+    // If the product has toppings, calculate the total price of the toppings
+    const toppingsTotal = productTypeToppings.reduce((toppingTotal, toppingItem) => {
+      return (
+        toppingTotal +
+        parseFloat(toppingItem.topping.toppingPrice.toString()) * parseFloat(toppingItem.quantity.toString())
+      );
+    }, 0);
+  
+    // If the item already exists in the receipt, update its quantity and subtotal
     if (existingItem) {
-      // Update existing receipt item
       existingItem.quantity += parsedQuantity;
-      existingItem.receiptSubTotal +=
-        (productPrice + toppingsTotal) * parsedQuantity;
+      existingItem.receiptSubTotal += (productPrice + toppingsTotal) * parsedQuantity;
+      // update in product meal
+      const mealProduct = cateringEvent.value.meals![mealIndex].mealProducts.find((mp) => mp.product.productId === product.productId);
+      if (mealProduct) {
+        mealProduct.quantity += parsedQuantity;
+        mealProduct.totalPrice += (productPrice + toppingsTotal) * parsedQuantity;
+      } else {
+        cateringEvent.value.meals![mealIndex].mealProducts.push({
+          mealId: mealIndex,
+          product: product,
+          quantity: parsedQuantity,
+          totalPrice: (productPrice + toppingsTotal) * parsedQuantity,
+          type: productType.productTypeName,
+        });
+      }
     } else {
-      // Add a new item to the receipt
+      // If the item does not exist, add it as a new receipt item
       receiptItems.push({
         receiptItemId: 0,
         productTypeToppings: productTypeToppings,
@@ -419,46 +441,26 @@ const addMeal = () => {
         sweetnessLevel: sweetness,
         productType: productType,
       });
-    }
-
-    // Update in meal products
-    const mealIndex = selectedMealIndex.value; // Use selected mealIndex
-    const meal = cateringEvent.value.meals![mealIndex];
-
-    // Find the corresponding product in the meal
-    const existingMealProduct = meal.mealProducts.find(
-      (mealProduct) => mealProduct.product.productId === product.productId
-    );
-
-    if (existingMealProduct) {
-      // Update existing meal product
-      existingMealProduct.quantity += parsedQuantity;
-      existingMealProduct.totalPrice +=
-        (productPrice + toppingsTotal) * parsedQuantity;
-    } else {
-      // Add new product to the meal
-      meal.mealProducts.push({
+      // Add the product to the meal
+      cateringEvent.value.meals![mealIndex].mealProducts.push({
         mealId: mealIndex,
         product: product,
         quantity: parsedQuantity,
         totalPrice: (productPrice + toppingsTotal) * parsedQuantity,
-        type: product.storeType,
+        type: productType.productTypeName,
       });
     }
-
-    // Update total price for the meal
-    meal.totalPrice = meal.mealProducts.reduce(
-      (sum, mealProduct) => sum + mealProduct.totalPrice,
-      0
-    );
-
-    // Update total price for the catering event
-    const totalEventPrice = cateringEvent.value.meals!.reduce(
-      (sum, meal) => sum + meal.totalPrice,
-      0
-    );
+  
+    // Update the total price for the meal by recalculating based on all meal products
+    cateringEvent.value.meals![mealIndex].totalPrice = receiptItems.reduce((sum, item) => sum + item.receiptSubTotal, 0);
+  
+    // Update the total price for the entire catering event by summing up all meals' total prices
+    const totalEventPrice = cateringEvent.value.meals!.reduce((sum, meal) => sum + meal.totalPrice, 0);
     cateringEvent.value.cashierAmount = totalEventPrice;
+  
+    console.log("Updated catering event:", cateringEvent.value);
   };
+  
 
   return {
     fetchMeals,
@@ -474,6 +476,6 @@ const addMeal = () => {
     selectItemEdit,
     addProduct,
     addToReceipt,
-    cashierAmount
+    cashierAmount,
   };
 });
