@@ -9,6 +9,8 @@ import type { Receipt, ReceiptItem } from "@/types/receipt.type";
 import type { Product, ProductType } from "@/types/product.type";
 import { usePosStore } from "./pos.store";
 import type { ProductTypeTopping } from "@/types/productTypeTopping.type";
+import receiptService from "@/service/receipt.service";
+import cateringService from "@/service/catering.service";
 
 export const useCateringStore = defineStore("catering", () => {
   const meals = ref<Meal[]>([]);
@@ -157,11 +159,77 @@ const addMeal = () => {
   const createCateringEvent = async () => {
     try {
       cateringEvent.value.user = userStore.currentUser;
-      const response = await axios.post(
-        "/catering-events",
-        cateringEvent.value
-      );
-      cateringEvent.value = response.data;
+      console.log("Creating catering event:", JSON.stringify(cateringEvent.value));
+      // create recipt status catering 
+    
+      for (const meal of cateringEvent.value.meals!) {
+        const reciptItemCoffee = ref<ReceiptItem[]>([]);
+        const reciptItemRice = ref<ReceiptItem[]>([]);
+        for(const item of meal.receipt.receiptItems){
+          if(item.product?.storeType == "ร้านกาแฟ"){
+            reciptItemCoffee.value.push(item);
+          }
+          else{
+            reciptItemRice.value.push(item);
+          }
+
+        }
+        // create recipt 
+        const receiptCoffee: Receipt = {
+          receiptTotalPrice: reciptItemCoffee.value.reduce((sum, item) => sum + item.receiptSubTotal, 0),
+          receiptType: "ร้านกาแฟ",
+          receiptTotalDiscount: 0,
+          receiptNetPrice: reciptItemCoffee.value.reduce((sum, item) => sum + item.receiptSubTotal, 0),
+          receiptStatus: "ร้านจัดเลี้ยง",
+          queueNumber: 0,
+          receive: 0,
+          change: 0,
+          receiptItems: reciptItemCoffee.value,
+          receiptPromotions: [],
+          createdDate: cateringEvent.value.createdDate,
+          checkIngredientId: 0
+        };
+        // calculate total and set up
+        // rice recipt
+        const receiptRice: Receipt = {
+          receiptTotalPrice: reciptItemRice.value.reduce((sum, item) => sum + item.receiptSubTotal, 0),
+          receiptType: "ร้านข้าว",
+          receiptTotalDiscount: 0,
+          receiptNetPrice: reciptItemRice.value.reduce((sum, item) => sum + item.receiptSubTotal, 0),
+          receiptStatus: "ร้านจัดเลี้ยง",
+          queueNumber: 0,
+          receive: 0,
+          change: 0,
+          receiptItems: reciptItemRice.value,
+          receiptPromotions: [],
+          createdDate: cateringEvent.value.createdDate,
+          checkIngredientId: 0
+        };
+        console.log( "recipt Coffee", receiptCoffee);
+        console.log( "recipt Rice", receiptRice);
+        
+        // calculate total and set up
+        meal.receipt = receiptCoffee;
+        const responseCoffee  = await receiptService.createReceipt(receiptCoffee);
+        console.log("Receipt created successfully", responseCoffee.data);
+        const responseRice  = await receiptService.createReceipt(receiptRice);
+        console.log("Receipt created successfully", responseRice.data);
+        if(responseCoffee.status === 201 && responseRice.status === 201){
+          console.log("Receipt created successfully", responseCoffee.data);
+          console.log("Receipt created successfully", responseRice.data);
+        }
+        
+
+
+   
+      }
+      console.log("Creating catering event:", cateringEvent.value);
+      const responseEvent = await cateringService.createCateringEvent(cateringEvent.value);
+      if (responseEvent.status === 201) {
+        console.log("Catering event created successfully", responseEvent.data);
+      }
+
+      
       Swal.fire("Success", "Catering event created successfully", "success");
     } catch (error) {
       console.error("Error creating catering event:", error);
