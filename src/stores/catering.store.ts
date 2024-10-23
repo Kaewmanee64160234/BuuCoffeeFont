@@ -17,6 +17,8 @@ export const useCateringStore = defineStore("catering", () => {
   const userStore = useUserStore();
   const selectedMealIndex = ref<number>(0);
   const cashierAmount = ref<number>(0);
+  const cateringReceiptItemDialog = ref<boolean>(false);
+  const filteredReceiptItems = ref<ReceiptItem[]>([]);
 
   const selectItemEdit = ref<ReceiptItem>({
     receiptItemId: 0,
@@ -70,30 +72,6 @@ export const useCateringStore = defineStore("catering", () => {
     } catch (error) {
       console.error("Error fetching meals:", error);
     }
-  }
-
-  // Clear form
-  function clearForm() {
-    cateringEvent.value = {
-      cashierId: 0,
-      cashierAmount: 0,
-      createdDate: new Date(),
-      deletedAt: "",
-      meals: [],
-      user: {
-        role: {
-          id: 0,
-          name: "",
-          permissions: [],
-        },
-        userId: 0,
-        userEmail: "",
-        userName: "",
-        userPassword: "",
-        userRole: "",
-        userStatus: "",
-      },
-    };
   }
 
   // Save meals
@@ -457,6 +435,16 @@ const addMeal = () => {
     console.log("Updated catering event:", cateringEvent.value);
   };
 
+  // calculate in reciptItem,
+  const calculateReceiptItem = (receiptItem: ReceiptItem) => {
+    const productPrice = receiptItem.product?.productPrice || 0;
+    const toppingsTotal = receiptItem.productTypeToppings.reduce((sum, topping) => {
+      return sum + topping.topping.toppingPrice * topping.quantity;
+    }, 0);
+    
+    return productPrice + toppingsTotal;
+  };
+
   // clear data catering
   const clearData = () => {
     cateringEvent.value = {
@@ -494,5 +482,8 @@ const addMeal = () => {
     addProduct,
     addToReceipt,
     cashierAmount,
+    cateringReceiptItemDialog,
+    filteredReceiptItems,
+    calculateReceiptItem
   };
 });

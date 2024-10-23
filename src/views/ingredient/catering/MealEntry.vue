@@ -7,6 +7,7 @@ import type { MealProduct } from "@/types/catering/meal.type";
 import DrinkSelectionDialog from "@/components/pos/DrinkSelectionDialog.vue";
 import { useToppingStore } from "@/stores/topping.store";
 import type { ReceiptItem } from "@/types/receipt.type";
+import CateringReciptItemDialog from "@/components/pos/CateringReciptItemDialog.vue";
 
 const productStore = useProductStore(); // New product store
 const activePanelIndex = ref(0);
@@ -89,6 +90,16 @@ const calculateTotalPrice = () => {
     );
   }, 0);
 };
+// setfilteredReceiptItems 
+const setFilteredReceiptItems =(mealIndex:number,mealProduct:MealProduct)=>{
+  const receiptItems = cateringStore.cateringEvent.meals![mealIndex].receipt.receiptItems.filter(
+    (receiptItem:ReceiptItem) => receiptItem.product!.productId === mealProduct.product.productId
+  );
+  cateringStore.filteredReceiptItems = receiptItems;
+  console.log(cateringStore.filteredReceiptItems);
+  
+  cateringStore.cateringReceiptItemDialog = true;
+}
 
 // Watch for changes in the meal products and recalculate the total price
 watch(
@@ -243,6 +254,7 @@ watch(
                       <tr
                         v-for="(item, itemIndex) in meal.mealProducts"
                         :key="itemIndex"
+                        @click="setFilteredReceiptItems(indexMeals,item)"
                       >
                     
                         <td>{{ itemIndex + 1 }}</td>
@@ -291,20 +303,7 @@ watch(
                           </v-btn>
                         </td>
                         <v-row> 
-                          <br>
                           
-                          <!-- Expandable row for showing product details -->
-                           <v-row v-if="item.product.haveTopping" >
-                             <v-row v-for="(itemReciept,indexItemReceipt) in meal.receipt.receiptItems.filter(
-                               (receiptItem:ReceiptItem) => receiptItem.product!.productId === item.product.productId
-                             )" :key="indexItemReceipt" >
-                             <v-col>{{ itemReciept.product?.productName }}</v-col>
-                             <v-col>{{ itemReciept.quantity }}</v-col>
-                             <v-col>{{ itemReciept.productType?.productTypeName }}</v-col>
- 
-                             </v-row>
- 
-                           </v-row>
                      
                        </v-row>
                     
@@ -330,6 +329,7 @@ watch(
     </v-card-text>
   </v-card>
   <DrinkSelectionDialog />
+  <CateringReciptItemDialog />
 </template>
 
 <style scoped>
