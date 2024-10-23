@@ -83,7 +83,7 @@ const saveCheckData = async () => {
   <v-container fluid style="padding-left: 80px;">
     <v-card-title>
       <v-row>
-        <v-col cols="9" style="padding: 20px;">
+        <v-col cols="9" style="padding: 10px;">
           <h3>คืนวัตถุดิบเหลือร้านเลี้ยงรับรอง</h3>
         </v-col>
       </v-row>

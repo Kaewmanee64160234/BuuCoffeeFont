@@ -76,9 +76,9 @@ const subunits = [
 <template>
   <v-dialog v-model="ingredientStore.dialog" persistent width="1024">
     <v-card class="rounded-card white-background">
-      <v-card-title class="text-center">
-        <span>เพิ่มวัตถุดิบ</span>
-      </v-card-title>
+      <!-- <v-card-title > -->
+        <h3 class="text-center mt-2">เพิ่มวัตถุดิบ</h3>
+      <!-- </v-card-title> -->
 
       <v-card-text>
         <v-form ref="form">
@@ -86,11 +86,11 @@ const subunits = [
             <v-row> ตัวอย่าง : <strong>เนสกาแฟ เบลนด์ แอนด์ บรู กาแฟปรุงสำเร็จ ริช อโรมา </strong><strong>1 ถุง มี 27 ซอง</strong>  ขั้นต่ำในคลัง <strong>100 ซอง</strong> </v-row>
             <v-row>
               <v-col cols="12" sm="12" class="d-flex justify-center align-center">
-                <v-img v-if="imagePreview" :src="imagePreview" width="200" height="200" class="rounded-card"></v-img>
+                <v-img v-if="imagePreview" :src="imagePreview" width="180" height="180" class="rounded-card"></v-img>
                 <v-img v-else-if="ingredientStore.editedIngredient.ingredientId"
                   :src="`http://localhost:3000/ingredients/${ingredientStore.editedIngredient.ingredientId}/image`"
-                  width="200" height="200" class="rounded-card"></v-img>
-                <v-img v-else src="https://via.placeholder.com/200" width="200" height="200"
+                  width="180" height="180" class="rounded-card"></v-img>
+                <v-img v-else src="https://via.placeholder.com/200" width="180" height="180"
                   class="rounded-card"></v-img>
               </v-col>
             </v-row>
@@ -199,7 +199,7 @@ const subunits = [
 
   .v-btn {
     width: 100%;
-    margin-top: 10px;
+    margin-top: 5px;
   }
 
   .v-col {

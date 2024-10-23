@@ -664,6 +664,7 @@ const selectReceipt = (receipt: Receipt) => {
   overflow-y: auto;
   max-height: 35vh;
   margin-bottom: 20px;
+  margin-right: 20px;
   padding: 15px;
   background-color: #ffffff;
   border-radius: 10px;

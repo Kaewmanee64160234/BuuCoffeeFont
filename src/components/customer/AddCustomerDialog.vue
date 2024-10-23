@@ -67,7 +67,7 @@ async function saveCustomer() {
 </script>
 
 <template>
-  <v-dialog v-model="customerStore.openDialogRegisterCustomer" max-width="800px">
+  <v-dialog v-model="customerStore.openDialogRegisterCustomer" max-width="550px">
     <v-card>
       <v-card-title>
         <span class="text-h5">สมัครสมาชิก</span>

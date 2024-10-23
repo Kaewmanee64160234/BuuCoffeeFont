@@ -324,7 +324,7 @@ const selectReceipt = (receipt: Receipt) => {
                 <v-col cols="12" md="6">
                   <h3 class="order-summary-title">สรุปรายการ</h3>
                 </v-col>
-                <v-col cols="12" md="5" class="text-end ml-5" >
+                <v-col cols="12" md="6" class="text-end" >
                   <p @click="cancelReceipt()" class="cancel-order">ยกเลิกรายการ</p>
                 </v-col>
               </v-row>
@@ -600,6 +600,7 @@ const selectReceipt = (receipt: Receipt) => {
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   margin-bottom: 5px;
+  margin-right: 13px;
   background-color: #ffffff;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   transition: box-shadow 0.3s;

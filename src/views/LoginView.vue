@@ -184,5 +184,10 @@ const loginHandler = async () => {
     height: auto;
   }
 }
-
+.login-btn {
+  width: 40%;
+  background-color: #CE9461;
+  color: white;
+  transition: transform 0.2s ease-in-out;
+}
 </style>

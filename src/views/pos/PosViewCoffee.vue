@@ -369,20 +369,21 @@ const showQueue = computed(() => {
             class="full-width-row"
             style="overflow: hidden; margin-bottom: 5px; margin-top: -20px"
           >
-            <v-col cols="12" md="6">
-              <v-text-field
-                v-model="barcode"
-                append-icon="mdi-barcode"
-                label="แสกนบาร์โค้ด"
-                variant="solo"
-                dense
-                hide-details
-                @change="handleBarcodeInput"
-                style="background-color: #f1f1f1; border-radius: 8px"
-                class="ml-6"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="12" md="5" class="d-flex justify-end align-center">
+          <v-col cols="12" md="6">
+            <v-text-field
+              v-model="barcode"
+              append-inner-icon="mdi-barcode"
+              label="แสกนบาร์โค้ด"
+              variant="solo"
+              dense
+              hide-details
+              @change="handleBarcodeInput"
+              style="background-color: #f1f1f1; border-radius: 8px; text-align: right;"
+              class="ml-6"
+            ></v-text-field>
+          </v-col>
+          
+            <v-col cols="12" md="5" class="d-flex justify-end align-center" style="margin-left: 7%;">
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
@@ -412,7 +413,7 @@ const showQueue = computed(() => {
 
           <!-- Category Tabs -->
           <v-row
-            class="full-width-row"
+            class="full-width-row ml-8"
             style="overflow: hidden; margin-bottom: 10px"
           >
             <v-col cols="12">

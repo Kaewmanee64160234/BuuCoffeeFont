@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-tabs v-model="selectedCategory" background-color="#f5f5f5" >
+    <v-tabs v-model="selectedCategory" background-color="#f5f5f5" class="ml-3" >
       <v-tab
         v-for="category in categoryStore.categoriesForCreate"
         :key="category.categoryId"
