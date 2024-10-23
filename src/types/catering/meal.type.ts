@@ -1,6 +1,6 @@
 import type { Ingredient } from "../ingredient.type";
 import type { Product } from "../product.type";
-import type { ReceiptItem } from "../receipt.type";
+import type { Receipt, ReceiptItem } from "../receipt.type";
 
 export interface Meal {
   mealName: string;
@@ -8,8 +8,8 @@ export interface Meal {
   mealTime: string;
   cateringEventId: number;
   mealProducts: MealProduct[];
-  receiptItemsRice?: ReceiptItem[];
-  receiptItemsCoffee?: ReceiptItem[];
+  receipt: Receipt; // One receipt for either rice or coffee in this meal
+
 }
 export interface MealProduct {
   mealId: number;
@@ -18,3 +18,5 @@ export interface MealProduct {
   totalPrice: number;
   type: string; // riceShop coffeeShop
 }
+
+ 

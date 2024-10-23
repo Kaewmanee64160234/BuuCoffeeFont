@@ -38,8 +38,8 @@ export interface Receipt {
   checkIngredientId:number;
   receiptNumber?: number;
   receiptPromotions:ReceiptPromotion[];
-  createdDate: Date;
-  updatedDate: Date;
+  createdDate?: Date;
+  updatedDate?: Date;
 }
 
 export function mapToReceipt(data: any): Receipt {

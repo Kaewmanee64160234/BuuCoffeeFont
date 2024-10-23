@@ -6,6 +6,7 @@ import { useCateringStore } from "@/stores/catering.store";
 import type { MealProduct } from "@/types/catering/meal.type";
 import DrinkSelectionDialog from "@/components/pos/DrinkSelectionDialog.vue";
 import { useToppingStore } from "@/stores/topping.store";
+
 const productStore = useProductStore(); // New product store
 const activePanelIndex = ref(0);
 const searchQuery = ref("");
@@ -16,14 +17,13 @@ const type = ref("");
 const cateringStore = useCateringStore();
 const toppingStore = useToppingStore();
 
-const removeProductFromMeal = (index: number, itemIndex: number) => {
-  const mealIndex = activePanelIndex.value;
-  cateringStore.cateringEvent.meals![mealIndex].mealProducts.splice(index, 1); // Adjusted for product
+// Remove a product from the meal
+const removeProductFromMeal = (mealIndex: number, itemIndex: number) => {
+  cateringStore.cateringEvent.meals![mealIndex].mealProducts.splice(itemIndex, 1); // Adjusted for product removal
   calculateTotalPrice();
 };
 
-
-// incress number of product quantity
+// Increase the number of products in a meal
 const increaseProductQuantity = (item: MealProduct) => {
   item.quantity++;
   if (item.product.haveTopping) {
@@ -34,7 +34,8 @@ const increaseProductQuantity = (item: MealProduct) => {
   }
   calculateTotalPrice();
 };
-// decress number of product quantity
+
+// Decrease the number of products in a meal
 const decreaseProductQuantity = (item: MealProduct) => {
   if (item.quantity > 1) {
     item.quantity--;
@@ -47,41 +48,44 @@ const decreaseProductQuantity = (item: MealProduct) => {
     calculateTotalPrice();
   }
 };
+
+// Watch for tab selection changes and update product filters accordingly
 watch(selectedTab, () => {
   filterProducts();
   type.value = selectedTab.value === "coffee" ? "coffee" : "rice";
 });
 
+// Filter products based on the selected tab (coffee or rice)
 async function filterProducts() {
-  console.log("selectedTab.value", selectedTab.value);
-
   if (selectedTab.value === "coffee") {
     await productStore.getProductByStoreType("ร้านกาแฟ"); // Fetch coffee products
     productFilters.value = productStore.products;
-    type.value = "coffee";
   } else if (selectedTab.value === "rice") {
     await productStore.getProductByStoreType("ร้านข้าว"); // Fetch rice products
     productFilters.value = productStore.products;
-    type.value = "rice";
   }
 }
 
+// Initialize component with coffee products and toppings
 onMounted(async () => {
-  await productStore.getProductByStoreType("ร้านกาแฟ"); // Fetch coffee products
+  await productStore.getProductByStoreType("ร้านกาแฟ"); // Fetch coffee products by default
   await toppingStore.getAllToppings();
-  
   filterProducts();
   calculateTotalPrice();
 });
 
+// Calculate total price for all products in all meals
 const calculateTotalPrice = () => {
-  totalPrice.value = cateringStore.mealProducts.reduce((sum, item) => {
-    return sum + (item.totalPrice! * item.quantity || 0);
+  totalPrice.value = cateringStore.cateringEvent.meals!.reduce((sum, meal) => {
+    return sum + meal.mealProducts.reduce((productSum, item) => {
+      return productSum + (item.totalPrice! * item.quantity || 0);
+    }, 0);
   }, 0);
 };
 
+// Watch for changes in the meal products and recalculate the total price
 watch(
-  () => cateringStore.mealProducts,
+  () => cateringStore.cateringEvent.meals,
   () => {
     calculateTotalPrice();
   },
@@ -94,20 +98,20 @@ watch(
     <v-card-text>
       <v-expansion-panels class="mb-5">
         <v-expansion-panel
-          v-for="(meal, index) in cateringStore.cateringEvent.meals"
-          :key="index"
+          v-for="(meal, indexMeals) in cateringStore.cateringEvent.meals"
+          :key="indexMeals"
           class="mb-4"
         >
           <v-expansion-panel-header>
             <v-row class="d-flex align-center">
               <v-col class="d-flex align-center">
-                <v-card-title
-                  >รายละเอียดมื้ออาหาร #{{ index + 1 }}</v-card-title
-                >
+                <v-card-title>
+                  รายละเอียดมื้ออาหาร #{{ indexMeals + 1 }}
+                </v-card-title>
                 <v-btn
                   icon
                   class="ml-2"
-                  @click="cateringStore.removeMeal(index)"
+                  @click="cateringStore.removeMeal(indexMeals)"
                 >
                   <v-icon>mdi-delete</v-icon>
                 </v-btn>
@@ -134,8 +138,7 @@ watch(
                   dense
                   hide-details
                   variant="solo"
-                >
-                </v-text-field>
+                ></v-text-field>
               </v-col>
               <v-col cols="4">
                 <v-text-field
@@ -145,8 +148,7 @@ watch(
                   hide-details
                   variant="solo"
                   disabled
-                >
-                </v-text-field>
+                ></v-text-field>
               </v-col>
             </v-row>
             <v-card-title>
@@ -163,8 +165,7 @@ watch(
                     variant="solo"
                     outlined
                     v-model="searchQuery"
-                  >
-                  </v-text-field>
+                  ></v-text-field>
                 </v-col>
               </v-row>
             </v-card-title>
@@ -190,26 +191,26 @@ watch(
                       v-for="(item, index) in productFilters"
                       :key="index"
                     >
-                    
-                      <v-card width="100%" @click="cateringStore.addProduct(item,type)">
+                      <v-card
+                        width="100%"
+                        @click="cateringStore.addProduct(item, indexMeals,type)"
+                      >
                         <v-img
                           :src="`http://localhost:3000/products/${item.productId}/image`"
                           height="100"
-                        >
-                        </v-img>
-                        <v-card-title style="font-size: 14px">{{
-                          item.productName
-                        }}</v-card-title>
-                        <!-- <v-card-subtitle style="font-size: 12px">{{ item.productSupplier }}</v-card-subtitle> -->
-                        <v-card-subtitle style="font-size: 12px"
-                          >ราคาต้นทุน
+                        ></v-img>
+                        <v-card-title style="font-size: 14px">
+                          {{ item.productName }}
+                        </v-card-title>
+                        <v-card-subtitle style="font-size: 12px">
+                          ราคาต้นทุน
                           {{
                             item.haveTopping
                               ? item.productTypes![0].productTypePrice
                               : item.productPrice
                           }}
-                          บาท</v-card-subtitle
-                        >
+                          บาท
+                        </v-card-subtitle>
                       </v-card>
                     </v-col>
                   </v-row>
@@ -221,12 +222,12 @@ watch(
                   <v-table>
                     <thead>
                       <tr>
-                        <th class="text-center" >ลำดับ</th>
-                        <th class="text-center" >ชื่อสินค้า</th>
-                        <th class="text-center" >คลัง</th>
-                        <th class="text-center" >ราคารวม</th>
-                        <th class="text-center" >จำนวน</th>
-                        <th class="text-center" >แอคชั่น</th>
+                        <th class="text-center">ลำดับ</th>
+                        <th class="text-center">ชื่อสินค้า</th>
+                        <th class="text-center">คลัง</th>
+                        <th class="text-center">ราคารวม</th>
+                        <th class="text-center">จำนวน</th>
+                        <th class="text-center">แอคชั่น</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -239,9 +240,6 @@ watch(
                         <td>{{ item.type }}</td>
                         <td>{{ item.totalPrice }}</td>
                         <td>
-                          <!-- add button increaes and decesss -->
-
-                          <!-- add button increases and decreases -->
                           <v-row justify="center" align="center">
                             <v-col cols="4" class="text-center">
                               <v-btn
@@ -287,7 +285,7 @@ watch(
       </v-expansion-panels>
       <v-btn
         style="background-color: #ff9642"
-        @click="cateringStore.addMeal"
+        @click="cateringStore.addMeal()"
         class="button-full-width"
         rounded
       >
