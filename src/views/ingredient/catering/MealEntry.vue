@@ -268,7 +268,7 @@ watch(
                         </td>
                         <td>
                           <button
-                            @click="removeProductFromMeal(index, itemIndex)"
+                            @click="removeProductFromMeal(indexMeals, itemIndex)"
                             class="styled-button"
                           >
                             ลบ
