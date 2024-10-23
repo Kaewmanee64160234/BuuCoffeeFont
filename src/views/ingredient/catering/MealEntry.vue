@@ -6,6 +6,7 @@ import { useCateringStore } from "@/stores/catering.store";
 import type { MealProduct } from "@/types/catering/meal.type";
 import DrinkSelectionDialog from "@/components/pos/DrinkSelectionDialog.vue";
 import { useToppingStore } from "@/stores/topping.store";
+import type { ReceiptItem } from "@/types/receipt.type";
 
 const productStore = useProductStore(); // New product store
 const activePanelIndex = ref(0);
@@ -291,11 +292,11 @@ watch(
                         </td>
                         <v-row> 
                           <br>
-                          {{ meal.receipt.receiptItems }}
+                          
                           <!-- Expandable row for showing product details -->
                            <v-row v-if="item.product.haveTopping" >
                              <v-row v-for="(itemReciept,indexItemReceipt) in meal.receipt.receiptItems.filter(
-                               (receiptItem) => receiptItem.product!.productId === item.product.productId
+                               (receiptItem:ReceiptItem) => receiptItem.product!.productId === item.product.productId
                              )" :key="indexItemReceipt" >
                              <v-col>{{ itemReciept.product?.productName }}</v-col>
                              <v-col>{{ itemReciept.quantity }}</v-col>
