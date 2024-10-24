@@ -94,13 +94,17 @@ const calculateTotalPrice = () => {
 };
 // setfilteredReceiptItems 
 const setFilteredReceiptItems =(mealIndex:number,mealProduct:MealProduct)=>{
-  const receiptItems = cateringStore.cateringEvent.meals![mealIndex].receipt.receiptItems.filter(
+  if(mealProduct.product.haveTopping){
+    const receiptItems = cateringStore.cateringEvent.meals![mealIndex].receipt.receiptItems.filter(
     (receiptItem:ReceiptItem) => receiptItem.product!.productId === mealProduct.product.productId
   );
   cateringStore.filteredReceiptItems = receiptItems;
   console.log(cateringStore.filteredReceiptItems);
   
   cateringStore.cateringReceiptItemDialog = true;
+
+  }
+ 
 }
 
 // Watch for changes in the meal products and recalculate the total price
