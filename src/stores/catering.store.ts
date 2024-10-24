@@ -18,7 +18,24 @@ export const useCateringStore = defineStore("catering", () => {
   const selectedMealIndex = ref<number>(0);
   const cashierAmount = ref<number>(0);
   const cateringReceiptItemDialog = ref<boolean>(false);
+  const cateringProductDialog = ref<boolean>(false);
   const filteredReceiptItems = ref<ReceiptItem[]>([]);
+  const productsCatering = ref<Product[]>([]);
+  const productCatering = ref<Product>({
+    productId: 0,
+    productName: "",
+    barcode: "",
+    countingPoint: false,
+    storeType: "",
+    category: {
+      categoryId: 0,
+      categoryName: "",
+    },
+    haveTopping: false,
+    productImage: "",
+    productPrice: 0,
+  });
+
 
   const selectItemEdit = ref<ReceiptItem>({
     receiptItemId: 0,
@@ -484,6 +501,9 @@ const addMeal = () => {
     cashierAmount,
     cateringReceiptItemDialog,
     filteredReceiptItems,
-    calculateReceiptItem
+    calculateReceiptItem,
+    productsCatering,
+    productCatering,
+    cateringProductDialog
   };
 });

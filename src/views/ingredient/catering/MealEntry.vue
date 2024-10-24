@@ -8,6 +8,7 @@ import DrinkSelectionDialog from "@/components/pos/DrinkSelectionDialog.vue";
 import { useToppingStore } from "@/stores/topping.store";
 import type { ReceiptItem } from "@/types/receipt.type";
 import CateringReciptItemDialog from "@/components/pos/CateringReciptItemDialog.vue";
+import ProductCateringDialog from "@/components/pos/ProductCateringDialog.vue";
 
 const productStore = useProductStore(); // New product store
 const activePanelIndex = ref(0);
@@ -19,6 +20,7 @@ const type = ref("");
 const cateringStore = useCateringStore();
 const toppingStore = useToppingStore();
 const visibleDetails = ref<number | null>(null); // Stores the index of the visible details row
+
 
 
 // Toggle the visibility of the product details row
@@ -109,6 +111,10 @@ watch(
   },
   { deep: true }
 );
+
+const openDrinkSelectionDialog = () => {
+  cateringStore.cateringProductDialog = true;
+};
 </script>
 
 <template>
@@ -138,6 +144,7 @@ watch(
           </v-expansion-panel-header>
 
           <v-expansion-panel-content>
+
             <v-row>
               <v-col cols="4">
                 <v-text-field
@@ -171,6 +178,7 @@ watch(
             </v-row>
             <v-card-title>
               <v-row class="d-flex align-center">
+
                 <v-col cols="9">
                   <h3>การเลี้ยงรับรอง - วัตถุดิบ</h3>
                 </v-col>
@@ -186,6 +194,8 @@ watch(
                   ></v-text-field>
                 </v-col>
               </v-row>
+        <v-btn color="accent"  @click="openDrinkSelectionDialog()" >เพิ่มสินค้าจัดเลี้ยง</v-btn>
+
             </v-card-title>
 
             <v-tabs
@@ -199,6 +209,7 @@ watch(
             </v-tabs>
 
             <v-row class="mt-4">
+
               <!-- Updated to show products -->
               <v-col cols="6">
                 <v-container>
@@ -330,6 +341,7 @@ watch(
   </v-card>
   <DrinkSelectionDialog />
   <CateringReciptItemDialog />
+  <ProductCateringDialog />
 </template>
 
 <style scoped>
