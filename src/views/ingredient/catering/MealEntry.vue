@@ -112,8 +112,9 @@ watch(
   { deep: true }
 );
 
-const openDrinkSelectionDialog = () => {
+const openDrinkSelectionDialog = (indexMeals:number) => {
   cateringStore.cateringProductDialog = true;
+  cateringStore.selectedMealIndex = indexMeals;
 };
 </script>
 
@@ -194,7 +195,7 @@ const openDrinkSelectionDialog = () => {
                   ></v-text-field>
                 </v-col>
               </v-row>
-        <v-btn color="accent"  @click="openDrinkSelectionDialog()" >เพิ่มสินค้าจัดเลี้ยง</v-btn>
+        <v-btn color="accent"  @click="openDrinkSelectionDialog(indexMeals)" >เพิ่มสินค้าจัดเลี้ยง</v-btn>
 
             </v-card-title>
 

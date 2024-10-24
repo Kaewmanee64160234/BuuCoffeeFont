@@ -314,7 +314,7 @@ const addMeal = () => {
     const receipt = meal.receipt;
   
     // Find existing receipt item for this product
-    const receiptItem = receipt.receiptItems.find(ri => ri.product?.productId === item.productId);
+    const receiptItem = receipt.receiptItems.find(ri => ri.product?.productName === item.productName);
   
     if (receiptItem) {
       // Update existing receipt item
@@ -332,7 +332,7 @@ const addMeal = () => {
     }
   
     // Find or add meal product
-    const mealProduct = meal.mealProducts.find(mp => mp.product.productId === item.productId);
+    const mealProduct = meal.mealProducts.find(mp => mp.product.productName === item.productName);
     if (mealProduct) {
       mealProduct.quantity += quantity;
       mealProduct.totalPrice += item.productPrice * quantity;
@@ -486,6 +486,29 @@ const addMeal = () => {
     };
   
   };
+
+  const addProductCateringInCaterings = (item: Product) => {
+    productCatering.value = item;
+    // add to meal and reciptItem
+    addProductToMeal(item, selectedMealIndex.value);
+    cateringProductDialog.value = false;
+    // clear product
+    productCatering.value = {
+      productId: 0,
+      productName: "",
+      barcode: "",
+      countingPoint: false,
+      storeType: "",
+      category: {
+        categoryId: 0,
+        categoryName: "",
+      },
+      haveTopping: false,
+      productImage: "",
+      productPrice: 0,
+    };
+
+  }
   return {
     fetchMeals,
     saveMeals,
@@ -504,6 +527,8 @@ const addMeal = () => {
     calculateReceiptItem,
     productsCatering,
     productCatering,
-    cateringProductDialog
+    cateringProductDialog,
+    addProductCateringInCaterings,
+    selectedMealIndex
   };
 });

@@ -4,6 +4,25 @@ import { ref } from 'vue';
 
 const cateringStore = useCateringStore();
 const quantity = ref(1);
+
+const closeDialog = () => {
+  cateringStore.cateringProductDialog = false;
+  cateringStore.productCatering = {
+    productId: 0,
+    productName: "",
+    barcode: "",
+    countingPoint: false,
+    storeType: "",
+    category: {
+      categoryId: 0,
+      categoryName: "",
+    },
+    haveTopping: false,
+    productImage: "",
+    productPrice: 0,
+  };
+};
+
 </script>
 
 <template>
@@ -55,8 +74,8 @@ const quantity = ref(1);
       <!-- Optional footer for buttons -->
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn text color="primary" @click="cateringStore.saveCateringProduct">บันทึก</v-btn>
-        <v-btn text color="secondary" @click="cateringStore.cateringProductDialog = false">ยกเลิก</v-btn>
+        <v-btn text color="primary" @click="cateringStore.addProductCateringInCaterings(cateringStore.productCatering)">บันทึก</v-btn>
+        <v-btn text color="secondary" @click="closeDialog()">ยกเลิก</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
