@@ -153,6 +153,7 @@ watch(paginate, async (newValue, oldValue) => {
             <th style="text-align: center;font-weight: bold;">รูปภาพ</th>
             <th style="text-align: center;font-weight: bold;">ชื่อวัตถุดิบ</th>
             <th style="text-align: center;font-weight: bold;">ผู้จัดจำหน่าย</th>
+            <th style="text-align: center;font-weight: bold;">หน่วยใหญ่</th>
             <th style="text-align: center;font-weight: bold;">จำนวนที่มีในคลัง</th>
             <th style="text-align: center;font-weight: bold;">การกระทำ</th>
           </tr>
@@ -165,6 +166,7 @@ watch(paginate, async (newValue, oldValue) => {
             </td>
             <td>{{ item.ingredientName }}</td>
             <td>{{ item.ingredientSupplier }}</td>
+            <td>{{ item.ingredientQuantityPerUnit }} x {{ item.ingredientVolumeUnit }}</td>
             <td :style="{ color: item.ingredientQuantityInStock <= item.ingredientMinimun ? 'red' : 'black' }">{{ item.ingredientQuantityInStock }} {{ item.ingredientUnit }}</td>
             <td>
               <v-btn color="#FFDD83" class="mr-5" icon="mdi-pencil" @click="ingredientStore.setEditedIngredient(item)"></v-btn>
