@@ -5,28 +5,40 @@ import { ref } from 'vue';
 
 const cateringStore = useCateringStore();
 
+// Calculate the subtotal for an item based on quantity and toppings
+const calculateSubtotal = (item: ReceiptItem) => {
+  let subtotal = item.productType?.productTypePrice! * item.quantity;
 
-// Define methods for increasing, decreasing, and removing items
-const increaseQuantity = (item: ReceiptItem) => {
-  item.quantity++;
-item.receiptSubTotal = cateringStore.calculateReceiptItem(item);
-// update meal total price
-
-  
-
+  // If the product has toppings, add topping prices to the subtotal
+  if (item.product?.haveTopping && item.productTypeToppings) {
+    const toppingsTotal = item.productTypeToppings.reduce((total, topping) => {
+      return total + topping.topping.toppingPrice * topping.quantity;
+    }, 0);
+    subtotal += toppingsTotal * item.quantity;
+  }
+  return subtotal;
 };
 
-const decreaseQuantity = (item: ReceiptItem) => {
+// Increase item quantity and update subtotal
+const increaseQuantity = (item: ReceiptItem) => {
+  item.quantity++;
+  item.receiptSubTotal = calculateSubtotal(item);
+};
+
+// Decrease item quantity and update subtotal
+const decreaseQuantity = (item: ReceiptItem, index: number) => {
   if (item.quantity > 1) {
     item.quantity--;
-    item.receiptSubTotal = item.product!.productPrice * item.quantity; // Update total
+    item.receiptSubTotal = calculateSubtotal(item);
+  } else {
+    removeItem(index); // If quantity is 1, remove the item instead
   }
 };
 
+// Remove item from the list
 const removeItem = (index: number) => {
-  cateringStore.filteredReceiptItems.splice(index, 1); // Remove from the list
+  cateringStore.filteredReceiptItems.splice(index, 1);
 };
-
 </script>
 
 <template>
@@ -38,24 +50,20 @@ const removeItem = (index: number) => {
     max-width="500px"
     transition="dialog-transition"
   >
-    <!-- Dialog Content -->
     <v-card>
       <v-card-title>
         รายการสินค้าที่เลือก
       </v-card-title>
       <v-card-text>
-        <!-- Selected Items List -->
         <div class="selected-items-list">
           <v-list>
             <v-list-item-group>
-              <!-- Loop through receipt items in the catering event -->
               <div
                 v-for="(item, index) in cateringStore.filteredReceiptItems"
                 :key="index"
                 class="selected-item"
               >
                 <v-list-item>
-                  <!-- Product Image and Details -->
                   <v-row no-gutters>
                     <v-col cols="6" class="product-name">
                       {{ item.product?.productName }}
@@ -64,18 +72,12 @@ const removeItem = (index: number) => {
                       <p>{{ item.receiptSubTotal }}.-</p>
                     </v-col>
                   </v-row>
-
+                  
                   <v-row no-gutters>
                     <v-col cols="7">
-                      <!-- Product Type and Toppings -->
                       <div v-if="item.product?.haveTopping" class="product-details">
                         {{ item.productType?.productTypeName }} +{{ item.productType?.productTypePrice }} | ความหวาน {{ item.sweetnessLevel }}%
                       </div>
-                      <div v-else class="product-details">
-                        {{ item.product?.productName }} ({{ item.product?.category.categoryName }}) {{ item.product?.productPrice }}.-
-                      </div>
-
-                      <!-- Toppings List -->
                       <ul v-if="item.productTypeToppings?.length" class="toppings-list">
                         <li
                           v-for="topping in item.productTypeToppings"
@@ -83,14 +85,13 @@ const removeItem = (index: number) => {
                           class="topping-item"
                         >
                           x{{ topping?.quantity }} {{ topping?.topping?.toppingName }}
-                          <span v-if="topping?.topping?.toppingName.length > 3">: {{ topping?.topping?.toppingPrice }}.-</span>
+                          <span v-if="topping?.topping?.toppingPrice">: {{ topping?.topping?.toppingPrice }}.-</span>
                         </li>
                       </ul>
                     </v-col>
-
-                    <!-- Quantity Controls -->
+                    
                     <v-col cols="5" class="quantity-controls">
-                      <v-btn size="xs-small" color="#C5C5C5" icon @click.stop="decreaseQuantity(item)">
+                      <v-btn size="xs-small" color="#C5C5C5" icon @click.stop="decreaseQuantity(item, index)">
                         <v-icon>mdi-minus</v-icon>
                       </v-btn>
                       <span class="quantity">{{ item.quantity }}</span>
@@ -108,7 +109,7 @@ const removeItem = (index: number) => {
           </v-list>
         </div>
       </v-card-text>
-
+      
       <v-card-actions>
         <v-btn color="primary" @click="cateringStore.cateringReceiptItemDialog = false">ปิด</v-btn>
       </v-card-actions>
