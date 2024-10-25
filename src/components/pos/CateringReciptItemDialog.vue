@@ -19,10 +19,32 @@ const calculateSubtotal = (item: ReceiptItem) => {
   return subtotal;
 };
 
+// Sync meal product quantity and total price for the meal
+const syncMealProduct = () => {
+  const selectedMeal = cateringStore.cateringEvent.meals![cateringStore.selectedMealIndex];
+  
+  // Calculate and update total price for each meal product
+  selectedMeal.mealProducts.forEach((mealProduct) => {
+    const associatedReceiptItems = selectedMeal.receipt.receiptItems
+      .filter((receiptItem) => receiptItem.product?.productId === mealProduct.product!.productId);
+
+    // Update mealProduct quantity and totalPrice based on associated receipt items
+    mealProduct.quantity = associatedReceiptItems.reduce((sum, item) => sum + item.quantity, 0);
+    mealProduct.totalPrice = associatedReceiptItems.reduce((sum, item) => sum + item.receiptSubTotal, 0);
+  });
+
+  // Calculate and update total price of the selected meal
+  selectedMeal.totalPrice = selectedMeal.mealProducts.reduce((total, mealProduct) => total + mealProduct.totalPrice, 0);
+};
+
 // Increase item quantity and update subtotal
 const increaseQuantity = (item: ReceiptItem) => {
   item.quantity++;
   item.receiptSubTotal = calculateSubtotal(item);
+
+  // Update total price in catering store
+  syncMealProduct();
+  cateringStore.updateTotalPrice();
 };
 
 // Decrease item quantity and update subtotal
@@ -33,13 +55,66 @@ const decreaseQuantity = (item: ReceiptItem, index: number) => {
   } else {
     removeItem(index); // If quantity is 1, remove the item instead
   }
+
+  // Update total price in catering store
+  syncMealProduct();
+  cateringStore.updateTotalPrice();
 };
 
-// Remove item from the list
+// Remove item from the list and update mealProduct
 const removeItem = (index: number) => {
+  const item = cateringStore.filteredReceiptItems[index];
+  
+  // Remove the item from filteredReceiptItems
   cateringStore.filteredReceiptItems.splice(index, 1);
+
+  // Update the selected meal in catering event
+  const selectedMeal = cateringStore.cateringEvent.meals![cateringStore.selectedMealIndex];
+
+  // Remove the item from receipt items in the selected meal
+  const receiptIndex = selectedMeal.receipt.receiptItems.findIndex(
+    (receiptItem) => receiptItem.product?.productId === item.product!.productId && receiptItem === item
+  );
+  if (receiptIndex !== -1) {
+    selectedMeal.receipt.receiptItems.splice(receiptIndex, 1);
+  }
+
+  // Remove corresponding mealProduct if there are no remaining receipt items for this product
+  const remainingItemsForProduct = selectedMeal.receipt.receiptItems
+    .filter((receiptItem) => receiptItem.product?.productId === item.product!.productId);
+  
+  if (remainingItemsForProduct.length === 0) {
+    const mealProductIndex = selectedMeal.mealProducts.findIndex(
+      (mealProduct) => mealProduct.product!.productId === item.product!.productId
+    );
+    if (mealProductIndex !== -1) {
+      selectedMeal.mealProducts.splice(mealProductIndex, 1);
+    }
+    if (selectedMeal.receipt.receiptItems.length === 0) {
+      // close dialog if all items are removed
+      cateringStore.cateringReceiptItemDialog = false;
+    }
+  }
+
+  // If all items in receipt are removed, reset the meal data
+  if (selectedMeal.receipt.receiptItems.length === 0) {
+    selectedMeal.totalPrice = 0;
+    selectedMeal.mealProducts = [];
+  } else {
+    // Recalculate the total price for the selected meal based on remaining receipt items
+    selectedMeal.totalPrice = selectedMeal.receipt.receiptItems.reduce((total, receiptItem) => {
+      return total + receiptItem.receiptSubTotal;
+    }, 0);
+  }
+
+  // Update total price and quantities in catering store
+  syncMealProduct();
+  cateringStore.updateTotalPrice();
 };
+
 </script>
+
+
 
 <template>
   <v-dialog
@@ -51,6 +126,7 @@ const removeItem = (index: number) => {
     transition="dialog-transition"
   >
     <v-card>
+      {{ cateringStore.cateringEvent.meals![cateringStore.selectedMealIndex].receipt.receiptItems.filter((item) => item.product?.productId === item.product?.productId).length }}
       <v-card-title>
         รายการสินค้าที่เลือก
       </v-card-title>

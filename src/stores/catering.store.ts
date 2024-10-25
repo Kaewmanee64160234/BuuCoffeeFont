@@ -559,6 +559,23 @@ export const useCateringStore = defineStore("catering", () => {
       productPrice: 0,
     };
   };
+
+  // updateTotalPrice
+  const updateTotalPrice = () => {
+    const meal = cateringEvent.value.meals![selectedMealIndex.value];
+    meal.totalPrice = meal.mealProducts.reduce(
+      (sum, mealProduct) => sum + mealProduct.totalPrice,
+      0
+    );
+    const totalEventPrice = cateringEvent.value.meals!.reduce(
+      (sum, meal) => sum + meal.totalPrice,
+      0
+    );
+    cateringEvent.value.cashierAmount = totalEventPrice;
+    cateringEvent.value.meals![selectedMealIndex.value] = meal;
+
+  }
+
   return {
     fetchMeals,
     saveMeals,
@@ -580,5 +597,6 @@ export const useCateringStore = defineStore("catering", () => {
     cateringProductDialog,
     addProductCateringInCaterings,
     selectedMealIndex,
+    updateTotalPrice
   };
 });
