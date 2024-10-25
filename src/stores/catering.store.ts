@@ -575,6 +575,43 @@ export const useCateringStore = defineStore("catering", () => {
     cateringEvent.value.meals![selectedMealIndex.value] = meal;
 
   }
+  const calculateSubtotal = (item: ReceiptItem) => {
+    let subtotal = item.productType?.productTypePrice! * item.quantity;
+  
+    if (item.product?.haveTopping && item.productTypeToppings) {
+      const toppingsTotal = item.productTypeToppings.reduce((total, topping) => {
+        return total + topping.topping.toppingPrice * topping.quantity;
+      }, 0);
+      subtotal += toppingsTotal * item.quantity;
+    }
+    return subtotal;
+  };
+  const syncMealProduct = () => {
+    const selectedMeal =
+      cateringEvent.value.meals![selectedMealIndex.value];
+  
+    selectedMeal.mealProducts.forEach((mealProduct) => {
+      const associatedReceiptItems = selectedMeal.receipt.receiptItems.filter(
+        (receiptItem) =>
+          receiptItem.product?.productId === mealProduct.product!.productId
+      );
+  
+      mealProduct.quantity = associatedReceiptItems.reduce(
+        (sum, item) => sum + item.quantity,
+        0
+      );
+      mealProduct.totalPrice = associatedReceiptItems.reduce(
+        (sum, item) => sum + item.receiptSubTotal,
+        0
+      );
+    });
+  
+    selectedMeal.totalPrice = selectedMeal.mealProducts.reduce(
+      (total, mealProduct) => total + mealProduct.totalPrice,
+      0
+    );
+  };
+  
 
   return {
     fetchMeals,
@@ -597,6 +634,8 @@ export const useCateringStore = defineStore("catering", () => {
     cateringProductDialog,
     addProductCateringInCaterings,
     selectedMealIndex,
-    updateTotalPrice
+    updateTotalPrice,
+    calculateSubtotal,
+    syncMealProduct
   };
 });
