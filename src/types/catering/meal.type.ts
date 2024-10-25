@@ -13,7 +13,9 @@ export interface Meal {
 }
 export interface MealProduct {
   mealId: number;
-  product: Product;
+  product?: Product;
+  productName?: string;
+  productPrice?: number;
   quantity: number;
   totalPrice: number;
   type: string; // riceShop coffeeShop

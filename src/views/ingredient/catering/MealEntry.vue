@@ -21,8 +21,6 @@ const cateringStore = useCateringStore();
 const toppingStore = useToppingStore();
 const visibleDetails = ref<number | null>(null); // Stores the index of the visible details row
 
-
-
 // Toggle the visibility of the product details row
 const toggleDetails = (index: number) => {
   if (visibleDetails.value === index) {
@@ -53,7 +51,10 @@ const decreaseProductQuantity = (item: any) => {
 
 // Handle removing the product from the meal
 const removeProductFromMeal = (mealIndex: number, productIndex: number) => {
-  cateringStore.cateringEvent.meals![mealIndex].mealProducts.splice(productIndex, 1);
+  cateringStore.cateringEvent.meals![mealIndex].mealProducts.splice(
+    productIndex,
+    1
+  );
 };
 
 // Watch for tab selection changes and update product filters accordingly
@@ -92,20 +93,24 @@ const calculateTotalPrice = () => {
     );
   }, 0);
 };
-// setfilteredReceiptItems 
-const setFilteredReceiptItems =(mealIndex:number,mealProduct:MealProduct)=>{
-  if(mealProduct.product.haveTopping){
-    const receiptItems = cateringStore.cateringEvent.meals![mealIndex].receipt.receiptItems.filter(
-    (receiptItem:ReceiptItem) => receiptItem.product!.productId === mealProduct.product.productId
-  );
-  cateringStore.filteredReceiptItems = receiptItems;
-  console.log(cateringStore.filteredReceiptItems);
-  
-  cateringStore.cateringReceiptItemDialog = true;
+// setfilteredReceiptItems
+const setFilteredReceiptItems = (
+  mealIndex: number,
+  mealProduct: MealProduct
+) => {
+  if (mealProduct.product.haveTopping) {
+    const receiptItems = cateringStore.cateringEvent.meals![
+      mealIndex
+    ].receipt.receiptItems.filter(
+      (receiptItem: ReceiptItem) =>
+        receiptItem.product!.productId === mealProduct.product.productId
+    );
+    cateringStore.filteredReceiptItems = receiptItems;
+    console.log(cateringStore.filteredReceiptItems);
 
+    cateringStore.cateringReceiptItemDialog = true;
   }
- 
-}
+};
 
 // Watch for changes in the meal products and recalculate the total price
 watch(
@@ -116,7 +121,7 @@ watch(
   { deep: true }
 );
 
-const openDrinkSelectionDialog = (indexMeals:number) => {
+const openDrinkSelectionDialog = (indexMeals: number) => {
   cateringStore.cateringProductDialog = true;
   cateringStore.selectedMealIndex = indexMeals;
 };
@@ -149,7 +154,6 @@ const openDrinkSelectionDialog = (indexMeals:number) => {
           </v-expansion-panel-header>
 
           <v-expansion-panel-content>
-
             <v-row>
               <v-col cols="4">
                 <v-text-field
@@ -183,7 +187,6 @@ const openDrinkSelectionDialog = (indexMeals:number) => {
             </v-row>
             <v-card-title>
               <v-row class="d-flex align-center">
-
                 <v-col cols="9">
                   <h3>การเลี้ยงรับรอง - วัตถุดิบ</h3>
                 </v-col>
@@ -199,22 +202,24 @@ const openDrinkSelectionDialog = (indexMeals:number) => {
                   ></v-text-field>
                 </v-col>
               </v-row>
-        <v-btn color="accent"  @click="openDrinkSelectionDialog(indexMeals)" >เพิ่มสินค้าจัดเลี้ยง</v-btn>
-
+              <v-btn
+                color="accent"
+                @click="openDrinkSelectionDialog(indexMeals)"
+                >เพิ่มสินค้าจัดเลี้ยง</v-btn
+              >
             </v-card-title>
 
             <v-tabs
               v-model="selectedTab"
               align-tabs="start"
               color="brown"
-              background-color="#fff"
+              background-colaor="#fff"
             >
               <v-tab value="coffee">วัตถุดิบร้านกาแฟ</v-tab>
               <v-tab value="rice">วัตถุดิบร้านข้าว</v-tab>
             </v-tabs>
 
             <v-row class="mt-4">
-
               <!-- Updated to show products -->
               <v-col cols="6">
                 <v-container>
@@ -270,9 +275,8 @@ const openDrinkSelectionDialog = (indexMeals:number) => {
                       <tr
                         v-for="(item, itemIndex) in meal.mealProducts"
                         :key="itemIndex"
-                        @click="setFilteredReceiptItems(indexMeals,item)"
+                        @click="setFilteredReceiptItems(indexMeals, item)"
                       >
-                    
                         <td>{{ itemIndex + 1 }}</td>
                         <td @click="toggleDetails(itemIndex)">
                           {{ item.product.productName }}
@@ -282,7 +286,12 @@ const openDrinkSelectionDialog = (indexMeals:number) => {
                         <td>{{ item.totalPrice }}</td>
                         <td>
                           <v-row justify="center" align="center">
-                            <v-col cols="4" class="text-center">
+                            <!-- Check if the product does not have toppings before showing the quantity buttons -->
+                            <v-col
+                              v-if="!item.product.haveTopping"
+                              cols="4"
+                              class="text-center"
+                            >
                               <v-btn
                                 icon
                                 @click.stop="decreaseProductQuantity(item)"
@@ -295,7 +304,11 @@ const openDrinkSelectionDialog = (indexMeals:number) => {
                             <v-col cols="4" class="text-center">
                               {{ item.quantity }}
                             </v-col>
-                            <v-col cols="4" class="text-center">
+                            <v-col
+                              v-if="!item.product.haveTopping"
+                              cols="4"
+                              class="text-center"
+                            >
                               <v-btn
                                 icon
                                 @click.stop="increaseProductQuantity(item)"
@@ -307,6 +320,7 @@ const openDrinkSelectionDialog = (indexMeals:number) => {
                             </v-col>
                           </v-row>
                         </td>
+
                         <td>
                           <v-btn
                             icon
@@ -318,14 +332,8 @@ const openDrinkSelectionDialog = (indexMeals:number) => {
                             <v-icon>mdi-delete</v-icon>
                           </v-btn>
                         </td>
-                        <v-row> 
-                          
-                     
-                       </v-row>
-                    
+                        <v-row> </v-row>
                       </tr>
-
-                     
                     </tbody>
                   </v-table>
                 </v-card>

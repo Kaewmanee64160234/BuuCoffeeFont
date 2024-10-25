@@ -26,7 +26,7 @@ export const useCateringStore = defineStore("catering", () => {
     productName: "",
     barcode: "",
     countingPoint: false,
-    storeType: "",
+    storeType: "เลี้ยงรับรอง",
     category: {
       categoryId: 0,
       categoryName: "",
@@ -35,7 +35,6 @@ export const useCateringStore = defineStore("catering", () => {
     productImage: "",
     productPrice: 0,
   });
-
 
   const selectItemEdit = ref<ReceiptItem>({
     receiptItemId: 0,
@@ -101,38 +100,37 @@ export const useCateringStore = defineStore("catering", () => {
     }
   }
 
-// Add meal to the catering event with initialized receipt
-const addMeal = () => {
-  cateringEvent.value.meals!.push({
-    mealName: "",
-    mealTime: "",
-    totalPrice: 0,
-    mealProducts: [],
-    receipt: { // Initialize the receipt object here
-      receiptType: "", 
-      receiptTotalDiscount: 0,
-      receiptNetPrice: 0,
-      receiptStatus: "",
-      createdReceipt: new Date(),
-      receiptItems: [], // Initialize empty receipt items
-      receiptPromotions: [],
-      receiptTotalPrice: 0,
-      paymentMethod: "",
-      change: 0,
-      receive: 0,
-      customer: {
-        customerId: 0,
-        customerName: "",
-        customerPhone: "",
-        customerNumberOfStamp: 0,
-        createMemberDate: new Date(),
+  // Add meal to the catering event with initialized receipt
+  const addMeal = () => {
+    cateringEvent.value.meals!.push({
+      mealName: "",
+      mealTime: "",
+      totalPrice: 0,
+      mealProducts: [],
+      receipt: {
+        // Initialize the receipt object here
+        receiptType: "",
+        receiptTotalDiscount: 0,
+        receiptNetPrice: 0,
+        receiptStatus: "",
+        createdReceipt: new Date(),
+        receiptItems: [], // Initialize empty receipt items
+        receiptPromotions: [],
+        receiptTotalPrice: 0,
+        paymentMethod: "",
+        change: 0,
+        receive: 0,
+        customer: {
+          customerId: 0,
+          customerName: "",
+          customerPhone: "",
+          customerNumberOfStamp: 0,
+          createMemberDate: new Date(),
+        },
       },
-    },
-  });
-  console.log("Added meal:", cateringEvent.value.meals);
-  
-};
-
+    });
+    console.log("Added meal:", cateringEvent.value.meals);
+  };
 
   // Remove an ingredient from a meal
   function removeIngredientFromMeal(
@@ -154,10 +152,12 @@ const addMeal = () => {
   const createCateringEvent = async () => {
     try {
       cateringEvent.value.user = userStore.currentUser;
-      console.log("Creating catering event:", JSON.stringify(cateringEvent.value));
-      // create recipt status catering 
-     
-    
+      console.log(
+        "Creating catering event:",
+        JSON.stringify(cateringEvent.value)
+      );
+      // create recipt status catering
+
       for (const meal of cateringEvent.value.meals!) {
         if (!meal.receipt) {
           // กรัณาใส่รายการอาหารอย่างน้อย 1
@@ -168,31 +168,33 @@ const addMeal = () => {
         if (meal.mealName.length < 3) {
           Swal.fire("Error", "ชื่ออาหารต้องมีอย่างน้อย 3 ตัวอักษร", "error");
           return;
-
         }
         // input time
         if (meal.mealTime.length < 1) {
           Swal.fire("Error", "กรุณาใส่เวลา", "error");
           return;
-
         }
         const reciptItemCoffee = ref<ReceiptItem[]>([]);
         const reciptItemRice = ref<ReceiptItem[]>([]);
-        for(const item of meal.receipt.receiptItems){
-          if(item.product?.storeType == "ร้านกาแฟ"){
+        for (const item of meal.receipt.receiptItems) {
+          if (item.product?.storeType == "ร้านกาแฟ") {
             reciptItemCoffee.value.push(item);
-          }
-          else{
+          } else {
             reciptItemRice.value.push(item);
           }
-
         }
-        // create recipt 
+        // create recipt
         const receiptCoffee: Receipt = {
-          receiptTotalPrice: reciptItemCoffee.value.reduce((sum, item) => sum + item.receiptSubTotal, 0),
+          receiptTotalPrice: reciptItemCoffee.value.reduce(
+            (sum, item) => sum + item.receiptSubTotal,
+            0
+          ),
           receiptType: "ร้านกาแฟ",
           receiptTotalDiscount: 0,
-          receiptNetPrice: reciptItemCoffee.value.reduce((sum, item) => sum + item.receiptSubTotal, 0),
+          receiptNetPrice: reciptItemCoffee.value.reduce(
+            (sum, item) => sum + item.receiptSubTotal,
+            0
+          ),
           receiptStatus: "ร้านจัดเลี้ยง",
           queueNumber: 0,
           receive: 0,
@@ -200,15 +202,21 @@ const addMeal = () => {
           receiptItems: reciptItemCoffee.value,
           receiptPromotions: [],
           createdDate: cateringEvent.value.createdDate,
-          checkIngredientId: 0
+          checkIngredientId: 0,
         };
         // calculate total and set up
         // rice recipt
         const receiptRice: Receipt = {
-          receiptTotalPrice: reciptItemRice.value.reduce((sum, item) => sum + item.receiptSubTotal, 0),
+          receiptTotalPrice: reciptItemRice.value.reduce(
+            (sum, item) => sum + item.receiptSubTotal,
+            0
+          ),
           receiptType: "ร้านข้าว",
           receiptTotalDiscount: 0,
-          receiptNetPrice: reciptItemRice.value.reduce((sum, item) => sum + item.receiptSubTotal, 0),
+          receiptNetPrice: reciptItemRice.value.reduce(
+            (sum, item) => sum + item.receiptSubTotal,
+            0
+          ),
           receiptStatus: "ร้านจัดเลี้ยง",
           queueNumber: 0,
           receive: 0,
@@ -216,42 +224,39 @@ const addMeal = () => {
           receiptItems: reciptItemRice.value,
           receiptPromotions: [],
           createdDate: cateringEvent.value.createdDate,
-          checkIngredientId: 0
+          checkIngredientId: 0,
         };
-        console.log( "recipt Coffee", receiptCoffee);
-        console.log( "recipt Rice", receiptRice);
-        
+        console.log("recipt Coffee", receiptCoffee);
+        console.log("recipt Rice", receiptRice);
+
         // calculate total and set up
         meal.receipt = receiptCoffee;
-        const responseCoffee  = await receiptService.createReceipt(receiptCoffee);
+        const responseCoffee = await receiptService.createReceipt(
+          receiptCoffee
+        );
         console.log("Receipt created successfully", responseCoffee.data);
-        const responseRice  = await receiptService.createReceipt(receiptRice);
+        const responseRice = await receiptService.createReceipt(receiptRice);
         console.log("Receipt created successfully", responseRice.data);
-        if(responseCoffee.status === 201 && responseRice.status === 201){
+        if (responseCoffee.status === 201 && responseRice.status === 201) {
           console.log("Receipt created successfully", responseCoffee.data);
           console.log("Receipt created successfully", responseRice.data);
         }
-        
-
-
-   
       }
       console.log("Creating catering event:", cateringEvent.value);
-      const responseEvent = await cateringService.createCateringEvent(cateringEvent.value);
+      const responseEvent = await cateringService.createCateringEvent(
+        cateringEvent.value
+      );
       if (responseEvent.status === 201) {
         console.log("Catering event created successfully", responseEvent.data);
         clearData();
       }
 
-      
       Swal.fire("Success", "Catering event created successfully", "success");
     } catch (error) {
       console.error("Error creating catering event:", error);
       Swal.fire("Error", "Error creating catering event", "error");
     }
   };
-
-
 
   const addProduct = (item: Product, mealIndex: number, type: string) => {
     // If the product has toppings, open the topping dialog
@@ -282,11 +287,15 @@ const addMeal = () => {
     selectedMealIndex.value = mealIndex; // Store the mealIndex to ensure you update the correct meal
   };
 
-  const addProductToMeal = (item: Product, mealIndex: number, quantity: number = 1) => {
+  const addProductToMeal = (
+    item: Product,
+    mealIndex: number,
+    quantity: number = 1
+  ) => {
     console.log("Adding product to meal:", item, mealIndex);
-  
+
     const meal = cateringEvent.value.meals![mealIndex];
-  
+
     // Ensure the receipt exists in the meal
     if (!meal.receipt) {
       meal.receipt = {
@@ -310,12 +319,14 @@ const addMeal = () => {
         },
       };
     }
-  
+
     const receipt = meal.receipt;
-  
+
     // Find existing receipt item for this product
-    const receiptItem = receipt.receiptItems.find(ri => ri.product?.productName === item.productName);
-  
+    const receiptItem = receipt.receiptItems.find(
+      (ri) => ri.product?.productName === item.productName
+    );
+
     if (receiptItem) {
       // Update existing receipt item
       receiptItem.quantity += quantity;
@@ -330,9 +341,11 @@ const addMeal = () => {
         receiptSubTotal: item.productPrice * quantity,
       });
     }
-  
+
     // Find or add meal product
-    const mealProduct = meal.mealProducts.find(mp => mp.product.productName === item.productName);
+    const mealProduct = meal.mealProducts.find(
+      (mp) => mp.product!.productName === item.productName
+    );
     if (mealProduct) {
       mealProduct.quantity += quantity;
       mealProduct.totalPrice += item.productPrice * quantity;
@@ -346,17 +359,22 @@ const addMeal = () => {
         type: item.storeType,
       });
     }
-  
+
     // Update total price for the meal
-    meal.totalPrice = meal.receipt.receiptItems.reduce((sum, item) => sum + item.receiptSubTotal, 0);
-  
+    meal.totalPrice = meal.receipt.receiptItems.reduce(
+      (sum, item) => sum + item.receiptSubTotal,
+      0
+    );
+
     // Update total price for the catering event
-    const totalEventPrice = cateringEvent.value.meals.reduce((sum, meal) => sum + meal.totalPrice, 0);
+    const totalEventPrice = cateringEvent.value.meals!.reduce(
+      (sum, meal) => sum + meal.totalPrice,
+      0
+    );
     cateringEvent.value.cashierAmount = totalEventPrice;
-  
+
     console.log("Updated meal and catering event:", meal, cateringEvent.value);
   };
-  
 
   const addToReceipt = (
     product: Product,
@@ -367,16 +385,19 @@ const addMeal = () => {
   ) => {
     const parsedQuantity = parseInt(quantity.toString(), 10);
     const productPrice = parseInt(productType.productTypePrice.toString(), 10);
-  
+
     // Ensure `selectedMealIndex` has a valid value
-    if (selectedMealIndex.value === null || selectedMealIndex.value === undefined) {
+    if (
+      selectedMealIndex.value === null ||
+      selectedMealIndex.value === undefined
+    ) {
       console.error("No selected meal index.");
       return;
     }
-  
+
     const mealIndex = selectedMealIndex.value;
     const meal = cateringEvent.value.meals![mealIndex];
-  
+
     // Ensure the receipt exists in the meal
     if (!meal.receipt) {
       meal.receipt = {
@@ -392,20 +413,23 @@ const addMeal = () => {
         receiptPromotions: [],
       };
     }
-  
+
     // Access receipt items from the meal's receipt
     const receiptItems = meal.receipt.receiptItems;
-  
+
     // Find an existing meal product and receipt item
-    const existingMealProduct = meal.mealProducts.find(mp => mp.product.productId === product.productId);
+    const existingMealProduct = meal.mealProducts.find(
+      (mp) => mp.product!.productId === product.productId
+    );
     const toppingsTotal = productTypeToppings.reduce((sum, topping) => {
       return sum + topping.topping.toppingPrice * topping.quantity;
     }, 0);
-  
+
     if (existingMealProduct) {
       // Update existing meal product
       existingMealProduct.quantity += parsedQuantity;
-      existingMealProduct.totalPrice += (productPrice + toppingsTotal) * parsedQuantity;
+      existingMealProduct.totalPrice +=
+        (productPrice + toppingsTotal) * parsedQuantity;
     } else {
       // Add new meal product
       meal.mealProducts.push({
@@ -416,19 +440,21 @@ const addMeal = () => {
         type: productType.productTypeName,
       });
     }
-  
+
     const existingReceiptItem = receiptItems.find(
-      item =>
+      (item) =>
         item.product?.productId === product.productId &&
         item.sweetnessLevel === sweetness &&
-        JSON.stringify(item.productTypeToppings) === JSON.stringify(productTypeToppings) &&
+        JSON.stringify(item.productTypeToppings) ===
+          JSON.stringify(productTypeToppings) &&
         item.productType?.productTypeId === productType.productTypeId
     );
-  
+
     if (existingReceiptItem) {
       // Update existing receipt item
       existingReceiptItem.quantity += parsedQuantity;
-      existingReceiptItem.receiptSubTotal += (productPrice + toppingsTotal) * parsedQuantity;
+      existingReceiptItem.receiptSubTotal +=
+        (productPrice + toppingsTotal) * parsedQuantity;
     } else {
       // Add a new receipt item
       receiptItems.push({
@@ -441,24 +467,33 @@ const addMeal = () => {
         productType: productType,
       });
     }
-  
+
     // Update total price for the meal
-    meal.totalPrice = receiptItems.reduce((sum, item) => sum + item.receiptSubTotal, 0);
-  
+    meal.totalPrice = receiptItems.reduce(
+      (sum, item) => sum + item.receiptSubTotal,
+      0
+    );
+
     // Update total price for the entire catering event
-    const totalEventPrice = cateringEvent.value.meals!.reduce((sum, meal) => sum + meal.totalPrice, 0);
+    const totalEventPrice = cateringEvent.value.meals!.reduce(
+      (sum, meal) => sum + meal.totalPrice,
+      0
+    );
     cateringEvent.value.cashierAmount = totalEventPrice;
-  
+
     console.log("Updated catering event:", cateringEvent.value);
   };
 
   // calculate in reciptItem,
   const calculateReceiptItem = (receiptItem: ReceiptItem) => {
     const productPrice = receiptItem.product?.productPrice || 0;
-    const toppingsTotal = receiptItem.productTypeToppings.reduce((sum, topping) => {
-      return sum + topping.topping.toppingPrice * topping.quantity;
-    }, 0);
-    
+    const toppingsTotal = receiptItem.productTypeToppings.reduce(
+      (sum, topping) => {
+        return sum + topping.topping.toppingPrice * topping.quantity;
+      },
+      0
+    );
+
     return productPrice + toppingsTotal;
   };
 
@@ -484,21 +519,37 @@ const addMeal = () => {
         userStatus: "",
       },
     };
-  
   };
 
   const addProductCateringInCaterings = (item: Product) => {
     productCatering.value = item;
-    // add to meal and reciptItem
-    addProductToMeal(item, selectedMealIndex.value);
+    // add in meal
+    // check name meal
+    const productMeal = cateringEvent.value.meals![
+      selectedMealIndex.value
+    ].mealProducts.find((mp) => mp.product?.productName === item.productName);
+    if (productMeal) {
+      productMeal.quantity += 1;
+      productMeal.totalPrice += parseInt(item.productPrice+'');
+    } else {
+      cateringEvent.value.meals![selectedMealIndex.value].mealProducts.push({
+        mealId: selectedMealIndex.value,
+        product: item,
+        quantity: 1,
+        totalPrice: item.productPrice,
+        type: item.storeType,
+      });
+    }
+
     cateringProductDialog.value = false;
+    // เลี้ยงรับรอง product and set catergory
     // clear product
     productCatering.value = {
       productId: 0,
       productName: "",
       barcode: "",
       countingPoint: false,
-      storeType: "",
+      storeType: "เลี้ยงรับรอง",
       category: {
         categoryId: 0,
         categoryName: "",
@@ -507,8 +558,7 @@ const addMeal = () => {
       productImage: "",
       productPrice: 0,
     };
-
-  }
+  };
   return {
     fetchMeals,
     saveMeals,
@@ -529,6 +579,6 @@ const addMeal = () => {
     productCatering,
     cateringProductDialog,
     addProductCateringInCaterings,
-    selectedMealIndex
+    selectedMealIndex,
   };
 });
