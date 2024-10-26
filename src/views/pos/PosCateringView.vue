@@ -53,18 +53,20 @@ const createCateringEvent = () => {
   const eventDate = new Date(cateringStore.cateringEvent.eventDate);
   const today = new Date();
 
-  const diffTime = eventDate.getTime() - today.getTime(); 
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+  const diffTime = eventDate.getTime() - today.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-  if (diffDays < -2) {
+  if (diffDays < -2 || diffDays > 0) {
     Swal.fire({
       icon: "error",
-      title: "วันที่จัดงานต้องไม่เกิน 2 วันที่ผ่านมา",
+      title:
+        "วันที่จัดงานต้องไม่เกิน 2 วันที่ผ่านมา และไม่สามารถกำหนดล่วงหน้าได้",
       showConfirmButton: false,
       timer: 1500,
     });
     return;
   }
+
   if (!cateringStore.cateringEvent.eventLocation) {
     Swal.fire({
       icon: "error",
