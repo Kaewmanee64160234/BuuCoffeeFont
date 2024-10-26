@@ -246,8 +246,8 @@ export const useCateringStore = defineStore("catering", () => {
         const responseRice = await receiptService.createReceipt(receiptRice);
         console.log("Receipt created successfully", responseRice.data);
         if (responseCoffee.status === 201 && responseRice.status === 201) {
-          console.log("Receipt created successfully", responseCoffee.data);
-          console.log("Receipt created successfully", responseRice.data);
+          cateringEvent.value.coffeeReceiptId = responseCoffee.data.receiptId;
+          cateringEvent.value.riceReceiptId = responseRice.data.receiptId;
         }
       }
       console.log("Creating catering event:", cateringEvent.value);
