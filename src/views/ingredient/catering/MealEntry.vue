@@ -3,7 +3,7 @@ import { computed, onMounted, ref, watch } from "vue";
 import { useProductStore } from "@/stores/product.store"; // Updated to use Product Store
 import type { Product } from "@/types/product.type";
 import { useCateringStore } from "@/stores/catering.store";
-import type { MealProduct } from "@/types/catering/meal.type";
+import type { Meal, MealProduct } from "@/types/catering/meal.type";
 import DrinkSelectionDialog from "@/components/pos/DrinkSelectionDialog.vue";
 import { useToppingStore } from "@/stores/topping.store";
 import type { ReceiptItem } from "@/types/receipt.type";
@@ -21,6 +21,7 @@ const cateringStore = useCateringStore();
 const toppingStore = useToppingStore();
 const visibleDetails = ref<number | null>(null); // Stores the index of the visible details row
 
+
 // Toggle the visibility of the product details row
 const toggleDetails = (index: number) => {
   if (visibleDetails.value === index) {
@@ -30,23 +31,30 @@ const toggleDetails = (index: number) => {
   }
 };
 
-// Check if the details for a specific row are visible
-const isDetailsVisible = (index: number) => {
-  return visibleDetails.value === index;
-};
-
-// Handle quantity increase
-const increaseProductQuantity = (item: any) => {
-  item.quantity++;
-  item.totalPrice = item.product.productPrice * item.quantity;
-};
-
 // Handle quantity decrease
-const decreaseProductQuantity = (item: any) => {
+const decreaseProductQuantity = (mealIndex:number,item: MealProduct) => {
   if (item.quantity > 1) {
     item.quantity--;
-    item.totalPrice = item.product.productPrice * item.quantity;
+    item.totalPrice = item.product!.productPrice * item.quantity;
+    console.log(item.totalPrice);
+    // update in reciptItem
+    cateringStore.cateringEvent.meals![mealIndex].receipt.receiptItems.forEach(
+      (receiptItem: ReceiptItem) => {
+        if (receiptItem.product!.productName === item.product!.productName) {
+          receiptItem.quantity = item.quantity;
+          receiptItem.receiptSubTotal = item.totalPrice;
+        }
+      }
+    );
+    const totalEventPrice = cateringStore.cateringEvent.meals!.reduce(
+      (sum, meal) => sum + meal.totalPrice,
+      0
+    );
+    cateringStore.cateringEvent.cashierAmount = totalEventPrice;
   }
+  cateringStore.calculateTotalPrice(mealIndex)
+  // Update total price for all meals in the catering event
+ 
 };
 
 // Handle removing the product from the meal
@@ -55,6 +63,15 @@ const removeProductFromMeal = (mealIndex: number, productIndex: number) => {
     productIndex,
     1
   );
+  cateringStore.cateringEvent.meals![mealIndex].totalPrice = cateringStore.cateringEvent.meals![mealIndex].mealProducts.reduce(
+    (sum, item) => {
+      return sum + item.totalPrice;
+    },
+    0
+  );
+
+
+
 };
 
 // Watch for tab selection changes and update product filters accordingly
@@ -79,51 +96,36 @@ onMounted(async () => {
   await productStore.getProductByStoreType("ร้านกาแฟ"); // Fetch coffee products by default
   await toppingStore.getAllToppings();
   filterProducts();
-  calculateTotalPrice();
 });
 
 // Calculate total price for all products in all meals
-const calculateTotalPrice = () => {
-  totalPrice.value = cateringStore.cateringEvent.meals!.reduce((sum, meal) => {
-    return (
-      sum +
-      meal.mealProducts.reduce((productSum, item) => {
-        return productSum + (item.totalPrice! * item.quantity || 0);
-      }, 0)
-    );
-  }, 0);
-};
+
 // setfilteredReceiptItems
 const setFilteredReceiptItems = (
   mealIndex: number,
   mealProduct: MealProduct
 ) => {
-  if (mealProduct.product.haveTopping) {
+  if (mealProduct.product!.haveTopping) {
     const receiptItems = cateringStore.cateringEvent.meals![
       mealIndex
     ].receipt.receiptItems.filter(
       (receiptItem: ReceiptItem) =>
-        receiptItem.product!.productId === mealProduct.product.productId
+        receiptItem.product!.productName === mealProduct.product!.productName
     );
     cateringStore.filteredReceiptItems = receiptItems;
-    console.log(cateringStore.filteredReceiptItems);
+    console.log("filteredReceiptItems", cateringStore.filteredReceiptItems);
+    cateringStore.selectedMealIndex = mealIndex;
 
     cateringStore.cateringReceiptItemDialog = true;
   }
 };
 
-// Watch for changes in the meal products and recalculate the total price
-watch(
-  () => cateringStore.cateringEvent.meals,
-  () => {
-    calculateTotalPrice();
-  },
-  { deep: true }
-);
+
 
 const openDrinkSelectionDialog = (indexMeals: number) => {
-  cateringStore.cateringProductDialog = true;
   cateringStore.selectedMealIndex = indexMeals;
+
+  cateringStore.cateringProductDialog = true;
 };
 </script>
 
@@ -279,7 +281,7 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
                       >
                         <td>{{ itemIndex + 1 }}</td>
                         <td @click="toggleDetails(itemIndex)">
-                          {{ item.product.productName }}
+                          {{ item.product!.productName }}
                         </td>
                         <!-- Clicking toggles details -->
                         <td>{{ item.type }}</td>
@@ -288,13 +290,13 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
                           <v-row justify="center" align="center">
                             <!-- Check if the product does not have toppings before showing the quantity buttons -->
                             <v-col
-                              v-if="!item.product.haveTopping"
+                              v-if="!item.product!.haveTopping"
                               cols="4"
                               class="text-center"
                             >
                               <v-btn
                                 icon
-                                @click.stop="decreaseProductQuantity(item)"
+                                @click.stop="decreaseProductQuantity(indexMeals, item)"
                                 size="small"
                                 class="styled-button"
                               >
@@ -305,13 +307,13 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
                               {{ item.quantity }}
                             </v-col>
                             <v-col
-                              v-if="!item.product.haveTopping"
+                              v-if="!item.product!.haveTopping"
                               cols="4"
                               class="text-center"
                             >
                               <v-btn
                                 icon
-                                @click.stop="increaseProductQuantity(item)"
+                                @click.stop="cateringStore.addProductToMeal(item.product!, indexMeals)"
                                 size="small"
                                 class="styled-button"
                               >

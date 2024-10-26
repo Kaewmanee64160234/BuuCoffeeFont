@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useCateringStore } from '@/stores/catering.store';
-import { ref } from 'vue';
+import { useCateringStore } from "@/stores/catering.store";
+import { ref } from "vue";
 
 const cateringStore = useCateringStore();
 const quantity = ref(1);
@@ -22,14 +22,10 @@ const closeDialog = () => {
     productPrice: 0,
   };
 };
-
 </script>
 
 <template>
-  <v-dialog
-    v-model="cateringStore.cateringProductDialog"
-    max-width="600px"
-  >
+  <v-dialog v-model="cateringStore.cateringProductDialog" max-width="600px">
     <v-card>
       <v-card-title class="text-h6">เพิ่มสินค้าเพื่อเลี้ยงรับรอง</v-card-title>
       <v-card-text>
@@ -50,8 +46,8 @@ const closeDialog = () => {
           <v-text-field
             v-model="cateringStore.productCatering.productPrice"
             label="ราคา"
-                        variant="outlined"
-
+            variant="outlined"
+            type="number"
             dense
             required
             clearable
@@ -62,8 +58,8 @@ const closeDialog = () => {
           <v-text-field
             v-model="quantity"
             label="จำนวน"
-                        variant="outlined"
-
+            variant="outlined"
+            type="number"
             dense
             required
             clearable
@@ -74,7 +70,16 @@ const closeDialog = () => {
       <!-- Optional footer for buttons -->
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn text color="primary" @click="cateringStore.addProductCateringInCaterings(cateringStore.productCatering)">บันทึก</v-btn>
+        <v-btn
+          text
+          color="primary"
+          @click="
+            cateringStore.addProductCateringInCaterings(
+              cateringStore.productCatering
+            )
+          "
+          >บันทึก</v-btn
+        >
         <v-btn text color="secondary" @click="closeDialog()">ยกเลิก</v-btn>
       </v-card-actions>
     </v-card>

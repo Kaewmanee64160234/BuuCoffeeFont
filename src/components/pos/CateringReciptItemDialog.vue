@@ -5,15 +5,23 @@ import { ref } from "vue";
 
 const cateringStore = useCateringStore();
 
-
-
-
 const increaseQuantity = (item: ReceiptItem) => {
+  console.log(
+    "mealProducts",
+    cateringStore.cateringEvent.meals![cateringStore.selectedMealIndex]
+      .mealProducts
+  );
+
   item.quantity++;
   item.receiptSubTotal = cateringStore.calculateSubtotal(item);
+  console.log(
+    "mealProducts1",
+    cateringStore.cateringEvent.meals![cateringStore.selectedMealIndex]
+      .mealProducts
+  );
 
   cateringStore.syncMealProduct();
-  cateringStore.updateTotalPrice();
+  cateringStore.calculateTotalPrice(cateringStore.selectedMealIndex);
 };
 
 const decreaseQuantity = (item: ReceiptItem, index: number) => {
@@ -21,11 +29,11 @@ const decreaseQuantity = (item: ReceiptItem, index: number) => {
     item.quantity--;
     item.receiptSubTotal = cateringStore.calculateSubtotal(item);
   } else {
-    removeItem(index);
+    removeItem(index); // If quantity reaches zero, remove the item
   }
 
   cateringStore.syncMealProduct();
-  cateringStore.updateTotalPrice();
+  cateringStore.calculateTotalPrice(cateringStore.selectedMealIndex);
 };
 
 const removeItem = (index: number) => {
@@ -40,41 +48,43 @@ const removeItem = (index: number) => {
       receiptItem.product?.productId === item.product!.productId &&
       receiptItem === item
   );
+
   if (receiptIndex !== -1) {
     selectedMeal.receipt.receiptItems.splice(receiptIndex, 1);
   }
 
-  const remainingItemsForProduct = selectedMeal.receipt.receiptItems.filter(
-    (receiptItem) => receiptItem.product?.productId === item.product!.productId
-  );
-
-  if (remainingItemsForProduct.length === 0) {
-    const mealProductIndex = selectedMeal.mealProducts.findIndex(
-      (mealProduct) =>
-        mealProduct.product!.productId === item.product!.productId
-    );
-    if (mealProductIndex !== -1) {
-      selectedMeal.mealProducts.splice(mealProductIndex, 1);
-    }
-    if (selectedMeal.receipt.receiptItems.length === 0) {
-      cateringStore.cateringReceiptItemDialog = false;
-    }
-  }
-
-  if (selectedMeal.receipt.receiptItems.length === 0) {
+  if (!selectedMeal.receipt.receiptItems.length) {
     selectedMeal.totalPrice = 0;
     selectedMeal.mealProducts = [];
   } else {
     selectedMeal.totalPrice = selectedMeal.receipt.receiptItems.reduce(
-      (total, receiptItem) => {
-        return total + receiptItem.receiptSubTotal;
-      },
+      (total, receiptItem) => total + receiptItem.receiptSubTotal,
       0
     );
   }
 
   cateringStore.syncMealProduct();
-  cateringStore.updateTotalPrice();
+  cateringStore.calculateTotalPrice(cateringStore.selectedMealIndex);
+};
+
+const closeDialog = () => {
+  cateringStore.cateringProductDialog = false;
+  cateringStore.cateringReceiptItemDialog = false;
+  cateringStore.filteredReceiptItems = [];
+  cateringStore.productCatering = {
+    productId: 0,
+    productName: "",
+    barcode: "",
+    countingPoint: false,
+    storeType: "",
+    category: {
+      categoryId: 0,
+      categoryName: "",
+    },
+    haveTopping: false,
+    productImage: "",
+    productPrice: 0,
+  };
 };
 </script>
 
@@ -89,13 +99,7 @@ const removeItem = (index: number) => {
     transition="dialog-transition"
   >
     <v-card>
-      {{
-        cateringStore.cateringEvent.meals![
-          cateringStore.selectedMealIndex
-        ].receipt.receiptItems.filter(
-          (item) => item.product?.productId === item.product?.productId
-        ).length
-      }}
+    
       <v-card-title> รายการสินค้าที่เลือก </v-card-title>
       <v-card-text>
         <div class="selected-items-list">
@@ -159,15 +163,11 @@ const removeItem = (index: number) => {
                         size="xs-small"
                         color="#FF9642"
                         icon
-                        @click.stop="increaseQuantity(item)"
+                        @click="increaseQuantity(item)"
                       >
                         <v-icon>mdi-plus</v-icon>
                       </v-btn>
-                      <v-btn
-                        icon
-                        variant="text"
-                        @click.stop="removeItem(index)"
-                      >
+                      <v-btn icon variant="text" @click="removeItem(index)">
                         <v-icon color="red">mdi-delete</v-icon>
                       </v-btn>
                     </v-col>
@@ -180,11 +180,7 @@ const removeItem = (index: number) => {
       </v-card-text>
 
       <v-card-actions>
-        <v-btn
-          color="primary"
-          @click="cateringStore.cateringReceiptItemDialog = false"
-          >ปิด</v-btn
-        >
+        <v-btn color="primary" @click="closeDialog()">ปิด</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
