@@ -1,39 +1,18 @@
 <script lang="ts" setup>
 import { useSubIngredientStore } from '@/stores/ingredientSubInventory.store';
-import { computed, onMounted, ref, watch } from "vue";
+import {  onMounted } from "vue";
 import { useRouter } from 'vue-router';
 
 const subIngredientStore = useSubIngredientStore();
 const router = useRouter();
-
-
-// onMounted(async () => {
-//   await subIngredientStore.getIngredientsCoffeePaginate(); // โหลดข้อมูลเมื่อคอมโพเนนต์ถูกสร้าง
-// });
-
 onMounted(async () => {
   await subIngredientStore.getSubIngredients_coffee();
   await subIngredientStore.getIngredientsCoffeePaginate();
 });
-
-// Navigate to a different route
 const navigateTo = (routeName: string) => {
   router.push({ name: routeName });
 };
-
-// Watch for changes in the page and fetch new data
-// watch(
-//   () => subIngredientStore.currentPage, 
-//   async () => {
-//     await subIngredientStore.getIngredientsCoffeePaginate();
-//   }
-// );
-
-
-
-
 </script>
-
 <template>
   <v-container>
     <v-card>
@@ -63,9 +42,9 @@ const navigateTo = (routeName: string) => {
           </v-col>
 
           <v-col>
-            <v-btn color="red" class="button-full-width" @click="navigateTo('returningredientcoffee')">
-              <v-icon left>mdi-arrow-up-thick</v-icon>
-              คืนวัตถุดิบ
+            <v-btn class="button-full-width custom-yellow" @click="navigateTo('returningredientcoffee')">
+              <v-icon left>mdi-inbox</v-icon>
+              ปรับสต็อก
             </v-btn>
           </v-col>
         </v-row>
@@ -121,6 +100,11 @@ const navigateTo = (routeName: string) => {
 
 .button-full-width {
   width: 100%;
+  
+}
+.custom-yellow {
+  background-color: rgb(255, 217, 0); 
+  color: black; 
 }
 
 th,

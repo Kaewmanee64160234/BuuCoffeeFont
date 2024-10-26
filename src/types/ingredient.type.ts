@@ -11,4 +11,5 @@ export interface Ingredient {
   importType?: string;
   ingredientQuantityPerSubUnit?: string;
   ingredientRemining?: number; 
+  ingredientVolumeUnit?: string;
 }

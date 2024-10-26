@@ -5,6 +5,7 @@ export interface Importingredientitem {
   importIngredientsItemID?: number;
   pricePerUnit?: number;
   unitPrice?: number;
+  discount?: number;
   Quantity?: number;
   name?: String;
   importType?: 'piece' | 'box';
