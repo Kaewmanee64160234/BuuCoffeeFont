@@ -12,7 +12,6 @@ import type { ProductTypeTopping } from "@/types/productTypeTopping.type";
 import receiptService from "@/service/receipt.service";
 import cateringService from "@/service/catering.service";
 
-
 export const useCateringStore = defineStore("catering", () => {
   const meals = ref<Meal[]>([]);
   const userStore = useUserStore();
@@ -180,7 +179,8 @@ export const useCateringStore = defineStore("catering", () => {
         for (const item of meal.receipt.receiptItems) {
           if (item.product?.storeType == "ร้านกาแฟ") {
             reciptItemCoffee.value.push(item);
-          } else {
+          }
+          if (item.product?.storeType == "ร้านข้าว") {
             reciptItemRice.value.push(item);
           }
         }
@@ -365,24 +365,25 @@ export const useCateringStore = defineStore("catering", () => {
 
   const calculateTotalPrice = (mealIndex: number) => {
     const meal = cateringEvent.value.meals![mealIndex];
-  
+
     // Calculate total price for the meal based on current mealProducts
     meal.totalPrice = meal.mealProducts.reduce(
       (sum, item) => sum + item.totalPrice,
       0
     );
-  
+
     // Calculate total price for the entire catering event
     const totalEventPrice = cateringEvent.value.meals.reduce(
       (sum, meal) => sum + meal.totalPrice,
       0
     );
-  
-    cateringEvent.value.cashierAmount = totalEventPrice;
-      console.log("mealProducts3", cateringEvent.value.meals![selectedMealIndex.value].mealProducts);
 
+    cateringEvent.value.cashierAmount = totalEventPrice;
+    console.log(
+      "mealProducts3",
+      cateringEvent.value.meals![selectedMealIndex.value].mealProducts
+    );
   };
-  
 
   const addToReceipt = (
     product: Product,
@@ -532,11 +533,11 @@ export const useCateringStore = defineStore("catering", () => {
   const addProductCateringInCaterings = (item: Product) => {
     productCatering.value = item;
     const meal = cateringEvent.value.meals![selectedMealIndex.value];
-  
+
     const productMeal = meal.mealProducts.find(
       (mp) => mp.product?.productName === item.productName
     );
-  
+
     if (productMeal) {
       productMeal.quantity += 1;
       productMeal.totalPrice += item.productPrice;
@@ -545,13 +546,13 @@ export const useCateringStore = defineStore("catering", () => {
         mealId: selectedMealIndex.value,
         product: item,
         quantity: 1,
-        totalPrice: parseInt(item.productPrice+''),
+        totalPrice: parseInt(item.productPrice + ""),
         type: "เลี้ยงรับรอง",
       });
     }
-  
+
     cateringProductDialog.value = false;
-    // clear data 
+    // clear data
     productCatering.value = {
       productId: 0,
       productName: "",
@@ -562,15 +563,13 @@ export const useCateringStore = defineStore("catering", () => {
         categoryId: 0,
         categoryName: "",
       },
-      haveTopping
-      : false,
+      haveTopping: false,
       productImage: "",
       productPrice: 0,
     };
-      
+
     calculateTotalPrice(selectedMealIndex.value);
   };
-  
 
   // updateTotalPrice
   const updateTotalPrice = () => {
@@ -602,7 +601,6 @@ export const useCateringStore = defineStore("catering", () => {
   };
   const syncMealProduct = () => {
     const selectedMeal = cateringEvent.value.meals![selectedMealIndex.value];
-    
 
     selectedMeal.mealProducts.forEach((mealProduct) => {
       const associatedReceiptItems = selectedMeal.receipt.receiptItems.filter(
@@ -610,9 +608,9 @@ export const useCateringStore = defineStore("catering", () => {
           receiptItem.product?.productName === mealProduct.product!.productName
       );
       console.log("associatedReceiptItems", associatedReceiptItems);
-      if(associatedReceiptItems.length === 0) {
+      if (associatedReceiptItems.length === 0) {
         return;
-      }else{
+      } else {
         mealProduct.quantity = associatedReceiptItems.reduce(
           (sum, item) => sum + item.quantity,
           0
@@ -622,15 +620,16 @@ export const useCateringStore = defineStore("catering", () => {
           0
         );
       }
-
-    
     });
 
     selectedMeal.totalPrice = selectedMeal.mealProducts.reduce(
       (total, mealProduct) => total + mealProduct.totalPrice,
       0
     );
-     console.log("mealProducts2", cateringEvent.value.meals![selectedMealIndex.value].mealProducts);
+    console.log(
+      "mealProducts2",
+      cateringEvent.value.meals![selectedMealIndex.value].mealProducts
+    );
   };
 
   return {
