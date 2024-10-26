@@ -21,19 +21,26 @@ export const useCateringStore = defineStore("catering", () => {
   const cateringProductDialog = ref<boolean>(false);
   const filteredReceiptItems = ref<ReceiptItem[]>([]);
   const productsCatering = ref<Product[]>([]);
-  const productCatering = ref<Product>({
-    productId: 0,
-    productName: "",
-    barcode: "",
-    countingPoint: false,
-    storeType: "เลี้ยงรับรอง",
-    category: {
-      categoryId: 0,
-      categoryName: "",
+  const mealProductEdit = ref<MealProduct>({
+   mealId: 0,
+    product: {
+      productId: 0,
+      productName: "",
+      barcode: "",
+      countingPoint: false,
+      storeType: "",
+      category: {
+        categoryId: 0,
+        categoryName: "",
+      },
+      haveTopping: false,
+      productImage: "",
+      productPrice: 0,
     },
-    haveTopping: false,
-    productImage: "",
-    productPrice: 0,
+    quantity: 0,
+    totalPrice: 0,
+    type: "",
+    productName: "",
   });
 
   const selectItemEdit = ref<ReceiptItem>({
@@ -530,8 +537,8 @@ export const useCateringStore = defineStore("catering", () => {
     };
   };
 
-  const addProductCateringInCaterings = (item: Product) => {
-    productCatering.value = item;
+  const addProductCateringInCaterings = (item: MealProduct) => {
+    mealProductEdit.value = item;
     const meal = cateringEvent.value.meals![selectedMealIndex.value];
 
     const productMeal = meal.mealProducts.find(
@@ -540,20 +547,35 @@ export const useCateringStore = defineStore("catering", () => {
 
     if (productMeal) {
       productMeal.quantity += 1;
-      productMeal.totalPrice += item.productPrice;
+      productMeal.totalPrice += item.productPrice!;
     } else {
       meal.mealProducts.push({
         mealId: selectedMealIndex.value,
-        product: item,
-        quantity: 1,
-        totalPrice: parseInt(item.productPrice + ""),
+        product: {
+          productId: item.product?.productId!,
+          productName: item.productName,
+          barcode: "",
+          countingPoint: false,
+          storeType: "เลี้ยงรับรอง",
+          category: {
+            categoryId: 0,
+            categoryName: "",
+          },
+          haveTopping: false,
+          productImage: "",
+          productPrice: item.productPrice!,
+        },
+        quantity: parseInt(item.quantity!+''),
+        totalPrice: parseInt(item.productPrice+'')*parseInt(item.quantity!+''),
         type: "เลี้ยงรับรอง",
+        productName: item.productName,
+        productPrice: item.productPrice,
       });
     }
 
     cateringProductDialog.value = false;
     // clear data
-    productCatering.value = {
+    mealProductEdit.value = {
       productId: 0,
       productName: "",
       barcode: "",
@@ -649,7 +671,7 @@ export const useCateringStore = defineStore("catering", () => {
     filteredReceiptItems,
     calculateReceiptItem,
     productsCatering,
-    productCatering,
+    mealProductEdit,
     cateringProductDialog,
     addProductCateringInCaterings,
     selectedMealIndex,

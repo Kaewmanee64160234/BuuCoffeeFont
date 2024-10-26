@@ -7,19 +7,13 @@ const quantity = ref(1);
 
 const closeDialog = () => {
   cateringStore.cateringProductDialog = false;
-  cateringStore.productCatering = {
-    productId: 0,
+  cateringStore.mealProductEdit = {
+    mealId: 0,
     productName: "",
-    barcode: "",
-    countingPoint: false,
-    storeType: "",
-    category: {
-      categoryId: 0,
-      categoryName: "",
-    },
-    haveTopping: false,
-    productImage: "",
     productPrice: 0,
+    quantity: 0,
+    totalPrice: 0,
+    type: "",
   };
 };
 </script>
@@ -33,7 +27,7 @@ const closeDialog = () => {
           <!-- Form product dialog for catering -->
           <!-- Create text field input name -->
           <v-text-field
-            v-model="cateringStore.productCatering.productName"
+            v-model="cateringStore.mealProductEdit.productName"
             label="ชื่องานจัดเลี้ยง"
             variant="outlined"
             dense
@@ -44,7 +38,7 @@ const closeDialog = () => {
 
           <!-- Input price product -->
           <v-text-field
-            v-model="cateringStore.productCatering.productPrice"
+            v-model="cateringStore.mealProductEdit.productPrice"
             label="ราคา"
             variant="outlined"
             type="number"
@@ -56,7 +50,7 @@ const closeDialog = () => {
 
           <!-- Quantity input -->
           <v-text-field
-            v-model="quantity"
+            v-model="cateringStore.mealProductEdit.quantity"
             label="จำนวน"
             variant="outlined"
             type="number"
@@ -75,7 +69,7 @@ const closeDialog = () => {
           color="primary"
           @click="
             cateringStore.addProductCateringInCaterings(
-              cateringStore.productCatering
+              cateringStore.mealProductEdit
             )
           "
           >บันทึก</v-btn
