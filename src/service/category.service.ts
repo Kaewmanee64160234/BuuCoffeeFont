@@ -33,6 +33,7 @@ function searchCategories(query: string) {
 }
 
 
+
 export default {
   getAllCategories,
   getCategoryById,

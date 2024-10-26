@@ -56,11 +56,11 @@ function getExpenditure() {
 
 // http://localhost:3000/catering-event
 function cateringEvent() {
-  return http.get(`/catering-event`);
+  return http.get(`/catering-events`);
 }
 // catering event pageinate
 function cateringEventPaginate(page: number, limit: number) {
-  return http.get(`/catering-event/paginate`, {
+  return http.get(`/catering-events/paginate`, {
     params: {
       page,
       limit
@@ -86,6 +86,7 @@ export default {
   getTopSellingProducts,
   getIngradientsUsage,
   cateringEvent,
-  cateringEventPaginate
+  cateringEventPaginate,
+  
 
 };

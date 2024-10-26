@@ -5,6 +5,8 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import ingredientService from "@/service/ingredient.service";
 import financeService from "@/service/report/finance.service";
+import categoryService from "@/service/category.service";
+import cateringService from "@/service/catering.service";
 export const useCateringEventStore = defineStore("cateringEvent", () => {
   const historyCateringEvent = ref<HistoryCateringEvent[]>([]);
   const historyCateringitem = ref<HistoryCateringEvent | null>(null);
@@ -18,10 +20,9 @@ export const useCateringEventStore = defineStore("cateringEvent", () => {
     last_page: 1,
   });
 
-
   const fetchCateringEvents = async () => {
     try {
-      const response = await financeService.cateringEvent()
+      const response = await financeService.cateringEvent();
       historyCateringEvent.value = response.data;
       console.log(historyCateringEvent.value);
     } catch (error) {
@@ -42,15 +43,15 @@ export const useCateringEventStore = defineStore("cateringEvent", () => {
 
     if (result.isConfirmed) {
       try {
-        await axios.patch(`http://localhost:3000/catering-event/${id}/status`, {
-          status,
-        });
-        await fetchCateringEvents();
-        Swal.fire(
-          "เปลี่ยนสถานะ!",
-          "สถานะของเหตุการณ์ถูกเปลี่ยนแล้ว.",
-          "success"
-        );
+        const res = await cateringService.updateStatusCateringEvent(id, status);
+        if (res.status === 200) {
+          await fetchCateringEvents();
+          Swal.fire(
+            "เปลี่ยนสถานะ!",
+            "สถานะของเหตุการณ์ถูกเปลี่ยนแล้ว.",
+            "success"
+          );
+        }
       } catch (error) {
         console.error("Failed to update event status:", error);
         Swal.fire("เกิดข้อผิดพลาด!", "ไม่สามารถเปลี่ยนสถานะได้.", "error");
@@ -71,17 +72,19 @@ export const useCateringEventStore = defineStore("cateringEvent", () => {
 
     if (result.isConfirmed) {
       try {
-        await axios.patch(
-          `http://localhost:3000/checkingredients/${id}/cancel`
-        );
-        await fetchCateringEvents();
-        Swal.fire("ยกเลิกแล้ว!", "เหตุการณ์นี้ถูกยกเลิก.", "success");
+        const res = await cateringService.cancelCateringEvent(id);
+        if (res.status === 200) {
+          await fetchCateringEvents();
+          Swal.fire("ยกเลิกแล้ว!", "เหตุการณ์นี้ถูกยกเลิก.", "success");
+        }
       } catch (error) {
         console.error("Failed to cancel event:", error);
         Swal.fire("เกิดข้อผิดพลาด!", "ไม่สามารถยกเลิกเหตุการณ์ได้.", "error");
       }
     }
   };
+
+  
   const getHistoryCateringById = async (id: number) => {
     try {
       const response = await ingredientService.getHistoryCateringById(id);
@@ -99,13 +102,10 @@ export const useCateringEventStore = defineStore("cateringEvent", () => {
       totalItems.value = response.data.meta.total; // Make sure meta contains the total count
       currentPage.value = response.data.meta.page;
       itemsPerPage.value = response.data.meta.limit;
-
-
     } catch (error) {
-      console.error('Failed to fetch catering events:', error);
+      console.error("Failed to fetch catering events:", error);
     }
   };
-  
 
   return {
     historyCateringEvent,
@@ -117,8 +117,8 @@ export const useCateringEventStore = defineStore("cateringEvent", () => {
     cancelEvent,
     getHistoryCateringById,
     cateringEventPaginate,
-    totalItems ,
-    itemsPerPage ,
-    currentPage ,
+    totalItems,
+    itemsPerPage,
+    currentPage,
   };
 });
