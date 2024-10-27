@@ -10,6 +10,7 @@ import cateringService from "@/service/catering.service";
 export const useCateringEventStore = defineStore("cateringEvent", () => {
   const historyCateringEvent = ref<HistoryCateringEvent[]>([]);
   const historyCateringitem = ref<HistoryCateringEvent | null>(null);
+  const dialogCateringItemDetail  = ref(false);
   const dialogCateringItem = ref(false);
   const totalItems = ref(0);
   const itemsPerPage = ref(10);
@@ -127,6 +128,7 @@ export const useCateringEventStore = defineStore("cateringEvent", () => {
     totalItems,
     itemsPerPage,
     currentPage,
-    last_page
+    last_page,
+    dialogCateringItemDetail
   };
 });
