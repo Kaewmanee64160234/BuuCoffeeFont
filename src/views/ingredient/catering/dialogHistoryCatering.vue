@@ -1,18 +1,20 @@
 <script lang="ts" setup>
+import { useCateringStore } from '@/stores/catering.store';
 import { useCateringEventStore } from '@/stores/historycatering.store';
 
-const cateringStore = useCateringEventStore();
+const cateringEventStore = useCateringEventStore();
+const cateringStore = useCateringStore();
 const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
 };
 </script>
-<template> <v-dialog v-model="cateringStore.dialogCateringItem" max-width="50%">
+<template> <v-dialog v-model="cateringEventStore.dialogCateringItem" max-width="50%">
      <v-card>
       <v-card-title>
         <v-row justify="center" align="center">
           <v-icon color="primary" style="font-size: 30px;">mdi-calendar-month</v-icon>
-          <strong style="font-size: 18px; margin-left: 8px;">{{ cateringStore.historyCateringitem?.eventName }} วันที่  {{
-            formatDate(cateringStore.historyCateringitem?.eventDate + '') }} สถานที่จัดเลี้ยง {{ cateringStore.historyCateringitem?.eventLocation }}</strong>
+          <strong style="font-size: 18px; margin-left: 8px;">{{ cateringStore.cateringHistory!.eventName }} วันที่  {{
+            formatDate(cateringStore.cateringHistory!.eventDate + '') }} สถานที่จัดเลี้ยง {{ cateringStore.cateringHistory!.eventLocation }}</strong>
         </v-row>
 
         <v-row>
@@ -20,7 +22,7 @@ const formatDate = (dateString: string) => {
             <v-icon color="primary" left style="font-size: 20px;">mdi-clipboard-text</v-icon>
             <strong style="font-size: 16px;"> สถานะ : </strong>
             <span style="font-size: 14px;">
-              {{ cateringStore.historyCateringitem?.status === 'pending' ? 'รอดำเนินการ' : (  cateringStore.historyCateringitem?.status === 'canceled' ? 'ยกเลิก' : 'สำเร็จ') }}
+              {{ cateringStore.cateringHistory!.status === 'pending' ? 'รอดำเนินการ' : (  cateringStore.cateringHistory!.status === 'canceled' ? 'ยกเลิก' : 'สำเร็จ') }}
             </span>
             
           </v-col>
@@ -28,7 +30,7 @@ const formatDate = (dateString: string) => {
           <v-col style="padding-top: 4px;">
             <v-icon color="primary" left style="font-size: 20px;">mdi-account-outline</v-icon>
             <strong style="font-size: 16px;"> ผู้รับผิดชอบ : </strong>
-            <span style="font-size: 14px;">{{  cateringStore.historyCateringitem?.user.userName }}</span>
+            <span style="font-size: 14px;">{{  cateringStore.cateringHistory!.user.userName }}</span>
           </v-col>
         </v-row>
 
@@ -36,13 +38,13 @@ const formatDate = (dateString: string) => {
           <v-col style="padding-top: 4px;">
             <v-icon color="primary" left style="font-size: 20px;">mdi-text</v-icon>
             <strong style="font-size: 16px;"> จำนวนคน : </strong>
-            <span style="font-size: 14px;">  {{  cateringStore.historyCateringitem?.attendeeCount }} คน</span>
+            <span style="font-size: 14px;">  {{  cateringStore.cateringHistory!.attendeeCount }} คน</span>
           </v-col>
 
           <v-col style="padding-top: 4px;">
             <v-icon color="primary" left style="font-size: 20px;">mdi-text</v-icon>
             <strong style="font-size: 16px;"> งบประมาณรวม : </strong>
-            <span style="font-size: 14px;">  {{  cateringStore.historyCateringitem?.totalBudget }} บาท</span>
+            <span style="font-size: 14px;">  {{  cateringStore.cateringHistory!.totalBudget }} บาท</span>
           </v-col>
         </v-row>
 
@@ -65,7 +67,7 @@ const formatDate = (dateString: string) => {
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(meal, index) in cateringStore.historyCateringitem?.meals" :key="index">
+            <tr v-for="(meal, index) in cateringStore.cateringHistory!.meals" :key="index">
               <td>{{ index + 1 }}</td>
               <td>{{ meal.mealName }}</td>
               <td>{{ meal.mealTime }}</td>

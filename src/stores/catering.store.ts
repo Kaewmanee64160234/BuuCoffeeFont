@@ -21,6 +21,7 @@ export const useCateringStore = defineStore("catering", () => {
   const cateringProductDialog = ref<boolean>(false);
   const filteredReceiptItems = ref<ReceiptItem[]>([]);
   const productsCatering = ref<Product[]>([]);
+  const cateringHistory = ref<CateringEvent>();
   const mealProductEdit = ref<MealProduct>({
    mealId: 0,
     product: {
@@ -679,5 +680,6 @@ export const useCateringStore = defineStore("catering", () => {
     calculateSubtotal,
     syncMealProduct,
     calculateTotalPrice,
+    cateringHistory
   };
 });
