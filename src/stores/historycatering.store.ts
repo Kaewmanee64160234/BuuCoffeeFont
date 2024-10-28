@@ -12,7 +12,7 @@ export const useCateringEventStore = defineStore("cateringEvent", () => {
   const historyCateringitem = ref<HistoryCateringEvent | null>(null);
   const dialogCateringItem = ref(false);
   const totalItems = ref(0);
-  const itemsPerPage = ref(10);
+  const itemsPerPage = ref(5);
   const currentPage = ref(1);
   const last_page = ref(1);
   const meta = ref({
