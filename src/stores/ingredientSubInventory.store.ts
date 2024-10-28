@@ -1,4 +1,4 @@
-import { ref, computed, watch } from "vue";
+import { ref, watch } from "vue";
 import { defineStore } from "pinia";
 import ingredientService from "@/service/ingredient.service";
 import type { SubInventoriesCoffee } from "@/types/subinventoriescoffee.type";
@@ -7,12 +7,12 @@ import type { IngredientLog } from "@/types/IngredientLog.type";
 import type { ReportIngredientLog } from "@/types/pairsWithdrawalReturn.type";
 import type { Ingredient } from "@/types/ingredient.type";
 import { useUserStore } from "./user.store";
-import { useMessageStore } from './message'; // Update the path if necessary
 import type { SubInventoriesRice } from "@/types/subinventoriesrice.type";
 import type { SubInventoriesCatering } from "@/types/subinventoriescateringtype";
 
 export const useSubIngredientStore = defineStore("subinventory", () => {
   const subingredients_coffee = ref<SubInventoriesCoffee[]>([]);
+  const selectedIngredient= ref<Ingredient>();
   const subIngredients_catering = ref<SubInventoriesCoffee[]>([]);
   const subingredients_rice = ref<SubInventoriesRice[]>([]);
   const subingredientsRiceCatering = ref<SubInventoriesCatering[]>([]);
@@ -25,7 +25,6 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
   const IngredientLogitem = ref<IngredientLog[]>([]);
   const checkIngerdient = ref<Checkingredient>();
   const userStore = useUserStore();
-  const messageStore = useMessageStore();
 
   const ingredientCheckListForCofee = ref<
     { ingredientcheck: Ingredient; count: number; type: string }[]
@@ -71,8 +70,8 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
         searchQuery.value    // Search term
         if (response.status === 200) {
             ingredientCheckListForCofee.value = response.data.data;
-            totalIngredients.value = response.data.total; // ตรวจสอบให้แน่ใจว่ามีค่าที่ถูกต้อง
-            console.log('Total Ingredients:', totalIngredients.value); // ตรวจสอบค่า total
+            totalIngredients.value = response.data.total; 
+            console.log('Total Ingredients:', totalIngredients.value); 
         }
     } catch (error) {
         console.error('Error getting ingredientsCoffeePaginate:', error);
@@ -99,8 +98,8 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
         console.log('getIngredientsCateringPaginate', response.data);
         if (response.status === 200) {
             ingredientCheckListForCatering.value = response.data.data;
-            totalIngredients.value = response.data.total; // ตรวจสอบให้แน่ใจว่ามีค่าที่ถูกต้อง
-            console.log('Total Ingredients:', totalIngredients.value); // ตรวจสอบค่า total
+            totalIngredients.value = response.data.total; 
+            console.log('Total Ingredients:', totalIngredients.value); 
         }
     } catch (error) {
         console.error('Error getting ingredientsCateringPaginate:', error);
@@ -393,6 +392,7 @@ export const useSubIngredientStore = defineStore("subinventory", () => {
   }
 
   return {
+    selectedIngredient,
     subingredients_coffee,
     subingredients_rice,
     History,

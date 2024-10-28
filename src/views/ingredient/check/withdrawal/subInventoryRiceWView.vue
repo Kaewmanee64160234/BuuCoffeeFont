@@ -1,17 +1,36 @@
 <script lang="ts" setup>
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import Swal from 'sweetalert2';
 import { useIngredientStore } from '@/stores/Ingredient.store';
 import { useSubIngredientStore } from '@/stores/ingredientSubInventory.store';
 
 const ingredientStore = useIngredientStore();
 const subIngredientStore = useSubIngredientStore();
+const barcode = ref("");
 
 onMounted(async () => {
   await ingredientStore.getIngredients();
   await subIngredientStore.getSubIngredients_rice();
 });
+const handleBarcodeInput = async () => {
+  if (barcode.value) {
+    const foundItem = ingredientStore.all_ingredients.find(
+  (item) => item.ingredientBarcode === barcode.value.trim()
+);
 
+    if (foundItem) {
+      ingredientStore.Addingredienttotable(foundItem);
+  console.log(foundItem);
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "ไม่พบสินค้า",
+        text: "ไม่พบสินค้าที่มีบาร์โค้ดนี้",
+      });
+    }
+    barcode.value = "";
+  }
+};
 // Computed property to filter out ingredients
 const filteredIngredients = computed(() => {
   const subIngredients = subIngredientStore.subingredients_rice;
@@ -77,9 +96,17 @@ const saveCheckData = async () => {
         </v-col>
       </v-row>
       <v-row>
-        <v-col cols="3">
-          <v-text-field label="ค้นหาวัตถุดิบ" append-inner-icon="mdi-magnify" dense hide-details variant="solo" outlined
-            v-model="ingredientStore.search"></v-text-field>
+        <v-col cols="12" md="6">
+          <v-text-field
+            v-model="barcode"
+            append-inner-icon="mdi-barcode"
+            label="แสกนบาร์โค้ด"
+            variant="solo"
+            dense
+            hide-details
+            @keydown.enter="handleBarcodeInput" 
+            style="background-color: #f1f1f1; border-radius: 8px; text-align: right;"
+          ></v-text-field>
         </v-col>
         <v-col cols="auto">
           <v-btn color="success" :to="{ name: 'ingredients_rice' }">

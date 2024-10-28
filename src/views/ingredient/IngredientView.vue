@@ -1,12 +1,14 @@
 <script lang="ts" setup>
 import { useIngredientStore } from '@/stores/Ingredient.store';
 import IngredientDialog from "@/views/ingredient/IngredientDialog.vue";
-import { computed, onMounted, ref, watch } from "vue";
-import { useRouter } from 'vue-router'; 
+import { computed, nextTick, onMounted, ref, watch } from "vue";
+import { useRouter } from 'vue-router';
+import { jsPDF } from 'jspdf';
 import Swal from 'sweetalert2';
-
+import JsBarcode from 'jsbarcode';
+import SarabunFont from '@/assets/Sarabun/Sarabun-Medium.ttf';
 const ingredientStore = useIngredientStore();
-const router = useRouter(); 
+const router = useRouter();
 
 const menu1 = ref(false);
 const menu2 = ref(false);
@@ -15,9 +17,61 @@ const paginate = ref(true);
 const page = computed(() => ingredientStore.page);
 const take = computed(() => ingredientStore.take);
 
+
 onMounted(async () => {
   await ingredientStore.getAllIngredients();
 });
+
+
+
+const exportIngredients = async () => {
+  try {
+    await ingredientStore.getAllIngredients();
+
+    const doc = new jsPDF();
+    doc.addFileToVFS('Sarabun.ttf', SarabunFont);
+    doc.addFont('Sarabun.ttf', 'Sarabun', 'normal');
+    doc.setFont('Sarabun');
+
+
+
+
+    const lineHeight = 30;
+    // await nextTick();
+
+    const barcodeContainer = document.createElement('div');
+    barcodeContainer.style.display = 'none';
+    document.body.appendChild(barcodeContainer);
+    doc.text('สวัสดีครับ', 10, 10);
+
+    for (const ingredient of ingredientStore.ingredients) {
+      const { ingredientName, ingredientBarcode } = ingredient;
+
+      console.log(`Name: ${ingredientName}, Barcode: ${ingredientBarcode}`);
+
+      if (ingredientName && ingredientBarcode) {
+        const canvas = document.createElement('canvas');
+        barcodeContainer.appendChild(canvas);
+
+        JsBarcode(canvas, ingredientBarcode, { format: "CODE128" });
+
+        doc.text(ingredientName, 10, lineHeight * (ingredientStore.ingredients.indexOf(ingredient) + 1));
+
+        const imgData = canvas.toDataURL("image/png");
+        doc.addImage(imgData, 'PNG', 100, lineHeight * (ingredientStore.ingredients.indexOf(ingredient) + 1) - 5, 50, 20);
+      } else {
+        console.error(`Missing ingredientName or ingredientBarcode for ingredient: ${ingredient}`);
+      }
+    }
+
+    document.body.removeChild(barcodeContainer);
+    doc.save('ingredients.pdf');
+  } catch (error) {
+    console.error(error);
+    Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถส่งออกวัตถุดิบได้.', 'error');
+  }
+};
+
 
 const deleteIngredient = async (id?: number) => {
   if (id !== undefined) {
@@ -50,7 +104,7 @@ const deleteIngredient = async (id?: number) => {
 };
 
 const navigateTo = (routeName: string) => {
-  router.push( '/'+routeName) ;
+  router.push('/' + routeName);
 };
 
 watch(paginate, async (newValue, oldValue) => {
@@ -67,11 +121,14 @@ watch(paginate, async (newValue, oldValue) => {
       <v-card-title>
         <v-row>
           <v-col cols="9" style="padding: 10px;">
-          <h3>คลังวัตถุดิบ</h3>
+            <h3>คลังวัตถุดิบ</h3>
           </v-col>
           <v-col cols="3">
-            <v-text-field style="height: fit-content;" label="ค้นหารายการวัตถุดิบ" append-inner-icon="mdi-magnify" dense hide-details variant="solo"
-            outlined v-model="ingredientStore.keyword"></v-text-field>
+            <v-btn @click="exportIngredients">  <v-icon left>mdi-barcode</v-icon>Barcode</v-btn>
+          </v-col>
+          <v-col cols="3">
+            <v-text-field style="height: fit-content;" label="ค้นหารายการวัตถุดิบ" append-inner-icon="mdi-magnify" dense
+              hide-details variant="solo" outlined v-model="ingredientStore.keyword"></v-text-field>
           </v-col>
         </v-row>
 
@@ -86,7 +143,7 @@ watch(paginate, async (newValue, oldValue) => {
 
 
           <v-col>
-            <v-menu v-model="menu1" >
+            <v-menu v-model="menu1">
               <template v-slot:activator="{ props }">
                 <v-btn color="success" class="button-full-width" v-bind="props">
                   <v-icon left>mdi-arrow-down-thick</v-icon>
@@ -105,11 +162,11 @@ watch(paginate, async (newValue, oldValue) => {
           </v-col>
 
           <v-col>
-            <v-menu v-model="menu2" >
+            <v-menu v-model="menu2">
               <template v-slot:activator="{ props }">
                 <v-btn color="red" class="button-full-width" v-bind="props">
                   <v-icon left>mdi-arrow-up-thick</v-icon>
-                   วัตถุดิบหมดอายุ / เสียหาย
+                  วัตถุดิบหมดอายุ / เสียหาย
                 </v-btn>
               </template>
               <v-list>
@@ -123,11 +180,11 @@ watch(paginate, async (newValue, oldValue) => {
             </v-menu>
           </v-col>
           <v-col>
-            <v-menu v-model="menu3" >
+            <v-menu v-model="menu3">
               <template v-slot:activator="{ props }">
                 <v-btn color="red" class="button-full-width" v-bind="props">
                   <v-icon left>mdi-swap-vertical-bold</v-icon>
-                   ประวัติเบิกเข้า - เบิกออก
+                  ประวัติเบิกเข้า - เบิกออก
                 </v-btn>
               </template>
               <v-list>
@@ -136,9 +193,6 @@ watch(paginate, async (newValue, oldValue) => {
                 </v-list-item>
                 <v-list-item @click="navigateTo('history-rice-store')">
                   <v-list-item-title>ร้านข้าว </v-list-item-title>
-                </v-list-item>
-                <v-list-item @click="navigateTo('history-catering-store')">
-                  <v-list-item-title>ร้านเลี้ยงรับรอง </v-list-item-title>
                 </v-list-item>
               </v-list>
             </v-menu>
@@ -166,11 +220,16 @@ watch(paginate, async (newValue, oldValue) => {
             </td>
             <td>{{ item.ingredientName }}</td>
             <td>{{ item.ingredientSupplier }}</td>
-            <td>{{ item.ingredientQuantityPerUnit }} x {{ item.ingredientVolumeUnit }}</td>
-            <td :style="{ color: item.ingredientQuantityInStock <= item.ingredientMinimun ? 'red' : 'black' }">{{ item.ingredientQuantityInStock }} {{ item.ingredientUnit }}</td>
+            <td>{{ item.ingredientQuantityPerUnit }} {{ item.ingredientQuantityPerSubUnit }} x {{
+              item.ingredientVolumeUnit }}
+            </td>
+            <td :style="{ color: item.ingredientQuantityInStock <= item.ingredientMinimun ? 'red' : 'black' }">{{
+              item.ingredientQuantityInStock }} {{ item.ingredientUnit }}</td>
             <td>
-              <v-btn color="#FFDD83" class="mr-5" icon="mdi-pencil" @click="ingredientStore.setEditedIngredient(item)"></v-btn>
-              <v-btn color="#FFDD83" class="mr-5" icon="mdi-delete" @click="deleteIngredient(item.ingredientId)"></v-btn>
+              <v-btn color="#FFDD83" class="mr-5" icon="mdi-pencil"
+                @click="ingredientStore.setEditedIngredient(item)"></v-btn>
+              <v-btn color="#FFDD83" class="mr-5" icon="mdi-delete"
+                @click="deleteIngredient(item.ingredientId)"></v-btn>
             </td>
           </tr>
         </tbody>
@@ -181,12 +240,8 @@ watch(paginate, async (newValue, oldValue) => {
         </tbody>
       </v-table>
 
-      <v-pagination
-            justify="center"
-            v-model="ingredientStore.page"
-            :length="ingredientStore.lastPage"
-            rounded="circle"
-          ></v-pagination>
+      <v-pagination justify="center" v-model="ingredientStore.page" :length="ingredientStore.lastPage"
+        rounded="circle"></v-pagination>
     </v-card>
   </v-container>
 </template>
@@ -202,10 +257,11 @@ watch(paginate, async (newValue, oldValue) => {
   width: 100%;
 }
 
-th, td {
-  padding-top: 9px !important; 
-  padding-bottom: 9px !important; 
-  text-align: center !important; 
+th,
+td {
+  padding-top: 9px !important;
+  padding-bottom: 9px !important;
+  text-align: center !important;
 }
 
 .flex-container {
@@ -240,4 +296,3 @@ th, td {
   }
 }
 </style>
-

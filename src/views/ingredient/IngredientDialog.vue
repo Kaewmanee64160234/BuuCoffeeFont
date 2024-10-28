@@ -7,6 +7,7 @@ import type { VForm } from "vuetify/components";
 const form = ref<VForm | null>(null);
 const ingredientStore = useIngredientStore();
 const imagePreview = ref<string | null>(null);
+const barcode = ref('');
 
 watch(
   () => ingredientStore.editedIngredient.file,
@@ -24,28 +25,47 @@ watch(
 );
 
 async function save() {
-  const { valid } = await form.value!.validate();
-  if (valid) {
-    try {
-      console.log(ingredientStore.editedIngredient.file);
-      await ingredientStore.saveIngredient();
+  console.log("Starting save process...");
 
-      ingredientStore.dialog = false;
-      Swal.fire({
-        title: "สำเร็จ",
-        text: "วัตถุดิบถูกบันทึกเรียบร้อยแล้ว!",
-        icon: "success",
-        confirmButtonText: "ตกลง",
-      }).then(() => {
-        window.location.reload();
-      });
-      imagePreview.value = null;
-    } catch (error) {
-      console.error("Error saving ingredient:", error);
-      Swal.fire("เกิดข้อผิดพลาด", "เกิดข้อผิดพลาดขณะบันทึกวัตถุดิบ.", "error");
+  if (form.value) {
+    const { valid } = await form.value.validate();
+    console.log("Form validation status:", valid);
+
+    if (valid) {
+      try {
+        console.log("Ingredient data to save:", ingredientStore.editedIngredient);
+        console.log("Image file:", ingredientStore.editedIngredient.file);
+
+        await ingredientStore.saveIngredient();
+
+        console.log("Ingredient saved successfully.");
+        ingredientStore.dialog = false;
+
+        Swal.fire({
+          title: "สำเร็จ",
+          text: "วัตถุดิบถูกบันทึกเรียบร้อยแล้ว!",
+          icon: "success",
+          confirmButtonText: "ตกลง",
+        }).then(() => {
+          console.log("Reloading page...");
+          window.location.reload();
+        });
+        imagePreview.value = null;
+      } catch (error) {
+        console.error("Error saving ingredient:", error);
+        Swal.fire("เกิดข้อผิดพลาด", "เกิดข้อผิดพลาดขณะบันทึกวัตถุดิบ.", "error");
+      }
+    } else {
+      console.warn("Form validation failed.");
+      Swal.fire("เกิดข้อผิดพลาด", "กรุณากรอกข้อมูลให้ครบถ้วน.", "error");
     }
+  } else {
+    console.error("Form reference is null");
+    Swal.fire("เกิดข้อผิดพลาด", "กรุณากรอกข้อมูลให้ครบถ้วน.", "error");
   }
 }
+
+
 
 function cancel() {
   ingredientStore.dialog = false;
@@ -77,13 +97,14 @@ const subunits = [
   <v-dialog v-model="ingredientStore.dialog" persistent width="1024">
     <v-card class="rounded-card white-background">
       <!-- <v-card-title > -->
-        <h3 class="text-center mt-2">เพิ่มวัตถุดิบ</h3>
+      <h3 class="text-center mt-2">เพิ่มวัตถุดิบ</h3>
       <!-- </v-card-title> -->
 
       <v-card-text>
         <v-form ref="form">
           <v-container>
-            <v-row> ตัวอย่าง : <strong>เนสกาแฟ เบลนด์ แอนด์ บรู กาแฟปรุงสำเร็จ ริช อโรมา </strong><strong>1 ถุง มี 27 ซอง</strong>  ขั้นต่ำในคลัง <strong>100 ซอง</strong> </v-row>
+            <v-row> ตัวอย่าง : <strong>เนสกาแฟ เบลนด์ แอนด์ บรู กาแฟปรุงสำเร็จ ริช อโรมา </strong><strong>1 ถุง มี 27
+                ซอง</strong> ขั้นต่ำในคลัง <strong>100 ซอง</strong> </v-row>
             <v-row>
               <v-col cols="12" sm="12" class="d-flex justify-center align-center">
                 <v-img v-if="imagePreview" :src="imagePreview" width="180" height="180" class="rounded-card"></v-img>
@@ -103,8 +124,8 @@ const subunits = [
             </v-row>
             <v-row>
               <v-col cols="12" sm="6">
-                <v-text-field label="ชื่อวัตถุดิบ (ตัวอย่าง : เนสกาแฟ เบลนด์ แอนด์ บรู กาแฟปรุงสำเร็จ ริช อโรมา)" required
-                  v-model="ingredientStore.editedIngredient.ingredientName" :rules="[
+                <v-text-field label="ชื่อวัตถุดิบ (ตัวอย่าง : เนสกาแฟ เบลนด์ แอนด์ บรู กาแฟปรุงสำเร็จ ริช อโรมา)"
+                  required v-model="ingredientStore.editedIngredient.ingredientName" :rules="[
                     (v) => !!v || 'กรุณากรอกชื่อวัตถุดิบ',
                     (v) => v.length >= 3 || 'ความยาวต้องมากกว่า 3 ตัวอักษร',
                   ]" dense hide-details variant="solo"></v-text-field>
@@ -124,9 +145,11 @@ const subunits = [
                   ]" dense hide-details variant="solo"></v-text-field>
               </v-col>
               <v-col cols="12" sm="6">
-                <v-autocomplete label="หน่วยใหญ่ (ตัวอย่าง : ถุง)" v-model="ingredientStore.editedIngredient.ingredientUnit"
-                  :items="units" dense hide-details variant="solo"></v-autocomplete>
+                <v-autocomplete label="หน่วยใหญ่ (ตัวอย่าง : ถุง)"
+                  v-model="ingredientStore.editedIngredient.ingredientUnit" :items="units" dense hide-details
+                  variant="solo"></v-autocomplete>
               </v-col>
+
 
             </v-row>
             <v-row>
@@ -141,8 +164,18 @@ const subunits = [
               </v-col>
               <v-col cols="12" sm="6">
                 <v-autocomplete label="หน่วย/ย่อย (ตัวอย่าง : ซอง ) " v-model.number="ingredientStore.editedIngredient
-                    .ingredientQuantityPerSubUnit
+                  .ingredientQuantityPerSubUnit
                   " :items="subunits" dense hide-details variant="solo"></v-autocomplete>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-text-field label="ปริมาณ" v-model.number="ingredientStore.editedIngredient
+                  .ingredientVolumeUnit
+                  " dense hide-details variant="solo"></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-text-field label="บาร์โคด" v-model.number="ingredientStore.editedIngredient
+                  .ingredientBarcode
+                  " dense hide-details variant="solo"></v-text-field>
               </v-col>
             </v-row>
 

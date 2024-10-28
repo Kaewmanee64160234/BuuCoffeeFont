@@ -89,6 +89,8 @@ async function saveIngredient(ingredient: Ingredient & { imageFile: File }) {
     "ingredientQuantityPerSubUnit",
     ingredient.ingredientQuantityPerSubUnit || ""
   );
+  formData.append("ingredientBarcode", ingredient.ingredientBarcode || "");
+  formData.append("ingredientVolumeUnit", ingredient.ingredientVolumeUnit || "");
 
   if (ingredient.imageFile) {
     formData.append(

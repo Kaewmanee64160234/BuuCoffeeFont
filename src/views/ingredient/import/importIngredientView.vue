@@ -256,14 +256,10 @@
 import { ref, watch, onMounted, computed } from "vue";
 import { useIngredientStore } from "@/stores/Ingredient.store";
 import Swal from "sweetalert2";
-import type { VForm } from "vuetify/components";
-import type { Importingredientitem } from "@/types/importIngredientItem.type";
-
 const ingredientStore = useIngredientStore();
 const searchQuery = ref("");
 const storeField = ref(null);
 const discountField = ref(null);
-const totalField = ref(null);
 const newIngredientName = ref("");
 onMounted(async () => {
   await ingredientStore.getIngredients();

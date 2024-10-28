@@ -1,18 +1,16 @@
 <script lang="ts" setup>
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import Swal from 'sweetalert2';
 import { useIngredientStore } from '@/stores/Ingredient.store';
 import { useSubIngredientStore } from '@/stores/ingredientSubInventory.store';
-
 const ingredientStore = useIngredientStore();
 const subIngredientStore = useSubIngredientStore();
-
+const barcode = ref("");
 onMounted(async () => {
   await ingredientStore.getIngredients();
   await subIngredientStore.getSubIngredients_coffee();
-});
 
-// Computed property to filter out ingredients
+});
 const filteredIngredients = computed(() => {
   const subIngredients = subIngredientStore.subingredients_coffee;
   return ingredientStore.all_ingredients.filter(item => {
@@ -42,7 +40,7 @@ const saveCheckData = async () => {
         }
       });
       ingredientStore.shopType = 'coffee';
-    ingredientStore.actionType = 'withdrawal';
+      ingredientStore.actionType = 'withdrawal';
 
       // ส่งข้อมูล
       await ingredientStore.createReturnWithdrawalIngredients();
@@ -66,39 +64,57 @@ const saveCheckData = async () => {
     });
   }
 };
+const handleBarcodeInput = async () => {
+  if (barcode.value) {
+    const foundItem = ingredientStore.all_ingredients.find(
+      (item) => item.ingredientBarcode === barcode.value.trim()
+    );
+
+    if (foundItem) {
+      ingredientStore.Addingredienttotable(foundItem);
+      console.log(foundItem);
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "ไม่พบสินค้า",
+        text: "ไม่พบสินค้าที่มีบาร์โค้ดนี้",
+      });
+    }
+    barcode.value = "";
+  }
+};
 </script>
 
 <template>
   <v-container fluid style="padding-left: 80px;">
     <v-card-title>
       <v-row>
-        <v-col cols="9" style="padding: 10px;">
+        <v-col cols="12">
           <h3>เบิกวัตถุดิบร้านกาแฟ</h3>
         </v-col>
       </v-row>
       <v-row>
-        <v-col cols="3">
-          <v-text-field label="ค้นหาวัตถุดิบ" append-inner-icon="mdi-magnify" dense hide-details variant="solo" outlined
-            v-model="ingredientStore.search"></v-text-field>
+        <v-col cols="12" md="6">
+          <v-text-field v-model="barcode" append-inner-icon="mdi-barcode" label="แสกนบาร์โค้ด" variant="solo" dense
+            hide-details @keydown.enter="handleBarcodeInput"
+            style="background-color: #f1f1f1; border-radius: 8px; text-align: right;"></v-text-field>
         </v-col>
         <v-col cols="auto">
           <v-btn color="success" :to="{ name: 'ingredients_coffee' }">
-            <v-icon left>mdi-arrow-u-left-top-bold </v-icon> ย้อนกลับ
+            <v-icon left>mdi-arrow-u-left-top-bold</v-icon> ย้อนกลับ
           </v-btn>
         </v-col>
       </v-row>
       <v-spacer></v-spacer>
     </v-card-title>
+
     <v-row>
       <v-col cols="6" class="d-flex flex-column">
         <v-container>
           <v-row>
-            <v-col cols="3" style="text-align: center; padding: 8px"
-              v-for="(item, index) in filteredIngredients" :key="index">
-              <v-card
-                width="100%"
-                @click="ingredientStore.Addingredienttotable(item)"
-              >
+            <v-col cols="3" style="text-align: center; padding: 8px" v-for="(item, index) in filteredIngredients"
+              :key="index">
+              <v-card width="100%" @click="ingredientStore.Addingredienttotable(item)">
                 <v-img :src="`http://localhost:3000/ingredients/${item.ingredientId}/image`" height="100"></v-img>
                 <v-card-title style="font-size: 14px">{{ item.ingredientName }}</v-card-title>
                 <v-card-subtitle style="font-size: 12px">{{ item.ingredientSupplier }}</v-card-subtitle>
@@ -107,6 +123,7 @@ const saveCheckData = async () => {
           </v-row>
         </v-container>
       </v-col>
+
       <v-col cols="6" class="d-flex flex-column">
         <v-card style="height: 400px; overflow-y: auto; width: 100%">
           <v-table style="max-height: 100%; overflow-y: auto">
@@ -159,6 +176,7 @@ const saveCheckData = async () => {
     </v-row>
   </v-container>
 </template>
+
 
 <style scoped>
 .disabled-card {
@@ -287,7 +305,8 @@ td {
     font-size: 12px;
   }
 
-  thead, th {
+  thead,
+  th {
     font-size: 10px;
   }
 
@@ -321,19 +340,21 @@ td {
   td {
     white-space: nowrap;
   }
-  
+
   v-container {
-    padding: 0; /* ลด padding ของ container */
+    padding: 0;
+    /* ลด padding ของ container */
   }
-  
+
   v-card {
-    margin: 0; /* ลด margin ของ card */
+    margin: 0;
+    /* ลด margin ของ card */
   }
-  
-  v-row, v-col {
+
+  v-row,
+  v-col {
     margin: 0;
     padding: 0;
   }
 }
 </style>
-

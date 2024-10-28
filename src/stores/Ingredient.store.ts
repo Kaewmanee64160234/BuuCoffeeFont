@@ -31,6 +31,8 @@ export const useIngredientStore = defineStore("ingredient", () => {
     ingredientQuantityPerUnit: 0,
     ingredientQuantityPerSubUnit: "",
     ingredientRemining: 0,
+    ingredientVolumeUnit:"",
+    ingredientBarcode:"",
     ingredientImage: "no_image.jpg",
     file: new File([""], "filename"),
   });
@@ -46,6 +48,8 @@ export const useIngredientStore = defineStore("ingredient", () => {
         ingredientQuantityPerUnit: 0,
         ingredientQuantityPerSubUnit: "",
         ingredientRemining: 0,
+        ingredientVolumeUnit:"",
+        ingredientBarcode:"",
         ingredientImage: "no_image.jpg",
         file: new File([""], "filename"),
       };
@@ -326,14 +330,14 @@ export const useIngredientStore = defineStore("ingredient", () => {
           imageFile: editedIngredient.value.file,
         });
       }
-      dialog.value = false; // ปิด dialog หลังจากบันทึกข้อมูลเสร็จสิ้น
+      dialog.value = false; 
       window.location.reload();
-      await getAllIngredients(); // Refresh ingredient list after save
+      await getAllIngredients(); 
     } catch (e) {
       console.log(e);
       messageStore.showError("Cannot save product");
     } finally {
-      loadingStore.loading = false; // ให้ isLoading เป็น false ทุกรอบ
+      loadingStore.loading = false; 
     }
   }
 

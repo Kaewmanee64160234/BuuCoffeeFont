@@ -10,13 +10,8 @@ const formatDate = (dateString: string) => {
   const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', timeZone: 'UTC' };
   return new Date(dateString).toLocaleDateString('th-TH', options);
 };
-const actionTypeLabel = computed(() => {
-  return ingredientStore.checkingredient?.actionType === 'check'
-    ? 'จำนวนที่นับ'
-    : ingredientStore.checkingredient?.actionType === 'issuing'
-    ? 'จำนวนนำออก'
-    : 'จำนวนที่เลี้ยงรับรอง';
-});
+
+
 </script>
 <template>
   <v-dialog v-model="ingredientStore.dialogCheckItem" max-width="50%">
@@ -34,7 +29,7 @@ const actionTypeLabel = computed(() => {
             <v-icon color="primary" left style="font-size: 20px;">mdi-clipboard-text</v-icon>
             <strong style="font-size: 16px;"> รูปแบบ : </strong>
             <span style="font-size: 14px;">
-              {{ ingredientStore.checkingredient?.actionType === 'issuing' ? 'นำวัตถุดิบออก' : ( ingredientStore.checkingredient?.actionType === 'check' ? 'เช็ควัตถุดิบ' : 'เลี้ยงรับรอง') }}
+              {{ ingredientStore.checkingredient?.actionType === 'return' ? 'ปรับสต็อก' : ( ingredientStore.checkingredient?.actionType === 'withdrawal' ? 'เบิกเข้าสต็อก' : '') }}
             </span>
           </v-col>
 
@@ -64,7 +59,7 @@ const actionTypeLabel = computed(() => {
             <th class="column-header text-center">ลำดับ</th>
             <th class="column-header text-center">ชื่อวัตถุดิบ</th>
             <th class="column-header text-center">จำนวนเดิม</th>
-            <th class="column-header text-center">{{ actionTypeLabel }}</th>
+            <th class="column-header text-center"></th>
 
           </tr>
         </thead>
