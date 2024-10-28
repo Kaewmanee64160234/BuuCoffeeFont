@@ -16,7 +16,7 @@ export const useCateringStore = defineStore("catering", () => {
   const meals = ref<Meal[]>([]);
   const userStore = useUserStore();
   const selectedMealIndex = ref<number>(0);
-  const cashierAmount = ref<number>(0);
+  const totalBudget = ref<number>(0);
   const cateringReceiptItemDialog = ref<boolean>(false);
   const cateringProductDialog = ref<boolean>(false);
   const filteredReceiptItems = ref<ReceiptItem[]>([]);
@@ -70,7 +70,7 @@ export const useCateringStore = defineStore("catering", () => {
   const cateringEvent = ref<CateringEvent>({
     cashierId: 0,
     meals: [], // Meals with one receipt per meal
-    cashierAmount: 0,
+    totalBudget: 0,
     createdDate: new Date(),
     deletedAt: "",
     user: {
@@ -278,7 +278,7 @@ export const useCateringStore = defineStore("catering", () => {
       (sum, meal) => sum + meal.totalPrice,
       0
     );
-    cateringEvent.value.cashierAmount = totalEventPrice;
+    cateringEvent.value.totalBudget = totalEventPrice;
   };
 
   const openToppingDialog = (item: Product, mealIndex: number) => {
@@ -386,7 +386,7 @@ export const useCateringStore = defineStore("catering", () => {
       0
     );
 
-    cateringEvent.value.cashierAmount = totalEventPrice;
+    cateringEvent.value.totalBudget = totalEventPrice;
     console.log(
       "mealProducts3",
       cateringEvent.value.meals![selectedMealIndex.value].mealProducts
@@ -496,7 +496,7 @@ export const useCateringStore = defineStore("catering", () => {
       (sum, meal) => sum + meal.totalPrice,
       0
     );
-    cateringEvent.value.cashierAmount = totalEventPrice;
+    cateringEvent.value.totalBudget = totalEventPrice;
 
     console.log("Updated catering event:", cateringEvent.value);
   };
@@ -518,7 +518,7 @@ export const useCateringStore = defineStore("catering", () => {
   const clearData = () => {
     cateringEvent.value = {
       cashierId: 0,
-      cashierAmount: 0,
+      totalBudget: 0,
       createdDate: new Date(),
       deletedAt: "",
       meals: [],
@@ -605,7 +605,7 @@ export const useCateringStore = defineStore("catering", () => {
       (sum, meal) => sum + meal.totalPrice,
       0
     );
-    cateringEvent.value.cashierAmount = totalEventPrice;
+    cateringEvent.value.totalBudget = totalEventPrice;
     cateringEvent.value.meals![selectedMealIndex.value] = meal;
   };
   const calculateSubtotal = (item: ReceiptItem) => {
@@ -667,7 +667,7 @@ export const useCateringStore = defineStore("catering", () => {
     selectItemEdit,
     addProduct,
     addToReceipt,
-    cashierAmount,
+    totalBudget,
     cateringReceiptItemDialog,
     filteredReceiptItems,
     calculateReceiptItem,

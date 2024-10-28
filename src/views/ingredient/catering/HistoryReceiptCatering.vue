@@ -138,7 +138,7 @@ watch(
           >
             <td style="text-align: center">
               {{
-                (cateringEventStore.currentPage - 1) * itemsPerPage + index + 1
+               index + 1 + (cateringEventStore.currentPage - 1) * cateringEventStore.totalItems
               }}
             </td>
             <td>{{ catering.eventName }}</td>

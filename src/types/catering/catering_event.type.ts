@@ -7,7 +7,8 @@ export interface CateringEvent {
   eventDate?: Date;
   eventLocation?: string;
   attendeeCount?: number;
-  cashierAmount?: number;
+  // cashierAmount?: number;
+  status?: string;
   totalBudget?: number;
   createdDate?: Date;
   deletedAt?: string;
