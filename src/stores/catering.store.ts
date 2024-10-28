@@ -11,6 +11,7 @@ import { usePosStore } from "./pos.store";
 import type { ProductTypeTopping } from "@/types/productTypeTopping.type";
 import receiptService from "@/service/receipt.service";
 import cateringService from "@/service/catering.service";
+import { useCateringEventStore } from "./historycatering.store";
 
 export const useCateringStore = defineStore("catering", () => {
   const meals = ref<Meal[]>([]);
@@ -22,8 +23,9 @@ export const useCateringStore = defineStore("catering", () => {
   const filteredReceiptItems = ref<ReceiptItem[]>([]);
   const productsCatering = ref<Product[]>([]);
   const cateringHistory = ref<CateringEvent>();
+  const cateringEventStore = useCateringEventStore();
   const mealProductEdit = ref<MealProduct>({
-   mealId: 0,
+    mealId: 0,
     product: {
       productId: 0,
       productName: "",
@@ -566,8 +568,9 @@ export const useCateringStore = defineStore("catering", () => {
           productImage: "",
           productPrice: item.productPrice!,
         },
-        quantity: parseInt(item.quantity!+''),
-        totalPrice: parseInt(item.productPrice+'')*parseInt(item.quantity!+''),
+        quantity: parseInt(item.quantity! + ""),
+        totalPrice:
+          parseInt(item.productPrice + "") * parseInt(item.quantity! + ""),
         type: "เลี้ยงรับรอง",
         productName: item.productName,
         productPrice: item.productPrice,
@@ -622,17 +625,32 @@ export const useCateringStore = defineStore("catering", () => {
     }
     return subtotal;
   };
-  const syncMealProduct = () => {
+  const syncMealProduct = (item: ReceiptItem) => {
     const selectedMeal = cateringEvent.value.meals![selectedMealIndex.value];
 
     selectedMeal.mealProducts.forEach((mealProduct) => {
-      const associatedReceiptItems = selectedMeal.receipt.receiptItems.filter(
+      // find from recipt item
+      const associatedReceiptItems = selectedMeal.receipt?.receiptItems.filter(
         (receiptItem) =>
-          receiptItem.product?.productName === mealProduct.product!.productName
+          receiptItem.product?.productName === mealProduct.product?.productName
       );
       console.log("associatedReceiptItems", associatedReceiptItems);
+
+      console.log("associatedReceiptItems", associatedReceiptItems);
       if (associatedReceiptItems.length === 0) {
-        return;
+        const mealContainerProduct = selectedMeal.mealProducts.find((mp) => {
+          return mp.product?.productName === item.product?.productName
+        });
+        const itemInReceipt = selectedMeal.receipt?.receiptItems.find((ri) => {
+          return ri.product?.productName === item.product?.productName
+        });
+        if(!itemInReceipt && mealContainerProduct) {
+          const mealProductIndex = selectedMeal.mealProducts.findIndex((mp) => {
+            return mp.product?.productName === item.product?.productName
+          });
+          selectedMeal.mealProducts.splice(mealProductIndex, 1);
+          cateringReceiptItemDialog.value = false;
+        }
       } else {
         mealProduct.quantity = associatedReceiptItems.reduce(
           (sum, item) => sum + item.quantity,
@@ -680,6 +698,6 @@ export const useCateringStore = defineStore("catering", () => {
     calculateSubtotal,
     syncMealProduct,
     calculateTotalPrice,
-    cateringHistory
+    cateringHistory,
   };
 });
