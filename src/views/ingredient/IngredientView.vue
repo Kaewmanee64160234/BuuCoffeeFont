@@ -1,9 +1,11 @@
 <script lang="ts" setup>
 import { useIngredientStore } from '@/stores/Ingredient.store';
 import IngredientDialog from "@/views/ingredient/IngredientDialog.vue";
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { useRouter } from 'vue-router'; 
+import { jsPDF } from 'jspdf';
 import Swal from 'sweetalert2';
+import JsBarcode from 'jsbarcode';
 
 const ingredientStore = useIngredientStore();
 const router = useRouter(); 
@@ -18,6 +20,50 @@ const take = computed(() => ingredientStore.take);
 onMounted(async () => {
   await ingredientStore.getAllIngredients();
 });
+
+const exportIngredients = async () => {
+  try {
+    await ingredientStore.getAllIngredients();
+
+    const doc = new jsPDF();
+    const lineHeight = 10;
+    await nextTick();
+    const barcodeContainer = document.createElement('div');
+    barcodeContainer.style.display = 'none';
+    document.body.appendChild(barcodeContainer);
+
+    for (let index = 0; index < ingredientStore.ingredients.length; index++) {
+      const ingredient = ingredientStore.ingredients[index];
+      const { ingredientName, ingredientBarcode } = ingredient;
+
+      console.log(`Index: ${index}, Name: ${ingredientName}, Barcode: ${ingredientBarcode}`);
+
+      if (ingredientName && ingredientBarcode) {
+        const canvasId = `barcode-${index}`;
+        const canvas = document.createElement('canvas');
+        canvas.id = canvasId;
+        barcodeContainer.appendChild(canvas);
+        await nextTick(); 
+        JsBarcode(canvasId, ingredientBarcode, { format: "CODE128" });
+
+        doc.text(ingredientName, 10, lineHeight * (index + 1));
+
+        const imgData = canvas.toDataURL("image/png");
+        doc.addImage(imgData, 'PNG', 100, lineHeight * (index + 1) - 5, 50, 20);
+      } else {
+        console.error(`Missing ingredientName or ingredientBarcode for index ${index}`);
+      }
+    }
+
+    document.body.removeChild(barcodeContainer);
+
+    doc.save('ingredients.pdf');
+  } catch (error) {
+    console.error(error);
+    Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถส่งออกวัตถุดิบได้.', 'error');
+  }
+};
+
 
 const deleteIngredient = async (id?: number) => {
   if (id !== undefined) {
@@ -68,6 +114,9 @@ watch(paginate, async (newValue, oldValue) => {
         <v-row>
           <v-col cols="9" style="padding: 10px;">
           <h3>คลังวัตถุดิบ</h3>
+          </v-col>
+          <v-col cols="3">
+            <v-btn @click="exportIngredients">Export Ingredients</v-btn>
           </v-col>
           <v-col cols="3">
             <v-text-field style="height: fit-content;" label="ค้นหารายการวัตถุดิบ" append-inner-icon="mdi-magnify" dense hide-details variant="solo"
@@ -166,7 +215,7 @@ watch(paginate, async (newValue, oldValue) => {
             </td>
             <td>{{ item.ingredientName }}</td>
             <td>{{ item.ingredientSupplier }}</td>
-            <td>{{ item.ingredientQuantityPerUnit }} x {{ item.ingredientVolumeUnit }}</td>
+            <td>{{ item.ingredientQuantityPerUnit }} {{ item.ingredientQuantityPerSubUnit }} x {{ item.ingredientVolumeUnit }}</td>
             <td :style="{ color: item.ingredientQuantityInStock <= item.ingredientMinimun ? 'red' : 'black' }">{{ item.ingredientQuantityInStock }} {{ item.ingredientUnit }}</td>
             <td>
               <v-btn color="#FFDD83" class="mr-5" icon="mdi-pencil" @click="ingredientStore.setEditedIngredient(item)"></v-btn>

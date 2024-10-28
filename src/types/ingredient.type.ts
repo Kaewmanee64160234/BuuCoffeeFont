@@ -12,4 +12,6 @@ export interface Ingredient {
   ingredientQuantityPerSubUnit?: string;
   ingredientRemining?: number; 
   ingredientVolumeUnit?: string;
+  ingredientBarcode?: string;
+
 }
