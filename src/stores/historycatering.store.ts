@@ -14,6 +14,7 @@ export const useCateringEventStore = defineStore("cateringEvent", () => {
   const totalItems = ref(0);
   const itemsPerPage = ref(10);
   const currentPage = ref(1);
+  const last_page = ref(1);
   const meta = ref({
     total: 0,
     page: 1,
@@ -45,7 +46,7 @@ export const useCateringEventStore = defineStore("cateringEvent", () => {
       try {
         const res = await cateringService.updateStatusCateringEvent(id, status);
         if (res.status === 200) {
-          await fetchCateringEvents();
+          await cateringEventPaginate(currentPage.value, itemsPerPage.value);
           Swal.fire(
             "เปลี่ยนสถานะ!",
             "สถานะของเหตุการณ์ถูกเปลี่ยนแล้ว.",
@@ -77,6 +78,8 @@ export const useCateringEventStore = defineStore("cateringEvent", () => {
           await fetchCateringEvents();
           Swal.fire("ยกเลิกแล้ว!", "เหตุการณ์นี้ถูกยกเลิก.", "success");
         }
+          await cateringEventPaginate(currentPage.value, itemsPerPage.value);
+
       } catch (error) {
         console.error("Failed to cancel event:", error);
         Swal.fire("เกิดข้อผิดพลาด!", "ไม่สามารถยกเลิกเหตุการณ์ได้.", "error");
@@ -102,6 +105,10 @@ export const useCateringEventStore = defineStore("cateringEvent", () => {
       totalItems.value = response.data.meta.total; // Make sure meta contains the total count
       currentPage.value = response.data.meta.page;
       itemsPerPage.value = response.data.meta.limit;
+      last_page.value = response.data.meta.last_page;
+
+      console.log(response.data);
+      
     } catch (error) {
       console.error("Failed to fetch catering events:", error);
     }
@@ -120,5 +127,6 @@ export const useCateringEventStore = defineStore("cateringEvent", () => {
     totalItems,
     itemsPerPage,
     currentPage,
+    last_page
   };
 });
