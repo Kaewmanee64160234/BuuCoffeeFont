@@ -3,8 +3,12 @@ import { onMounted, ref, watch } from "vue";
 import { useCateringEventStore } from "@/stores/historycatering.store";
 import type { HistoryCateringEvent } from "@/types/catering/history_catering.type";
 import dialogHistoryCatering from "@/views/ingredient/catering/dialogHistoryCatering.vue";
+import type { CateringEvent } from "@/types/catering/catering_event.type";
+import { useCategoryStore } from "@/stores/category.store";
+import { useCateringStore } from "@/stores/catering.store";
 
 const cateringEventStore = useCateringEventStore();
+const cateringStore = useCateringStore();
 const historyCheckDialog = ref(false);
 const selectedCheck = ref<HistoryCateringEvent | null>(null);
 
@@ -45,9 +49,9 @@ const translateStatus = (status: any) => {
 };
 
 // Open a dialog to check details for a specific catering event
-const openHistoryCheckDialog = async (checkcatering: HistoryCateringEvent) => {
-  await cateringEventStore.getHistoryCateringById(checkcatering.eventId);
-  cateringEventStore.historyCateringitem = checkcatering;
+const openHistoryCheckDialog = async (checkcatering: CateringEvent) => {
+  // await cateringEventStore.getHistoryCateringById(checkcatering.cashierId);
+  cateringStore.cateringHistory = checkcatering;
   cateringEventStore.dialogCateringItem = true;
 };
 
@@ -73,7 +77,7 @@ watch(
 <template>
   <dialogHistoryCatering
     v-model:dialog="historyCheckDialog"
-    :checkcatering="selectedCheck"
+ 
   />
   <v-container>
     <v-card>
@@ -134,7 +138,7 @@ watch(
           >
             <td style="text-align: center">
               {{
-                (cateringEventStore.currentPage - 1) * itemsPerPage + index + 1
+               index + 1 + (cateringEventStore.currentPage - 1) * cateringEventStore.totalItems
               }}
             </td>
             <td>{{ catering.eventName }}</td>

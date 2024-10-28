@@ -20,7 +20,7 @@ const increaseQuantity = (item: ReceiptItem) => {
       .mealProducts
   );
 
-  cateringStore.syncMealProduct();
+  cateringStore.syncMealProduct(item);
   cateringStore.calculateTotalPrice(cateringStore.selectedMealIndex);
 };
 
@@ -32,7 +32,7 @@ const decreaseQuantity = (item: ReceiptItem, index: number) => {
     removeItem(index); // If quantity reaches zero, remove the item
   }
 
-  cateringStore.syncMealProduct();
+  cateringStore.syncMealProduct(item);
   cateringStore.calculateTotalPrice(cateringStore.selectedMealIndex);
 };
 
@@ -40,7 +40,7 @@ const removeItem = (index: number) => {
   const item = cateringStore.filteredReceiptItems[index];
   cateringStore.filteredReceiptItems.splice(index, 1);
 
-  const selectedMeal =
+  const selectedMeal = 
     cateringStore.cateringEvent.meals![cateringStore.selectedMealIndex];
 
   const receiptIndex = selectedMeal.receipt.receiptItems.findIndex(
@@ -48,6 +48,7 @@ const removeItem = (index: number) => {
       receiptItem.product?.productId === item.product!.productId &&
       receiptItem === item
   );
+  
 
   if (receiptIndex !== -1) {
     selectedMeal.receipt.receiptItems.splice(receiptIndex, 1);
@@ -63,7 +64,7 @@ const removeItem = (index: number) => {
     );
   }
 
-  cateringStore.syncMealProduct();
+  cateringStore.syncMealProduct(item);
   cateringStore.calculateTotalPrice(cateringStore.selectedMealIndex);
 };
 

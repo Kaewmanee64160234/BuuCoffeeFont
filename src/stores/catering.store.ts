@@ -11,18 +11,21 @@ import { usePosStore } from "./pos.store";
 import type { ProductTypeTopping } from "@/types/productTypeTopping.type";
 import receiptService from "@/service/receipt.service";
 import cateringService from "@/service/catering.service";
+import { useCateringEventStore } from "./historycatering.store";
 
 export const useCateringStore = defineStore("catering", () => {
   const meals = ref<Meal[]>([]);
   const userStore = useUserStore();
   const selectedMealIndex = ref<number>(0);
-  const cashierAmount = ref<number>(0);
+  const totalBudget = ref<number>(0);
   const cateringReceiptItemDialog = ref<boolean>(false);
   const cateringProductDialog = ref<boolean>(false);
   const filteredReceiptItems = ref<ReceiptItem[]>([]);
   const productsCatering = ref<Product[]>([]);
+  const cateringHistory = ref<CateringEvent>();
+  const cateringEventStore = useCateringEventStore();
   const mealProductEdit = ref<MealProduct>({
-   mealId: 0,
+    mealId: 0,
     product: {
       productId: 0,
       productName: "",
@@ -69,7 +72,7 @@ export const useCateringStore = defineStore("catering", () => {
   const cateringEvent = ref<CateringEvent>({
     cashierId: 0,
     meals: [], // Meals with one receipt per meal
-    cashierAmount: 0,
+    totalBudget: 0,
     createdDate: new Date(),
     deletedAt: "",
     user: {
@@ -277,7 +280,7 @@ export const useCateringStore = defineStore("catering", () => {
       (sum, meal) => sum + meal.totalPrice,
       0
     );
-    cateringEvent.value.cashierAmount = totalEventPrice;
+    cateringEvent.value.totalBudget = totalEventPrice;
   };
 
   const openToppingDialog = (item: Product, mealIndex: number) => {
@@ -385,7 +388,7 @@ export const useCateringStore = defineStore("catering", () => {
       0
     );
 
-    cateringEvent.value.cashierAmount = totalEventPrice;
+    cateringEvent.value.totalBudget = totalEventPrice;
     console.log(
       "mealProducts3",
       cateringEvent.value.meals![selectedMealIndex.value].mealProducts
@@ -495,7 +498,7 @@ export const useCateringStore = defineStore("catering", () => {
       (sum, meal) => sum + meal.totalPrice,
       0
     );
-    cateringEvent.value.cashierAmount = totalEventPrice;
+    cateringEvent.value.totalBudget = totalEventPrice;
 
     console.log("Updated catering event:", cateringEvent.value);
   };
@@ -517,7 +520,7 @@ export const useCateringStore = defineStore("catering", () => {
   const clearData = () => {
     cateringEvent.value = {
       cashierId: 0,
-      cashierAmount: 0,
+      totalBudget: 0,
       createdDate: new Date(),
       deletedAt: "",
       meals: [],
@@ -565,8 +568,9 @@ export const useCateringStore = defineStore("catering", () => {
           productImage: "",
           productPrice: item.productPrice!,
         },
-        quantity: parseInt(item.quantity!+''),
-        totalPrice: parseInt(item.productPrice+'')*parseInt(item.quantity!+''),
+        quantity: parseInt(item.quantity! + ""),
+        totalPrice:
+          parseInt(item.productPrice + "") * parseInt(item.quantity! + ""),
         type: "เลี้ยงรับรอง",
         productName: item.productName,
         productPrice: item.productPrice,
@@ -604,7 +608,7 @@ export const useCateringStore = defineStore("catering", () => {
       (sum, meal) => sum + meal.totalPrice,
       0
     );
-    cateringEvent.value.cashierAmount = totalEventPrice;
+    cateringEvent.value.totalBudget = totalEventPrice;
     cateringEvent.value.meals![selectedMealIndex.value] = meal;
   };
   const calculateSubtotal = (item: ReceiptItem) => {
@@ -621,17 +625,32 @@ export const useCateringStore = defineStore("catering", () => {
     }
     return subtotal;
   };
-  const syncMealProduct = () => {
+  const syncMealProduct = (item: ReceiptItem) => {
     const selectedMeal = cateringEvent.value.meals![selectedMealIndex.value];
 
     selectedMeal.mealProducts.forEach((mealProduct) => {
-      const associatedReceiptItems = selectedMeal.receipt.receiptItems.filter(
+      // find from recipt item
+      const associatedReceiptItems = selectedMeal.receipt?.receiptItems.filter(
         (receiptItem) =>
-          receiptItem.product?.productName === mealProduct.product!.productName
+          receiptItem.product?.productName === mealProduct.product?.productName
       );
       console.log("associatedReceiptItems", associatedReceiptItems);
+
+      console.log("associatedReceiptItems", associatedReceiptItems);
       if (associatedReceiptItems.length === 0) {
-        return;
+        const mealContainerProduct = selectedMeal.mealProducts.find((mp) => {
+          return mp.product?.productName === item.product?.productName
+        });
+        const itemInReceipt = selectedMeal.receipt?.receiptItems.find((ri) => {
+          return ri.product?.productName === item.product?.productName
+        });
+        if(!itemInReceipt && mealContainerProduct) {
+          const mealProductIndex = selectedMeal.mealProducts.findIndex((mp) => {
+            return mp.product?.productName === item.product?.productName
+          });
+          selectedMeal.mealProducts.splice(mealProductIndex, 1);
+          cateringReceiptItemDialog.value = false;
+        }
       } else {
         mealProduct.quantity = associatedReceiptItems.reduce(
           (sum, item) => sum + item.quantity,
@@ -666,7 +685,7 @@ export const useCateringStore = defineStore("catering", () => {
     selectItemEdit,
     addProduct,
     addToReceipt,
-    cashierAmount,
+    totalBudget,
     cateringReceiptItemDialog,
     filteredReceiptItems,
     calculateReceiptItem,
@@ -679,5 +698,6 @@ export const useCateringStore = defineStore("catering", () => {
     calculateSubtotal,
     syncMealProduct,
     calculateTotalPrice,
+    cateringHistory,
   };
 });
