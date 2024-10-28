@@ -151,33 +151,33 @@ const createCateringEvent = () => {
       </v-col>
 
       <!-- Confirmation Section -->
-      <v-card style="background-color: #f6d3bb">
+      <v-card style="background-color: #f6d3bb" class="ma-3">
         <v-card-title>สรุปจัดเลี้ยงรับรอง</v-card-title>
         <v-card-text>
-          <p style="color: red">ตรวจสอบรายละเอียดของของคุณก่อนที่จะส่ง</p>
+          <p style="color: red">*** กรุณาตรวจสอบรายละเอียดของของคุณก่อนที่จะส่ง ***</p>
           <p>
-            <strong>Event Name:</strong>
+            <strong>ชื่ออีเว้นท์:</strong>
             {{ cateringStore.cateringEvent.eventName }}
           </p>
           <p>
-            <strong>Event Date:</strong>
+            <strong>วันที่จัดอีเว้นท์:</strong>
             {{ cateringStore.cateringEvent.eventDate }}
           </p>
           <p>
-            <strong>Event Location:</strong>
+            <strong>สถานที่จัดอีเว้นท์:</strong>
             {{ cateringStore.cateringEvent.eventLocation }}
           </p>
           <p>
-            <strong>Attendee Count:</strong>
+            <strong>จำนวนคนที่เข้าร่วม:</strong>
             {{ cateringStore.cateringEvent.attendeeCount }} คน
           </p>
-          <p><strong>Total Budget:</strong> {{ totalBudget }} บาท</p>
+          <p><strong>จำนวนเงินทั้งหมดที่ใช้ในงานจัดเลี้ยง:</strong> {{ totalBudget }} บาท</p>
           <div
             v-for="(meal, index) in cateringStore.cateringEvent.meals!"
             :key="index"
           >
             <p>
-              <strong>Meal {{ index + 1 }}:</strong> {{ meal.mealName }} เวลา :
+              <strong>มื้ออาหารที่ {{ index + 1 }}:</strong> {{ meal.mealName }} เวลา :
               {{ meal.mealTime }}, งบประมาณต่อมื้อรวม:
               {{ meal.totalPrice }} บาท, รายการอาหาร:
               <span v-for="(ingredient, i) in meal.mealProducts" :key="i">
