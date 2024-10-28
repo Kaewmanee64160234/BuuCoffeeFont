@@ -157,7 +157,7 @@ const subunits = [
                   .ingredientQuantityPerSubUnit
                   " :items="subunits" dense hide-details variant="solo"></v-autocomplete>
               </v-col>
-              
+
               <v-col cols="12" sm="6">
                 <v-text-field label="ปริมาณหน่วยย่อย (ตัวอย่าง : 27)" v-model.number="ingredientStore.editedIngredient.ingredientQuantityPerUnit
                   " :rules="[
@@ -174,12 +174,15 @@ const subunits = [
                     (v) => v >= 0 || 'ขั้นต่ำต้องมากกว่า 0',
                   ]" dense hide-details variant="solo"></v-text-field>
               </v-col>
-              
-
               <v-col cols="12" sm="6">
-                <v-text-field label="บาร์โค้ด" v-model.number="ingredientStore.editedIngredient
-                  .ingredientBarcode
-                  " dense hide-details variant="solo"></v-text-field>
+                <v-text-field
+                  label="บาร์โค้ด"
+                  v-model.number="ingredientStore.editedIngredient.ingredientBarcode"
+                  dense
+                  hide-details
+                  variant="solo"
+                  disabled
+                ></v-text-field>
               </v-col>
               
             </v-row>
