@@ -205,7 +205,7 @@ const createCateringEvent = () => {
           <v-row>
             <v-col cols="6">
               <v-text-field
-                label="Event Name"
+                label="ชื่ออีเว้นท์"
                 v-model="cateringStore.cateringEvent.eventName"
                 dense
                 hide-details
@@ -214,7 +214,7 @@ const createCateringEvent = () => {
             </v-col>
             <v-col cols="6">
               <v-text-field
-                label="Event Location"
+                label="สถานที่จัดอีเว้นท์"
                 v-model="cateringStore.cateringEvent.eventLocation"
                 dense
                 hide-details
@@ -223,7 +223,7 @@ const createCateringEvent = () => {
             </v-col>
             <v-col cols="4">
               <v-text-field
-                label="Event Date"
+                label="วันที่จัดอีเว้นท์"
                 v-model="cateringStore.cateringEvent.eventDate"
                 type="date"
                 dense
@@ -234,7 +234,7 @@ const createCateringEvent = () => {
 
             <v-col cols="4">
               <v-text-field
-                label="Attendee Count"
+                label="จำนวนคนที่เข้าร่วม"
                 v-model.number="cateringStore.cateringEvent.attendeeCount"
                 type="number"
                 dense
@@ -244,7 +244,7 @@ const createCateringEvent = () => {
             </v-col>
             <v-col cols="4">
               <v-text-field
-                label="Total Budget"
+                label="จำนวนเงินทั้งหมดที่ใช้ในงานจัดเลี้ยง"
                 v-model.number="totalBudget"
                 type="number"
                 dense

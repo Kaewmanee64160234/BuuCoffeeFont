@@ -140,18 +140,20 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
         >
           <v-expansion-panel-header>
             <v-row class="d-flex align-center">
-              <v-col class="d-flex align-center">
+              <v-col class="d-flex align-center justify-space-between">
                 <v-card-title>
                   รายละเอียดมื้ออาหาร #{{ indexMeals + 1 }}
                 </v-card-title>
                 <v-btn
                   icon
-                  class="ml-2"
+                  class="ma-3"
+                  color="#F55050"
                   @click="cateringStore.removeMeal(indexMeals)"
                 >
                   <v-icon>mdi-delete</v-icon>
                 </v-btn>
               </v-col>
+              
             </v-row>
           </v-expansion-panel-header>
 
@@ -161,6 +163,7 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
                 <v-text-field
                   label="Meal Name"
                   v-model="meal.mealName"
+                  class="ml-4"
                   dense
                   hide-details
                   variant="solo"
@@ -180,6 +183,7 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
                 <v-text-field
                   label="Total Price"
                   v-model.number="meal.totalPrice"
+                  class="mr-4"
                   dense
                   hide-details
                   variant="solo"
@@ -197,6 +201,7 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
                     label="ค้นหาวัตถุดิบ"
                     append-inner-icon="mdi-magnify"
                     dense
+                    class="mt-3"
                     hide-details
                     variant="solo"
                     outlined
@@ -216,6 +221,7 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
               align-tabs="start"
               color="brown"
               background-colaor="#fff"
+              class="ma-4"
             >
               <v-tab value="coffee">วัตถุดิบร้านกาแฟ</v-tab>
               <v-tab value="rice">วัตถุดิบร้านข้าว</v-tab>
@@ -261,8 +267,8 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
               </v-col>
 
               <v-col cols="6">
-                <v-card style="height: 400px; overflow-y: auto">
-                  <v-table>
+                <v-card style="height: 400px; overflow-y: auto" class="ma-5">
+                  <v-table >
                     <thead>
                       <tr>
                         <th class="text-center">ลำดับ</th>
