@@ -278,7 +278,7 @@ watch(
   <CreateDialogAddCashier />
   <CreateHistoryDialogCashier />
   <v-container>
-    <v-carousel hide-delimiter-background hide-delimiters height="auto"
+    <v-carousel hide-delimiter-background hide-delimiters height="290"
       style="background-color: #C7AE8D; border-radius: 20px;">
       <!-- ยอดขายวันนี้ร้านกาแฟ -->
       <v-carousel-item>
@@ -299,8 +299,8 @@ watch(
                 <v-card>
                   <v-card-title class="d-flex justify-space-between align-center" >
                     เงินในลิ้นชัก
-                    <v-btn icon>
-                      <v-icon  @click="openHistoryDialog">mdi-eye</v-icon>
+                    <v-btn icon color="#F7DCB9 ">
+                      <v-icon color="#A66E38" @click="openHistoryDialog">mdi-eye</v-icon>
                     </v-btn>
                   </v-card-title>
                   <template v-if="ReportFinnceStore.cashiers !== null && Object.keys(ReportFinnceStore.cashiers).length !== 0">
@@ -353,10 +353,10 @@ watch(
           ยอดขายวันนี้ร้านอาหาร
         </v-card-title>
         <v-row justify="center" align="center" no-gutters>
-          <v-col cols="12" md="8">
+          <v-col cols="12" md="8" >
             <v-row justify="center" no-gutters>
               <v-col cols="12" md="4" class="pa-2">
-                <v-card class="text-center">
+                <v-card class="text-center mt-10">
                   <v-card-title>
                     รายได้
                   </v-card-title>
@@ -366,7 +366,7 @@ watch(
                 </v-card>
               </v-col>
               <v-col cols="12" md="4" class="pa-2">
-                <v-card class="text-center">
+                <v-card class="text-center mt-10">
                   <v-card-title>
                     จำนวนรายการ
                   </v-card-title>
@@ -376,7 +376,7 @@ watch(
                 </v-card>
               </v-col>
               <v-col cols="12" md="4" class="pa-2">
-                <v-card class="text-center">
+                <v-card class="text-center mt-10">
                   <v-card-title>
                     ส่วนลด
                   </v-card-title>
@@ -398,7 +398,7 @@ watch(
         </v-card-title>
         <v-row justify="center" align="center" no-gutters >
           <v-col cols="12" md="4" class="pa-2" style="width: fit-content;">
-            <v-card class="d-flex justify-center align-center" >
+            <v-card class="d-flex justify-center align-center mt-10" >
               <v-card-title class="text-center">
                 ต้นทุน
               </v-card-title>
@@ -416,7 +416,7 @@ watch(
             </v-card>
           </v-col>
           <v-col cols="12" md="4">
-            <v-card class="d-flex justify-center align-center">
+            <v-card class="d-flex justify-center align-center mt-10">
               <v-card-title class="text-center">
                 ส่วนลด
               </v-card-title>

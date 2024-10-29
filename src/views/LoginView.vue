@@ -29,8 +29,8 @@
         </v-btn>
       </v-card-actions>
     </v-card>
-    <img src="../components/img/coffeeBaby1.png" alt="Character Top Left" class="character-top-left">
-    <img src="../components/img/coffeeBaby2.png" alt="Character Bottom Right" class="character-bottom-right">
+    <!-- <img src="../components/img/coffeeBaby1.png" alt="Character Top Left" class="character-top-left">
+    <img src="../components/img/coffeeBaby2.png" alt="Character Bottom Right" class="character-bottom-right"> -->
   </v-container>
 </template>
 

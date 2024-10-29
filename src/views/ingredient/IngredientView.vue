@@ -33,9 +33,6 @@ const exportIngredients = async () => {
     doc.addFont('Sarabun.ttf', 'Sarabun', 'normal');
     doc.setFont('Sarabun');
 
-
-
-
     const lineHeight = 30;
     // await nextTick();
 
@@ -193,6 +190,9 @@ watch(paginate, async (newValue, oldValue) => {
                 </v-list-item>
                 <v-list-item @click="navigateTo('history-rice-store')">
                   <v-list-item-title>ร้านข้าว </v-list-item-title>
+                </v-list-item>
+                <v-list-item @click="navigateTo('history-catering-store')">
+                  <v-list-item-title>ร้านเลี้ยงรับรอง </v-list-item-title>
                 </v-list-item>
               </v-list>
             </v-menu>

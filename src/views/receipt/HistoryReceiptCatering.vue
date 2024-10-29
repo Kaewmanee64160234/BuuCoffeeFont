@@ -6,12 +6,6 @@ import { computed} from 'vue';
 const receiptsStore = useReceiptsStore();
 const receiptStore = useReceiptStore();
 
-const paginatedReceipts = computed(() => {
-  const start = (receiptStore.currentPage - 1) * receiptStore.itemsPerPage;
-  const end = start + receiptStore.itemsPerPage;
-  return filteredReceipts.value.slice(start, end);
-});
-
 const filteredReceipts = computed(() => {
   if (!receiptStore.searchQuery) {
     return receiptStore.receipts.slice().sort((a, b) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime());
@@ -21,6 +15,14 @@ const filteredReceipts = computed(() => {
     receipt.receiptId?.toString().includes(receiptStore.searchQuery)
   ).sort((a, b) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime());
 });
+
+const paginatedReceipts = computed(() => {
+  const start = (receiptStore.currentPage - 1) * receiptStore.itemsPerPage;
+  const end = start + receiptStore.itemsPerPage;
+  return filteredReceipts.value.slice(start, end);
+});
+
+
 </script>
 
 <template>
@@ -32,7 +34,7 @@ const filteredReceipts = computed(() => {
         <v-row>
           <v-col cols="9"> จัดเลี้ยงรับรอง </v-col>
           <v-col cols="3">
-            <v-text-field variant="solo" label="ค้นหาประวัติการเช็ควัตถุดิบ" append-inner-icon="mdi-magnify"
+            <v-text-field v-model="receiptStore.searchQuery" variant="solo" label="ค้นหาประวัติการเช็ควัตถุดิบ" append-inner-icon="mdi-magnify"
               hide-details dense></v-text-field>
           </v-col>
         </v-row>
@@ -53,6 +55,7 @@ const filteredReceipts = computed(() => {
             <th style="text-align: center; font-weight: bold">ผู้รับผิดชอบ</th>
             <th style="text-align: center; font-weight: bold">แอคชั่น</th>
           </tr>
+          
         </thead>
         <tbody>
          

@@ -14,6 +14,12 @@
               <v-file-input v-model="productImage" label="รูปภาพสินค้า" prepend-icon="mdi-camera" accept="image/*"
                 variant="solo" @change="handleImageUpload" />
             </v-col>
+
+            <v-col cols="12" sm="6">
+              <v-select v-model="storeName" :items="storeNames" label="เลือกชื่อร้าน" dense variant="solo"
+                :error-messages="!storeName ? ['กรุณาเลือก'] : []" />
+            </v-col>
+
             <v-col cols="12" sm="6">
               <v-text-field variant="solo" v-model="productName" label="ชื่อสินค้า" :rules="nameRules"
                 :error-messages="!productName ? ['กรุณากรอกชื่อสินค้า'] : []" required />
@@ -25,36 +31,39 @@
                 dense variant="solo" :error-messages="!selectedCategory ? ['กรุณาเลือก'] : []" />
             </v-col>
 
-            <v-col cols="12" sm="6">
-              <v-text-field variant="solo" v-model="barcode" label="บาร์โค้ด" />
-            </v-col>
-  <!-- Checkbox for "เครื่องดื่มที่สามารถชงได้" -->
-  <v-col cols="12">
-              <v-checkbox label="เครื่องดื่มที่สามารถชงได้" v-model="haveTopping" />
-            </v-col>
-              <!-- Checkbox for "เครื่องดื่มที่สามารถชงได้" -->
-              <v-col cols="12">
-              <v-checkbox label="นับชแต้ม" v-model="countingPoint" />
-            </v-col>
-            <v-col cols="12" sm="6">
-              <v-select v-model="storeName" :items="storeNames" label="เลือกชื่อร้าน" dense variant="solo"
-                :error-messages="!storeName ? ['กรุณาเลือก'] : []" />
-            </v-col>
+            <!-- Checkbox for "เครื่องดื่มที่สามารถชงได้" -->
+            <v-row class="d-flex align-center">
+              <v-col cols="6">
+                <v-checkbox label="เครื่องดื่มที่สามารถชงได้" v-if="storeName !== 'ร้านข้าว'" v-model="haveTopping" />
+              </v-col>
+              <v-col :cols="storeName !== 'ร้านข้าว' ? 6 : 12">
+                <v-checkbox label="นับแต้ม" v-model="countingPoint" />
+              </v-col>
+            </v-row>
 
             <v-col cols="12" sm="6" v-if="!haveTopping" >
               <v-text-field variant="solo" v-model="productPrice" label="ราคา" type="number" :rules="priceRules"
                 :error-messages="!productPrice ? ['กรุณากรอกราคาเริ่มต้น'] : []" required />
             </v-col>
 
-          
-
             <!-- Product Type Checkboxes (Only show if haveTopping is true) -->
-            <v-col cols="12" v-if="haveTopping">
-              <v-checkbox label="ร้อน" v-model="productTypes.hot" @change="handleProductTypeChange('ร้อน', productTypes.hot)" />
-              <v-checkbox label="เย็น" v-model="productTypes.cold" @change="handleProductTypeChange('เย็น', productTypes.cold)" />
-              <v-checkbox label="ปั่น" v-model="productTypes.blend" @change="handleProductTypeChange('ปั่น', productTypes.blend)" />
+            <v-row class="d-flex align-center">
+              <v-col cols="4" v-if="haveTopping && storeName !== 'ร้านข้าว'">
+                <v-checkbox label="ร้อน" v-model="productTypes.hot" @change="handleProductTypeChange('ร้อน', productTypes.hot)" />                
+              </v-col>
+              <v-col cols="4" v-if="haveTopping && storeName !== 'ร้านข้าว'">
+                <v-checkbox label="เย็น" v-model="productTypes.cold" @change="handleProductTypeChange('เย็น', productTypes.cold)" />
+              </v-col>
+              <v-col cols="4" v-if="haveTopping && storeName !== 'ร้านข้าว'">
+                <v-checkbox label="ปั่น" v-model="productTypes.blend" @change="handleProductTypeChange('ปั่น', productTypes.blend)" />
+              </v-col>
+            </v-row>
+
+            <v-col cols="12" sm="6">
+              <v-text-field variant="solo" v-model="barcode" label="บาร์โค้ด" />
             </v-col>
 
+            
             <!-- Show Price TextFields Based on Selected Product Types -->
             <v-col cols="12" v-if="productTypes.hot && haveTopping">
               <v-text-field variant="solo" v-model="productTypesPrice.hot" label="ราคาสินค้าร้อน" type="number" required />
@@ -65,6 +74,7 @@
             <v-col cols="12" v-if="productTypes.blend && haveTopping">
               <v-text-field variant="solo" v-model="productTypesPrice.blend" label="ราคาสินค้าปั่น" type="number" required />
             </v-col>
+
           </v-row>
         </v-form>
       </v-card-text>
@@ -189,6 +199,8 @@ const clearData = () => {
   productTypesPrice.blend = 0;
   storeName.value = '';
   productStore.createProductDialog = false;
+  haveTopping.value = false; 
+  countingPoint.value = false;
 };
 
 const showSuccessDialog = (message: string) => {
@@ -199,4 +211,10 @@ const showSuccessDialog = (message: string) => {
     confirmButtonText: 'ตกลง'
   });
 };
+// Watcher เพื่อตรวจสอบการเปลี่ยนค่า storeName
+watch(storeName, (newValue) => {
+  if (newValue === 'ร้านข้าว') {
+    haveTopping.value = false; // Reset ค่า haveTopping
+  }
+});
 </script>
