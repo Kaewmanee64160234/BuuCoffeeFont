@@ -1,52 +1,74 @@
 <script setup lang="ts">
+import { ref, onMounted, watch } from "vue";
 import { useAuthorizeStore } from '@/stores/autorize.store';
-import { ref, onMounted } from 'vue';
+import type Groups from "@/types/authentorize/group.type";
 
 const authorizeStore = useAuthorizeStore();
-const newGroupPermissions = ref<number[]>([]);
-const newGroupName = ref("");
-const newGroupDescription = ref("");
+const isEditMode = ref(false); 
 
-// Snackbar for showing error messages
 const snackbar = ref(false);
 const snackbarMessage = ref("");
+const selectedPermissions = ref<number[]>([]);
 
-// Load permissions when component mounts
 onMounted(async () => {
   await authorizeStore.getPermissions();
+  
 });
 
-const createGroup = async () => {
-  // Validate group name length and permissions
-  if (newGroupName.value.length < 3) {
+watch(() => authorizeStore.createGroupDialog, (isOpen) => {
+  if (!isOpen) resetForm(); // Reset form on close
+});
+// watch for changes in the currentGroup data
+watch(() => authorizeStore.currentGroup, (newGroup) => {
+  selectedPermissions.value = newGroup.permissions!.map((p) => p.id);
+});
+
+const openEditDialog = (group:Groups) => {
+  isEditMode.value = true;
+  authorizeStore.currentGroup = { ...group }; // Set the selected group data to currentGroup
+  authorizeStore.currentGroup.permissionIds = group.permissions!.map((p) => p.id); // Map permissions to IDs for checkboxes
+  authorizeStore.createGroupDialog = true;
+};
+
+const resetForm = () => {
+  authorizeStore.currentGroup = { name: "", permissions: [] }; // Clear currentGroup
+  isEditMode.value = false;
+};
+
+const saveGroup = async () => {
+  if (authorizeStore.currentGroup.name.length < 3) {
     snackbarMessage.value = "ชื่อกลุ่มต้องมีอย่างน้อย 3 ตัวอักษร";
     snackbar.value = true;
     return;
   }
 
-  if (!newGroupPermissions.value.length) {
+  if (!authorizeStore.currentGroup.permissions!.length) {
     snackbarMessage.value = "กรุณาเลือกสิทธิ์การใช้งานอย่างน้อย 1 สิทธิ์";
     snackbar.value = true;
     return;
   }
 
-  // Create the group
-  await authorizeStore.createGroup({
-    name: newGroupName.value,
-    permissionIds: newGroupPermissions.value,
-  });
+  if (isEditMode.value && authorizeStore.currentGroup.groupId) {
+    await authorizeStore.updateGroup({
+      id: authorizeStore.currentGroup.groupId,
+      name: authorizeStore.currentGroup.name,
+      permissions: authorizeStore.currentGroup.permissions,
+    });
+    snackbarMessage.value = "บันทึกการเปลี่ยนแปลงสำเร็จ!";
+  } else {
+    await authorizeStore.createGroup({
+      name: authorizeStore.currentGroup.name,
+      permissions: authorizeStore.currentGroup.permissions,
+    });
+    snackbarMessage.value = "สร้างกลุ่มสำเร็จ!";
+  }
 
-  // Show success message in snackbar
-  snackbarMessage.value = "สร้างกลุ่มสำเร็จ!";
   snackbar.value = true;
 
-  // Clear inputs and close dialog
-  newGroupName.value = "";
-  newGroupDescription.value = "";
-  newGroupPermissions.value = [];
+  resetForm();
   authorizeStore.createGroupDialog = false;
 
-  await authorizeStore.getGroups(); // Refresh the groups list
+  await authorizeStore.getGroups(); 
 };
 </script>
 
@@ -58,21 +80,16 @@ const createGroup = async () => {
     transition="dialog-transition"
   >
     <v-card>
-      <v-card-title class="text-h6">สร้างกลุ่มผู้ใช้งาน</v-card-title>
+      <v-card-title class="text-h6">{{ isEditMode ? "แก้ไขกลุ่มผู้ใช้งาน" : "สร้างกลุ่มผู้ใช้งาน" }}</v-card-title>
       <v-card-text>
         <!-- Group Name Input -->
         <v-text-field 
           variant="outlined" 
-          v-model="newGroupName" 
+          v-model="authorizeStore.currentGroup.name" 
           label="ชื่อกลุ่ม" 
           outlined 
           :rules="[v => v.length >= 3 || 'ตัวอักษรอย่างน้อย 3 ตัว']"
         ></v-text-field>
-
-        <!-- Description (Optional) -->
-        <v-expand-transition>
-          <v-textarea v-if="newGroupDescription" v-model="newGroupDescription" label="คำอธิบาย (ไม่บังคับ)" outlined></v-textarea>
-        </v-expand-transition>
 
         <!-- Permission Checklist -->
         <div class="permission-checklist">
@@ -85,7 +102,7 @@ const createGroup = async () => {
               class="no-horizontal-scroll"
             >
               <v-checkbox
-                v-model="newGroupPermissions"
+                v-model="selectedPermissions"
                 :label="permission.name"
                 :value="permission.id"
               ></v-checkbox>
@@ -96,7 +113,7 @@ const createGroup = async () => {
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn text @click="authorizeStore.createGroupDialog = false">ยกเลิก</v-btn>
-        <v-btn color="primary" @click="createGroup">สร้างกลุ่ม</v-btn>
+        <v-btn color="primary" @click="saveGroup">{{ isEditMode ? "บันทึกการเปลี่ยนแปลง" : "สร้างกลุ่ม" }}</v-btn>
       </v-card-actions>
     </v-card>
 
