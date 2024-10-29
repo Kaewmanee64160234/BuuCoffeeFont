@@ -30,8 +30,10 @@ const formatDate = (dateString: string) => {
 };
 const openProductMealDialog = (meal: Meal) => {
   selectedMeal.value = meal;
-  cateringEventStore.dialogCateringItemDetail = true;
+  cateringEventStore.dialogCateringItem = false; // ปิด Main Catering Event Dialog
+  cateringEventStore.dialogCateringItemDetail = true; // เปิด New Product Meal Detail Dialog
 };
+
 </script>
 <template>
   <!-- Main Catering Event Dialog -->
@@ -125,8 +127,8 @@ const openProductMealDialog = (meal: Meal) => {
                 </span>
               </td> -->
               <td>
-                <v-btn class="mb-1" icon @click="openProductMealDialog(meal)">
-                  <v-icon color="primary">mdi-arrow-right</v-icon>
+                <v-btn class="ma-2" icon color="#F7DCB9 ">
+                  <v-icon color="#A66E38" @click="openProductMealDialog(meal)">mdi-eye</v-icon>
                 </v-btn>
               </td>
             </tr>
