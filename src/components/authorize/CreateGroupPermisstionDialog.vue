@@ -58,7 +58,7 @@
               ></v-text-field>
 
               <!-- Display selected users for testing -->
-              <div>Selected User IDs: {{ selectedUsers }}</div>
+              <!-- <div>Selected User IDs: {{ selectedUsers }}</div> -->
 
               <v-row>
                 <v-col
@@ -132,8 +132,8 @@ watch(
   (newGroup) => {
     if (newGroup) {
       selectedPermissions.value = newGroup.permissions?.map((p) => p.id) || [];
-      selectedUsers.value = newGroup.users
-        ? newGroup.users.map((u) => u.userId)
+      selectedUsers.value = newGroup.members
+        ? newGroup.members.map((u) => u.user.userId)
         : [];
     }
   }
