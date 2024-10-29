@@ -161,24 +161,28 @@ const disabled = computed(() => {
                 :items="categoryStore.categoriesForCreate.map(category => category.categoryName)" label="เลือกหมวดหมู่"
                 dense @change="checkCategory"></v-select>
             </v-col>
-            <v-col cols="12" sm="6">
+            <v-col cols="12" sm="5">
               <v-text-field variant="solo" v-model="productStore.editedProduct.barcode" label="บาร์โค้ด" />
             </v-col>
-            <v-col cols="12" sm="6">
+            <v-col cols="12" sm="5">
               <v-select v-model="productStore.storeName" :items="storeNames" label="เลือกชื่อร้าน" dense />
             </v-col>
-            <v-col cols="12" sm="6">
+            <v-col cols="12" sm="2">
               <v-checkbox v-model="productStore.countingPoint" label="นับแต้ม" />
             </v-col>
           </v-row>
-          <v-row class="d-flex justify-space-between">
-            <v-checkbox label="ร้อน" v-model="productStore.isHot"
-   ></v-checkbox>
-            <v-checkbox label="เย็น" v-model="productStore.isCold"
-             ></v-checkbox>
-            <v-checkbox label="ปั่น" v-model="productStore.isBlend"
-            ></v-checkbox>
+          <v-row class="d-flex justify-center">
+            <v-col cols="4" class="d-flex justify-center">
+              <v-checkbox label="ร้อน" v-model="productStore.isHot"></v-checkbox>
+            </v-col>
+            <v-col cols="4" class="d-flex justify-center">
+              <v-checkbox label="เย็น" v-model="productStore.isCold"></v-checkbox>
+            </v-col>
+            <v-col cols="4" class="d-flex justify-center">
+              <v-checkbox label="ปั่น" v-model="productStore.isBlend"></v-checkbox>
+            </v-col>
           </v-row>
+          
           <!-- Price Fields for Each Product Type -->
           <v-row>
             <v-col cols="12" v-if="productStore.isHot">
