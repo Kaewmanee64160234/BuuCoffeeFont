@@ -17,7 +17,7 @@ function reloadData() {
 
 <template>
   <v-container class="d-flex justify-center align-center fill-height">
-    <v-card class="fill-width" max-width="1200px">
+    <v-card class="fill-width scrollable-card" max-width="1400px">
       <v-card-title class="text-center">
         <h3>Dashboard</h3>
       </v-card-title>
@@ -107,4 +107,13 @@ html, body {
     font-size: 1.2rem;
   }
 }
+
+.scrollable-card {
+  max-height: 90vh; /* Set max height for the card */
+  overflow-y: auto; /* Add vertical scrollbar inside the card */
+  padding: 16px;
+}
+
+
+
 </style>

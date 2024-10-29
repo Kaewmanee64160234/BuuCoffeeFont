@@ -30,15 +30,17 @@ const formatDate = (dateString: string) => {
 };
 const openProductMealDialog = (meal: Meal) => {
   selectedMeal.value = meal;
-  cateringEventStore.dialogCateringItemDetail = true;
+  cateringEventStore.dialogCateringItem = false; // ปิด Main Catering Event Dialog
+  cateringEventStore.dialogCateringItemDetail = true; // เปิด New Product Meal Detail Dialog
 };
+
 </script>
 <template>
   <!-- Main Catering Event Dialog -->
   <v-dialog v-model="cateringEventStore.dialogCateringItem" max-width="70%">
-    <v-card>
-      <v-card-title class="title-section">
-        <v-row justify="center" align="center">
+    <v-card style="width: fit-content;" class="justify-center mx-auto text-center">
+      <v-card-title class="title-section ">
+        <v-row justify="center" align="center" class="ma-2">
           <v-icon color="primary" style="font-size: 30px"
             >mdi-calendar-month</v-icon
           >
@@ -49,7 +51,7 @@ const openProductMealDialog = (meal: Meal) => {
           </strong>
         </v-row>
         <v-row>
-          <v-col style="padding-top: 4px">
+          <v-col style="padding-top: 4px; text-align: left" class="ml-4">
             <v-icon color="primary" left style="font-size: 20px"
               >mdi-clipboard-text</v-icon
             >
@@ -64,7 +66,7 @@ const openProductMealDialog = (meal: Meal) => {
               }}
             </span>
           </v-col>
-          <v-col style="padding-top: 4px">
+          <v-col style="padding-top: 4px; text-align: right" class="mr-6">
             <v-icon color="primary" left style="font-size: 20px"
               >mdi-account-outline</v-icon
             >
@@ -75,8 +77,8 @@ const openProductMealDialog = (meal: Meal) => {
           </v-col>
         </v-row>
         <v-row>
-          <v-col style="padding-top: 4px">
-            <v-icon color="primary" left style="font-size: 20px"
+          <v-col style="padding-top: 4px; text-align: left" class="ml-4">
+            <v-icon color="primary" left style="font-size: 20px" 
               >mdi-text</v-icon
             >
             <strong style="font-size: 16px"> จำนวนคน : </strong>
@@ -84,7 +86,7 @@ const openProductMealDialog = (meal: Meal) => {
               >{{ cateringStore.cateringHistory!.attendeeCount }} คน</span
             >
           </v-col>
-          <v-col style="padding-top: 4px">
+          <v-col style="padding-top: 4px; text-align: right" class="mr-5">
             <v-icon color="primary" left style="font-size: 20px"
               >mdi-cash-multiple</v-icon
             >
@@ -106,7 +108,7 @@ const openProductMealDialog = (meal: Meal) => {
               <th>มื้ออาหาร</th>
               <th>เวลาจัดเลี้ยง</th>
               <th>งบประมาณ</th>
-              <th>รายละเอียด</th>
+              <th colspan="2">รายละเอียด</th>
             </tr>
           </thead>
           <tbody>
@@ -118,15 +120,15 @@ const openProductMealDialog = (meal: Meal) => {
               <td>{{ meal.mealName }}</td>
               <td>{{ meal.mealTime }}</td>
               <td>{{ meal.totalPrice }} บาท</td>
-              <td>
+              <!-- <td>
                 <span v-for="(ingredient, i) in meal.mealIngredients" :key="i">
                   {{ ingredient.ingredient.ingredientName
                   }}<span v-if="i < meal.mealIngredients.length - 1">, </span>
                 </span>
-              </td>
+              </td> -->
               <td>
-                <v-btn icon @click="openProductMealDialog(meal)">
-                  <v-icon color="primary">mdi-arrow-right</v-icon>
+                <v-btn class="ma-2" icon color="#F7DCB9 ">
+                  <v-icon color="#A66E38" @click="openProductMealDialog(meal)">mdi-eye</v-icon>
                 </v-btn>
               </td>
             </tr>
@@ -141,9 +143,9 @@ const openProductMealDialog = (meal: Meal) => {
     v-model="cateringEventStore.dialogCateringItemDetail"
     max-width="50%"
   >
-    <v-card>
+    <v-card style="width: 75%;" class="justify-center mx-auto text-center">
       <v-card-title class="title-section">
-        <v-row justify="center" align="center">
+        <v-row justify="center" align="center" class="ma-1">
           <v-icon color="primary" style="font-size: 30px">mdi-food</v-icon>
           <strong style="font-size: 18px; margin-left: 8px"
             >รายละเอียดมื้ออาหาร</strong
@@ -154,28 +156,29 @@ const openProductMealDialog = (meal: Meal) => {
       <v-divider></v-divider>
 
       <v-card-text>
-        <v-table>
-          <thead>
-            <tr>
-              <th>ชื่ออาหาร</th>
-              <th>ประเภท</th>
-              <th>จำนวน</th>
-              <th>ราคา</th>
+        <v-table class="centered-table">
+          <thead >
+            <tr >
+              <th style="text-align: center;">ชื่ออาหาร</th>
+              <th style="text-align: center;">ประเภท</th>
+              <th style="text-align: center;">จำนวน</th>
+              <th style="text-align: center;">ราคา</th>
             </tr>
           </thead>
           <tbody>
             <tr
+            style="text-align: center;"
               v-for="(mealProduct, index) in selectedMeal.mealProducts"
               :key="index"
             >
-              <td v-if="mealProduct.productName">
+              <td v-if="mealProduct.productName" style="text-align: center;">
                 {{ mealProduct.productName }}
               </td>
             
-              <td v-else>{{ mealProduct.product.productName }}</td>
-              <td>{{ mealProduct.type }}</td>
-              <td>{{ mealProduct.quantity }}</td>
-              <td>{{ mealProduct.totalPrice }} บาท</td>
+              <td style="text-align: center;" v-else>{{ mealProduct.product.productName }}</td>
+              <td style="text-align: center;">{{ mealProduct.type }}</td>
+              <td style="text-align: center;">{{ mealProduct.quantity }}</td>
+              <td style="text-align: center;">{{ mealProduct.totalPrice }} บาท</td>
             </tr>
           </tbody>
         </v-table>
@@ -218,4 +221,20 @@ const openProductMealDialog = (meal: Meal) => {
     padding: 8px;
   }
 }
+
+.centered-table {
+  margin: 0 auto; /* จัดตารางให้อยู่ตรงกลาง */
+  width: 90%; /* กำหนดขนาดความกว้างของตาราง */
+}
+
+.centered-cell {
+  text-align: center; /* จัดข้อความให้อยู่ตรงกลาง */
+  vertical-align: middle; /* จัดข้อความให้อยู่ตรงกลางในแนวตั้ง */
+  padding: 8px; /* กำหนดระยะห่างภายในเซลล์ */
+}
+
+.centered-table th {
+  font-weight: bold; /* เน้นหัวข้อให้เด่นขึ้น */
+}
+
 </style>
