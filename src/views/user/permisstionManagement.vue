@@ -29,9 +29,11 @@
                 @click:close="removeUserFromGroup(group, user)"
               >
                 {{ user.name }}
+
               </v-chip>
             </v-chip-group>
           </v-card-text>
+
           <v-card-actions>
             <v-btn color="primary" @click="editGroup(group)">แก้ไข</v-btn>
             <v-btn color="red" @click="deleteGroup(group)">ลบ</v-btn>
@@ -157,7 +159,7 @@ const deleteGroup = async (group: Groups) => {
   });
 
   if (result.isConfirmed) {
-    await authorizeStore.deleteGroup(group.id!);
+    await authorizeStore.deleteGroup(group.groupId!);
     Swal.fire("Deleted!", "กลุ่มถูกลบเรียบร้อย", "success");
     await authorizeStore.getGroups(); // Refresh the groups list
   }

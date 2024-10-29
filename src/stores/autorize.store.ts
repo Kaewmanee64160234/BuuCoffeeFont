@@ -18,9 +18,7 @@ export const useAuthorizeStore = defineStore("authorize", () => {
     permissions: [],
   });
   const currentPermission = ref<Permission | null>(null);
-  const groups = ref<Groups[]>(
-    
-  );
+  const groups = ref<Groups[]>();
 
   const createRole = async (role: Role) => {
     try {
