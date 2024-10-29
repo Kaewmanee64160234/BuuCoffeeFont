@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, computed, watch } from 'vue';
 import { useUserStore } from '@/stores/user.store';
-import type { Permission } from '@/types/permisstion.type';
+import type { Permission } from '@/types/authentorize/permisstion.type';
 import { useAuthorizeStore } from '@/stores/autorize.store';
 
 const userStore = useUserStore();

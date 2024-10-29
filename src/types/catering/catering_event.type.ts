@@ -1,4 +1,4 @@
-import type { User } from "../user.type";
+import type { User } from "../authentorize/user.type";
 import type { Meal } from "./meal.type";
 
 export interface CateringEvent {

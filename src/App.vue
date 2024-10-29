@@ -18,7 +18,7 @@ import type { User } from './types/user.type';
 import LoadingDialog from './components/LoadingDialog.vue';
 import { useLoadingStore } from './stores/loading.store';
 import { useAuthStore } from './stores/auth';
-import UserManagement from './views/user/userManagement.vue';
+import UserManagement from './views/user/UserManagement.vue';
 
 const router = useRouter();
 const loadingStore = useLoadingStore();
