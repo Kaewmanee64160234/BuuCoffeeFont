@@ -83,8 +83,7 @@ export const useUserStore = defineStore("user", () => {
       console.error("Error creating user:", error);
     }
   };
-  
-  
+
   
 
   const updateUser = async (id: number, updatedUser: User) => {

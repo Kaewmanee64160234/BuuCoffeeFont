@@ -33,8 +33,42 @@ onMounted(async () => {
   await userStore.getAllUsers();
 });
 
-// Other existing methods for update, delete, addUserToGroup, removeUserFromGroup...
+// deleteGroup
+const deleteGroup = async (group: Groups) => {
+  const result = await Swal.fire({
+    title: "คุณแน่ใจหรือไม่?",
+    text: "คุณต้องการลบกลุ่มผู้ใช้งานนี้หรือไม่?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "ใช่, ลบกลุ่มนี้!",
+    cancelButtonText: "ยกเลิก",
+  });
 
+  if (result.isConfirmed) {
+    await authorizeStore.deleteGroup(group.groupId!);
+  }
+};
+
+// Other existing methods for update, delete, addUserToGroup, removeUserFromGroup...
+// removeUserFromGroup
+const removeUserFromGroup = async (group: Groups, user: any) => {
+  const result = await Swal.fire({
+    title: "คุณแน่ใจหรือไม่?",
+    text: `คุณต้องการลบผู้ใช้งาน ${user.userName} ออกจากกลุ่ม ${group.name} หรือไม่?`,
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "ใช่, ลบผู้ใช้งานนี้!",
+    cancelButtonText: "ยกเลิก",
+  });
+
+  if (result.isConfirmed) {
+    await authorizeStore.removeUserFromGroup(group.groupId!, user.userId);
+  }
+};
 </script>
 
 <template>
@@ -60,14 +94,14 @@ onMounted(async () => {
               </li>
             </ul>
             <h5 class="text-subtitle-1 mt-4">ผู้ใช้ในกลุ่ม:</h5>
-            <v-chip-group column v-if="group.users">
+            <v-chip-group column v-if="group.members">
               <v-chip
-                v-for="user in group.users"
-                :key="user.id"
+                v-for="member in group.members"
+                :key="member.user.userId"
                 close
-                @click:close="removeUserFromGroup(group, user)"
+                @click:close="removeUserFromGroup(group, member.user)"
               >
-                {{ user.name }}
+                {{ member.user.userName }}
               </v-chip>
             </v-chip-group>
           </v-card-text>

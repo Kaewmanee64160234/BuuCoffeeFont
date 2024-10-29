@@ -132,6 +132,7 @@ export const useAuthorizeStore = defineStore("authorize", () => {
       if (res.status === 200) {
         currentGroup.value = res.data;
       }
+      await getGroups();
     } catch (error) {
       console.error("Error deleting group:", error);
     }

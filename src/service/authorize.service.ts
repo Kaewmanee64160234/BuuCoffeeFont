@@ -47,7 +47,10 @@ const createGroup = async (group: Groups) => {
   const groupData = {
     name: group.name,
     permissionIds: group.permissionIds,
+    userIds: group.userIds
   }
+  console.log("groupData", groupData);
+  
  return http.post("/groups", groupData);
 }
 
