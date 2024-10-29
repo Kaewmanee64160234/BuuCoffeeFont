@@ -42,7 +42,7 @@ const saveGroup = async () => {
     return;
   }
 
-  if (!authorizeStore.currentGroup.permissions!.length) {
+  if (!selectedPermissions.value.length) {
     snackbarMessage.value = "กรุณาเลือกสิทธิ์การใช้งานอย่างน้อย 1 สิทธิ์";
     snackbar.value = true;
     return;
@@ -50,15 +50,16 @@ const saveGroup = async () => {
 
   if (isEditMode.value && authorizeStore.currentGroup.groupId) {
     await authorizeStore.updateGroup({
-      id: authorizeStore.currentGroup.groupId,
+      groupId: authorizeStore.currentGroup.groupId,
       name: authorizeStore.currentGroup.name,
-      permissions: authorizeStore.currentGroup.permissions,
+      permissionIds: selectedPermissions.value,
     });
     snackbarMessage.value = "บันทึกการเปลี่ยนแปลงสำเร็จ!";
   } else {
     await authorizeStore.createGroup({
       name: authorizeStore.currentGroup.name,
-      permissions: authorizeStore.currentGroup.permissions,
+      // permissions: authorizeStore.currentGroup.permissions,
+      permissionIds: selectedPermissions.value,
     });
     snackbarMessage.value = "สร้างกลุ่มสำเร็จ!";
   }
