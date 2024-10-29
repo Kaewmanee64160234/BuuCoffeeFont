@@ -6,7 +6,7 @@ import { useRouter } from 'vue-router';
 import { jsPDF } from 'jspdf';
 import Swal from 'sweetalert2';
 import JsBarcode from 'jsbarcode';
-import SarabunFont from '@/assets/Sarabun/Sarabun-Medium.ttf';
+import SarabunFont from '@/assets/Sarabun/Sarabun-Medium.base64';
 const ingredientStore = useIngredientStore();
 const router = useRouter();
 
@@ -31,7 +31,10 @@ const exportIngredients = async () => {
     const doc = new jsPDF();
     doc.addFileToVFS('Sarabun.ttf', SarabunFont);
     doc.addFont('Sarabun.ttf', 'Sarabun', 'normal');
-    doc.setFont('Sarabun');
+    doc.setFont('Helvetica');
+
+
+
 
     const lineHeight = 30;
     // await nextTick();
