@@ -56,7 +56,7 @@ const createGroup = async (group: Groups) => {
 
 // updateGroup
 const updateGroup = async (group: Groups) => {
-  return http.patch(`/groups/${group.id}`, group);
+  return http.patch(`/groups/${group.groupId}`, group);
 }
 
 // deleteGroup
@@ -72,6 +72,7 @@ const addUsersToGroup = async (groupId: number, userIds: number[]) => {
 const removeUserFromGroup = async (groupMemberId: number) => {
   return http.delete(`/group-members/${groupMemberId}`);
 }
+
 
 export default {
   createRole,
