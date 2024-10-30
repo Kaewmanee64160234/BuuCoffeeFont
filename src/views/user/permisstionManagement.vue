@@ -12,17 +12,16 @@ const userStore = useUserStore();
 const selectedGroup = ref<any>(null);
 const editDialog = ref(false);
 const selectedUser = ref<number | null>(null);
-const isEditMode = ref(false); // Track if the dialog is in edit mode
 
 const openCreateDialog = () => {
   selectedGroup.value = null;
-  isEditMode.value = false;
+  authorizeStore.editMode = false;
   authorizeStore.createGroupDialog = true;
 };
 
 const openEditDialog = (group: Groups) => {
   authorizeStore.currentGroup = group;
-  isEditMode.value = true;
+  authorizeStore.editMode = true;
   authorizeStore.createGroupDialog = true;
 };
 
@@ -67,6 +66,16 @@ const removeUserFromGroup = async (group: Groups, user: any) => {
 
   if (result.isConfirmed) {
     await authorizeStore.removeUserFromGroup(group.groupId!, user.userId);
+    // reset current group data
+    authorizeStore.currentGroup = {
+    name: "",
+    permissionIds: [],
+    userIds: [],
+    groupId: -1,
+    permissions: [],
+    members: [],
+    users: [],
+  };
   }
 };
 </script>
@@ -117,7 +126,7 @@ const removeUserFromGroup = async (group: Groups, user: any) => {
     <!-- Group Permission Dialog Component -->
     <CreateGroupPermisstionDialog 
       :groupData="selectedGroup" 
-      :isEditMode="isEditMode" 
+      :isEditMode="authorizeStore.editMode" 
       @close="authorizeStore.createGroupDialog = false"
     />
   </v-container>

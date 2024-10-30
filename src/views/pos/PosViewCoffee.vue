@@ -18,6 +18,7 @@ import PromotionUsePointDialog from "@/components/pos/PromotionUsePointDialog.vu
 import type { Recipe } from "@/types/recipe.type";
 import SelectedItemsListCoffee from "@/components/pos/SelectedItemsListCoffee.vue";
 import { useReceiptStore } from "@/stores/receipt.store";
+import { useReportFinnceStore } from "@/stores/report/finance.store";
 
 const productStore = useProductStore();
 const categoryStore = useCategoryStore();
@@ -31,9 +32,14 @@ const productFilters = ref<Product[]>([]);
 const searchQuery = ref("");
 const barcode = ref("");
 const receiptStore = useReceiptStore();
+const financeStore = useReportFinnceStore();
 
 // Load products, categories, promotions, and customers on mount
 onMounted(async () => {
+  await financeStore.checkCashierToday();
+  if(financeStore.checkTodayCoffee){
+   
+  
   promotionStore.promotions = [];
   await productStore.getProductByStoreType("ร้านกาแฟ");
   await categoryStore.getAllCategories();
@@ -63,6 +69,11 @@ onMounted(async () => {
   // Load queue list from local storage
   loadQueueListFromLocalStorage();
   loadFullscreenStateFromLocalStorage();
+  }
+  else{
+    // return null value
+
+  }
 });
 
 // Load queue list from local storage
@@ -187,7 +198,7 @@ const showQueue = computed(() => {
 
 <template>
   <v-app style="width: 100vw; height: 100vh; overflow: hidden">
-    <v-row :style="{ height: '100%' }">
+    <v-row v-if="financeStore.checkTodayCoffee" :style="{ height: '100%' }">
       <!-- Left Column (Queue) -->
       <v-col cols="2" class="queue-column" style="padding: 0" v-if="showQueue">
         <v-container
@@ -483,6 +494,32 @@ const showQueue = computed(() => {
         <v-sheet style="height: 100%">
           <SelectedItemsListCoffee />
         </v-sheet>
+      </v-col>
+    </v-row>
+    <!-- row when pagidiable -->
+    <v-row
+      v-else
+      class="d-flex align-center justify-center"
+      style="height: 100%; background-color: #fafafa;"
+    >
+      <v-col cols="12" class="text-center">
+        <v-card
+          elevation="2"
+          style="max-width: 500px; margin: auto; padding: 24px; background-color: #fff; border-radius: 12px;"
+        >
+          <v-card-title class="text-h5 text-center">
+            ร้านกาแฟไม่พร้อมใช้งาน
+          </v-card-title>
+          <v-card-subtitle class="text-center">
+            กรุณากรอกเงินในแคชเชียร์ให้ครบก่อนเริ่มการขาย
+          </v-card-subtitle>
+          <v-divider></v-divider>
+          <v-card-actions class="d-flex justify-center">
+            <v-btn color="primary" @click="handleCashierEntry">
+              ป้อนเงินในแคชเชียร์
+            </v-btn>
+          </v-card-actions>
+        </v-card>
       </v-col>
     </v-row>
 

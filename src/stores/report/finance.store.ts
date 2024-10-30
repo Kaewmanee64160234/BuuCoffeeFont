@@ -13,6 +13,8 @@ export const useReportFinnceStore = defineStore("cashier", () => {
   const dailyReport = ref<{ totalSales: number; totalDiscount: number ; totalTransactions: number}>({ totalSales: 0, totalDiscount: 0, totalTransactions:0});
   const coffeeSummary = ref<{ totalSales: number; totalCost: number ; totalDiscount: number ; totalOrders:number}>({ totalSales: 0, totalCost: 0, totalDiscount:0,totalOrders:0});
   const dailyReportFood = ref<{ totalSales: number; totalDiscount: number ; totalTransactions: number}>({ totalSales: 0, totalDiscount: 0, totalTransactions:0});
+  const checkTodayCoffee = ref(false);
+  const checkTodayRice = ref(false);
   const state = reactive({
     groupedByDay: {},
     groupedByMonth: {},
@@ -137,6 +139,19 @@ export const useReportFinnceStore = defineStore("cashier", () => {
       console.error('Error fetching top selling product:', error);
     }
   };
+  // checkToday
+  const checkCashierToday = async () => {
+    try {
+      const res = await financeService.checkToday();
+      if (res.data) {
+        checkTodayCoffee.value = res.data.coffee;
+        checkTodayRice.value = res.data.rice;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return {
     cashiers,
     createCashierDialog,
@@ -160,6 +175,9 @@ export const useReportFinnceStore = defineStore("cashier", () => {
     fetchGroupedFinanceFood,
     fetchGroupedFinance,
     getTopSellingProduct,
+    checkTodayCoffee,
+    checkTodayRice,
+    checkCashierToday
     
   };
 });

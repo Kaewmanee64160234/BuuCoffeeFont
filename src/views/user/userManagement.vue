@@ -4,9 +4,9 @@ import { computed, onMounted, ref } from 'vue';
 import AddUserDialog from '@/components/user/AddUserDialog.vue';
 import EditUserDialog from '@/components/user/EditUserDialog.vue';
 import DetailUserDialog from '@/components/user/DetailUserDialog.vue';
-import type { User } from '@/types/user.type';
 import { watch } from 'vue';
 import { useAuthorizeStore } from '@/stores/autorize.store';
+import type { User } from '@/types/authentorize/user.type';
 
 const userStore = useUserStore();
 const authorizeStore = useAuthorizeStore();

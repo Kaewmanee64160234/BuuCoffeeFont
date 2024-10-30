@@ -12,6 +12,7 @@ export const useAuthorizeStore = defineStore("authorize", () => {
   const currentRole = ref<Role | null>(null);
   const permissions = ref<Permission[]>([]);
   const createGroupDialog = ref<boolean>(false);
+  const editMode = ref<boolean>(false);
   const currentGroup = ref<Groups>({
     id: -1,
     name: "",
@@ -180,6 +181,7 @@ export const useAuthorizeStore = defineStore("authorize", () => {
     deleteGroup,
     createGroupDialog,
     addUsersToGroup,
-    removeUserFromGroup
+    removeUserFromGroup,
+    editMode
   };
 });
