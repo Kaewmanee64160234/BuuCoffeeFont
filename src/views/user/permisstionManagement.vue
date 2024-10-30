@@ -5,6 +5,7 @@ import type Groups from "@/types/authentorize/group.type";
 import { useUserStore } from "@/stores/user.store";
 import { useAuthorizeStore } from "@/stores/autorize.store";
 import CreateGroupPermisstionDialog from "@/components/authorize/CreateGroupPermisstionDialog.vue";
+import type { User } from "@/types/authentorize/user.type";
 
 const authorizeStore = useAuthorizeStore();
 const userStore = useUserStore();

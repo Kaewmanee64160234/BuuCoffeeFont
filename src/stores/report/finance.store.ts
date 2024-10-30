@@ -35,18 +35,7 @@ export const useReportFinnceStore = defineStore("cashier", () => {
       console.error(error);
     }
   };
-  const getfindToday = async () => {
-    try {
-      const res = await financeService.getfindToday();
-      if (res.data) {
-        cashiers.value = res.data;
-      }
-    } catch (error) {
-      createCashierDialog.value = true;
 
-      console.error(error);
-    }
-  };
   const getAll = async () => {
     try {
       const res = await financeService.getAll();
@@ -144,9 +133,21 @@ export const useReportFinnceStore = defineStore("cashier", () => {
     try {
       const res = await financeService.checkToday();
       if (res.data) {
-        checkTodayCoffee.value = res.data.coffee;
-        checkTodayRice.value = res.data.rice;
+        if(res.data.coffee.closedDate== false && res.data.coffee.createdToday ==true){
+        checkTodayCoffee.value = true;
+        }else{
+          checkTodayCoffee.value = false;
+        }
+        if(res.data.rice.closedDate== false && res.data.rice.createdToday ==true){
+          checkTodayRice.value = true;
+        }
+        else{
+          checkTodayRice.value = false;
+        }
+        
+      
       }
+
     } catch (error) {
       console.error(error);
     }
@@ -165,7 +166,6 @@ export const useReportFinnceStore = defineStore("cashier", () => {
     stateFood,
     topSellingProduct,
     createCashier,
-    getfindToday,
     getAll,
     deleteCashier,
     getSumType,

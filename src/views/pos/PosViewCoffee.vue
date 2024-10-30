@@ -19,6 +19,7 @@ import type { Recipe } from "@/types/recipe.type";
 import SelectedItemsListCoffee from "@/components/pos/SelectedItemsListCoffee.vue";
 import { useReceiptStore } from "@/stores/receipt.store";
 import { useReportFinnceStore } from "@/stores/report/finance.store";
+import DialogAddCashier from "@/components/reports/cashier/DialogAddCashier.vue";
 
 const productStore = useProductStore();
 const categoryStore = useCategoryStore();
@@ -37,7 +38,7 @@ const financeStore = useReportFinnceStore();
 // Load products, categories, promotions, and customers on mount
 onMounted(async () => {
   await financeStore.checkCashierToday();
-  financeStore.checkTodayCoffee =true;
+  // financeStore.checkTodayCoffee =true;
   if(financeStore.checkTodayCoffee){
    
   
@@ -195,6 +196,10 @@ const mainInterfaceCols = computed(() => {
 const showQueue = computed(() => {
   return posStore.hideNavigation; // Show the queue only when hideNavigation is true
 });
+// handleCashierEntry
+const handleCashierEntry = () => {
+financeStore.createCashierDialog = true;
+};
 </script>
 
 <template>
@@ -516,7 +521,7 @@ const showQueue = computed(() => {
           </v-card-subtitle>
           <v-divider></v-divider>
           <v-card-actions class="d-flex justify-center">
-            <v-btn color="primary" @click="handleCashierEntry">
+            <v-btn color="primary" @click="handleCashierEntry()">
               ป้อนเงินในแคชเชียร์
             </v-btn>
           </v-card-actions>
@@ -525,6 +530,7 @@ const showQueue = computed(() => {
     </v-row>
 
     <!-- Receipt Dialog -->
+     <DialogAddCashier />
     <receipt-dialog />
   </v-app>
 </template>

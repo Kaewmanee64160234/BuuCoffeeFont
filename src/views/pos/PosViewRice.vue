@@ -19,6 +19,7 @@ import type { Recipe } from "@/types/recipe.type";
 import SelectedItemsListRice from "@/components/pos/SelectedItemsListRice.vue";
 import { useReceiptStore } from "@/stores/receipt.store";
 import { useReportFinnceStore } from "@/stores/report/finance.store";
+import DialogAddCashier from "@/components/reports/cashier/DialogAddCashier.vue";
 
 const productStore = useProductStore();
 const categoryStore = useCategoryStore();
@@ -32,12 +33,14 @@ const productFilters = ref<Product[]>([]);
 const searchQuery = ref("");
 const barcode = ref("");
 const receiptStore = useReceiptStore();
-const finanaceStore = useReportFinnceStore();
+
+const financeStore = useReportFinnceStore();
 
 // Load products, categories, promotions, and customers on mount
 onMounted(async () => {
-  await finanaceStore.checkCashierToday();
-  if(finanaceStore.checkTodayRice){
+  await financeStore.checkCashierToday();
+  financeStore.checkTodayRice = true;
+  if(financeStore.checkTodayRice){
  
   promotionStore.promotions = [];
   await productStore.getProductByStoreType("ร้านข้าว");
@@ -192,11 +195,15 @@ const mainInterfaceCols = computed(() => {
 const showQueue = computed(() => {
   return posStore.hideNavigation; // Show the queue only when hideNavigation is true
 });
+
+const handleCashierEntry = () => {
+financeStore.createCashierDialog = true;
+};
 </script>
 
 <template>
   <v-app style="width: 100vw; height: 100vh; overflow: hidden">
-    <v-row :style="{ height: '100%' }" v-if="finanaceStore.checkTodayRice" >
+    <v-row :style="{ height: '100%' }" v-if="financeStore.checkTodayRice" >
       <!-- Left Column (Queue) -->
       <v-col cols="2" class="queue-column" style="padding: 0" v-if="showQueue">
         <v-container
@@ -521,6 +528,7 @@ const showQueue = computed(() => {
         </v-card>
       </v-col>
     </v-row>
+    <DialogAddCashier />
 
     <!-- Receipt Dialog -->
     <receipt-dialog />

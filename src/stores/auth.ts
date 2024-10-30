@@ -33,12 +33,12 @@ export const useAuthStore = defineStore("auth", () => {
         console.log(user__);
 
         // Redirect to the report page
-        if (userStore.currentUser.role.name === "ผู้จัดการร้าน") {
+        if (userStore.currentUser.role!.name === "ผู้จัดการร้าน") {
           router.push("/report");
         } else {
-          if (userStore.currentUser.role.name === "พนักงานขายกาแฟ") {
+          if (userStore.currentUser.role!.name === "พนักงานขายกาแฟ") {
             router.push("/pos-coffee");
-          } else if (userStore.currentUser.role.name === "พนักงานขายข้าว") {
+          } else if (userStore.currentUser.role!.name === "พนักงานขายข้าว") {
             router.push("/pos-rice");
           }else{
             router.push("/report");

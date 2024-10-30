@@ -99,7 +99,6 @@ const updateLineChartData = () => {
 
 onMounted(async () => {
   try {
-    await ReportFinnceStore.getfindToday();
     await ReportFinnceStore.getDailyReport(); //ยอดขายรายวันของร้านกาแฟ
     await ReportFinnceStore.getDailyReportFood(); //ยอดขายรายวันของข้าว
     await ReportFinnceStore.getcoffeeSummary();

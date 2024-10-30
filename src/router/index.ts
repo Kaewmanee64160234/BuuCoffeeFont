@@ -272,8 +272,8 @@ router.beforeEach((to, from, next) => {
       // Check if the route has role requirements
       if (to.meta.roles) {
         console.log("Role requirements:", to.meta.roles);
-        console.log("Role requirements:", userStore.currentUser.role.name);
-        const userRole = userStore.currentUser.role.name; // Assuming `userStore.currentUser.role.name` contains the current user's role name
+        console.log("Role requirements:", userStore.currentUser.role!.name);
+        const userRole = userStore.currentUser.role!.name; // Assuming `userStore.currentUser.role.name` contains the current user's role name
 
         // Check if user's role is included in the route's allowed roles
         if (to.meta.roles.includes(userRole)) {
@@ -310,12 +310,12 @@ router.beforeEach((to, from, next) => {
       cancelButtonText: "Cancel",
     }).then((result) => {
       if (result.isConfirmed) {
-        if (userStore.currentUser.role.name === "ผู้จัดการร้าน") {
+        if (userStore.currentUser.role!.name === "ผู้จัดการร้าน") {
           next("/"); // Redirect to `/pos` route if user confirms
         } else {
-          if (userStore.currentUser.role.name === "พนักงานขายข้าว") {
+          if (userStore.currentUser.role!.name === "พนักงานขายข้าว") {
             next("/pos-rice");
-          } else if (userStore.currentUser.role.name === "พนักงานขายกาแฟ") {
+          } else if (userStore.currentUser.role!.name === "พนักงานขายกาแฟ") {
             next("/pos-coffee");
           } else {
             next("/report");
