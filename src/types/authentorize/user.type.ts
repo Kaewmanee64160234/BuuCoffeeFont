@@ -1,3 +1,4 @@
+// user.type.ts
 import type GroupMember from "./group-member.type";
 import type { Role } from "./role.type";
 
@@ -22,11 +23,11 @@ export function mapToUser(data: any): User {
     userStatus: data.userStatus,
     role: data.role
       ? {
-          permissions: data.role.permissions,
+          permissions: data.role.permissions || [],
           id: data.role.id,
           name: data.role.name,
         }
-      : null, // ตรวจสอบว่ามีข้อมูล role หรือไม่,
+      : null, // Ensuring a valid role object if data is present
     groupMemberships: data.groupMemberships
       ? data.groupMemberships.map((groupMember: any) => ({
           groupMemberId: groupMember.groupMemberId,

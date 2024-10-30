@@ -9,7 +9,7 @@ import CreateGroupPermisstionDialog from "@/components/authorize/CreateGroupPerm
 const authorizeStore = useAuthorizeStore();
 const userStore = useUserStore();
 
-const selectedGroup = ref<any>(null);
+const selectedGroup = ref<Groups | null>(null);
 const editDialog = ref(false);
 const selectedUser = ref<number | null>(null);
 
@@ -20,6 +20,7 @@ const openCreateDialog = () => {
 };
 
 const openEditDialog = (group: Groups) => {
+  selectedGroup.value = group;
   authorizeStore.currentGroup = group;
   authorizeStore.editMode = true;
   authorizeStore.createGroupDialog = true;
@@ -50,9 +51,8 @@ const deleteGroup = async (group: Groups) => {
   }
 };
 
-// Other existing methods for update, delete, addUserToGroup, removeUserFromGroup...
 // removeUserFromGroup
-const removeUserFromGroup = async (group: Groups, user: any) => {
+const removeUserFromGroup = async (group: Groups, user: User) => {
   const result = await Swal.fire({
     title: "คุณแน่ใจหรือไม่?",
     text: `คุณต้องการลบผู้ใช้งาน ${user.userName} ออกจากกลุ่ม ${group.name} หรือไม่?`,
@@ -66,16 +66,14 @@ const removeUserFromGroup = async (group: Groups, user: any) => {
 
   if (result.isConfirmed) {
     await authorizeStore.removeUserFromGroup(group.groupId!, user.userId);
-    // reset current group data
     authorizeStore.currentGroup = {
-    name: "",
-    permissionIds: [],
-    userIds: [],
-    groupId: -1,
-    permissions: [],
-    members: [],
-    users: [],
-  };
+      name: "",
+      permissionIds: [],
+      userIds: [],
+      groupId: -1,
+      permissions: [],
+      users: [],
+    };
   }
 };
 </script>
@@ -91,7 +89,7 @@ const removeUserFromGroup = async (group: Groups, user: any) => {
 
     <!-- Display each group as a card with details and add/remove user options -->
     <v-row>
-      <v-col v-for="group in authorizeStore.groups" :key="group.id" cols="12" sm="6" md="4">
+      <v-col v-for="group in authorizeStore.groups" :key="group.groupId" cols="12" sm="6" md="4">
         <v-card class="group-card mb-4">
           <v-card-title>{{ group.name }}</v-card-title>
           <v-card-subtitle>{{ group.description || 'ไม่มีคำอธิบาย' }}</v-card-subtitle>
@@ -103,14 +101,14 @@ const removeUserFromGroup = async (group: Groups, user: any) => {
               </li>
             </ul>
             <h5 class="text-subtitle-1 mt-4">ผู้ใช้ในกลุ่ม:</h5>
-            <v-chip-group column v-if="group.members">
+            <v-chip-group column v-if="group.users">
               <v-chip
-                v-for="member in group.members"
-                :key="member.user.userId"
+                v-for="user in group.users"
+                :key="user.userId"
                 close
-                @click:close="removeUserFromGroup(group, member.user)"
+                @click:close="removeUserFromGroup(group, user)"
               >
-                {{ member.user.userName }}
+                {{ user.userName }}
               </v-chip>
             </v-chip-group>
           </v-card-text>
