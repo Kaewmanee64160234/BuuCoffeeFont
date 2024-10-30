@@ -25,16 +25,7 @@ export const useReportFinnceStore = defineStore("cashier", () => {
     groupedByMonth: {},
     groupedByYear: {},
   });
-  const createCashier = async (cashier: Cashier) => {
-    try {
-      const res = await financeService.createCashier(cashier);
-      if (res.data) {
-        cashiers.value.push(res.data);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
+
   const getfindToday = async () => {
     try {
       const res = await financeService.getfindToday();
@@ -164,7 +155,6 @@ export const useReportFinnceStore = defineStore("cashier", () => {
     state,
     stateFood,
     topSellingProduct,
-    createCashier,
     getfindToday,
     getAll,
     deleteCashier,

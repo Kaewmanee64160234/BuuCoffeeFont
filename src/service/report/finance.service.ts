@@ -8,9 +8,23 @@ async function getfindToday() {
     return await http.get("/cashiers/today");
  
 }
-export function createCashier(cashier: Cashier) {
-  return http.post("/cashiers", cashier);
+export function createCashier(cashier: Cashier, items: { denomination: string; quantity: number }[]) {
+  const payload = {
+    ...cashier, 
+    items, 
+  };
+  return http.post("/cashiers", payload);
 }
+export function createCloseCashier(cashier: Cashier, items: { denomination: string; quantity: number }[]) {
+  const payload = {
+    ...cashier,
+    items,
+  };
+
+  return http.post(`/cashiers/close/${cashier.type}/${cashier.user}`, payload);
+}
+
+
 function getAll() {
   return http.get("/cashiers");
 }
@@ -83,6 +97,7 @@ export default {
   getDailyReportFood,
   getcoffeeSummary,
   getGroupedFinance,
+  createCloseCashier,
   getSumType,
   deleteCashier,
   getRevenue,
