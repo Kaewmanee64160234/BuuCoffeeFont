@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { ref, onMounted, computed, watch } from 'vue';
-import VueApexCharts from 'vue3-apexcharts';
 import { useReportFinnceStore } from '@/stores/report/finance.store';
 import CreateDialogAddCashier from '../../components/reports/cashier/DialogAddCashier.vue';
 import CreateHistoryDialogCashier from '../../components/reports/cashier/HistoryCashier.vue';
@@ -12,23 +11,6 @@ const ReportFinnceStore = useReportFinnceStore();
 const expenditureStore = useExpenditureStore();
 const revenueStore = useRevenueStore();
 const chartSeries = ref([0, 0]);
-const chartOptions = ref({
-  chart: {
-    type: 'donut',
-    animations: {
-      enabled: true,
-    },
-  },
-  labels: ['เงินสด', 'พร้อมเพย์'],
-  colors: ['#FF6384', '#36A2EB'],
-  legend: {
-    position: 'right'
-  },
-  dataLabels: {
-    enabled: false
-  }
-});
-
 const updateChartData = () => {
   const cashAmount = parseInt(ReportFinnceStore.sumType.cash) || 0;
   const qrCodeAmount = parseInt(ReportFinnceStore.sumType.qrcode) || 0;
@@ -118,7 +100,6 @@ const updateLineChartData = () => {
 onMounted(async () => {
   try {
     await ReportFinnceStore.getfindToday();
-    await ReportFinnceStore.getSumType();
     await ReportFinnceStore.getDailyReport(); //ยอดขายรายวันของร้านกาแฟ
     await ReportFinnceStore.getDailyReportFood(); //ยอดขายรายวันของข้าว
     await ReportFinnceStore.getcoffeeSummary();
@@ -129,9 +110,9 @@ onMounted(async () => {
   } catch (error: unknown) {
     if (error instanceof Error) {
       if ((error as any).response && (error as any).response.status === 404) {
-        openCreateDialog(); // เปิด dialog เมื่อเจอข้อผิดพลาด 404
+        openCreateDialog(); 
       } else {
-        console.error(error.message); // แสดงข้อความข้อผิดพลาด
+        console.error(error.message);
       }
     } else {
       console.error('Unknown error', error);
@@ -154,39 +135,6 @@ const sum = computed(() => {
 const openCreateDialog = () => {
   ReportFinnceStore.createCashierDialog = true;
 };
-const openHistoryDialog = () => {
-  ReportFinnceStore.createHistoryCashierDialog = true;
-};
-const deleteCashier = async (id: number) => {
-  try {
-    // แสดง SweetAlert เพื่อยืนยันการลบ
-    const result = await Swal.fire({
-      title: 'คุณแน่ใจหรือไม่?',
-      text: 'คุณต้องการแก้ไขเงินในลิ้นชัก?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'ใช่, ลบเลย',
-      cancelButtonText: 'ยกเลิก'
-    });
-    if (result.isConfirmed) {
-      await ReportFinnceStore.deleteCashier(id);
-      await ReportFinnceStore.getfindToday();
-      Swal.fire({
-        icon: 'success',
-        title: 'ยกเลิกเรียบร้อย',
-        showConfirmButton: false,
-        timer: 1500 // 1.5 วินาที
-      });
-    }
-  } catch (error) {
-    Swal.fire({
-      icon: 'error',
-      title: 'เกิดข้อผิดพลาด',
-      text: 'ไม่สามารถลบผู้ใช้ได้ กรุณาลองใหม่ภายหลัง'
-    });
-  }
-};
-
 
 const lineChartOptions = ref({
   chart: {
@@ -283,40 +231,14 @@ watch(
       <!-- ยอดขายวันนี้ร้านกาแฟ -->
       <v-carousel-item>
         <v-card-title class="text-center">
-          
-            <v-icon size="25px">mdi-coffee-maker</v-icon>
-        ยอดขายวันนี้ร้านกาแฟ
+
+          <v-icon size="25px">mdi-coffee-maker</v-icon>
+          ยอดขายวันนี้ร้านกาแฟ
         </v-card-title>
         <v-row class="px-4">
-          <v-col cols="12" md="4">
-            <v-card>
-              <apexchart type="donut" :options="chartOptions" :series="chartSeries"></apexchart>
-            </v-card>
-          </v-col>
+
           <v-col cols="12" md="8">
             <v-row>
-              <v-col cols="12" md="6" style="height: fit-content;">
-                <v-card>
-                  <v-card-title class="d-flex justify-space-between align-center" >
-                    เงินในลิ้นชัก
-                    <v-btn icon color="#F7DCB9 ">
-                      <v-icon color="#A66E38" @click="openHistoryDialog">mdi-eye</v-icon>
-                    </v-btn>
-                  </v-card-title>
-                  <template v-if="ReportFinnceStore.cashiers !== null && Object.keys(ReportFinnceStore.cashiers).length !== 0">
-                    <v-card-subtitle>
-                      เงินต้น : {{ ReportFinnceStore.cashiers.cashierAmount }} บาท
-                      <span @click="deleteCashier(ReportFinnceStore.cashiers.cashierId)">
-                        <v-icon>mdi-delete</v-icon>
-                      </span>
-                      <v-card-subtitle>ยอดรวมเงินสดวันนี้ :{{ sum }} บาท</v-card-subtitle>
-                    </v-card-subtitle>
-                  </template>
-                  <template v-else>
-                    <v-btn class="ml-4 mb-3" @click="openCreateDialog">กรอกจำนวนเงินวันนี้</v-btn>
-                  </template>
-                </v-card>
-              </v-col>
               <v-col cols="12" md="6">
                 <v-card style="height: 100%">
                   <v-card-title class="d-flex justify-space-between align-center mt-2">
@@ -330,7 +252,8 @@ watch(
                   <v-card-title class="d-flex justify-space-between align-center">
                     จำนวนรายการ
                   </v-card-title>
-                  <v-card-subtitle class="text-h5">{{ ReportFinnceStore.dailyReport.totalTransactions }} รายการ</v-card-subtitle>
+                  <v-card-subtitle class="text-h5">{{ ReportFinnceStore.dailyReport.totalTransactions }}
+                    รายการ</v-card-subtitle>
                 </v-card>
               </v-col>
               <v-col cols="12" md="6">
@@ -338,22 +261,23 @@ watch(
                   <v-card-title class="d-flex justify-space-between align-center">
                     ส่วนลด
                   </v-card-title>
-                  <v-card-subtitle class="text-h5">{{ ReportFinnceStore.dailyReport.totalDiscount }} บาท</v-card-subtitle>
+                  <v-card-subtitle class="text-h5">{{ ReportFinnceStore.dailyReport.totalDiscount }}
+                    บาท</v-card-subtitle>
                 </v-card>
               </v-col>
             </v-row>
           </v-col>
         </v-row>
       </v-carousel-item>
-      
+
       <!-- ยอดขายวันนี้ร้านอาหาร -->
       <v-carousel-item>
         <v-card-title class="text-center">
-            <v-icon size="25px">mdi-pasta</v-icon>
+          <v-icon size="25px">mdi-pasta</v-icon>
           ยอดขายวันนี้ร้านอาหาร
         </v-card-title>
         <v-row justify="center" align="center" no-gutters>
-          <v-col cols="12" md="8" >
+          <v-col cols="12" md="8">
             <v-row justify="center" no-gutters>
               <v-col cols="12" md="4" class="pa-2">
                 <v-card class="text-center mt-10">
@@ -393,12 +317,12 @@ watch(
       <!-- กำไร & ต้นทุนร้านกาแฟทั้งหมด -->
       <v-carousel-item>
         <v-card-title class="text-center">
-            <v-icon size="25px">mdi-chart-histogram</v-icon>
+          <v-icon size="25px">mdi-chart-histogram</v-icon>
           กำไร & ต้นทุนร้านกาแฟทั้งหมด
         </v-card-title>
-        <v-row justify="center" align="center" no-gutters >
+        <v-row justify="center" align="center" no-gutters>
           <v-col cols="12" md="4" class="pa-2" style="width: fit-content;">
-            <v-card class="d-flex justify-center align-center mt-10" >
+            <v-card class="d-flex justify-center align-center mt-10">
               <v-card-title class="text-center">
                 ต้นทุน
               </v-card-title>
@@ -438,17 +362,22 @@ watch(
     </v-carousel>
 
     <v-row class="mt-4 ml-1">
-      <v-text-field label="เริ่มวันที่" v-model="dateRange.startDate" type="date" dense hide-details variant="solo" class="mr-4"/>
-      <v-text-field label="ถึงวันที่" v-model="dateRange.endDate" type="date" dense hide-details variant="solo" class="mr-4"/>
-      <v-select label="กรองตาม" :items="['day', 'month', 'year']" v-model="groupBy" dense hide-details variant="solo" class="mr-4"/>
+      <v-text-field label="เริ่มวันที่" v-model="dateRange.startDate" type="date" dense hide-details variant="solo"
+        class="mr-4" />
+      <v-text-field label="ถึงวันที่" v-model="dateRange.endDate" type="date" dense hide-details variant="solo"
+        class="mr-4" />
+      <v-select label="กรองตาม" :items="['day', 'month', 'year']" v-model="groupBy" dense hide-details variant="solo"
+        class="mr-4" />
     </v-row>
 
     <v-row class="mt-4">
       <v-col cols="12" md="6">
-        <apexchart style="height: fit-content; width: fit-content;" type="line" :options="lineChartOptions" :series="lineChartSeries"></apexchart>
+        <apexchart style="height: fit-content; width: fit-content;" type="line" :options="lineChartOptions"
+          :series="lineChartSeries"></apexchart>
       </v-col>
       <v-col cols="12" md="6">
-        <apexchart style="height: fit-content; width: fit-content;" type="line" :options="lineChartOptions2" :series="lineChartSeries2"></apexchart>
+        <apexchart style="height: fit-content; width: fit-content;" type="line" :options="lineChartOptions2"
+          :series="lineChartSeries2"></apexchart>
       </v-col>
     </v-row>
   </v-container>
@@ -468,12 +397,12 @@ v-card {
     margin-right: 0 !important;
     margin-bottom: 8px;
   }
-  
+
   .v-col {
     padding-left: 0;
     padding-right: 0;
   }
-  
+
   .text-h4 {
     font-size: 1.4rem;
   }
@@ -483,4 +412,3 @@ v-card {
   }
 }
 </style>
-

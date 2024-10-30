@@ -2,6 +2,7 @@
 <template>
   <div>
     <h2>Receipt Reports</h2>
+    <button @click="exportToExcel">Export to Excel</button>
     <table>
       <thead>
         <tr>
@@ -80,18 +81,64 @@
   <script lang="ts" setup>
   import { useReceiptReportStore } from '@/stores/report_receipt.store';
   import { onMounted } from 'vue';
-  
+  import * as XLSX from 'xlsx';
   const reportStore = useReceiptReportStore();
   
   onMounted(async () => {
-    try {
-      await reportStore.fetchReceipts(); // Ensure this function is called
-      console.log('Receipts fetched:', reportStore.receipts);
-    } catch (error) {
-      console.error('Error fetching receipts:', error);
-    }
-    console.log('Test');
-    console.log('Last');
+
+      await reportStore.fetchReceipts(); 
+
+
   });
+  const exportToExcel = () => {
+  const reportData = reportStore.receipts.map(report => ({
+    'วันที่ เวลา ที่เปิดการขาย': report.openedDate,
+    'วันที่ เวลา ที่ปิดการขาย': report.closedDate,
+    'พนักงานที่เปิดการขาย': report.openedBy,
+    'พนักงานที่ปิดการขาย': report.closedBy,
+    'ยอดรวมเงินสดที่ได้รับ': report.cashTotal,
+    'ยอดรวมเงินโอนที่ได้รับ': report.qrcodeTotal,
+  }));
+
+  // Prepare the cash details
+  const cashDetails = [];
+  reportStore.receipts.forEach(report => {
+    report.cash.forEach(cash => {
+      cashDetails.push({
+        'เวลาที่ขาย': cash.saleTime,
+        'จำนวนเงิน': cash.totalPrice,
+        'Net Price': cash.netPrice,
+        'จำนวนเงินทอน': cash.change,
+      });
+    });
+  });
+
+  // Prepare the QR code details
+  const qrCodeDetails = [];
+  reportStore.receipts.forEach(report => {
+    report.qrcode.forEach(qr => {
+      qrCodeDetails.push({
+        'เวลาที่ขาย': qr.saleTime,
+        'จำนวนเงิน': qr.totalPrice,
+        'Net Price': qr.netPrice,
+        'จำนวนเงินทอน': qr.change,
+      });
+    });
+  });
+
+  // Create a workbook and add the worksheets
+  const workbook = XLSX.utils.book_new();
+  const reportSheet = XLSX.utils.json_to_sheet(reportData);
+  const cashSheet = XLSX.utils.json_to_sheet(cashDetails);
+  const qrCodeSheet = XLSX.utils.json_to_sheet(qrCodeDetails);
+
+  // Add sheets to the workbook
+  XLSX.utils.book_append_sheet(workbook, reportSheet, 'Receipt Reports');
+  XLSX.utils.book_append_sheet(workbook, cashSheet, 'Cash Details');
+  XLSX.utils.book_append_sheet(workbook, qrCodeSheet, 'QR Code Details');
+
+  // Export the workbook as an Excel file
+  XLSX.writeFile(workbook, 'Receipt_Report.xlsx');
+};
   </script>
   
