@@ -50,6 +50,7 @@ const rules = {
 <template>
   <v-dialog v-model="ReportFinnceStore.createCashierDialog" max-width="500px">
     <v-card>
+
       <v-card-title>บันทึกยอดเงินสดประจำวัน</v-card-title>
       <v-card-text>
         <v-form ref="form" v-model="valid" @submit.prevent="submitForm">
