@@ -20,14 +20,14 @@ const router = createRouter({
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
 
-      component: () => import("../views/user/UserManagement.vue"),
+      component: () => import("../views/user/userManagement.vue"),
 
       meta: { requiresAuth: true, roles: ["ผู้จัดการร้าน"] },
     },
     {
       path: "/managementRole",
       name: "managementRole",
-      component: () => import("@/views/user/PermisstionManagement.vue"),
+      component: () => import("@/views/user/permisstionManagement.vue"),
       meta: { requiresAuth: true },
     },
     {
