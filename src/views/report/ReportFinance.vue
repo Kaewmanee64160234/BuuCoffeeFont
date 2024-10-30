@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import ReportFinanceComponant from '@/components/reports/ReportFinanceComponant.vue';
 import ReportIngredientComponant from '@/components/reports/ReportIngredientComponant.vue';
 import ReportProductComponant from '@/components/reports/ReportProductComponant.vue';
-
+import ReportTypeFinanceComponant from '@/components/reports/ReportTypeFinanceComponant.vue';
 const activeComponent = ref<string | null>(null);
 
 function showComponent(component: string) {
@@ -56,6 +56,17 @@ function reloadData() {
               รายงานสินค้า และ โปรโมชั่น
             </v-btn>
           </v-col>
+          <v-col cols="12" md="4" class="my-1">
+            <v-btn
+              color="success"
+              class="button-full-width"
+              block
+              @click="showComponent('typefinance')"
+            >
+              <v-icon left size="25">mdi-cart-percent</v-icon>
+              รายงานยอดขาย
+            </v-btn>
+          </v-col>
         </v-row>
 
         <v-row class="mt-1">
@@ -69,6 +80,9 @@ function reloadData() {
             />
             <component
               :is="activeComponent === 'product' ? ReportProductComponant : null"
+            />
+            <component
+              :is="activeComponent === 'typefinance' ? ReportTypeFinanceComponant : null"
             />
           <!-- </v-col> -->
         </v-row>
