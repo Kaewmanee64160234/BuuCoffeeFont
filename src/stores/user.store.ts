@@ -1,8 +1,8 @@
 import { ref, watch } from "vue";
 import { defineStore } from "pinia";
-import { mapToUser, type User } from "@/types/user.type";
-import type { Role } from "@/types/role.type";
+import type { Role } from "@/types/authentorize/role.type";
 import userService from "@/service/user.service";
+import { mapToUser, type User } from "@/types/authentorize/user.type";
 
 export const useUserStore = defineStore("user", () => {
   const currentUser = ref<User>({
@@ -83,8 +83,7 @@ export const useUserStore = defineStore("user", () => {
       console.error("Error creating user:", error);
     }
   };
-  
-  
+
   
 
   const updateUser = async (id: number, updatedUser: User) => {

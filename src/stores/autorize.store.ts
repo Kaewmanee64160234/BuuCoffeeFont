@@ -2,23 +2,24 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import authorizeService from "@/service/authorize.service"; // Assuming this service handles API calls
-import type { Permission } from "@/types/permisstion.type";
-import type { Role } from "@/types/role.type";
+import type { Permission } from "@/types/authentorize/permisstion.type";
+import type { Role } from "@/types/authentorize/role.type";
+import type Groups from "@/types/authentorize/group.type";
+import type GroupMember from "@/types/authentorize/group-member.type";
 
 export const useAuthorizeStore = defineStore("authorize", () => {
   const roles = ref<Role[]>([]);
   const currentRole = ref<Role | null>(null);
   const permissions = ref<Permission[]>([]);
+  const createGroupDialog = ref<boolean>(false);
+  const editMode = ref<boolean>(false);
+  const currentGroup = ref<Groups>({
+    id: -1,
+    name: "",
+    permissions: [],
+  });
   const currentPermission = ref<Permission | null>(null);
-  const groups = ref<{ name: string; id: string; permissions: Permission[] }[]>(
-    [
-      { name: "การขาย", id: "sales", permissions: [] }, // Sales group
-      { name: "สินค้า", id: "products", permissions: [] }, // Products group
-      { name: "ผู้ใช้", id: "users", permissions: [] }, // Users group
-      { name: "วัตถุดิบ", id: "materials", permissions: [] }, // Materials group
-      { name: "รายงาน", id: "reports", permissions: [] }, // Reports group
-    ]
-  );
+  const groups = ref<Groups[]>();
 
   const createRole = async (role: Role) => {
     try {
@@ -66,7 +67,7 @@ export const useAuthorizeStore = defineStore("authorize", () => {
       if (Array.isArray(res.data)) {
         permissions.value = res.data;
 
-        groupPermissions(); // Group the permissions after fetching them
+       
       } else {
         console.error("API response is not an array:", res.data);
       }
@@ -75,28 +76,7 @@ export const useAuthorizeStore = defineStore("authorize", () => {
     }
   };
 
-  const groupPermissions = () => {
-    // Ensure permissions.value is an array before iterating
-    if (Array.isArray(permissions.value)) {
-      // Reset each group's permissions before reassigning them
-      groups.value.forEach((group) => (group.permissions = []));
 
-      permissions.value.forEach((permission) => {
-        // Find the group in the groups array that matches the permission's group property
-        const group = groups.value.find(
-          (group) => group.name === permission.group
-        );
-
-        if (group) {
-          group.permissions.push(permission);
-        }
-      });
-      console.log("Grouped permissions:", groups.value);
-      
-    } else {
-      console.error("permissions is not an array:", permissions.value);
-    }
-  };
   const getRoleById = async (id: number) => {
     try {
       const res = await authorizeService.getRoleById(id);
@@ -114,6 +94,73 @@ export const useAuthorizeStore = defineStore("authorize", () => {
       console.error("Error assigning permissions:", error);
     }
   };
+  // getGroups
+  const getGroups = async () => {
+    try {
+      const res = await authorizeService.getGroups();
+      groups.value = res.data;
+    } catch (error) {
+      console.error("Error fetching groups:", error);
+    }
+  }
+
+  // createGroup
+  const createGroup = async (group: Groups) => {
+    try {
+      const res = await authorizeService.createGroup(group);
+      if (res.status === 201) {
+        currentGroup.value = res.data;
+      }
+    } catch (error) {
+      console.error("Error creating group:", error);
+    }
+  }
+  // updateGroup
+  const updateGroup = async (group: Groups) => {
+    try {
+      const res = await authorizeService.updateGroup(group);
+      if (res.status === 200) {
+        currentGroup.value = res.data;
+      }
+    } catch (error) {
+      console.error("Error updating group:", error);
+    }
+  }
+  // deleteGroup
+  const deleteGroup = async (id: number) => {
+    try {
+      const res = await authorizeService.deleteGroup(id);
+      if (res.status === 200) {
+        currentGroup.value = res.data;
+      }
+      await getGroups();
+    } catch (error) {
+      console.error("Error deleting group:", error);
+    }
+  }
+  // addUserToGroup
+  const addUsersToGroup = async (groupId: number, userIds: number[]) => {
+    try {
+      const res = await authorizeService.addUsersToGroup(groupId, userIds);
+      if (res.status === 200) {
+        currentGroup.value = res.data;
+      }
+    } catch (error) {
+      console.error("Error adding users to group:", error);
+    }
+  }
+
+  // removeUserFromGroup
+  const removeUserFromGroup = async (group: Groups) => {
+    try {
+      const res = await authorizeService.removeUserFromGroup(group.id!);
+      if (res.status === 200) {
+        currentGroup.value = res.data;
+      }
+    } catch (error) {
+      console.error("Error removing user from group:", error);
+    }
+  }
 
   return {
     roles,
@@ -126,7 +173,15 @@ export const useAuthorizeStore = defineStore("authorize", () => {
     getRoleById,
     assignPermissionsToRole,
     getPermissions,
-    groupPermissions,
-    updateRole
+    updateRole,
+    getGroups,
+    currentGroup,
+    createGroup,
+    updateGroup,
+    deleteGroup,
+    createGroupDialog,
+    addUsersToGroup,
+    removeUserFromGroup,
+    editMode
   };
 });

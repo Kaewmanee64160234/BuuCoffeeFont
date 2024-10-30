@@ -67,6 +67,10 @@ function cateringEventPaginate(page: number, limit: number) {
     }
   });
 }
+// check-today
+function checkToday() {
+  return http.get(`/cashiers/check-today`);
+}
 
 export default {
   getfindToday,
@@ -87,6 +91,7 @@ export default {
   getIngradientsUsage,
   cateringEvent,
   cateringEventPaginate,
+  checkToday
   
 
 };
