@@ -28,7 +28,7 @@ const router = createRouter({
       path: "/managementRole",
       name: "managementRole",
       component: () => import("@/views/user/PermisstionManagement.vue"),
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, roles: ["ผู้จัดการร้าน"] },
     },
     {
       path: "/productsManagement",

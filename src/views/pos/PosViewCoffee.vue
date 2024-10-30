@@ -37,6 +37,7 @@ const financeStore = useReportFinnceStore();
 // Load products, categories, promotions, and customers on mount
 onMounted(async () => {
   await financeStore.checkCashierToday();
+  financeStore.checkTodayCoffee =true;
   if(financeStore.checkTodayCoffee){
    
   
