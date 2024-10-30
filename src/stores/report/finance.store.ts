@@ -36,6 +36,7 @@ export const useReportFinnceStore = defineStore("cashier", () => {
     }
   };
 
+
   const getAll = async () => {
     try {
       const res = await financeService.getAll();
@@ -166,6 +167,7 @@ export const useReportFinnceStore = defineStore("cashier", () => {
     stateFood,
     topSellingProduct,
     createCashier,
+
     getAll,
     deleteCashier,
     getSumType,

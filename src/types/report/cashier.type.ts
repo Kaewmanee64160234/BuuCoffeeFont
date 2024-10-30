@@ -1,7 +1,8 @@
 export interface Cashier {
-    cashierId: number;
+    cashierId?: number;
     cashierAmount?: number;
     createdDate?: string;
     deletedAt?: string;
     user?: number;
+    type?: string | null;
  }

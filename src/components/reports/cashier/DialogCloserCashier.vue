@@ -61,7 +61,7 @@ const submitForm = async () => {
 
       try {
 
-        await financeService.createCashier(cashier, items);
+        await financeService.createCloseCashier(cashier, items);
         console.log(cashier); 
         clearData();
       } catch (error) {
@@ -80,7 +80,7 @@ const rules = {
 <template>
   <v-dialog v-model="ReportFinnceStore.createCashierDialog" max-width="500px">
     <v-card>
-      <v-card-title>บันทึกยอดเงินสดประจำวัน</v-card-title>
+      <v-card-title>ปิดการขาย</v-card-title>
       <v-row>
   <v-col cols="12">
     <v-radio-group v-model="selectedType" row>
