@@ -161,7 +161,7 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
             <v-row>
               <v-col cols="4">
                 <v-text-field
-                  label="Meal Name"
+                  label="ชื่อมื้ออาหาร"
                   v-model="meal.mealName"
                   class="ml-4"
                   dense
@@ -171,7 +171,7 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
               </v-col>
               <v-col cols="4">
                 <v-text-field
-                  label="Meal Time"
+                  label="เวลามื้ออาหาร"
                   v-model="meal.mealTime"
                   type="time"
                   dense
@@ -181,7 +181,7 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
               </v-col>
               <v-col cols="4">
                 <v-text-field
-                  label="Total Price"
+                  label="ราคารวม"
                   v-model.number="meal.totalPrice"
                   class="mr-4"
                   dense
@@ -212,6 +212,7 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
               <v-btn
                 color="accent"
                 @click="openDrinkSelectionDialog(indexMeals)"
+                style="font-size: 17px;"
                 >เพิ่มสินค้าจัดเลี้ยง</v-btn
               >
             </v-card-title>
@@ -223,8 +224,8 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
               background-colaor="#fff"
               class="ma-4"
             >
-              <v-tab value="coffee">วัตถุดิบร้านกาแฟ</v-tab>
-              <v-tab value="rice">วัตถุดิบร้านข้าว</v-tab>
+              <v-tab value="coffee" style="font-size: 17px;">วัตถุดิบร้านกาแฟ</v-tab>
+              <v-tab value="rice" style="font-size: 17px;">วัตถุดิบร้านข้าว</v-tab>
             </v-tabs>
 
             <v-row class="mt-4">
@@ -234,12 +235,14 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
                   <v-row>
                     <v-col
                       cols="3"
-                      style="text-align: center; padding: 8px"
+                      style=" white-space: nowrap;text-align: center; padding: 8px"
                       v-for="(item, index) in productFilters"
                       :key="index"
                     >
                       <v-card
-                        width="100%"
+                        width="120%"
+                        height="100%"
+                        class="pa-2"
                         @click="
                           cateringStore.addProduct(item, indexMeals, type)
                         "
@@ -248,10 +251,10 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
                           :src="`http://localhost:3000/products/${item.productId}/image`"
                           height="100"
                         ></v-img>
-                        <v-card-title style="font-size: 14px">
+                        <v-card-title style="font-size: 18px">
                           {{ item.productName }}
                         </v-card-title>
-                        <v-card-subtitle style="font-size: 12px">
+                        <v-card-subtitle style="font-size: 15px">
                           ราคาต้นทุน
                           {{
                             item.haveTopping
@@ -265,87 +268,51 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
                   </v-row>
                 </v-container>
               </v-col>
-
               <v-col cols="6">
-                <v-card style="height: 400px; overflow-y: auto" class="ma-5">
-                  <v-table >
+                <v-card style="white-space: nowrap;height: 400px; overflow-y: auto" class="ma-5">
+                  <v-table>
                     <thead>
                       <tr>
-                        <th class="text-center">ลำดับ</th>
-                        <th class="text-center">ชื่อสินค้า</th>
-                        <th class="text-center">คลัง</th>
-                        <th class="text-center">ราคารวม</th>
-                        <th class="text-center">จำนวน</th>
-                        <th class="text-center">แอคชั่น</th>
+                        <th class="text-center" style="white-space: nowrap;font-size: 18px; width: 10%;">ลำดับ</th>
+                        <th class="text-center" style="white-space: nowrap;font-size: 18px; width: 25%;">ชื่อสินค้า</th>
+                        <th class="text-center" style="white-space: nowrap;font-size: 18px; width: 15%;">คลัง</th>
+                        <th class="text-center" style="white-space: nowrap;font-size: 18px; width: 20%;">ราคารวม</th>
+                        <th class="text-center" style="white-space: nowrap;font-size: 18px; width: 20%;">จำนวน</th>
+                        <th class="text-center" style="white-space: nowrap;font-size: 18px; width: 10%;">แอคชั่น</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr
-                        v-for="(item, itemIndex) in meal.mealProducts"
-                        :key="itemIndex"
-                        @click="setFilteredReceiptItems(indexMeals, item)"
-                      >
-                        <td>{{ itemIndex + 1 }}</td>
-                        <td @click="toggleDetails(itemIndex)">
+                      <tr style="white-space: nowrap;font-size: 18px" v-for="(item, itemIndex) in meal.mealProducts" :key="itemIndex" @click="setFilteredReceiptItems(indexMeals, item)">
+                        <td class="text-center" style="white-space: nowrap;font-size: 18px">{{ itemIndex + 1 }}</td>
+                        <td class="text-center" style="white-space: nowrap;font-size: 18px" @click="toggleDetails(itemIndex)">
                           {{ item.product!.productName }}
                         </td>
-                        <!-- Clicking toggles details -->
-                        <td>{{ item.type }}</td>
-                        <td>{{ item.totalPrice }}</td>
-                        <td>
+                        <td class="text-center" style="white-space: nowrap;font-size: 18px">{{ item.type }}</td>
+                        <td class="text-center" style="white-space: nowrap;font-size: 18px">{{ item.totalPrice }}</td>
+                        <td class="text-center" style="white-space: nowrap;font-size: 18px">
                           <v-row justify="center" align="center">
-                            <!-- Check if the product does not have toppings before showing the quantity buttons -->
-                            <v-col
-                              v-if="!item.product!.haveTopping"
-                              cols="4"
-                              class="text-center"
-                            >
-                              <v-btn
-                                icon
-                                @click.stop="decreaseProductQuantity(indexMeals, item)"
-                                size="small"
-                                class="styled-button"
-                              >
-                                -
-                              </v-btn>
+                            <v-col v-if="!item.product!.haveTopping" cols="4" class="text-center">
+                              <v-btn icon @click.stop="decreaseProductQuantity(indexMeals, item)" size="small" class="styled-button">-</v-btn>
                             </v-col>
                             <v-col cols="4" class="text-center">
                               {{ item.quantity }}
                             </v-col>
-                            <v-col
-                              v-if="!item.product!.haveTopping"
-                              cols="4"
-                              class="text-center"
-                            >
-                              <v-btn
-                                icon
-                                @click.stop="cateringStore.addProductToMeal(item.product!, indexMeals)"
-                                size="small"
-                                class="styled-button"
-                              >
-                                +
-                              </v-btn>
+                            <v-col v-if="!item.product!.haveTopping" cols="4" class="text-center">
+                              <v-btn icon @click.stop="cateringStore.addProductToMeal(item.product!, indexMeals)" size="small" class="styled-button">+</v-btn>
                             </v-col>
                           </v-row>
                         </td>
-
-                        <td>
-                          <v-btn
-                            icon
-                            @click.stop="
-                              removeProductFromMeal(indexMeals, itemIndex)
-                            "
-                            class="styled-button"
-                          >
+                        <td class="text-center">
+                          <v-btn icon @click.stop="removeProductFromMeal(indexMeals, itemIndex)" class="styled-button">
                             <v-icon>mdi-delete</v-icon>
                           </v-btn>
                         </td>
-                        <v-row> </v-row>
                       </tr>
                     </tbody>
                   </v-table>
                 </v-card>
               </v-col>
+              
             </v-row>
           </v-expansion-panel-content>
         </v-expansion-panel>
