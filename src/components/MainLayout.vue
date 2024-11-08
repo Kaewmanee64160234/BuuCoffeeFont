@@ -26,7 +26,7 @@
         <v-subheader @click="toggleSale" class="menu-item d-flex align-center"
         v-if="hasPermission('ดูรายงาน') || hasPermission('สามารถขายได้') || hasPermission('แก้ไขใบเสร็จ')">
          
-        >
+        
           <img
             src="../../src/components/img/sell.png"
             alt="การขาย"
