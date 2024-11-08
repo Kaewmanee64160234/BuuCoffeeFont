@@ -40,40 +40,40 @@ const financeStore = useReportFinnceStore();
 onMounted(async () => {
   await financeStore.checkCashierToday();
   financeStore.checkTodayRice = true;
-  if(financeStore.checkTodayRice){
- 
-  promotionStore.promotions = [];
-  await productStore.getProductByStoreType("ร้านข้าว");
-  await categoryStore.getAllCategories();
-  await toppingStore.getAllToppings();
-  await customerStore.getAllCustomers();
-  await receiptStore.getRecieptIn30Min("ร้านข้าว");
+  if (financeStore.checkTodayRice) {
+    promotionStore.promotions = [];
+    await productStore.getProductByStoreType("ร้านข้าว");
+    await categoryStore.getAllCategories();
+    await toppingStore.getAllToppings();
+    await customerStore.getAllCustomers();
+    await receiptStore.getRecieptIn30Min("ร้านข้าว");
 
-  userStore.getCurrentUser();
+    userStore.getCurrentUser();
 
-  promotionStore.getPromotionByType("ร้านข้าว");
-  selectedCategory.value = "กับข้าว";
+    promotionStore.getPromotionByType("ร้านข้าว");
+    selectedCategory.value = "กับข้าว";
 
-  // Filter categories to show only "กับข้าว"
-  categoryStore.categoriesForCreate = categoryStore.categoriesForCreate.filter(
-    (category) => category.categoryName === "กับข้าว"
-  );
+    // Filter categories to show only "กับข้าว"
+    categoryStore.categoriesForCreate =
+      categoryStore.categoriesForCreate.filter(
+        (category) => category.categoryName === "กับข้าว"
+      );
 
-  // Filter products to show only those without toppings and in the "กับข้าว" category
-  productFilters.value = productStore.products.filter(
-    (product) =>
-      product.category.categoryName === "กับข้าว" &&
-      !product.category.haveTopping
-  );
+    // Filter products to show only those without toppings and in the "กับข้าว" category
+    productFilters.value = productStore.products.filter(
+      (product) =>
+        product.category.categoryName === "กับข้าว" &&
+        !product.category.haveTopping
+    );
 
-  // Filter promotions to show only those for "ร้านข้าว"
-  promotionStore.promotions = promotionStore.promotions.filter(
-    (promotion) => promotion.promotionForStore === "ร้านข้าว"
-  );
+    // Filter promotions to show only those for "ร้านข้าว"
+    promotionStore.promotions = promotionStore.promotions.filter(
+      (promotion) => promotion.promotionForStore === "ร้านข้าว"
+    );
 
-  // Load queue list from local storage
-  loadQueueListFromLocalStorage();
-  loadFullscreenStateFromLocalStorage();
+    // Load queue list from local storage
+    loadQueueListFromLocalStorage();
+    loadFullscreenStateFromLocalStorage();
   }
 });
 
@@ -197,13 +197,55 @@ const showQueue = computed(() => {
 });
 
 const handleCashierEntry = () => {
-financeStore.createCashierDialog = true;
+  financeStore.createCashierDialog = true;
 };
+//  watch  financeStore.checkTodayCoffee
+watch(
+  () => financeStore.checkTodayRice,
+  async () => {
+    await financeStore.checkCashierToday();
+    if (financeStore.checkTodayRice) {
+      promotionStore.promotions = [];
+      await productStore.getProductByStoreType("ร้านข้าว");
+      await categoryStore.getAllCategories();
+      await toppingStore.getAllToppings();
+      await customerStore.getAllCustomers();
+      await receiptStore.getRecieptIn30Min("ร้านข้าว");
+
+      userStore.getCurrentUser();
+
+      promotionStore.getPromotionByType("ร้านข้าว");
+      selectedCategory.value = "กับข้าว";
+
+      // Filter categories to show only "กับข้าว"
+      categoryStore.categoriesForCreate =
+        categoryStore.categoriesForCreate.filter(
+          (category) => category.categoryName === "กับข้าว"
+        );
+
+      // Filter products to show only those without toppings and in the "กับข้าว" category
+      productFilters.value = productStore.products.filter(
+        (product) =>
+          product.category.categoryName === "กับข้าว" &&
+          !product.category.haveTopping
+      );
+
+      // Filter promotions to show only those for "ร้านข้าว"
+      promotionStore.promotions = promotionStore.promotions.filter(
+        (promotion) => promotion.promotionForStore === "ร้านข้าว"
+      );
+
+      // Load queue list from local storage
+      loadQueueListFromLocalStorage();
+      loadFullscreenStateFromLocalStorage();
+    }
+  }
+);
 </script>
 
 <template>
   <v-app style="width: 100vw; height: 100vh; overflow: hidden">
-    <v-row :style="{ height: '100%' }" v-if="financeStore.checkTodayRice" >
+    <v-row :style="{ height: '100%' }" v-if="financeStore.checkTodayRice">
       <!-- Left Column (Queue) -->
       <v-col cols="2" class="queue-column" style="padding: 0" v-if="showQueue">
         <v-container
@@ -385,23 +427,27 @@ financeStore.createCashierDialog = true;
             class="full-width-row"
             style="overflow: hidden; margin-bottom: 5px; margin-top: -20px"
           >
-          <v-col cols="12" md="6">
-            <v-text-field
-              v-model="barcode"
-              append-inner-icon="mdi-barcode"
-              label="แสกนบาร์โค้ด"
-              variant="solo"
-              dense
-              hide-details
-              @change="handleBarcodeInput"
-              style="background-color: #f1f1f1; border-radius: 8px; text-align: right;"
-              class="ml-6"
-            ></v-text-field>
-          </v-col>
+            <v-col cols="12" md="6">
+              <v-text-field
+                v-model="barcode"
+                append-inner-icon="mdi-barcode"
+                label="แสกนบาร์โค้ด"
+                variant="solo"
+                dense
+                hide-details
+                @change="handleBarcodeInput"
+                style="
+                  background-color: #f1f1f1;
+                  border-radius: 8px;
+                  text-align: right;
+                "
+                class="ml-6"
+              ></v-text-field>
+            </v-col>
             <v-col
               cols="12"
               md="5"
-              style="margin-left: 7%;"
+              style="margin-left: 7%"
               class="d-flex justify-end align-center"
             >
               <v-tooltip bottom>
@@ -411,13 +457,12 @@ financeStore.createCashierDialog = true;
                     v-bind="attrs"
                     v-on="on"
                     @click="toggleNavigationDrawer"
-                    style="
-                      background-color: #fff;
-                      border-radius: 50%;
-                    "
+                    style="background-color: #fff; border-radius: 50%"
                   >
                     <v-icon>{{
-                      posStore.hideNavigation ? "mdi-fullscreen" : "mdi-fullscreen-exit"
+                      posStore.hideNavigation
+                        ? "mdi-fullscreen"
+                        : "mdi-fullscreen-exit"
                     }}</v-icon>
                   </v-btn>
                 </template>
@@ -426,7 +471,6 @@ financeStore.createCashierDialog = true;
                 }}</span>
               </v-tooltip>
             </v-col>
-          
           </v-row>
 
           <!-- Category Tabs -->
@@ -506,12 +550,18 @@ financeStore.createCashierDialog = true;
     <v-row
       v-else
       class="d-flex align-center justify-center"
-      style="height: 100%; background-color: #fafafa;"
+      style="height: 100%; background-color: #fafafa"
     >
       <v-col cols="12" class="text-center">
         <v-card
           elevation="2"
-          style="max-width: 500px; margin: auto; padding: 24px; background-color: #fff; border-radius: 12px;"
+          style="
+            max-width: 500px;
+            margin: auto;
+            padding: 24px;
+            background-color: #fff;
+            border-radius: 12px;
+          "
         >
           <v-card-title class="text-h5 text-center">
             ร้านกาแฟไม่พร้อมใช้งาน

@@ -18,8 +18,9 @@ import PromotionUsePointDialog from "@/components/pos/PromotionUsePointDialog.vu
 import type { Recipe } from "@/types/recipe.type";
 import SelectedItemsListCoffee from "@/components/pos/SelectedItemsListCoffee.vue";
 import { useReceiptStore } from "@/stores/receipt.store";
-import { useReportFinnceStore } from "@/stores/report/finance.store";
 import DialogAddCashier from "@/components/reports/cashier/DialogAddCashier.vue";
+import { useReportFinnceStore } from "@/stores/report/finance.store";
+import { useReceiptReportStore } from "@/stores/report_receipt.store";
 
 const productStore = useProductStore();
 const categoryStore = useCategoryStore();
@@ -34,23 +35,21 @@ const searchQuery = ref("");
 const barcode = ref("");
 const receiptStore = useReceiptStore();
 const financeStore = useReportFinnceStore();
+const receiptReportStore = useReceiptReportStore();
 
 // Load products, categories, promotions, and customers on mount
 onMounted(async () => {
   await financeStore.checkCashierToday();
   // financeStore.checkTodayCoffee =true;
-  if(financeStore.checkTodayCoffee){
-   
-  
-  promotionStore.promotions = [];
-  await productStore.getProductByStoreType("ร้านกาแฟ");
-  await categoryStore.getAllCategories();
-  await toppingStore.getAllToppings();
-  await customerStore.getAllCustomers();
-  await receiptStore.getRecieptIn30Min('ร้านกาแฟ');
-  
+  if (financeStore.checkTodayCoffee) {
+    promotionStore.promotions = [];
+    await productStore.getProductByStoreType("ร้านกาแฟ");
+    await categoryStore.getAllCategories();
+    await toppingStore.getAllToppings();
+    await customerStore.getAllCustomers();
+    await receiptStore.getRecieptIn30Min("ร้านกาแฟ");
 
-  userStore.getCurrentUser();
+    userStore.getCurrentUser();
 
     promotionStore.getPromotionByType("ร้านกาแฟ");
     selectedCategory.value = "กาแฟ";
@@ -66,15 +65,10 @@ onMounted(async () => {
     promotionStore.promotions = promotionStore.promotions.filter(
       (promotion) => promotion.promotionForStore === "ร้านกาแฟ"
     );
- 
 
-  // Load queue list from local storage
-  loadQueueListFromLocalStorage();
-  loadFullscreenStateFromLocalStorage();
-  }
-  else{
-    // return null value
-
+    // Load queue list from local storage
+    loadQueueListFromLocalStorage();
+    loadFullscreenStateFromLocalStorage();
   }
 });
 
@@ -103,7 +97,48 @@ const saveFullscreenStateToLocalStorage = () => {
     JSON.stringify(posStore.hideNavigation)
   );
 };
+// watchreceiptReportStore receipt
+watch(
+  () => financeStore.checkTodayCoffee,
+  async () => {
+    await financeStore.checkCashierToday();
 
+    promotionStore.promotions = [];
+    await productStore.getProductByStoreType("ร้านกาแฟ");
+    await categoryStore.getAllCategories();
+    await toppingStore.getAllToppings();
+    await customerStore.getAllCustomers();
+    await receiptStore.getRecieptIn30Min("ร้านกาแฟ");
+
+    userStore.getCurrentUser();
+
+    promotionStore.getPromotionByType("ร้านกาแฟ");
+    selectedCategory.value = "กาแฟ";
+    const cateIndex = categoryStore.categoriesForCreate.findIndex(
+      (category) => category.categoryName === "กับข้าว"
+    );
+    if (cateIndex !== -1)
+      categoryStore.categoriesForCreate.splice(cateIndex, 1);
+    productFilters.value = productStore.products.filter(
+      (product) =>
+        product.category.categoryName.toLowerCase() === "กาแฟ".toLowerCase()
+    );
+    promotionStore.promotions = promotionStore.promotions.filter(
+      (promotion) => promotion.promotionForStore === "ร้านกาแฟ"
+    );
+
+    // Load queue list from local storage
+    loadQueueListFromLocalStorage();
+    loadFullscreenStateFromLocalStorage();
+  }
+);
+
+watch(
+  () => posStore.queueReceipt,
+  () => {
+    posStore.saveQueueListToLocalStorage();
+  }
+);
 // Remove an item from the queue
 const removeFromQueue = (index: number) => {
   posStore.queueReceipt.splice(index, 1);
@@ -198,7 +233,7 @@ const showQueue = computed(() => {
 });
 // handleCashierEntry
 const handleCashierEntry = () => {
-financeStore.createCashierDialog = true;
+  financeStore.createCashierDialog = true;
 };
 </script>
 
@@ -386,21 +421,30 @@ financeStore.createCashierDialog = true;
             class="full-width-row"
             style="overflow: hidden; margin-bottom: 5px; margin-top: -20px"
           >
-          <v-col cols="12" md="6">
-            <v-text-field
-              v-model="barcode"
-              append-inner-icon="mdi-barcode"
-              label="แสกนบาร์โค้ด"
-              variant="solo"
-              dense
-              hide-details
-              @change="handleBarcodeInput"
-              style="background-color: #f1f1f1; border-radius: 8px; text-align: right;"
-              class="ml-6"
-            ></v-text-field>
-          </v-col>
-          
-            <v-col cols="12" md="5" class="d-flex justify-end align-center" style="margin-left: 7%;">
+            <v-col cols="12" md="6">
+              <v-text-field
+                v-model="barcode"
+                append-inner-icon="mdi-barcode"
+                label="แสกนบาร์โค้ด"
+                variant="solo"
+                dense
+                hide-details
+                @change="handleBarcodeInput"
+                style="
+                  background-color: #f1f1f1;
+                  border-radius: 8px;
+                  text-align: right;
+                "
+                class="ml-6"
+              ></v-text-field>
+            </v-col>
+
+            <v-col
+              cols="12"
+              md="5"
+              class="d-flex justify-end align-center"
+              style="margin-left: 7%"
+            >
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
@@ -455,7 +499,7 @@ financeStore.createCashierDialog = true;
           <!-- Product List -->
           <v-row
             class="full-width-row product-list-container"
-            style="flex: 1; overflow-y: auto "
+            style="flex: 1; overflow-y: auto"
           >
             <v-tabs-items v-model="selectedCategory" style="width: 100%">
               <v-tab-item>
@@ -506,12 +550,18 @@ financeStore.createCashierDialog = true;
     <v-row
       v-else
       class="d-flex align-center justify-center"
-      style="height: 100%; background-color: #fafafa;"
+      style="height: 100%; background-color: #fafafa"
     >
       <v-col cols="12" class="text-center">
         <v-card
           elevation="2"
-          style="max-width: 500px; margin: auto; padding: 24px; background-color: #fff; border-radius: 12px;"
+          style="
+            max-width: 500px;
+            margin: auto;
+            padding: 24px;
+            background-color: #fff;
+            border-radius: 12px;
+          "
         >
           <v-card-title class="text-h5 text-center">
             ร้านกาแฟไม่พร้อมใช้งาน
@@ -530,7 +580,7 @@ financeStore.createCashierDialog = true;
     </v-row>
 
     <!-- Receipt Dialog -->
-     <DialogAddCashier />
+    <DialogAddCashier />
     <receipt-dialog />
   </v-app>
 </template>

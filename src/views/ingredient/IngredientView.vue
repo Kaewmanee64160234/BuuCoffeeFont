@@ -31,11 +31,7 @@ const exportIngredients = async () => {
     const doc = new jsPDF();
     doc.addFileToVFS('Sarabun.ttf', SarabunFont);
     doc.addFont('Sarabun.ttf', 'Sarabun', 'normal');
-    doc.setFont('Helvetica');
-
-
-
-
+    doc.setFont('Helvetica')
     const lineHeight = 30;
     // await nextTick();
 

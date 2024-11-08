@@ -31,6 +31,8 @@ export const useReportFinnceStore = defineStore("cashier", () => {
       if (res.data) {
         cashiers.value.push(res.data);
       }
+      window.location.reload();
+
     } catch (error) {
       console.error(error);
     }

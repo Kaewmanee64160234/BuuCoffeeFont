@@ -9,6 +9,7 @@ const ReportFinnceStore = useReportFinnceStore();
 const cashierAmount = ref<number | null>(null);
 const userId = 1;
 const selectedType = ref<string | null>(null);
+const financeStore = useReportFinnceStore();
 
 const currencyTypes = [
   { label: 'ธนบัตร 1000 บาท', value: 1000 },
@@ -63,6 +64,8 @@ const submitForm = async () => {
 
         await financeService.createCashier(cashier, items);
         console.log(cashier); 
+        await financeStore.checkCashierToday(); 
+  
         clearData();
       } catch (error) {
         console.error('Error creating cashier:', error);

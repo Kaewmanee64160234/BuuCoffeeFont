@@ -311,7 +311,7 @@ router.beforeEach((to, from, next) => {
     }).then((result) => {
       if (result.isConfirmed) {
         if (userStore.currentUser.role!.name === "ผู้จัดการร้าน") {
-          next("/"); // Redirect to `/pos` route if user confirms
+          next("/report"); // Redirect to `/pos` route if user confirms
         } else {
           if (userStore.currentUser.role!.name === "พนักงานขายข้าว") {
             next("/pos-rice");

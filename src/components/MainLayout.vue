@@ -23,7 +23,10 @@
 
       <v-list density="compact" nav>
         <!-- การขาย -->
-        <v-subheader @click="toggleSale" class="menu-item d-flex align-center">
+        <v-subheader @click="toggleSale" class="menu-item d-flex align-center"
+        v-if="hasPermission('ดูรายงาน') || hasPermission('สามารถขายได้') || hasPermission('แก้ไขใบเสร็จ')">
+         
+        >
           <img
             src="../../src/components/img/sell.png"
             alt="การขาย"
@@ -37,7 +40,7 @@
 
         <v-expand-transition>
           <v-list v-show="showSale" style="padding-left: 33px">
-            <v-list-item to="/report">
+            <v-list-item to="/report" v-if="hasPermission('ดูรายงาน')">
               <template v-slot:prepend>
                 <img
                   src="../../src/components/img/dashboard.png"
@@ -48,7 +51,7 @@
               รายงานสรุปผล
             </v-list-item>
 
-            <v-list-item to="/pos-coffee" >
+            <v-list-item to="/pos-coffee" v-if="hasPermission('สามารถขายได้')">
               <template v-slot:prepend>
                 <img
                   src="../../src/components/img/store.png"
@@ -59,7 +62,13 @@
               POSร้านกาแฟ
             </v-list-item>
 
-            <v-list-item to="/pos-rice" v-if="userStore.currentUser?.role?.name !== 'พนักงานขายกาแฟ'  " >
+            <v-list-item
+              to="/pos-rice"
+              v-if="
+                userStore.currentUser?.role?.name !== 'พนักงานขายกาแฟ' &&
+                hasPermission('สามารถขายได้')
+              "
+            >
               <template v-slot:prepend>
                 <img
                   src="../../src/components/img/store.png"
@@ -70,7 +79,10 @@
               POSร้านข้าว
             </v-list-item>
 
-            <v-list-item to="/historyReceipt">
+            <v-list-item
+              to="/historyReceipt"
+              v-if="hasPermission('แก้ไขใบเสร็จ')"
+            >
               <template v-slot:prepend>
                 <img
                   src="../../src/components/img/receipt.png"
@@ -87,6 +99,11 @@
         <v-subheader
           @click="toggleIngredients"
           class="menu-item d-flex align-center"
+          v-if="
+          hasPermission('ดูวัตถุดิบ') ||
+          hasPermission('จัดการวัตถุดิบ') 
+
+          "
         >
           <img
             src="../../src/components/img/ingredients.png"
@@ -101,7 +118,10 @@
 
         <v-expand-transition>
           <v-list v-show="showIngredients" style="padding-left: 33px">
-            <v-list-item to="/ingredientList">
+            <v-list-item
+              to="/ingredientList"
+              v-if="hasPermission('ดูวัตถุดิบ')"
+            >
               <template v-slot:prepend>
                 <img
                   src="../../src/components/img/groceries.png"
@@ -112,7 +132,10 @@
               คลังวัตถุดิบ
             </v-list-item>
 
-            <v-list-item to="/ingredientCoffeeList">
+            <v-list-item
+              to="/ingredientCoffeeList"
+              v-if="hasPermission('ดูวัตถุดิบ')"
+            >
               <template v-slot:prepend>
                 <img
                   src="../../src/components/img/coffee-beans.png"
@@ -123,7 +146,10 @@
               คลังร้านกาแฟ
             </v-list-item>
 
-            <v-list-item to="/ingredientRiceList">
+            <v-list-item
+              to="/ingredientRiceList"
+              v-if="hasPermission('ดูวัตถุดิบ')"
+            >
               <template v-slot:prepend>
                 <img
                   src="../../src/components/img/rice.png"
@@ -133,8 +159,6 @@
               </template>
               คลังร้านข้าว
             </v-list-item>
-
-
           </v-list>
         </v-expand-transition>
 
@@ -142,6 +166,11 @@
         <v-subheader
           @click="toggleCatering"
           class="menu-item d-flex align-center"
+          v-if="
+          hasPermission('จัดการการเลี้ยงรับรอง') ||
+          hasPermission('ดูประวัติการเลี้ยงรับรอง') 
+
+          "
         >
           <img
             src="../../src/components/img/cateringProfile.png"
@@ -156,7 +185,10 @@
 
         <v-expand-transition>
           <v-list v-show="showCatering" style="padding-left: 33px">
-            <v-list-item to="/pos-catering">
+            <v-list-item
+              to="/pos-catering"
+              v-if="hasPermission('จัดการการเลี้ยงรับรอง')"
+            >
               <template v-slot:prepend>
                 <img
                   src="../../src/components/img/catering.png"
@@ -167,7 +199,10 @@
               การเลี้ยงรับรอง
             </v-list-item>
 
-            <v-list-item to="/historyReceiptCatering">
+            <v-list-item
+              to="/historyReceiptCatering"
+              v-if="hasPermission('จัดการการเลี้ยงรับรอง')"
+            >
               <template v-slot:prepend>
                 <img
                   src="../../src/components/img/buffet.png"
@@ -184,6 +219,12 @@
         <v-subheader
           @click="toggleProductUserManagement"
           class="menu-item d-flex align-center"
+          v-if="
+          hasPermission('ดูรายการสินค้า') ||
+          hasPermission('จัดการผู้ใช้') ||
+          hasPermission('จัดการสิทธิ์เข้าถึง') ||
+          hasPermission('ดูข้อมูลลูกค้า')
+          "
         >
           <img
             src="../../src/components/img/evaluation.png"
@@ -198,7 +239,10 @@
 
         <v-expand-transition>
           <v-list v-show="showProductUserManagement" style="padding-left: 33px">
-            <v-list-item to="/productsManagement">
+            <v-list-item
+              to="/productsManagement"
+              v-if="hasPermission('ดูรายการสินค้า')"
+            >
               <template v-slot:prepend>
                 <img
                   src="../../src/components/img/product.png"
@@ -209,14 +253,23 @@
               จัดการสินค้า
             </v-list-item>
 
-            <v-list-item to="/userManagement">
+            <v-list-item
+              to="/userManagement"
+              v-if="hasPermission('จัดการผู้ใช้')"
+            >
               <template v-slot:prepend>
-
-                <img src="../../src/components/img/man.png" alt="จัดการผู้ใช้งาน" class="nav-icon" />
+                <img
+                  src="../../src/components/img/man.png"
+                  alt="จัดการผู้ใช้งาน"
+                  class="nav-icon"
+                />
               </template>
               จัดการผู้ใช้งาน
             </v-list-item>
-            <v-list-item to="/managementRole">
+            <v-list-item
+              to="/managementRole"
+              v-if="hasPermission('จัดการสิทธิ์เข้าถึง')"
+            >
               <template v-slot:prepend>
                 <img
                   src="../../src/components/img/user.png"
@@ -227,7 +280,10 @@
               จัดการสิทธิ์ผู้ใช้งาน
             </v-list-item>
 
-            <v-list-item to="/customersManagement">
+            <v-list-item
+              to="/customersManagement"
+              v-if="hasPermission('ดูข้อมูลลูกค้า')"
+            >
               <template v-slot:prepend>
                 <img
                   src="../../src/components/img/customer.png"
@@ -244,6 +300,12 @@
         <v-subheader
           @click="togglePromotionCategory"
           class="menu-item d-flex align-center"
+          v-if="
+          hasPermission('จัดการโปรโมชั่น') ||
+          hasPermission('จัดการประเภทสินค้า') ||
+          hasPermission('จัดการท้อปปิ้ง')
+          
+          "
         >
           <img
             src="../../src/components/img/box.png"
@@ -258,7 +320,10 @@
 
         <v-expand-transition>
           <v-list v-show="showPromotionCategory" style="padding-left: 33px">
-            <v-list-item to="/promotion">
+            <v-list-item
+              to="/promotion"
+              v-if="hasPermission('จัดการโปรโมชั่น')"
+            >
               <template v-slot:prepend>
                 <img
                   src="../../src/components/img/promotion.png"
@@ -269,7 +334,10 @@
               จัดการโปรโมชัน
             </v-list-item>
 
-            <v-list-item to="/category">
+            <v-list-item
+              to="/category"
+              v-if="hasPermission('จัดการประเภทสินค้า')"
+            >
               <template v-slot:prepend>
                 <img
                   src="../../src/components/img/inventory.png"
@@ -280,7 +348,7 @@
               จัดการหมวดหมู่
             </v-list-item>
 
-            <v-list-item to="/topping">
+            <v-list-item to="/topping" v-if="hasPermission('จัดการท้อปปิ้ง')">
               <template v-slot:prepend>
                 <img
                   src="../../src/components/img/topping.png"
@@ -292,8 +360,6 @@
             </v-list-item>
           </v-list>
         </v-expand-transition>
-
-        
 
         <!-- อื่นๆ -->
         <v-subheader
@@ -366,29 +432,39 @@ const showPromotionCategory = ref(false);
 const showIngredients = ref(false);
 const showOthers = ref(false);
 
+const hasPermission = (permission) => {
+  return userStore.currentUser?.groups?.some((group) =>
+    group.permissions.some((p) => p.name === permission)
+  );
+};
+
 const toggleSale = () => {
   showSale.value = rail.value ? false : !showSale.value; // ปิดเมนูถ้า rail เป็น true, สลับสถานะถ้า rail เป็น false
-}
+};
 
 const toggleCatering = () => {
   showCatering.value = rail.value ? false : !showCatering.value; // ปิดเมนูถ้า rail เป็น true, สลับสถานะถ้า rail เป็น false
-}
+};
 
 const toggleProductUserManagement = () => {
-  showProductUserManagement.value = rail.value ? false : !showProductUserManagement.value; // ปิดเมนูถ้า rail เป็น true, สลับสถานะถ้า rail เป็น false
-}
+  showProductUserManagement.value = rail.value
+    ? false
+    : !showProductUserManagement.value; // ปิดเมนูถ้า rail เป็น true, สลับสถานะถ้า rail เป็น false
+};
 
 const togglePromotionCategory = () => {
-  showPromotionCategory.value = rail.value ? false : !showPromotionCategory.value; // ปิดเมนูถ้า rail เป็น true, สลับสถานะถ้า rail เป็น false
-}
+  showPromotionCategory.value = rail.value
+    ? false
+    : !showPromotionCategory.value; // ปิดเมนูถ้า rail เป็น true, สลับสถานะถ้า rail เป็น false
+};
 
 const toggleIngredients = () => {
   showIngredients.value = rail.value ? false : !showIngredients.value; // ปิดเมนูถ้า rail เป็น true, สลับสถานะถ้า rail เป็น false
-}
+};
 
 const toggleOthers = () => {
   showOthers.value = rail.value ? false : !showOthers.value; // ปิดเมนูถ้า rail เป็น true, สลับสถานะถ้า rail เป็น false
-}
+};
 
 const toggleRail = () => {
   rail.value = !rail.value;
@@ -400,9 +476,7 @@ const toggleRail = () => {
     showIngredients.value = false;
     showOthers.value = false;
   }
-}
-
-
+};
 
 onMounted(() => {
   const userString = localStorage.getItem("user");
@@ -414,8 +488,7 @@ onMounted(() => {
     } catch (e) {
       console.error("Failed to parse user from localStorage:", e);
       authStore.isLogin = false;
-    router.push("/login");
-
+      router.push("/login");
     }
   } else {
     console.log("No user found in localStorage.");

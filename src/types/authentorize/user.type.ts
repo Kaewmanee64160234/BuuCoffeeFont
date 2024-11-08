@@ -10,7 +10,7 @@ export interface User {
   userEmail: string;
   userStatus: string;
   role: Role | null;
-  groupMemberships: GroupMember[];
+  groups: GroupMember[];
 }
 
 export function mapToUser(data: any): User {
@@ -28,12 +28,6 @@ export function mapToUser(data: any): User {
           name: data.role.name,
         }
       : null, // Ensuring a valid role object if data is present
-    groupMemberships: data.groupMemberships
-      ? data.groupMemberships.map((groupMember: any) => ({
-          groupMemberId: groupMember.groupMemberId,
-          group: groupMember.group,
-          user: groupMember.user,
-        }))
-      : [],
+    groups: data.groups || [],
   };
 }
