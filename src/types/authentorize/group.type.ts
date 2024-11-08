@@ -4,6 +4,7 @@ import type { Permission } from "./permisstion.type";
 import type { User } from "./user.type";
 
 export default interface Groups {
+  [x: string]: number;
   groupId?: number;
   name: string;
   permissions?: Permission[]; // Loaded permissions

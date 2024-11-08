@@ -72,68 +72,69 @@
         </v-container>
       </v-col>
       <v-col cols="6" class="d-flex flex-column" style="padding: 2px">
-        <v-card style="height: 400px; overflow-y: auto; width: 100%">
-          <v-table style="max-height: 100%; overflow-y: auto">
+        <v-card style="height: 400px; overflow-y: auto; width: 100%;">
+          <v-table style="max-height: 100%; overflow-y: auto;">
             <thead>
               <tr>
-                <th>ลำดับ</th>
-                <th>รายการสินค้า</th>
-                <th v-if="ingredientStore.TypeIngredient === 'รายการวัตถุดิบ'">
+                <th style="white-space: nowrap; font-size: 16px">ลำดับ</th>
+                <th style="white-space: nowrap;font-size: 16px">รายการสินค้า</th>
+                <th style="white-space: nowrap;font-size: 16px" v-if="ingredientStore.TypeIngredient === 'รายการวัตถุดิบ'">
                   จำนวน
                 </th>
-                <th v-if="ingredientStore.TypeIngredient === 'รายการวัตถุดิบ'">
+                <th style="white-space: nowrap;font-size: 16px" v-if="ingredientStore.TypeIngredient === 'รายการวัตถุดิบ'">
                   ราคา
                 </th>
-                <th>ส่วนลด</th>
-                <th v-if="ingredientStore.TypeIngredient === 'รายการวัตถุดิบ'">
+                <th style="white-space: nowrap;font-size: 16px">ส่วนลด</th>
+                <th style="white-space: nowrap;font-size: 16px" v-if="ingredientStore.TypeIngredient === 'รายการวัตถุดิบ'">
                   จำนวนเงิน
                 </th>
-                <th v-if="ingredientStore.TypeIngredient === 'รายการวัตถุดิบ'">
+                <th style="white-space: nowrap;font-size: 16px" v-if="ingredientStore.TypeIngredient === 'รายการวัตถุดิบ'">
                   หน่วย
                 </th>
-                <th>แอคชั่น</th>
+                <th style="white-space: nowrap;font-size: 16px">แอคชั่น</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="(item, index) in reversedIngredientList" :key="index">
-                <td>{{ index + 1 }}</td>
-                <td>
+                <td style="white-space: nowrap; font-size: 16px">{{ index + 1 }}</td>
+                <td style="white-space: nowrap; font-size: 16px">
                   {{
                     ingredientStore.TypeIngredient === "รายการวัตถุดิบสด"
                       ? item.name
                       : item.ingredient?.ingredientName
                   }}
                 </td>
-                <td v-if="ingredientStore.TypeIngredient === 'รายการวัตถุดิบ'">
+                <td style="white-space: nowrap; font-size: 16px" v-if="ingredientStore.TypeIngredient === 'รายการวัตถุดิบ'">
                   <input type="number" v-model.number="item.count" class="styled-input" min="1" />
                 </td>
-                <td v-if="ingredientStore.TypeIngredient === 'รายการวัตถุดิบ'">
+                <td style="white-space: nowrap; font-size: 16px" v-if="ingredientStore.TypeIngredient === 'รายการวัตถุดิบ'">
                   <input type="number" v-model.number="item.unitprice" class="styled-input" min="0" />
                 </td>
-                <td v-if="ingredientStore.TypeIngredient === 'รายการวัตถุดิบ'">
+                <td style="white-space: nowrap; font-size: 16px" v-if="ingredientStore.TypeIngredient === 'รายการวัตถุดิบ'">
                   <input type="number" v-model.number="item.discount" class="styled-input" min="0" />
                 </td>
-                <td v-if="ingredientStore.TypeIngredient === 'รายการวัตถุดิบ'">
+                <td style="white-space: nowrap; font-size: 16px" v-if="ingredientStore.TypeIngredient === 'รายการวัตถุดิบ'">
                   {{ calculateTotal(item) }}
                 </td>
-                <!-- <td v-if="ingredientStore.TypeIngredient === 'รายการวัตถุดิบ'">
-                  <input type="number" v-model.number="item.totalunit" class="styled-input" min="0" />
-                </td> -->
-                <td v-if="ingredientStore.TypeIngredient === 'รายการวัตถุดิบ'">
-                  <label>
-                    <input type="radio" v-model="item.importType" value="piece" />
-                    ชิ้น
-                  </label>
-                  <label>
-                    <input type="radio" v-model="item.importType" value="box" />
-                    แพ็ค
-                  </label>
+                <td style="white-space: nowrap; font-size: 16px" v-if="ingredientStore.TypeIngredient === 'รายการวัตถุดิบ'">
+                  <!-- Wrap the radio buttons in a container to align them on the same line -->
+                  <div class="d-flex align-center">
+                    <label>
+                      <input type="radio" v-model="item.importType" value="piece" />
+                      ชิ้น
+                    </label>
+                    <label class="ml-2">
+                      <input type="radio" v-model="item.importType" value="box" />
+                      แพ็ค
+                    </label>
+                  </div>
                 </td>
-
-                <td>
-                  <button @click="
-                    ingredientStore.removeIngredient(reversedIndex(index))
-                    " class="styled-button">
+                <td >
+                  <button
+                    style="white-space: nowrap; font-size: 16px"
+                    @click="ingredientStore.removeIngredient(reversedIndex(index))"
+                    class="styled-button"
+                  >
                     ลบ
                   </button>
                 </td>
@@ -141,114 +142,10 @@
             </tbody>
           </v-table>
         </v-card>
-
-        <v-row class="mt-2">
-  <!-- Row 1: ชื่อร้านค้า และ ประเภทร้านค้า -->
-  <v-col cols="6">
-    <v-row>
-      <v-col cols="12">ชื่อร้านค้า</v-col>
-    </v-row>
-    <v-row class="mt-2">
-      <v-col cols="12">
-        <v-text-field 
-          ref="storeField" 
-          label="กรุณากรอกชื่อร้านค้า" 
-          v-model="ingredientStore.store"
-          :rules="[rules.required, rules.name]" 
-          dense 
-          hide-details 
-          variant="solo" />
+      
+        <!-- Rest of the code for the form elements -->
       </v-col>
-    </v-row>
-  </v-col>
-
-  <v-col cols="6">
-    <v-row>
-      <v-col cols="12">ประเภทร้านค้า</v-col>
-    </v-row>
-    <v-row class="mt-2">
-      <v-col cols="12">
-        <v-radio-group 
-          v-model="ingredientStore.importStoreType" 
-          row 
-          :rules="[rules.required]">
-          <v-radio label="ร้านกาแฟ" value="ร้านกาแฟ"></v-radio>
-          <v-radio label="ร้านข้าว" value="ร้านข้าว"></v-radio>
-        </v-radio-group>
-      </v-col>
-    </v-row>
-  </v-col>
-</v-row>
-<v-row class="mt-2">
-  <v-col cols="6">
-    <v-row>
-      <v-col cols="12">ส่วนลด</v-col>
-    </v-row>
-    <v-row class="mt-2">
-      <v-col>
-        <v-text-field 
-          ref="discountField" 
-          label="กรุณากรอกส่วนลด" 
-          v-model="ingredientStore.discount"
-          :rules="[rules.required, rules.number]" 
-          dense 
-          hide-details 
-          variant="solo" />
-      </v-col>
-    </v-row>
-  </v-col>
-  <v-col cols="6">
-    <v-row>
-      <v-col cols="12">ภาษี</v-col>
-    </v-row>
-    <v-row class="mt-2">
-      <v-col>
-        <v-text-field 
-          ref="discountField" 
-          label="กรุณากรอกส่วนลด" 
-          v-model="ingredientStore.tax"
-          :rules="[rules.required, rules.number]" 
-          dense 
-          hide-details 
-          variant="solo" />
-      </v-col>
-    </v-row>
-  </v-col>
-</v-row>
-
-
-
-<v-row class="mt-2">
-  <!-- Row 4: หมายเหตุ -->
-  <v-col cols="12">
-    <v-row>
-      <v-col cols="12">หมายเหตุ</v-col>
-    </v-row>
-    <v-row class="mt-2">
-      <v-col cols="12">
-        <v-text-field 
-          ref="noteField" 
-          label="กรุณาระบุหมายเหตุ **ถ้ามี"
-          v-model="ingredientStore.importDescription" 
-          dense 
-          hide-details 
-          variant="solo" />
-      </v-col>
-    </v-row>
-  </v-col>
-</v-row>
-
-<v-row>
-  <v-col>
-    <v-btn @click="saveAndClearForm" color="success" class="button-full-width">
-      <v-icon left>mdi-plus</v-icon>
-      บันทึกข้อมูล
-    </v-btn>
-  </v-col>
-</v-row>
-
-
-      </v-col>
+      
     </v-row>
   </v-container>
 </template>

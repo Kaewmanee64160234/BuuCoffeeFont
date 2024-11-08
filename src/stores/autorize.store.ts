@@ -151,7 +151,7 @@ export const useAuthorizeStore = defineStore("authorize", () => {
   }
 
   // removeUserFromGroup
-  const removeUserFromGroup = async (group: Groups) => {
+  const removeUserFromGroup = async (p0: number, userId: number, group: Groups) => {
     try {
       const res = await authorizeService.removeUserFromGroup(group.id!);
       if (res.status === 200) {

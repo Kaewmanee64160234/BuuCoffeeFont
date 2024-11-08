@@ -137,7 +137,7 @@ const openCreateDialog = () => {
 
 const lineChartOptions = ref({
   chart: {
-    height: 350,
+    height: 450,
     type: 'line',
     zoom: {
       enabled: false
@@ -151,7 +151,11 @@ const lineChartOptions = ref({
   },
   title: {
     text: 'ยอดขายร้านกาแฟ',
-    align: 'center'
+    align: 'center',
+    style: {
+      fontSize: '20px', // Increase font size
+      fontWeight: 'bold'
+    }
   },
   xaxis: {
     categories: []
@@ -171,7 +175,7 @@ const lineChartSeries = ref([
 ]);
 const lineChartOptions2 = ref({
   chart: {
-    height: 350,
+    height: 450,
     type: 'line',
     zoom: {
       enabled: false
@@ -185,7 +189,11 @@ const lineChartOptions2 = ref({
   },
   title: {
     text: 'ยอดขายร้านข้าว',
-    align: 'center'
+    align: 'center',
+    style: {
+      fontSize: '20px', // Increase font size
+      fontWeight: 'bold'
+    }
   },
   xaxis: {
     categories: []
@@ -228,50 +236,46 @@ watch(
     <v-carousel hide-delimiter-background hide-delimiters height="290"
       style="background-color: #C7AE8D; border-radius: 20px;">
       <!-- ยอดขายวันนี้ร้านกาแฟ -->
-      <v-carousel-item>
-        <v-card-title class="text-center">
+      <v-carousel-item >
+        <v-card-title class="text-center"  style="margin-top: 20px;">
 
           <v-icon size="25px">mdi-coffee-maker</v-icon>
           ยอดขายวันนี้ร้านกาแฟ
         </v-card-title>
-        <v-row class="px-4">
-
-          <v-col cols="12" md="8">
-            <v-row>
-              <v-col cols="12" md="6">
-                <v-card style="height: 100%">
-                  <v-card-title class="d-flex justify-space-between align-center mt-2">
-                    รายได้
-                  </v-card-title>
-                  <v-card-subtitle class="text-h5">{{ ReportFinnceStore.dailyReport.totalSales }} บาท</v-card-subtitle>
-                </v-card>
-              </v-col>
-              <v-col cols="12" md="6">
-                <v-card class="mb-2">
-                  <v-card-title class="d-flex justify-space-between align-center">
-                    จำนวนรายการ
-                  </v-card-title>
-                  <v-card-subtitle class="text-h5">{{ ReportFinnceStore.dailyReport.totalTransactions }}
-                    รายการ</v-card-subtitle>
-                </v-card>
-              </v-col>
-              <v-col cols="12" md="6">
-                <v-card>
-                  <v-card-title class="d-flex justify-space-between align-center">
-                    ส่วนลด
-                  </v-card-title>
-                  <v-card-subtitle class="text-h5">{{ ReportFinnceStore.dailyReport.totalDiscount }}
-                    บาท</v-card-subtitle>
-                </v-card>
-              </v-col>
-            </v-row>
-          </v-col>
+        <v-row class="px-8">
+          <v-row class="d-flex justify-center mt-10">
+            <v-col cols="12" md="3">
+              <v-card style="height: 100%">
+                <v-card-title class="d-flex justify-space-between align-center">
+                  รายได้
+                </v-card-title>
+                <v-card-subtitle class="text-h5">{{ ReportFinnceStore.dailyReport.totalSales }} บาท</v-card-subtitle>
+              </v-card>
+            </v-col>
+            <v-col cols="12" md="3">
+              <v-card style="height: 100%">
+                <v-card-title class="d-flex justify-space-between align-center">
+                  จำนวนรายการ
+                </v-card-title>
+                <v-card-subtitle class="text-h5">{{ ReportFinnceStore.dailyReport.totalTransactions }} รายการ</v-card-subtitle>
+              </v-card>
+            </v-col>
+            <v-col cols="12" md="3">
+              <v-card style="height: 100%">
+                <v-card-title class="d-flex justify-space-between align-center">
+                  ส่วนลด
+                </v-card-title>
+                <v-card-subtitle class="text-h5">{{ ReportFinnceStore.dailyReport.totalDiscount }} บาท</v-card-subtitle>
+              </v-card>
+            </v-col>
+          </v-row>
+          
         </v-row>
       </v-carousel-item>
 
       <!-- ยอดขายวันนี้ร้านอาหาร -->
       <v-carousel-item>
-        <v-card-title class="text-center">
+        <v-card-title class="text-center" style="margin-top: 20px;">
           <v-icon size="25px">mdi-pasta</v-icon>
           ยอดขายวันนี้ร้านอาหาร
         </v-card-title>
@@ -279,7 +283,7 @@ watch(
           <v-col cols="12" md="8">
             <v-row justify="center" no-gutters>
               <v-col cols="12" md="4" class="pa-2">
-                <v-card class="text-center mt-10">
+                <v-card class="text-center mt-6">
                   <v-card-title>
                     รายได้
                   </v-card-title>
@@ -289,7 +293,7 @@ watch(
                 </v-card>
               </v-col>
               <v-col cols="12" md="4" class="pa-2">
-                <v-card class="text-center mt-10">
+                <v-card class="text-center mt-6">
                   <v-card-title>
                     จำนวนรายการ
                   </v-card-title>
@@ -299,7 +303,7 @@ watch(
                 </v-card>
               </v-col>
               <v-col cols="12" md="4" class="pa-2">
-                <v-card class="text-center mt-10">
+                <v-card class="text-center mt-6">
                   <v-card-title>
                     ส่วนลด
                   </v-card-title>
@@ -315,13 +319,13 @@ watch(
 
       <!-- กำไร & ต้นทุนร้านกาแฟทั้งหมด -->
       <v-carousel-item>
-        <v-card-title class="text-center">
+        <v-card-title class="text-center" style="margin-top: 20px;">
           <v-icon size="25px">mdi-chart-histogram</v-icon>
           กำไร & ต้นทุนร้านกาแฟทั้งหมด
         </v-card-title>
         <v-row justify="center" align="center" no-gutters>
           <v-col cols="12" md="4" class="pa-2" style="width: fit-content;">
-            <v-card class="d-flex justify-center align-center mt-10">
+            <v-card class="d-flex justify-center align-center mt-6">
               <v-card-title class="text-center">
                 ต้นทุน
               </v-card-title>
@@ -339,7 +343,7 @@ watch(
             </v-card>
           </v-col>
           <v-col cols="12" md="4">
-            <v-card class="d-flex justify-center align-center mt-10">
+            <v-card class="d-flex justify-center align-center mt-6">
               <v-card-title class="text-center">
                 ส่วนลด
               </v-card-title>
@@ -360,7 +364,7 @@ watch(
       </v-carousel-item>
     </v-carousel>
 
-    <v-row class="mt-4 ml-1">
+    <v-row class="mt-6 ml-1">
       <v-text-field label="เริ่มวันที่" v-model="dateRange.startDate" type="date" dense hide-details variant="solo"
         class="mr-4" />
       <v-text-field label="ถึงวันที่" v-model="dateRange.endDate" type="date" dense hide-details variant="solo"
@@ -369,7 +373,7 @@ watch(
         class="mr-4" />
     </v-row>
 
-    <v-row class="mt-4">
+    <v-row class="mt-6">
       <v-col cols="12" md="6">
         <apexchart style="height: fit-content; width: fit-content;" type="line" :options="lineChartOptions"
           :series="lineChartSeries"></apexchart>
