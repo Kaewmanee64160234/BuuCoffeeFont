@@ -1,4 +1,5 @@
 import type { Category } from "./category.type";
+import type { Ingredient } from "./ingredient.type";
 import type { ProductTypeTopping } from "./productTypeTopping.type";
 import type { Recipe } from "./recipe.type";
 
@@ -16,6 +17,7 @@ export interface Product {
   sweetnessLevel?: number;
   productTypeToppings?: ProductTypeTopping[];
   quantity?: number;
+  ingredient?: Ingredient;
 }
 export function mapToProduct(data: any): Product {
   return {

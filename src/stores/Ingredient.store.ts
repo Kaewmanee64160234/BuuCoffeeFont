@@ -325,13 +325,15 @@ export const useIngredientStore = defineStore("ingredient", () => {
           }
         );
       } else {
+        console.log("editedIngredient", JSON.stringify(editedIngredient.value));
+        
         res = await ingredientService.saveIngredient({
           ...editedIngredient.value,
           imageFile: editedIngredient.value.file,
         });
       }
       dialog.value = false; 
-      window.location.reload();
+      // window.location.reload();
       await getAllIngredients(); 
     } catch (e) {
       console.log(e);

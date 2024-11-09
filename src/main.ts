@@ -12,6 +12,10 @@ import '@mdi/font/css/materialdesignicons.css'
 import VueApexCharts from 'vue3-apexcharts';
 import { useAuthStore } from './stores/auth';
 
+// import fonts
+import '@/assets/fonts/THSarabunNew-normal.js'
+import '@/assets/fonts/THSarabunNew-Bold-normal.js'
+
 const app = createApp(App)
 const vuetify = createVuetify({
     icons: {

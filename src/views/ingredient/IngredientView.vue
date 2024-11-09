@@ -4,9 +4,14 @@ import IngredientDialog from "@/views/ingredient/IngredientDialog.vue";
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { useRouter } from 'vue-router';
 import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable'
+
 import Swal from 'sweetalert2';
 import JsBarcode from 'jsbarcode';
-import SarabunFont from '@/assets/Sarabun/Sarabun-Medium.base64';
+// import SarabunFont from '@/assets/Sarabun/Sarabun-Medium.base64';
+// import '@/assets/Font/THSarabunNew-Bold-normal.js'
+import { reactive } from 'vue'
+
 const ingredientStore = useIngredientStore();
 const router = useRouter();
 
@@ -22,23 +27,31 @@ onMounted(async () => {
   await ingredientStore.getAllIngredients();
 });
 
-
+const pdfOption = reactive({
+  orientation: 'p' as const, // กำหนดให้เป็น literal type
+  format: 'a4' as const, // กำหนดให้เป็น literal type
+  unit: 'px' as const, // กำหนดให้เป็น literal type
+  lineHeight: 2,
+  putOnlyUsedFonts: true,
+})
 
 const exportIngredients = async () => {
   try {
     await ingredientStore.getAllIngredients();
 
     const doc = new jsPDF();
-    doc.addFileToVFS('Sarabun.ttf', SarabunFont);
-    doc.addFont('Sarabun.ttf', 'Sarabun', 'normal');
-    doc.setFont('Helvetica')
+    // doc.addFileToVFS("THSarabunNew-Bold-normal.ttf", SarabunFont);
+    // doc.addFont('THSarabunNew-Bold-normal.ttf', 'THSarabunNew-Bold', 'normal');
+    doc.setFont('THSarabunNew', 'normal');
+
+
     const lineHeight = 30;
     // await nextTick();
 
     const barcodeContainer = document.createElement('div');
     barcodeContainer.style.display = 'none';
     document.body.appendChild(barcodeContainer);
-    doc.text('สวัสดีครับ', 10, 10);
+    doc.text('รายการวัตถุดิบทั้งหมด', 10, 10);
 
     for (const ingredient of ingredientStore.ingredients) {
       const { ingredientName, ingredientBarcode } = ingredient;
@@ -108,6 +121,8 @@ watch(paginate, async (newValue, oldValue) => {
     await ingredientStore.getAllIngredients();
   }
 })
+
+
 </script>
 
 <template>

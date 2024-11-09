@@ -51,20 +51,21 @@ const createCateringEvent = () => {
     return;
   }
   const eventDate = new Date(cateringStore.cateringEvent.eventDate);
-  const today = new Date();
+const today = new Date();
 
-  const diffTime = eventDate.getTime() - today.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+// Calculate the difference in days between the event date and today
+const diffTime = eventDate.getTime() - today.getTime();
+const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-  if (diffDays < -2 || diffDays > 0) {
-    Swal.fire({
-      icon: "error",
-      title:
-        "วันที่จัดงานต้องไม่เกิน 2 วันที่ผ่านมา และไม่สามารถกำหนดล่วงหน้าได้",
-      showConfirmButton: false,
-      timer: 1500,
-    });
-    return;
+// Allow event dates within 2 days in the past and 2 days in the future
+if (diffDays < -2 || diffDays > 2) {
+  Swal.fire({
+    icon: "error",
+    title: "วันที่จัดงานต้องอยู่ในช่วง 2 วันที่ผ่านมา หรือ 2 วันถัดไป",
+    showConfirmButton: false,
+    timer: 1500,
+  });
+  return;
   }
 
   if (!cateringStore.cateringEvent.eventLocation) {
@@ -154,29 +155,29 @@ const createCateringEvent = () => {
       <v-card style="background-color: #f6d3bb" class="ma-3">
         <v-card-title>สรุปจัดเลี้ยงรับรอง</v-card-title>
         <v-card-text>
-          <p style="color: red">*** กรุณาตรวจสอบรายละเอียดของของคุณก่อนที่จะส่ง ***</p>
-          <p>
+          <p style="color: red; font-size: 17px;">*** กรุณาตรวจสอบรายละเอียดของของคุณก่อนที่จะส่ง ***</p>
+          <p style="font-size: 17px;">
             <strong>ชื่ออีเว้นท์:</strong>
             {{ cateringStore.cateringEvent.eventName }}
           </p>
-          <p>
+          <p style="font-size: 17px;">
             <strong>วันที่จัดอีเว้นท์:</strong>
             {{ cateringStore.cateringEvent.eventDate }}
           </p>
-          <p>
+          <p style="font-size: 17px;">
             <strong>สถานที่จัดอีเว้นท์:</strong>
             {{ cateringStore.cateringEvent.eventLocation }}
           </p>
-          <p>
+          <p style="font-size: 17px;">
             <strong>จำนวนคนที่เข้าร่วม:</strong>
             {{ cateringStore.cateringEvent.attendeeCount }} คน
           </p>
-          <p><strong>จำนวนเงินทั้งหมดที่ใช้ในงานจัดเลี้ยง:</strong> {{ totalBudget }} บาท</p>
+          <p style="font-size: 17px;"><strong>จำนวนเงินทั้งหมดที่ใช้ในงานจัดเลี้ยง:</strong> {{ totalBudget }} บาท</p>
           <div
             v-for="(meal, index) in cateringStore.cateringEvent.meals!"
             :key="index"
           >
-            <p>
+            <p style="font-size: 17px;">
               <strong>มื้ออาหารที่ {{ index + 1 }}:</strong> {{ meal.mealName }} เวลา :
               {{ meal.mealTime }}, งบประมาณต่อมื้อรวม:
               {{ meal.totalPrice }} บาท, รายการอาหาร:
@@ -193,6 +194,7 @@ const createCateringEvent = () => {
               <v-btn
                 class="custom-button button-full-width"
                 rounded
+                style="font-size: 17px;"
                 @click="createCateringEvent()"
               >
                 <v-icon left>mdi-plus</v-icon>

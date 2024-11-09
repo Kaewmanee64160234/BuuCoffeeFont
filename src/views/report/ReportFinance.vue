@@ -22,45 +22,49 @@ function reloadData() {
         <h3>Dashboard</h3>
       </v-card-title>
       <v-card-text>
-        <v-row>
-          <v-col cols="12" md="4" class="my-1">
+        <v-row class="d-flex justify-center">
+          <v-col cols="12" md="3" class="my-1">
             <v-btn
               color="success"
               class="button-full-width"
               block
+              style="font-size: 16px;"
               @click="showComponent('finance')"
             >
               <v-icon left size="30">mdi-store</v-icon>
               รายงานยอดขาย
             </v-btn>
           </v-col>
-          <v-col cols="12" md="4" class="my-1">
+          <v-col cols="12" md="3" class="my-1">
             <v-btn
               color="success"
               class="button-full-width"
               block
+              style="font-size: 16px;"
               @click="showComponent('ingredient')"
             >
               <v-icon left size="25">mdi-cart-arrow-down</v-icon>
               รายงานวัตถุดิบ
             </v-btn>
           </v-col>
-          <v-col cols="12" md="4" class="my-1">
+          <v-col cols="12" md="3" class="my-1">
             <v-btn
               color="success"
               class="button-full-width"
               block
+              style="font-size: 16px;"
               @click="showComponent('product')"
             >
               <v-icon left size="25">mdi-cart-percent</v-icon>
               รายงานสินค้า และ โปรโมชั่น
             </v-btn>
           </v-col>
-          <v-col cols="12" md="4" class="my-1">
+          <v-col cols="12" md="3" class="my-1">
             <v-btn
               color="success"
               class="button-full-width"
               block
+              style="font-size: 16px;"
               @click="showComponent('typefinance')"
             >
               <v-icon left size="25">mdi-cart-percent</v-icon>
