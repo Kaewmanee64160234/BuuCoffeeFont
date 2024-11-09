@@ -302,7 +302,26 @@ const categoryStore = useCategoryStore();
 
 const productTypes = reactive({ hot: false, cold: false, blend: false });
 const productTypesPrice = reactive({ hot: 0, cold: 0, blend: 0 });
+const units = [
+  "กล่อง",
+  "แพ็ค",
+  "ถุง",
 
+];
+const subunits = [
+  "กระปุก",
+  "กระป๋อง",
+  "แก้ว",
+  "ขวด",
+  "ชิ้น",
+  "โหล",
+  "ถาด",
+  "ถ้วย",
+  "จาน",
+  "ชาม",
+  "ซอง",
+  "ถุง",
+];
 const handleProductTypeChange = (type: string, isChecked: boolean) => {
   if (!isChecked) {
     if (type === "ร้อน") productTypesPrice.hot = 0;

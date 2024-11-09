@@ -21,6 +21,7 @@ function createProduct(product: any & { file: File }) {
   formData.append("storeType", product.storeType);
   formData.append("countingPoint", product.countingPoint?.toString() || "");
   formData.append("haveTopping", product.haveTopping.toString());
+  formData.append("needLinkIngredient", product.needLinkIngredient.toString());
 
   // Append product image file if it exists
   if (product.file) {
@@ -57,13 +58,22 @@ function createProduct(product: any & { file: File }) {
     );
   }
   if (product.haveTopping === false && product.needLinkIngredient === true) {
-    Object.keys(product.ingredient).forEach((key) => {
-      if (key === "file" && product.ingredient[key]) {
-        formData.append(`ingredient[${key}]`, product.ingredient[key]); // Assumes `file` is an actual File object
-      } else {
-        formData.append(`ingredient[${key}]`, product.ingredient[key]);
-      }
-    });
+    formData.append("ingredient[ingredientName]", product.ingredient.ingredientName || "");
+  formData.append("ingredient[ingredientSupplier]", product.ingredient.ingredientSupplier || "");
+  formData.append("ingredient[ingredientMinimun]", `${product.ingredient.ingredientMinimun}`);
+  formData.append("ingredient[ingredientUnit]", product.ingredient.ingredientUnit || "");
+  formData.append(
+    "ingredient[ingredientQuantityPerUnit]",
+    `${product.ingredient.ingredientQuantityPerUnit || 0}`
+  );
+  formData.append(
+    "ingredient[ingredientQuantityPerSubUnit]",
+    product.ingredient.ingredientQuantityPerSubUnit || ""
+  );
+  formData.append("ingredient[ingredientBarcode]", product.ingredient.ingredientBarcode || "");
+  formData.append("ingredient[ingredientVolumeUnit]", product.ingredient.ingredientVolumeUnit || "");
+
+
   }
   // Log FormData for debugging (optional)
   for (const pair of formData.entries()) {
