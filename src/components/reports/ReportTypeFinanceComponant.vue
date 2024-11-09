@@ -1,78 +1,81 @@
 
 <template>
   <div>
-    <h2>Receipt Reports</h2>
-    <button @click="exportToExcel">Export to Excel</button>
-    <table>
-      <thead>
-        <tr>
-          <th>Opened Date</th>
-          <th>Closed Date</th>
-          <th>Opened By</th>
-          <th>Closed By</th>
-          <th>Cash Total</th>
-          <th>QR Code Total</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(report, index) in reportStore.receipts" :key="index">
-          <td>{{ report.openedDate }}</td>
-          <td>{{ report.closedDate }}</td>
-          <td>{{ report.openedBy }}</td>
-          <td>{{ report.closedBy }}</td>
-          <td>{{ report.cashTotal }}</td>
-          <td>{{ report.qrcodeTotal }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <!-- หัวข้อหลัก: รายงานยอดขาย -->
+    <h2>รายงานยอดขาย</h2>
+    <button
+      class="ma-2"
+      style="
+        background-color: #9EDF9C;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      "
+      @click="exportToExcel"
+    >
+      Export to Excel
+    </button>
 
-    <h3>Cash Receipt Details</h3>
-    <div v-for="(report, index) in reportStore.receipts" :key="'cash-' + index">
-      <h4>Cashier ID: {{ report.cashierId }}</h4>
-      <table>
-        <thead>
-          <tr>
-            <th>Sale Time</th>
-            <th>Total Price</th>
-            <th>Net Price</th>
-            <th>Change</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(receipt, i) in report.cash" :key="'cash-receipt-' + i">
-            <td>{{ receipt.saleTime }}</td>
-            <td>{{ receipt.totalPrice }}</td>
-            <td>{{ receipt.netPrice }}</td>
-            <td>{{ receipt.change }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <h3>QR Code Receipt Details</h3>
-    <div v-for="(report, index) in reportStore.receipts" :key="'qrcode-' + index">
-      <h4>Cashier ID: {{ report.cashierId }}</h4>
-      <table>
-        <thead>
-          <tr>
-            <th>Sale Time</th>
-            <th>Total Price</th>
-            <th>Net Price</th>
-            <th>Change</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(receipt, i) in report.qrcode" :key="'qrcode-receipt-' + i">
-            <td>{{ receipt.saleTime }}</td>
-            <td>{{ receipt.totalPrice }}</td>
-            <td>{{ receipt.netPrice }}</td>
-            <td>{{ receipt.change }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <!-- รายละเอียดใบเสร็จ -->
+    <section>
+      <h3 style="font-size: 20px;" class="mb-1">สรุปรายการใบเสร็จ</h3>
+      <div class="no-data-message" v-if="reportStore.receipts.length === 0" style="color: red;">
+        ยังไม่มีข้อมูล
+      </div>
+      <div v-for="(report, index) in reportStore.receipts" :key="index" class="receipt-summary">
+        <p style="font-size: 16px;"><strong>วันที่เปิดการขาย:</strong> {{ report.openedDate }}</p>
+        <p style="font-size: 16px;"><strong>วันที่ปิดการขาย:</strong> {{ report.closedDate }}</p>
+        <p style="font-size: 16px;"><strong>พนักงานที่เปิดการขาย:</strong> {{ report.openedBy }}</p>
+        <p style="font-size: 16px;"><strong>พนักงานที่เปิดการขาย:</strong> {{ report.closedBy }}</p>
+        <p style="font-size: 16px;"><strong>ยอดรวมเงินสดที่ได้รับ:</strong> {{ report.cashTotal }}</p>
+        <p style="font-size: 16px;"><strong>ยอดรวมเงินโอนที่ได้รับ:</strong> {{ report.qrcodeTotal }}</p>
+      </div>
+      <p>-----------------------------</p>
+    </section>
+  
+    <!-- รายละเอียดใบเสร็จเงินสด -->
+    <section>
+      <h3 style="font-size: 20px;" class="mb-1">รายละเอียดใบเสร็จที่ชำระด้วยเงินสด</h3>
+      
+      <div v-for="(report, index) in reportStore.receipts" :key="'cash-' + index" class="cash-receipt-details">
+        <h4 style="font-size: 16px;">รหัสพนักงาน: {{ report.cashierId }}</h4>
+        <div class="no-data-message" v-if="reportStore.receipts.every(report => report.cash.length === 0)" style="color: red;">
+          ยังไม่มีข้อมูล
+        </div>
+        <div v-for="(receipt, i) in report.cash" :key="'cash-receipt-' + i">
+          <p style="font-size: 16px;"><strong>เวลาที่ขาย:</strong> {{ receipt.saleTime }}</p>
+          <p style="font-size: 16px;"><strong>จำนวนเงิน:</strong> {{ receipt.totalPrice }}</p>
+          <p style="font-size: 16px;"><strong>ราคาสุทธิ:</strong> {{ receipt.netPrice }}</p>
+          <p style="font-size: 16px;"><strong>เงินทอน:</strong> {{ receipt.change }}</p>
+        </div>
+      </div>
+      <p>-----------------------------</p>
+    </section>
+  
+    <!-- รายละเอียดใบเสร็จ QR Code -->
+    <section>
+      <h3 style="font-size: 20px;" class="mb-1">รายละเอียดใบเสร็จที่ชำระด้วยการแสกน QR Code</h3>
+      
+      <div v-for="(report, index) in reportStore.receipts" :key="'qrcode-' + index" class="qrcode-receipt-details">
+        <h4 style="font-size: 16px;">รหัสพนักงาน: {{ report.cashierId }}</h4>
+        <div class="no-data-message" v-if="reportStore.receipts.every(report => report.qrcode.length === 0)" style="color: red;">
+          ยังไม่มีข้อมูล
+        </div>
+        <div v-for="(receipt, i) in report.qrcode" :key="'qrcode-receipt-' + i">
+          <p style="font-size: 16px;"><strong>เวลาที่ขาย:</strong> {{ receipt.saleTime }}</p>
+          <p style="font-size: 16px;"><strong>จำนวนเงิน:</strong> {{ receipt.totalPrice }}</p>
+          <p style="font-size: 16px;"><strong>ราคาสุทธิ:</strong> {{ receipt.netPrice }}</p>
+          <p style="font-size: 16px;"><strong>เงินทอน:</strong> {{ receipt.change }}</p>
+        </div>
+      </div>
+    </section>
   </div>
 </template>
+
 
   
   
@@ -139,3 +142,9 @@
 };
   </script>
   
+  <style scoped>
+  .no-data-message {
+  color: red;
+  font-size: 16px;
+}
+</style>
