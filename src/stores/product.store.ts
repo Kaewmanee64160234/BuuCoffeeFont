@@ -52,6 +52,7 @@ export const useProductStore = defineStore("product", () => {
     productImage: "",
     storeType: "",
     haveTopping: false,
+    needLinkIngredient: false,
 
     countingPoint: false,
     category: {
@@ -166,7 +167,8 @@ export const useProductStore = defineStore("product", () => {
 
   const createProduct = async (productdata:any) => {
     try {
-      console.log("productdata", productdata);
+      
+      console.log("productdata", JSON.stringify(productdata));
       
       const response = await productService.createProduct(productdata);
       if (response.status === 201) {

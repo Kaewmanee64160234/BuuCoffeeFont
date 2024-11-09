@@ -8,18 +8,18 @@ function getProductById(id: number) {
   return http.get(`/products/${id}`);
 }
 
-function createProduct(product: any& { file: File }) {
+function createProduct(product: any & { file: File }) {
   console.log(product.file);
-  
+
   const formData = new FormData();
 
   // Append simple fields
   formData.append("productName", product.productName);
   formData.append("productPrice", product.productPrice.toString());
   formData.append("categoryId", product.categoryId);
-  formData.append("barcode", product.barcode || '');
+  formData.append("barcode", product.barcode || "");
   formData.append("storeType", product.storeType);
-  formData.append("countingPoint", product.countingPoint?.toString() || '');
+  formData.append("countingPoint", product.countingPoint?.toString() || "");
   formData.append("haveTopping", product.haveTopping.toString());
 
   // Append product image file if it exists
@@ -29,23 +29,45 @@ function createProduct(product: any& { file: File }) {
 
   // If product types exist, map them and append to FormData
   if (product.productTypes!.length > 0) {
-    product.productTypes!.forEach((productType: { productTypeName: string | Blob; productTypePrice: { toString: () => string | Blob; }; }, index: any) => {
-      formData.append(`productTypes[${index}][productTypeName]`, productType.productTypeName);
-      formData.append(`productTypes[${index}][productTypePrice]`, productType.productTypePrice.toString());
+    product.productTypes!.forEach(
+      (
+        productType: {
+          productTypeName: string | Blob;
+          productTypePrice: { toString: () => string | Blob };
+        },
+        index: any
+      ) => {
+        formData.append(
+          `productTypes[${index}][productTypeName]`,
+          productType.productTypeName
+        );
+        formData.append(
+          `productTypes[${index}][productTypePrice]`,
+          productType.productTypePrice.toString()
+        );
 
-      // Handle recipes if available
-      // if (productType.recipes?.length) {
-      //   productType.recipes.forEach((recipe, recipeIndex) => {
-      //     formData.append(`productTypes[${index}][recipes][${recipeIndex}][ingredientId]`, recipe.ingredient.ingredientId.toString());
-      //     formData.append(`productTypes[${index}][recipes][${recipeIndex}][quantity]`, recipe.quantity.toString());
-      //   });
-      // }
+        // Handle recipes if available
+        // if (productType.recipes?.length) {
+        //   productType.recipes.forEach((recipe, recipeIndex) => {
+        //     formData.append(`productTypes[${index}][recipes][${recipeIndex}][ingredientId]`, recipe.ingredient.ingredientId.toString());
+        //     formData.append(`productTypes[${index}][recipes][${recipeIndex}][quantity]`, recipe.quantity.toString());
+        //   });
+        // }
+      }
+    );
+  }
+  if (product.haveTopping === false && product.needLinkIngredient === true) {
+    Object.keys(product.ingredient).forEach((key) => {
+      if (key === "file" && product.ingredient[key]) {
+        formData.append(`ingredient[${key}]`, product.ingredient[key]); // Assumes `file` is an actual File object
+      } else {
+        formData.append(`ingredient[${key}]`, product.ingredient[key]);
+      }
     });
   }
-
   // Log FormData for debugging (optional)
   for (const pair of formData.entries()) {
-    console.log(pair[0] + ': ' + pair[1]);
+    console.log(pair[0] + ": " + pair[1]);
   }
 
   // Send the form data using an HTTP POST request
@@ -56,42 +78,45 @@ function createProduct(product: any& { file: File }) {
   });
 }
 
-function updateProduct(id: number, product: Product&{file:File}) {
+function updateProduct(id: number, product: Product & { file: File }) {
   const formData = new FormData();
   console.log("File:", product.file);
 
   // Append simple fields to formData
-  formData.append('productName', product.productName);
-  formData.append('productPrice', product.productPrice.toString());
-  formData.append('barcode', product.barcode || '');
-  formData.append('storeType', product.storeType);
-  formData.append('countingPoint', product.countingPoint ? 'true' : 'false');
-  formData.append('haveTopping', product.haveTopping ? 'true' : 'false');
-  formData.append('categoryId', product.category.categoryId.toString());
-  
+  formData.append("productName", product.productName);
+  formData.append("productPrice", product.productPrice.toString());
+  formData.append("barcode", product.barcode || "");
+  formData.append("storeType", product.storeType);
+  formData.append("countingPoint", product.countingPoint ? "true" : "false");
+  formData.append("haveTopping", product.haveTopping ? "true" : "false");
+  formData.append("categoryId", product.category.categoryId.toString());
 
   // Append product types if they exist
   if (product.productTypes && product.productTypes.length > 0) {
     product.productTypes.forEach((productType, index) => {
-      formData.append(`productTypes[${index}][productTypeName]`, productType.productTypeName);
-      formData.append(`productTypes[${index}][productTypePrice]`, productType.productTypePrice.toString());
+      formData.append(
+        `productTypes[${index}][productTypeName]`,
+        productType.productTypeName
+      );
+      formData.append(
+        `productTypes[${index}][productTypePrice]`,
+        productType.productTypePrice.toString()
+      );
     });
   }
 
   // // Append product image if it exists
   if (product.file) {
-    
-    formData.append('imageFile', product.file, product.file.name);
+    formData.append("imageFile", product.file, product.file.name);
   }
 
   // Send the form data using PATCH request
   return http.patch(`/products/${id}`, formData, {
     headers: {
-      'Content-Type': 'multipart/form-data',
+      "Content-Type": "multipart/form-data",
     },
   });
 }
-
 
 function deleteProduct(id: number) {
   return http.delete(`/products/${id}`);
@@ -133,15 +158,14 @@ function getProductByStoreType(storeType: string) {
 }
 
 //  getProductPaginate by add query page and size
-function getProductPaginate(page: number, size: number,search : string) {
-    return http.get(`/products/paginate`, {
-      params: {
-        page,
-        limit: size,
-        search
-      }
-    });
-  
+function getProductPaginate(page: number, size: number, search: string) {
+  return http.get(`/products/paginate`, {
+    params: {
+      page,
+      limit: size,
+      search,
+    },
+  });
 }
 
 export default {
@@ -155,5 +179,5 @@ export default {
   getImageProduct,
   updateImageProduct,
   getProductPaginate,
-  getProductByStoreType
+  getProductByStoreType,
 };

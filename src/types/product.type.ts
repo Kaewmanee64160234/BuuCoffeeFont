@@ -16,6 +16,7 @@ export interface Product {
   productTypes?: ProductType[];
   sweetnessLevel?: number;
   productTypeToppings?: ProductTypeTopping[];
+  needLinkIngredient: boolean;
   quantity?: number;
   ingredient?: Ingredient;
 }

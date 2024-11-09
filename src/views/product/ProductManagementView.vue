@@ -8,6 +8,7 @@ import { useIngredientStore } from '@/stores/Ingredient.store';
 import type { Product } from '@/types/product.type';
 import Swal from 'sweetalert2';
 import type { IngredientQuantities } from '@/types/productType.type';
+import ProductDialog from '@/components/products/ProductDialog.vue';
 
 const productStore = useProductStore();
 const categoryStore = useCategoryStore();
@@ -130,7 +131,7 @@ const deleteProduct = async (productId: number) => {
 </script>
 
 <template>
-  <CreateProductDialog />
+  <ProductDialog />
   <UpdateProductDialog />
   <v-container>
     <v-card>

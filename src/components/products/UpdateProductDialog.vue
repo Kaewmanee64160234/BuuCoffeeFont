@@ -157,7 +157,7 @@ const disabled = computed(() => {
             </v-col>
 
             <v-col cols="12" sm="6">
-              <v-select v-model="productStore.selectedCategoryForUpdate"
+              <v-select variant="solo" v-model="productStore.selectedCategoryForUpdate"
                 :items="categoryStore.categoriesForCreate.map(category => category.categoryName)" label="เลือกหมวดหมู่"
                 dense @change="checkCategory"></v-select>
             </v-col>
@@ -165,7 +165,7 @@ const disabled = computed(() => {
               <v-text-field variant="solo" v-model="productStore.editedProduct.barcode" label="บาร์โค้ด" />
             </v-col>
             <v-col cols="12" sm="5">
-              <v-select v-model="productStore.storeName" :items="storeNames" label="เลือกชื่อร้าน" dense />
+              <v-select variant="solo" v-model="productStore.storeName" :items="storeNames" label="เลือกชื่อร้าน" dense />
             </v-col>
             <v-col cols="12" sm="2">
               <v-checkbox v-model="productStore.countingPoint" label="นับแต้ม" />
