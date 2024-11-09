@@ -1,43 +1,41 @@
 <script lang="ts" setup>
-import { ref, computed, watch, onMounted } from 'vue';
-import { usePosStore } from '@/stores/pos.store';
-import { useCustomerStore } from '@/stores/customer.store';
-import Swal from 'sweetalert2';
-import AddCustomerDialog from '../customer/AddCustomerDialog.vue';
-import type { Receipt, ReceiptItem } from '../../types/receipt.type';
-import type { Promotion } from '../../types/promotion.type';
-import { useUserStore } from '@/stores/user.store';
-import { useReceiptStore } from '@/stores/receipt.store';
-import ReceiptDetailsDialogPos from '../receipts/ReceiptDialogPos.vue';
-import DrinkSelectionDialog from './DrinkSelectionDialog.vue';
+import { ref, computed, watch, onMounted } from "vue";
+import { usePosStore } from "@/stores/pos.store";
+import { useCustomerStore } from "@/stores/customer.store";
+import Swal from "sweetalert2";
+import AddCustomerDialog from "../customer/AddCustomerDialog.vue";
+import type { Receipt, ReceiptItem } from "../../types/receipt.type";
+import type { Promotion } from "../../types/promotion.type";
+import { useUserStore } from "@/stores/user.store";
+import { useReceiptStore } from "@/stores/receipt.store";
+import ReceiptDetailsDialogPos from "../receipts/ReceiptDialogPos.vue";
+import DrinkSelectionDialog from "./DrinkSelectionDialog.vue";
 
 const step = ref(1);
 const posStore = usePosStore();
 const customerStore = useCustomerStore();
 const userStore = useUserStore();
 const selectedItems = computed(() => posStore.selectedItems);
-const selectedCustomer = ref('');
+const selectedCustomer = ref("");
 const receiptStore = useReceiptStore();
-const url = import.meta.env.VITE_URL_PORT
-
-
+const url = import.meta.env.VITE_URL_PORT;
 
 onMounted(async () => {
-  await receiptStore.getRecieptIn30Min('ร้านกาแฟ');
+  await receiptStore.getRecieptIn30Min("ร้านกาแฟ");
   await loadQueueListFromLocalStorage();
   const currentDate = new Date().toLocaleDateString(); // Get current date as a string
-  posStore.receipt.paymentMethod = 'cash';
+  posStore.receipt.paymentMethod = "cash";
   // Check if the queue number needs to be reset for a new day
-  const lastResetDate = localStorage.getItem('lastResetDate');
-  console.log('Last reset date:', lastResetDate);
-  console.log('Current date:', currentDate);
+  const lastResetDate = localStorage.getItem("lastResetDate");
+  console.log("Last reset date:", lastResetDate);
+  console.log("Current date:", currentDate);
 
   if (lastResetDate === currentDate) {
     if (posStore.queueReceipt.length > 0) {
-      posStore.queueNumber = posStore.queueReceipt[posStore.queueReceipt.length - 1].queueNumber + 1;
-    }
-    else {
-      const auateData = localStorage.getItem('queueData');
+      posStore.queueNumber =
+        posStore.queueReceipt[posStore.queueReceipt.length - 1].queueNumber + 1;
+    } else {
+      const auateData = localStorage.getItem("queueData");
       if (auateData) {
         posStore.queueNumber = JSON.parse(auateData).number + 1;
       } else {
@@ -47,36 +45,34 @@ onMounted(async () => {
   } else {
     posStore.queueNumber = 1;
     // set new lastResetDate
-    localStorage.setItem('lastResetDate', currentDate);
+    localStorage.setItem("lastResetDate", currentDate);
   }
-
-
 });
 
 function nextStep() {
   if (selectedItems.value.length === 0) {
     Swal.fire({
-      icon: 'error',
-      title: 'ข้อมูลไม่สมบูรณ์',
-      text: 'กรุณาเพิ่มรายการอย่างน้อยหนึ่งรายการในใบเสร็จ',
+      icon: "error",
+      title: "ข้อมูลไม่สมบูรณ์",
+      text: "กรุณาเพิ่มรายการอย่างน้อยหนึ่งรายการในใบเสร็จ",
     });
     return;
   }
-  if (posStore.receipt.paymentMethod === '' && step.value === 2) {
+  if (posStore.receipt.paymentMethod === "" && step.value === 2) {
     Swal.fire({
-      icon: 'error',
-      title: 'ข้อมูลไม่สมบูรณ์',
-      text: 'กรุณาเลือกวิธีการชำระเงิน',
+      icon: "error",
+      title: "ข้อมูลไม่สมบูรณ์",
+      text: "กรุณาเลือกวิธีการชำระเงิน",
     });
     return;
   }
   step.value++;
-  console.log('Next Step:', step.value);
+  console.log("Next Step:", step.value);
 }
 
 function prevStep() {
   step.value--;
-  console.log('Previous Step:', step.value);
+  console.log("Previous Step:", step.value);
 }
 
 function removeItem(index: number) {
@@ -84,8 +80,9 @@ function removeItem(index: number) {
 }
 
 function calculateChange() {
-  if (posStore.receipt.paymentMethod === 'cash') {
-    posStore.receipt.change = posStore.receipt.receive - posStore.receipt.receiptNetPrice;
+  if (posStore.receipt.paymentMethod === "cash") {
+    posStore.receipt.change =
+      posStore.receipt.receive - posStore.receipt.receiptNetPrice;
   }
 }
 
@@ -97,24 +94,39 @@ function openReceiptDialog() {
 function selectPaymentMethod(method: string) {
   console.log(`Selected payment method: ${method}`);
   posStore.receipt.paymentMethod = method;
-  if (method === 'cash') {
+  if (method === "cash") {
     calculateChange();
   } else {
     posStore.receipt.change = 0;
   }
 }
 
-watch(() => posStore.receipt.receive, () => {
-  calculateChange();
-});
+watch(
+  () => posStore.receipt.receive,
+  () => {
+    calculateChange();
+  }
+);
 
 function increaseQuantity(item: ReceiptItem) {
   // console.log('increase quantity', item);
   if (item.product?.haveTopping) {
     if (item.productTypeToppings.length > 0) {
-      posStore.addToReceipt(item.product, item.productType, item.productTypeToppings, 1, item.sweetnessLevel);
+      posStore.addToReceipt(
+        item.product,
+        item.productType,
+        item.productTypeToppings,
+        1,
+        item.sweetnessLevel
+      );
     } else {
-      posStore.addToReceipt(item.product, item.productType, [], 1, item.sweetnessLevel);
+      posStore.addToReceipt(
+        item.product,
+        item.productType,
+        [],
+        1,
+        item.sweetnessLevel
+      );
     }
   } else {
     posStore.addToReceipt(item.product, {}, [], 1, null);
@@ -133,32 +145,39 @@ function decreaseQuantity(index: number) {
 async function save() {
   if (selectedItems.value.length === 0) {
     Swal.fire({
-      icon: 'error',
-      title: 'ข้อมูลไม่สมบูรณ์',
-      text: 'กรุณาเพิ่มรายการอย่างน้อยหนึ่งรายการในใบเสร็จ',
+      icon: "error",
+      title: "ข้อมูลไม่สมบูรณ์",
+      text: "กรุณาเพิ่มรายการอย่างน้อยหนึ่งรายการในใบเสร็จ",
     });
     return;
   }
-  if (posStore.receipt.paymentMethod === '') {
+  if (posStore.receipt.paymentMethod === "") {
     Swal.fire({
-      icon: 'error',
-      title: 'ข้อมูลไม่สมบูรณ์',
-      text: 'กรุณาเลือกวิธีการชำระเงิน',
+      icon: "error",
+      title: "ข้อมูลไม่สมบูรณ์",
+      text: "กรุณาเลือกวิธีการชำระเงิน",
     });
     return;
   }
-  if (posStore.receipt.paymentMethod === 'cash' && posStore.receipt.receive < posStore.receipt.receiptNetPrice) {
+  if (
+    posStore.receipt.paymentMethod === "cash" &&
+    posStore.receipt.receive < posStore.receipt.receiptNetPrice
+  ) {
     Swal.fire({
-      icon: 'error',
-      title: 'ข้อมูลไม่สมบูรณ์',
-      text: 'กรุณาป้อนจำนวนเงินสดที่ได้รับที่ถูกต้อง',
+      icon: "error",
+      title: "ข้อมูลไม่สมบูรณ์",
+      text: "กรุณาป้อนจำนวนเงินสดที่ได้รับที่ถูกต้อง",
     });
     return;
   }
   if (posStore.receipt.receiptId) {
-    posStore.updateReceipt(posStore.receipt.receiptId, posStore.receipt,'ร้านกาแฟ');
+    posStore.updateReceipt(
+      posStore.receipt.receiptId,
+      posStore.receipt,
+      "ร้านกาแฟ"
+    );
   } else {
-    posStore.createReceipt('ร้านกาแฟ');
+    posStore.createReceipt("ร้านกาแฟ");
   }
 
   // Save the current state of the queue after updating/creating the receipt
@@ -171,19 +190,18 @@ async function save() {
   posStore.receipt.receive = 0;
   posStore.receipt.change = 0;
   step.value = 1;
-  posStore.receipt.paymentMethod = '';
+  posStore.receipt.paymentMethod = "";
   posStore.receipt.customer = null;
-  posStore.receipt.receiptStatus = 'รอชำระเงิน';
-  selectedCustomer.value = '';
- await receiptStore.getRecieptIn30Min('ร้านกาแฟ');
-
+  posStore.receipt.receiptStatus = "รอชำระเงิน";
+  selectedCustomer.value = "";
+  await receiptStore.getRecieptIn30Min("ร้านกาแฟ");
 }
 
 function openCreateCustomerDialog() {
   customerStore.openDialogRegisterCustomer = true;
 }
 const loadQueueListFromLocalStorage = () => {
-  const storedQueueList = localStorage.getItem('queueReceipt');
+  const storedQueueList = localStorage.getItem("queueReceipt");
   console.log(storedQueueList);
 
   if (storedQueueList) {
@@ -201,11 +219,11 @@ function cancelReceipt() {
     receiptNetPrice: 0,
     receiptPromotions: [],
     receiptItems: [],
-    receiptStatus: 'รอชำระเงิน',
-    paymentMethod: '',
+    receiptStatus: "รอชำระเงิน",
+    paymentMethod: "",
     createdDate: new Date(),
     queueNumber: posStore.queueNumber,
-    receiptType: '',
+    receiptType: "",
     updatedDate: new Date(),
   };
 
@@ -214,7 +232,7 @@ function cancelReceipt() {
   posStore.receipt.receive = 0;
   posStore.receipt.change = 0;
   step.value = 1;
-  posStore.receipt.paymentMethod = '';
+  posStore.receipt.paymentMethod = "";
 }
 
 function removePromotion(promotion: Promotion) {
@@ -224,44 +242,46 @@ function removePromotion(promotion: Promotion) {
 function openProductCardDialog(item: ReceiptItem) {
   if (item.product?.haveTopping) {
     posStore.selectedItemForEdit = item;
-    console.log('Selected Product:', posStore.selectedItemForEdit);
+    console.log("Selected Product:", posStore.selectedItemForEdit);
     posStore.toppingDialog = true;
   } else {
-    console.error("This product does not have toppings or product is undefined");
+    console.error(
+      "This product does not have toppings or product is undefined"
+    );
   }
 }
 
-
-
-
-
-
-watch(() => selectedCustomer.value, () => {
-  if (selectedCustomer.value === '' || selectedCustomer.value === null) {
-    posStore.receipt.customer = null;
-    return;
+watch(
+  () => selectedCustomer.value,
+  () => {
+    if (selectedCustomer.value === "" || selectedCustomer.value === null) {
+      posStore.receipt.customer = null;
+      return;
+    }
+    findCustomer();
   }
-  findCustomer();
-});
+);
 
 function findCustomer() {
-  console.log('Selected customer:', selectedCustomer.value);
-  const customer = customerStore.customers.find(c => c.customerPhone === selectedCustomer.value);
-  console.log('Customer found:', customer);
+  console.log("Selected customer:", selectedCustomer.value);
+  const customer = customerStore.customers.find(
+    (c) => c.customerPhone === selectedCustomer.value
+  );
+  console.log("Customer found:", customer);
 
   if (customer) {
     posStore.receipt.customer = customer;
   } else {
     Swal.fire({
-      icon: 'error',
-      title: 'ไม่พบลูกค้า',
-      text: 'ไม่พบลูกค้าที่มีหมายเลขโทรศัพท์นี้',
+      icon: "error",
+      title: "ไม่พบลูกค้า",
+      text: "ไม่พบลูกค้าที่มีหมายเลขโทรศัพท์นี้",
     });
   }
 }
 
 const selectReceipt = (receipt: Receipt) => {
-  receipt.receiptItems = receipt.receiptItems.map(item => ({
+  receipt.receiptItems = receipt.receiptItems.map((item) => ({
     ...item,
     quantity: parseInt(item.quantity.toString(), 10),
   }));
@@ -270,21 +290,19 @@ const selectReceipt = (receipt: Receipt) => {
   posStore.selectedItems = receipt.receiptItems;
   posStore.ReceiptDialogPos = false;
 
-  console.log('Selected Receipt:', receipt);
+  console.log("Selected Receipt:", receipt);
 };
 
 // closeSale
-const closeSale = () =>{
-  console.log('closeSale');
-  
-}
+const closeSale = () => {
+  console.log("closeSale");
+};
 </script>
-
 
 <template>
   <ReceiptDetailsDialogPos />
   <DrinkSelectionDialog />
-  <div >
+  <div>
     <AddCustomerDialog />
 
     <v-window v-model="step" transition="fade" class="h-screen">
@@ -295,38 +313,59 @@ const closeSale = () =>{
             <div class="header-info">
               <h3 class="order-title">รายละเอียดการสั่งซื้อ</h3>
               <h3 class="queue-number">#{{ posStore.queueNumber }}</h3>
-              <v-btn 
-      color="blue-grey-lighten-3" 
-     
-      @click="closeSale"
-    >
-      ปิดการขาย
-    </v-btn>
+              <v-btn color="blue-grey-lighten-3" @click="closeSale">
+                ปิดการขาย
+              </v-btn>
             </div>
             <v-divider class="divider" />
 
             <!-- Customer Info -->
-            <div class="customer-info pa-2" style="width: 96%;">
+            <div class="customer-info pa-2" style="width: 96%">
               <p class="customer-detail">
                 <span>สมาชิก</span>
-                <span class="info-value">{{ posStore.receipt.customer?.customerName ?? 'ไม่มี' }}</span>
+                <span class="info-value">{{
+                  posStore.receipt.customer?.customerName ?? "ไม่มี"
+                }}</span>
               </p>
               <p class="customer-detail mr-4">
                 <span>แต้มสะสม</span>
-                <span class="info-value">{{ posStore.receipt.customer?.customerNumberOfStamp ?? 0 }} Point</span>
+                <span class="info-value"
+                  >{{
+                    posStore.receipt.customer?.customerNumberOfStamp ?? 0
+                  }}
+                  Point</span
+                >
               </p>
             </div>
 
             <!-- Customer Actions -->
             <v-row class="customer-actions">
               <v-col cols="12" md="6">
-                <v-autocomplete v-model="selectedCustomer" :items="customerStore.customers.map(c => c.customerPhone)"
-                  item-text="phone" item-value="phone" label="เบอร์โทรลูกค้า" variant="solo" dense
-                  class="customer-phone-input" append-inner-icon="mdi-magnify" />
+                <v-autocomplete
+                  v-model="selectedCustomer"
+                  :items="customerStore.customers.map((c) => c.customerPhone)"
+                  item-text="phone"
+                  item-value="phone"
+                  label="เบอร์โทรลูกค้า"
+                  variant="solo"
+                  dense
+                  class="customer-phone-input"
+                  append-inner-icon="mdi-magnify"
+                />
               </v-col>
               <v-col cols="12" md="3" class="actions-end mr-8">
-                <v-btn class="add-customer-btn" style="width: 40px; height: 40px;" icon="mdi-account-plus" @click="openCreateCustomerDialog()" />
-                <v-btn class="history-btn" style="width: 150px; height: 40px;" @click="openReceiptDialog()">ประวัติการสั่งซื้อ</v-btn>
+                <v-btn
+                  class="add-customer-btn"
+                  style="width: 40px; height: 40px"
+                  icon="mdi-account-plus"
+                  @click="openCreateCustomerDialog()"
+                />
+                <v-btn
+                  class="history-btn"
+                  style="width: 150px; height: 40px"
+                  @click="openReceiptDialog()"
+                  >ประวัติการสั่งซื้อ</v-btn
+                >
               </v-col>
             </v-row>
 
@@ -337,8 +376,10 @@ const closeSale = () =>{
                 <v-col cols="12" md="6">
                   <h3 class="order-summary-title">สรุปรายการ</h3>
                 </v-col>
-                <v-col cols="12" md="6" class="text-end" >
-                  <p @click="cancelReceipt()" class="cancel-order">ยกเลิกรายการ</p>
+                <v-col cols="12" md="6" class="text-end">
+                  <p @click="cancelReceipt()" class="cancel-order">
+                    ยกเลิกรายการ
+                  </p>
                 </v-col>
               </v-row>
             </div>
@@ -353,38 +394,80 @@ const closeSale = () =>{
             <div class="selected-items-list">
               <v-list>
                 <v-list-item-group>
-                  <div v-for="(item, index) in selectedItems" :key="index" class="selected-item">
-                    <v-list-item @click="openProductCardDialog(item)" :prepend-avatar="`${url}/products/${item.product?.productId}/image`">
+                  <div
+                    v-for="(item, index) in selectedItems"
+                    :key="index"
+                    class="selected-item"
+                  >
+                    <v-list-item
+                      @click="openProductCardDialog(item)"
+                      :prepend-avatar="`${url}/products/${item.product?.productId}/image`"
+                    >
                       <v-row no-gutters>
-                        <v-col cols="6" class="product-name">{{ item.product?.productName }}</v-col>
+                        <v-col cols="6" class="product-name">{{
+                          item.product?.productName
+                        }}</v-col>
                         <v-col cols="6" class="text-right product-price">
                           <p>{{ item.receiptSubTotal }}</p>
                         </v-col>
                       </v-row>
                       <v-row no-gutters>
                         <v-col cols="7">
-                          <div v-if="item.product?.haveTopping" class="product-details">
-                            {{ item.productType?.productTypeName }} +{{ item.productType?.productTypePrice }} | ความหวาน {{ item.sweetnessLevel }}%
+                          <div
+                            v-if="item.product?.haveTopping"
+                            class="product-details"
+                          >
+                            {{ item.productType?.productTypeName }} +{{
+                              item.productType?.productTypePrice
+                            }}
+                            | ความหวาน {{ item.sweetnessLevel }}%
                           </div>
                           <div v-else class="product-details">
-                            {{ item.product?.productName }} ({{ item.product?.category.categoryName }}) {{ item.product?.productPrice }}.-
+                            {{ item.product?.productName }} ({{
+                              item.product?.category.categoryName
+                            }}) {{ item.product?.productPrice }}.-
                           </div>
-                          <ul v-if="item.productTypeToppings?.length" class="toppings-list">
-                            <li v-for="topping in item.productTypeToppings" :key="topping?.topping?.toppingId" class="topping-item">
-                              x{{ topping?.quantity }} {{ topping?.topping?.toppingName }}
-                              <span v-if="topping?.topping?.toppingName.length > 3">: {{ topping?.topping?.toppingPrice }}.-</span>
+                          <ul
+                            v-if="item.productTypeToppings?.length"
+                            class="toppings-list"
+                          >
+                            <li
+                              v-for="topping in item.productTypeToppings"
+                              :key="topping?.topping?.toppingId"
+                              class="topping-item"
+                            >
+                              x{{ topping?.quantity }}
+                              {{ topping?.topping?.toppingName }}
+                              <span
+                                v-if="topping?.topping?.toppingName.length > 3"
+                                >: {{ topping?.topping?.toppingPrice }}.-</span
+                              >
                             </li>
                           </ul>
                         </v-col>
                         <v-col cols="5" class="quantity-controls">
-                          <v-btn size="xs-small" color="#C5C5C5" icon @click.stop="decreaseQuantity(index)">
+                          <v-btn
+                            size="xs-small"
+                            color="#C5C5C5"
+                            icon
+                            @click.stop="decreaseQuantity(index)"
+                          >
                             <v-icon>mdi-minus</v-icon>
                           </v-btn>
                           <span class="quantity">{{ item.quantity }}</span>
-                          <v-btn size="xs-small" color="#FF9642" icon @click.stop="increaseQuantity(item)">
+                          <v-btn
+                            size="xs-small"
+                            color="#FF9642"
+                            icon
+                            @click.stop="increaseQuantity(item)"
+                          >
                             <v-icon>mdi-plus</v-icon>
                           </v-btn>
-                          <v-btn icon variant="text" @click.stop="removeItem(index)">
+                          <v-btn
+                            icon
+                            variant="text"
+                            @click.stop="removeItem(index)"
+                          >
                             <v-icon color="red">mdi-delete</v-icon>
                           </v-btn>
                         </v-col>
@@ -402,10 +485,21 @@ const closeSale = () =>{
               <v-card-subtitle class="mt-2">โปรโมชั่น:</v-card-subtitle>
               <div class="promotion-section mt-2">
                 <div class="promotion-list">
-                  <div v-for="promotion in posStore.receipt.receiptPromotions" :key="promotion.receiptPromotionId" class="promotion-item">
-                    <span class="promotion-name">{{ promotion.promotion.promotionName }}:</span>
+                  <div
+                    v-for="promotion in posStore.receipt.receiptPromotions"
+                    :key="promotion.receiptPromotionId"
+                    class="promotion-item"
+                  >
+                    <span class="promotion-name"
+                      >{{ promotion.promotion.promotionName }}:</span
+                    >
                     <span class="red--text">{{ promotion.discount }} $</span>
-                    <v-btn size="small" icon variant="text" @click="removePromotion(promotion.promotion)">
+                    <v-btn
+                      size="small"
+                      icon
+                      variant="text"
+                      @click="removePromotion(promotion.promotion)"
+                    >
                       <v-icon color="red">mdi-delete</v-icon>
                     </v-btn>
                   </div>
@@ -425,15 +519,17 @@ const closeSale = () =>{
 
           <div class="footer-buttons mt-10">
             <v-row class="d-flex justify-center">
-              <v-btn class="next-step-btn" rounded @click="nextStep">ชำระเงิน</v-btn>
+              <v-btn class="next-step-btn" rounded @click="nextStep"
+                >ชำระเงิน</v-btn
+              >
             </v-row>
           </div>
         </div>
       </v-window-item>
 
       <!-- Payment Method View -->
-         <!-- Payment Method View -->
-         <v-window-item :value="2" class="full-height">
+      <!-- Payment Method View -->
+      <v-window-item :value="2" class="full-height">
         <div class="content-container">
           <div class="title-detail">
             <div class="d-flex justify-space-between align-center header-info">
@@ -448,10 +544,22 @@ const closeSale = () =>{
             <h3 class="payment-title">เลือกวิธีชำระเงิน</h3>
             <v-row class="pa-3 justify-center">
               <div class="payment-buttons-container mt-4">
-                <v-btn :class="{ 'selected': posStore.receipt.paymentMethod === 'cash' }" class="payment-button" @click="selectPaymentMethod('cash')">
+                <v-btn
+                  :class="{
+                    selected: posStore.receipt.paymentMethod === 'cash',
+                  }"
+                  class="payment-button"
+                  @click="selectPaymentMethod('cash')"
+                >
                   เงินสด
                 </v-btn>
-                <v-btn :class="{ 'selected': posStore.receipt.paymentMethod === 'qrcode' }" class="payment-button" @click="selectPaymentMethod('qrcode')">
+                <v-btn
+                  :class="{
+                    selected: posStore.receipt.paymentMethod === 'qrcode',
+                  }"
+                  class="payment-button"
+                  @click="selectPaymentMethod('qrcode')"
+                >
                   แสกนจ่าย
                 </v-btn>
               </div>
@@ -465,21 +573,41 @@ const closeSale = () =>{
             <div class="ma-2">
               <p class="d-flex justify-space-between pr-6 my-2">
                 <span>ทั้งหมด:</span>
-                <span class="info-value">{{ posStore.receipt.receiptTotalPrice }}</span>
+                <span class="info-value">{{
+                  posStore.receipt.receiptTotalPrice
+                }}</span>
               </p>
 
               <div v-if="posStore.receipt.paymentMethod === 'cash'">
                 <p class="d-flex justify-space-between align-center pr-6 my-2">
-                  <span style="width: 50%;">รับมา:</span>
-                  <v-text-field v-model="posStore.receipt.receive" type="number" variant="solo" label="จำนวนเงิน" style="width: 50%;"></v-text-field>
+                  <span style="width: 50%">รับมา:</span>
+                  <v-text-field
+                    v-model="posStore.receipt.receive"
+                    type="number"
+                    variant="solo"
+                    label="จำนวนเงิน"
+                    style="width: 50%"
+                  ></v-text-field>
                 </p>
               </div>
 
               <!-- Change Amount -->
               <p class="d-flex justify-space-between pr-6 my-2">
                 <span>ทอน:</span>
-                <span :class="posStore.receipt.receive < 0 || posStore.receipt.receive < posStore.receipt.receiptNetPrice ? 'red--text' : 'black'" class="info-value">
-                  {{ parseFloat(posStore.receipt.change) < 0 ? 'จำนวนเงินไม่พอ' : posStore.receipt.change }}
+                <span
+                  :class="
+                    posStore.receipt.receive < 0 ||
+                    posStore.receipt.receive < posStore.receipt.receiptNetPrice
+                      ? 'red--text'
+                      : 'black'
+                  "
+                  class="info-value"
+                >
+                  {{
+                    parseFloat(posStore.receipt.change) < 0
+                      ? "จำนวนเงินไม่พอ"
+                      : posStore.receipt.change
+                  }}
                 </span>
               </p>
 
@@ -499,8 +627,12 @@ const closeSale = () =>{
 
           <div class="footer-buttons">
             <v-row class="d-flex justify-center pr-6">
-              <v-btn class="prev-step-btn mt-5" rounded @click="prevStep">ย้อนกลับ</v-btn>
-              <v-btn class="save-btn ml-3 mt-5" rounded @click="save">ยืนยันการชำระเงิน</v-btn>
+              <v-btn class="prev-step-btn mt-5" rounded @click="prevStep"
+                >ย้อนกลับ</v-btn
+              >
+              <v-btn class="save-btn ml-3 mt-5" rounded @click="save"
+                >ยืนยันการชำระเงิน</v-btn
+              >
             </v-row>
           </div>
         </div>
@@ -581,7 +713,7 @@ const closeSale = () =>{
 .add-customer-btn,
 .history-btn {
   color: #fff;
-  background-color: #FF9642;
+  background-color: #ff9642;
   border-radius: 8px;
 }
 
@@ -678,7 +810,7 @@ const closeSale = () =>{
 }
 
 .total-price {
-  color: #FF9642;
+  color: #ff9642;
   font-weight: bold;
   padding-right: 20px;
 }
@@ -693,7 +825,7 @@ const closeSale = () =>{
 
 .next-step-btn {
   width: 70%;
-  background-color: #FF9642;
+  background-color: #ff9642;
   color: white;
   transition: transform 0.2s ease-in-out, background-color 0.3s;
 }
@@ -805,7 +937,7 @@ const closeSale = () =>{
 }
 
 .total-price {
-  color: #FF9642;
+  color: #ff9642;
   font-weight: bold;
   padding-right: 65px;
 }
@@ -853,7 +985,7 @@ const closeSale = () =>{
 .prev-step-btn,
 .save-btn {
   width: 40%;
-  background-color: #FF9642;
+  background-color: #ff9642;
   color: white;
   transition: transform 0.2s ease-in-out;
 }
@@ -892,7 +1024,4 @@ const closeSale = () =>{
     margin-bottom: 10px;
   }
 }
-
-
 </style>
-

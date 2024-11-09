@@ -293,6 +293,10 @@ const selectReceipt = (receipt: Receipt) => {
 
   console.log("Selected Receipt:", receipt);
 };
+const closeSale = ()=>{
+  console.log("closeSale");
+  
+}
 </script>
 
 <template>
@@ -313,6 +317,13 @@ const selectReceipt = (receipt: Receipt) => {
             <div class="d-flex justify-space-between align-center header-info">
               <h3 class="order-title">รายละเอียดการสั่งซื้อ</h3>
               <h3 class="queue-number">#{{ posStore.queueNumber }}</h3>
+              <v-btn 
+      color="primary" 
+      class="ml-auto close-sale-btn" 
+      @click="closeSale"
+    >
+      ปิดการขาย
+    </v-btn>
             </div>
             <v-divider class="mb-4"></v-divider>
 
