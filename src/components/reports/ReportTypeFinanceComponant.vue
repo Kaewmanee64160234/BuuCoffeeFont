@@ -6,7 +6,6 @@
     <table>
       <thead>
         <tr>
-          <th>Cashier ID</th>
           <th>Opened Date</th>
           <th>Closed Date</th>
           <th>Opened By</th>
@@ -17,7 +16,6 @@
       </thead>
       <tbody>
         <tr v-for="(report, index) in reportStore.receipts" :key="index">
-          <td>{{ report.cashierId }}</td>
           <td>{{ report.openedDate }}</td>
           <td>{{ report.closedDate }}</td>
           <td>{{ report.openedBy }}</td>
@@ -83,7 +81,6 @@
   import { onMounted } from 'vue';
   import * as XLSX from 'xlsx';
   const reportStore = useReceiptReportStore();
-  
   onMounted(async () => {
 
       await reportStore.fetchReceipts(); 

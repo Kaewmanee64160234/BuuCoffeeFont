@@ -25,6 +25,7 @@
     "html2pdf.js": "^0.10.2",
     "jsbarcode": "^3.11.6",
     "jspdf": "^2.5.2",
+    "jspdf-autotable": "^3.8.4",
     "jwt-decode": "^4.0.0",
     "node-thermal-printer": "^4.4.2",
     "pdf-lib": "^1.17.1",
