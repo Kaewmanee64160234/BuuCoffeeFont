@@ -153,7 +153,6 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
                   <v-icon>mdi-delete</v-icon>
                 </v-btn>
               </v-col>
-              
             </v-row>
           </v-expansion-panel-header>
 
@@ -191,36 +190,23 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
                 ></v-text-field>
               </v-col>
             </v-row>
-            <v-card-title>
-              <v-row class="d-flex align-center">
-                <v-col cols="9">
-                  <h3>การเลี้ยงรับรอง - วัตถุดิบ</h3>
-                </v-col>
-                <v-col cols="3">
-                  <v-text-field
-                    label="ค้นหาวัตถุดิบ"
-                    append-inner-icon="mdi-magnify"
-                    dense
-                    class="mt-3"
-                    hide-details
-                    variant="solo"
-                    outlined
-                    v-model="searchQuery"
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-              <v-btn
-                color="accent"
-                @click="openDrinkSelectionDialog(indexMeals)"
-                >เพิ่มสินค้าจัดเลี้ยง</v-btn
-              >
-            </v-card-title>
 
+            <!-- Description Field at the top of the tabs section -->
+            <v-text-field
+              label="รายละเอียด"
+              v-model="meal.description"
+              dense
+              hide-details
+              variant="solo"
+              class="ma-4"
+            ></v-text-field>
+
+            <!-- Tabs Section -->
             <v-tabs
               v-model="selectedTab"
               align-tabs="start"
               color="brown"
-              background-colaor="#fff"
+              background-color="#fff"
               class="ma-4"
             >
               <v-tab value="coffee">วัตถุดิบร้านกาแฟ</v-tab>
@@ -228,7 +214,7 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
             </v-tabs>
 
             <v-row class="mt-4">
-              <!-- Updated to show products -->
+              <!-- Product Display -->
               <v-col cols="6">
                 <v-container>
                   <v-row>
@@ -266,9 +252,10 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
                 </v-container>
               </v-col>
 
+              <!-- Meal Products Table -->
               <v-col cols="6">
                 <v-card style="height: 400px; overflow-y: auto" class="ma-5">
-                  <v-table >
+                  <v-table>
                     <thead>
                       <tr>
                         <th class="text-center">ลำดับ</th>
@@ -289,12 +276,10 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
                         <td @click="toggleDetails(itemIndex)">
                           {{ item.product!.productName }}
                         </td>
-                        <!-- Clicking toggles details -->
                         <td>{{ item.type }}</td>
                         <td>{{ item.totalPrice }}</td>
                         <td>
                           <v-row justify="center" align="center">
-                            <!-- Check if the product does not have toppings before showing the quantity buttons -->
                             <v-col
                               v-if="!item.product!.haveTopping"
                               cols="4"
@@ -304,7 +289,6 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
                                 icon
                                 @click.stop="decreaseProductQuantity(indexMeals, item)"
                                 size="small"
-                                class="styled-button"
                               >
                                 -
                               </v-btn>
@@ -321,26 +305,20 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
                                 icon
                                 @click.stop="cateringStore.addProductToMeal(item.product!, indexMeals)"
                                 size="small"
-                                class="styled-button"
                               >
                                 +
                               </v-btn>
                             </v-col>
                           </v-row>
                         </td>
-
                         <td>
                           <v-btn
                             icon
-                            @click.stop="
-                              removeProductFromMeal(indexMeals, itemIndex)
-                            "
-                            class="styled-button"
+                            @click.stop="removeProductFromMeal(indexMeals, itemIndex)"
                           >
                             <v-icon>mdi-delete</v-icon>
                           </v-btn>
                         </td>
-                        <v-row> </v-row>
                       </tr>
                     </tbody>
                   </v-table>
@@ -360,10 +338,12 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
       </v-btn>
     </v-card-text>
   </v-card>
+
   <DrinkSelectionDialog />
   <CateringReciptItemDialog />
   <ProductCateringDialog />
 </template>
+
 
 <style scoped>
 .button-full-width {

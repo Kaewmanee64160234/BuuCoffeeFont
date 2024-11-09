@@ -181,7 +181,7 @@ const createCateringEvent = () => {
               {{ meal.mealTime }}, งบประมาณต่อมื้อรวม:
               {{ meal.totalPrice }} บาท, รายการอาหาร:
               <span v-for="(ingredient, i) in meal.mealProducts" :key="i">
-                {{ ingredient.product.productName
+                {{ ingredient.product!.productName
                 }}<span v-if="i < meal.mealProducts.length - 1">, </span>
               </span>
             </p>

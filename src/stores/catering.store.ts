@@ -168,99 +168,99 @@ export const useCateringStore = defineStore("catering", () => {
       );
       // create recipt status catering
 
-      for (const meal of cateringEvent.value.meals!) {
-        if (!meal.receipt) {
-          // กรัณาใส่รายการอาหารอย่างน้อย 1
-          Swal.fire("Error", "กรุณาใส่รายการอาหารอย่างน้อย 1 อย่าง", "error");
-          return;
-        }
-        // meal name charactor morthat 3
-        if (meal.mealName.length < 3) {
-          Swal.fire("Error", "ชื่ออาหารต้องมีอย่างน้อย 3 ตัวอักษร", "error");
-          return;
-        }
-        // input time
-        if (meal.mealTime.length < 1) {
-          Swal.fire("Error", "กรุณาใส่เวลา", "error");
-          return;
-        }
-        const reciptItemCoffee = ref<ReceiptItem[]>([]);
-        const reciptItemRice = ref<ReceiptItem[]>([]);
-        for (const item of meal.receipt.receiptItems) {
-          if (item.product?.storeType == "ร้านกาแฟ") {
-            reciptItemCoffee.value.push(item);
-          }
-          if (item.product?.storeType == "ร้านข้าว") {
-            reciptItemRice.value.push(item);
-          }
-        }
-        // create recipt
-        const receiptCoffee: Receipt = {
-          receiptTotalPrice: reciptItemCoffee.value.reduce(
-            (sum, item) => sum + item.receiptSubTotal,
-            0
-          ),
-          receiptType: "ร้านกาแฟ",
-          receiptTotalDiscount: 0,
-          receiptNetPrice: reciptItemCoffee.value.reduce(
-            (sum, item) => sum + item.receiptSubTotal,
-            0
-          ),
-          receiptStatus: "ร้านจัดเลี้ยง",
-          queueNumber: 0,
-          receive: 0,
-          change: 0,
-          receiptItems: reciptItemCoffee.value,
-          receiptPromotions: [],
-          createdDate: cateringEvent.value.createdDate,
-          checkIngredientId: 0,
-        };
-        // calculate total and set up
-        // rice recipt
-        const receiptRice: Receipt = {
-          receiptTotalPrice: reciptItemRice.value.reduce(
-            (sum, item) => sum + item.receiptSubTotal,
-            0
-          ),
-          receiptType: "ร้านข้าว",
-          receiptTotalDiscount: 0,
-          receiptNetPrice: reciptItemRice.value.reduce(
-            (sum, item) => sum + item.receiptSubTotal,
-            0
-          ),
-          receiptStatus: "ร้านจัดเลี้ยง",
-          queueNumber: 0,
-          receive: 0,
-          change: 0,
-          receiptItems: reciptItemRice.value,
-          receiptPromotions: [],
-          createdDate: cateringEvent.value.createdDate,
-          checkIngredientId: 0,
-        };
-        console.log("recipt Coffee", receiptCoffee);
-        console.log("recipt Rice", receiptRice);
+      // for (const meal of cateringEvent.value.meals!) {
+      //   if (!meal.receipt) {
+      //     // กรัณาใส่รายการอาหารอย่างน้อย 1
+      //     Swal.fire("Error", "กรุณาใส่รายการอาหารอย่างน้อย 1 อย่าง", "error");
+      //     return;
+      //   }
+      //   // meal name charactor morthat 3
+      //   if (meal.mealName.length < 3) {
+      //     Swal.fire("Error", "ชื่ออาหารต้องมีอย่างน้อย 3 ตัวอักษร", "error");
+      //     return;
+      //   }
+      //   // input time
+      //   if (meal.mealTime.length < 1) {
+      //     Swal.fire("Error", "กรุณาใส่เวลา", "error");
+      //     return;
+      //   }
+      //   const reciptItemCoffee = ref<ReceiptItem[]>([]);
+      //   const reciptItemRice = ref<ReceiptItem[]>([]);
+      //   for (const item of meal.receipt.receiptItems) {
+      //     if (item.product?.storeType == "ร้านกาแฟ") {
+      //       reciptItemCoffee.value.push(item);
+      //     }
+      //     if (item.product?.storeType == "ร้านข้าว") {
+      //       reciptItemRice.value.push(item);
+      //     }
+      //   }
+      //   // create recipt
+      //   const receiptCoffee: Receipt = {
+      //     receiptTotalPrice: reciptItemCoffee.value.reduce(
+      //       (sum, item) => sum + item.receiptSubTotal,
+      //       0
+      //     ),
+      //     receiptType: "ร้านกาแฟ",
+      //     receiptTotalDiscount: 0,
+      //     receiptNetPrice: reciptItemCoffee.value.reduce(
+      //       (sum, item) => sum + item.receiptSubTotal,
+      //       0
+      //     ),
+      //     receiptStatus: "ร้านจัดเลี้ยง",
+      //     queueNumber: 0,
+      //     receive: 0,
+      //     change: 0,
+      //     receiptItems: reciptItemCoffee.value,
+      //     receiptPromotions: [],
+      //     createdDate: cateringEvent.value.createdDate,
+      //     checkIngredientId: 0,
+      //   };
+      //   // calculate total and set up
+      //   // rice recipt
+      //   const receiptRice: Receipt = {
+      //     receiptTotalPrice: reciptItemRice.value.reduce(
+      //       (sum, item) => sum + item.receiptSubTotal,
+      //       0
+      //     ),
+      //     receiptType: "ร้านข้าว",
+      //     receiptTotalDiscount: 0,
+      //     receiptNetPrice: reciptItemRice.value.reduce(
+      //       (sum, item) => sum + item.receiptSubTotal,
+      //       0
+      //     ),
+      //     receiptStatus: "ร้านจัดเลี้ยง",
+      //     queueNumber: 0,
+      //     receive: 0,
+      //     change: 0,
+      //     receiptItems: reciptItemRice.value,
+      //     receiptPromotions: [],
+      //     createdDate: cateringEvent.value.createdDate,
+      //     checkIngredientId: 0,
+      //   };
+      //   console.log("recipt Coffee", receiptCoffee);
+      //   console.log("recipt Rice", receiptRice);
 
-        // calculate total and set up
-        meal.receipt = receiptCoffee;
-        const responseCoffee = await receiptService.createReceipt(
-          receiptCoffee
-        );
-        console.log("Receipt created successfully", responseCoffee.data);
-        const responseRice = await receiptService.createReceipt(receiptRice);
-        console.log("Receipt created successfully", responseRice.data);
-        if (responseCoffee.status === 201 && responseRice.status === 201) {
-          cateringEvent.value.coffeeReceiptId = responseCoffee.data.receiptId;
-          cateringEvent.value.riceReceiptId = responseRice.data.receiptId;
-        }
-      }
-      console.log("Creating catering event:", cateringEvent.value);
-      const responseEvent = await cateringService.createCateringEvent(
-        cateringEvent.value
-      );
-      if (responseEvent.status === 201) {
-        console.log("Catering event created successfully", responseEvent.data);
-        clearData();
-      }
+      //   // calculate total and set up
+      //   meal.receipt = receiptCoffee;
+      //   const responseCoffee = await receiptService.createReceipt(
+      //     receiptCoffee
+      //   );
+      //   console.log("Receipt created successfully", responseCoffee.data);
+      //   const responseRice = await receiptService.createReceipt(receiptRice);
+      //   console.log("Receipt created successfully", responseRice.data);
+      //   if (responseCoffee.status === 201 && responseRice.status === 201) {
+      //     cateringEvent.value.coffeeReceiptId = responseCoffee.data.receiptId;
+      //     cateringEvent.value.riceReceiptId = responseRice.data.receiptId;
+      //   }
+      // }
+      // console.log("Creating catering event:", cateringEvent.value);
+      // const responseEvent = await cateringService.createCateringEvent(
+      //   cateringEvent.value
+      // );
+      // if (responseEvent.status === 201) {
+      //   console.log("Catering event created successfully", responseEvent.data);
+      //   clearData();
+      // }
 
       Swal.fire("Success", "Catering event created successfully", "success");
     } catch (error) {

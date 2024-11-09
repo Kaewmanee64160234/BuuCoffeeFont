@@ -4,6 +4,7 @@ import type { Receipt, ReceiptItem } from "../receipt.type";
 
 export interface Meal {
   mealName: string;
+  description: string;
   totalPrice: number;
   mealTime: string;
   cateringEventId: number;
