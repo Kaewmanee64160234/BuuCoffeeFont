@@ -21,7 +21,6 @@ const cateringStore = useCateringStore();
 const toppingStore = useToppingStore();
 const visibleDetails = ref<number | null>(null); // Stores the index of the visible details row
 
-
 // Toggle the visibility of the product details row
 const toggleDetails = (index: number) => {
   if (visibleDetails.value === index) {
@@ -32,7 +31,7 @@ const toggleDetails = (index: number) => {
 };
 
 // Handle quantity decrease
-const decreaseProductQuantity = (mealIndex:number,item: MealProduct) => {
+const decreaseProductQuantity = (mealIndex: number, item: MealProduct) => {
   if (item.quantity > 1) {
     item.quantity--;
     item.totalPrice = item.product!.productPrice * item.quantity;
@@ -52,9 +51,8 @@ const decreaseProductQuantity = (mealIndex:number,item: MealProduct) => {
     );
     cateringStore.cateringEvent.cashierAmount = totalEventPrice;
   }
-  cateringStore.calculateTotalPrice(mealIndex)
+  cateringStore.calculateTotalPrice(mealIndex);
   // Update total price for all meals in the catering event
- 
 };
 
 // Handle removing the product from the meal
@@ -63,15 +61,13 @@ const removeProductFromMeal = (mealIndex: number, productIndex: number) => {
     productIndex,
     1
   );
-  cateringStore.cateringEvent.meals![mealIndex].totalPrice = cateringStore.cateringEvent.meals![mealIndex].mealProducts.reduce(
-    (sum, item) => {
-      return sum + item.totalPrice;
-    },
-    0
-  );
-
-
-
+  cateringStore.cateringEvent.meals![mealIndex].totalPrice =
+    cateringStore.cateringEvent.meals![mealIndex].mealProducts.reduce(
+      (sum, item) => {
+        return sum + item.totalPrice;
+      },
+      0
+    );
 };
 
 // Watch for tab selection changes and update product filters accordingly
@@ -119,8 +115,6 @@ const setFilteredReceiptItems = (
     cateringStore.cateringReceiptItemDialog = true;
   }
 };
-
-
 
 const openDrinkSelectionDialog = (indexMeals: number) => {
   cateringStore.selectedMealIndex = indexMeals;
@@ -260,8 +254,10 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
                       <tr>
                         <th class="text-center">ลำดับ</th>
                         <th class="text-center">ชื่อสินค้า</th>
-                        <th class="text-center">คลัง</th>
+                        <th class="text-center">ชื่อคำสั่ง</th>
+                        <th class="text-center">ราคา/ชิ้น</th>
                         <th class="text-center">ราคารวม</th>
+                        <th class="text-center">หน่วย</th>
                         <th class="text-center">จำนวน</th>
                         <th class="text-center">แอคชั่น</th>
                       </tr>
@@ -276,8 +272,25 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
                         <td @click="toggleDetails(itemIndex)">
                           {{ item.product!.productName }}
                         </td>
-                        <td>{{ item.type }}</td>
+                        <td>{{ item.product?.productName }}</td>
+                        <!-- Display Order Name -->
+                        <td>
+                          {{
+                            item.product?.haveTopping
+                              ? item.product.productTypes![0].productTypePrice
+                              : item.product?.productPrice
+                          }}
+                        </td>
+                        <!-- Display Price per Piece -->
                         <td>{{ item.totalPrice }}</td>
+                        <td>
+                          {{
+                            item.product?.haveTopping
+                              ? "ชิ้น"
+                              : "อย่าลืมแก้ code ชิ้น"
+                          }}
+                        </td>
+                        <!-- Display Unit -->
                         <td>
                           <v-row justify="center" align="center">
                             <v-col
@@ -287,7 +300,9 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
                             >
                               <v-btn
                                 icon
-                                @click.stop="decreaseProductQuantity(indexMeals, item)"
+                                @click.stop="
+                                  decreaseProductQuantity(indexMeals, item)
+                                "
                                 size="small"
                               >
                                 -
@@ -303,7 +318,12 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
                             >
                               <v-btn
                                 icon
-                                @click.stop="cateringStore.addProductToMeal(item.product!, indexMeals)"
+                                @click.stop="
+                                  cateringStore.addProductToMeal(
+                                    item.product!,
+                                    indexMeals
+                                  )
+                                "
                                 size="small"
                               >
                                 +
@@ -314,7 +334,9 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
                         <td>
                           <v-btn
                             icon
-                            @click.stop="removeProductFromMeal(indexMeals, itemIndex)"
+                            @click.stop="
+                              removeProductFromMeal(indexMeals, itemIndex)
+                            "
                           >
                             <v-icon>mdi-delete</v-icon>
                           </v-btn>
@@ -343,7 +365,6 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
   <CateringReciptItemDialog />
   <ProductCateringDialog />
 </template>
-
 
 <style scoped>
 .button-full-width {
