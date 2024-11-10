@@ -13,6 +13,7 @@ import { useCustomerStore } from "./customer.store";
 import Swal from "sweetalert2";
 import { useUserStore } from "./user.store";
 import { useReceiptStore } from "./receipt.store";
+import cateringService from "@/service/catering.service";
 
 export const usePosStore = defineStore("pos", () => {
   const selectedItems = ref<ReceiptItem[]>([]);
@@ -63,6 +64,7 @@ export const usePosStore = defineStore("pos", () => {
   const receiptStore = useReceiptStore();
   const hideNavigation = ref(false);
 
+
   // Load queue number from local storage
   const loadQueueNumber = () => {
     const storedQueueData = localStorage.getItem("queueData");
@@ -112,7 +114,7 @@ export const usePosStore = defineStore("pos", () => {
     hideNavigation.value = !hideNavigation.value;
   };
 
-  const addToReceipt = (
+  const addToReceipt = async (
     product: Product,
     productType: ProductType,
     productTypeToppings: ProductTypeTopping[],
@@ -121,7 +123,35 @@ export const usePosStore = defineStore("pos", () => {
   ) => {
     const parsedQuantity = parseInt(quantity.toString(), 10);
     const productPrice = parseInt(product.productPrice.toString(), 10);
-
+  
+    // Check if inventory is sufficient before adding, specifically for products with `haveTopping = false` and `needLinkIngredient = true`
+    if (product.haveTopping === false && product.needLinkIngredient === true) {
+      console.log("Checking inventory for linked ingredient...");
+  
+      // Calculate total required quantity including current receipt item quantity
+      const existingReceiptItem = selectedItems.value.find(
+        (item) => item.product?.productId === product.productId
+      );
+      const currentQuantityInReceipt = existingReceiptItem ? existingReceiptItem.quantity : 0;
+      const totalRequiredQuantity = currentQuantityInReceipt + parsedQuantity;
+  
+      // Check if adding this quantity exceeds available inventory
+      const sufficientInventory = await checkInventory(
+        product.productId,
+        totalRequiredQuantity,
+        product.storeType
+      );
+  
+      if (!sufficientInventory) {
+        Swal.fire({
+          icon: "error",
+          title: "สต็อกไม่เพียงพอ",
+          text: "สต็อกไม่เพียงพอสำหรับการเพิ่มสินค้านี้",
+        });
+        return;
+      }
+    }
+  
     let existingItem;
     if (product.haveTopping) {
       existingItem = selectedItems.value.find(
@@ -137,13 +167,13 @@ export const usePosStore = defineStore("pos", () => {
         (item) => item.product?.productId === product.productId
       );
     }
-    // เคยมี
+  
+    // Add or update the receipt item based on existing inventory and conditions
     if (existingItem) {
-      // แบบมี topping
+      // Update existing receipt item
       if (product.haveTopping) {
-        // มี topping
         if (productTypeToppings.length > 0) {
-          existingItem.quantity += parseInt(parsedQuantity + "");
+          existingItem.quantity += parsedQuantity;
           const toppingsTotal = productTypeToppings.reduce(
             (toppingAcc, toppingItem) =>
               toppingAcc +
@@ -158,18 +188,16 @@ export const usePosStore = defineStore("pos", () => {
             toppingsTotal;
           existingItem.receiptSubTotal = itemTotal;
         } else {
-          // ไม่มี topping
-
           existingItem.receiptSubTotal +=
-            parseFloat(productType.productTypePrice.toString()) *
-            parsedQuantity;
-          existingItem.quantity += parseInt(parsedQuantity + "");
+            parseFloat(productType.productTypePrice.toString()) * parsedQuantity;
+          existingItem.quantity += parsedQuantity;
         }
       } else {
         existingItem.receiptSubTotal += productPrice * parsedQuantity;
-        existingItem.quantity += parseInt(parsedQuantity + "");
+        existingItem.quantity += parsedQuantity;
       }
     } else {
+      // Add a new receipt item
       if (product.haveTopping) {
         if (productTypeToppings.length > 0) {
           const toppingsTotal = productTypeToppings.reduce(
@@ -215,8 +243,8 @@ export const usePosStore = defineStore("pos", () => {
         });
       }
     }
-
-    console.log("last", selectedItems.value[selectedItems.value.length - 1]);
+  
+    console.log("Last added item:", selectedItems.value[selectedItems.value.length - 1]);
     receipt.value.receiptTotalPrice = calculateTotal(selectedItems.value);
     if (receipt.value.receiptTotalDiscount === 0) {
       receipt.value.receiptNetPrice = receipt.value.receiptTotalPrice;
@@ -224,6 +252,35 @@ export const usePosStore = defineStore("pos", () => {
       receipt.value.receiptNetPrice =
         receipt.value.receiptTotalPrice - receipt.value.receiptTotalDiscount;
     }
+  };
+  
+
+  const checkInventory = async (
+    productId: number,
+    requiredQuantity: number,
+    storeType: string
+  ): Promise<boolean> => {
+    let inventory: any;
+  
+    // Fetch the correct inventory based on the store type
+    if (storeType === "ร้านกาแฟ") {
+      inventory = await cateringService.getSubInventoriesCoffeeByProductId(
+        productId
+      );
+    console.log("Inventory data:", inventory);
+
+    } else if (storeType === "ร้านข้าว") {
+      inventory = await cateringService.getSubInventoriesRiceByProductId(
+        productId
+      );
+    }
+    
+  
+    // Calculate available inventory considering reserved quantity
+    const availableQuantity = inventory.data.quantity - inventory.data.reservedQuantity;
+  
+    // Return true if enough inventory is available, otherwise false
+    return availableQuantity >= requiredQuantity;
   };
 
   // update receipt Item for edit in receipt
