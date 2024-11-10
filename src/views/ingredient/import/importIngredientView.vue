@@ -143,7 +143,12 @@
           </v-table>
         </v-card>
       
-        <!-- Rest of the code for the form elements -->
+       <!-- add butiin to save -->
+        <v-row>
+          <v-col cols="12" class="d-flex justify-center">
+            <v-btn color="success" @click="saveAndClearForm" class="button-full-width">บันทึก</v-btn>
+          </v-col>
+        </v-row>
       </v-col>
       
     </v-row>

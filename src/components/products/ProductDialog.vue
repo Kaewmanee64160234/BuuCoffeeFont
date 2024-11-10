@@ -420,6 +420,18 @@ const clearData = () => {
   countingPoint.value = false;
   needLinkIngredient.value = false;
   step.value = 1; // Reset to the first step
+  // rest data ingredient
+  ingredientStore.editedIngredient = {
+    ingredientName: "",
+    ingredientSupplier: "",
+    ingredientMinimun: 0,
+    ingredientUnit: "",
+    ingredientQuantityPerUnit: 0,
+    ingredientQuantityPerSubUnit: 0,
+    ingredientVolumeUnit: 0,
+    ingredientBarcode: 0,
+  };
+  
 };
 
 onMounted(async () => {

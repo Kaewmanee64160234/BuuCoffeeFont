@@ -201,6 +201,15 @@ const clearData = () => {
   productStore.createProductDialog = false;
   haveTopping.value = false; 
   countingPoint.value = false;
+  // clear data ingerdian
+  productStore.selectedIngredientsHot = [];
+  productStore.selectedIngredientsCold = [];
+  productStore.selectedIngredientsBlend = [];
+  productStore.ingredientQuantitiesHot = {};
+  productStore.ingredientQuantitiesCold = {};
+  productStore.ingredientQuantitiesBlend = {};
+
+
 };
 
 const showSuccessDialog = (message: string) => {
