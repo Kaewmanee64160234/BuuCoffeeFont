@@ -5,6 +5,7 @@ export interface SubInventoriesCatering{
     ingredient: Ingredient;
     quantity: number;
     type:string;
+    reservedQuantity?:number;
 
 
 }

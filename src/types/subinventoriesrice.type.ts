@@ -4,6 +4,7 @@ export interface SubInventoriesRice{
     subInventoryId: number;
     ingredient: Ingredient;
     quantity: number;
+    reservedQuantity?:number;
 
 
 }

@@ -73,9 +73,10 @@ const navigateTo = (routeName: string) => {
       <v-table class="mx-auto" style="width: 97%">
         <thead>
           <tr>
-            <th style="text-align: center;font-weight: bold;">รหัสวัตถุดิบ</th>
+          <th style="text-align: center;font-weight: bold;">รหัสวัตถุดิบ</th>
             <th style="text-align: center;font-weight: bold;">ชื่อวัตถุดิบ</th>
             <th style="text-align: center;font-weight: bold;">จำนวนคงเหลือ</th>
+            <th style="text-align: center;font-weight: bold;">จำนวนที่ถูกจองเพื่อจัดเลี้ยง</th>
           </tr>
         </thead>
         <tbody>
@@ -84,7 +85,8 @@ const navigateTo = (routeName: string) => {
             style="text-align: center;">
             <td>{{ (subIngredientStore.currentPage - 1) * subIngredientStore.itemsPerPage + index + 1 }}</td>
             <td>{{ item.ingredient.ingredientName }}</td>
-            <td>{{ item.quantity }}</td>
+            <td>{{ item.quantity-item.reservedQuantity! }}</td>
+            <td>{{ item.reservedQuantity }}</td>
         </tr>
         </tbody>
         <tbody v-if="!subIngredientStore.subingredients_rice.length">

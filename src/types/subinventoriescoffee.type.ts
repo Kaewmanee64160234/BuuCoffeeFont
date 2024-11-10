@@ -6,6 +6,7 @@ export interface SubInventoriesCoffee{
     quantity: number;
     type?:string;
     lastPrice?:number;
+    reservedQuantity?:number;
 
 
 }
