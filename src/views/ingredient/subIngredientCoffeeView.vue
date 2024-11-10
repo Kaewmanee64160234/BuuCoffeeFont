@@ -65,7 +65,7 @@ const navigateTo = (routeName: string) => {
               style="text-align: center;">
               <td>{{ (subIngredientStore.currentPage - 1) * subIngredientStore.itemsPerPage + index + 1 }}</td>
               <td>{{ item.ingredient.ingredientName }}</td>
-              <td>{{ item.quantity-item.reservedQuantity! }}</td>
+              <td>{{ item.quantity }}</td>
               <td>{{ item.reservedQuantity }}</td>
           </tr>
           <tr v-if="subIngredientStore.subingredients_coffee.length === 0">
