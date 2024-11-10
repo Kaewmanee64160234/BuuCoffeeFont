@@ -29,6 +29,9 @@ export function mapToProduct(data: any): Product {
     productPrice: data.productPrice,
     countingPoint: data.countingPoint,  
     haveTopping: data.haveTopping,
+    needLinkIngredient: data.needLinkIngredient,
+    ingredient: data.ingredient,
+    quantity: data.quantity,
     barcode: data.barcode,
     category: data.category,
     productTypes: data.productTypes ? data.productTypes.map((productType: any) => {

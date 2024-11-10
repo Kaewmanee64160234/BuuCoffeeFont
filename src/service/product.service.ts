@@ -89,6 +89,8 @@ function createProduct(product: any & { file: File }) {
 }
 
 function updateProduct(id: number, product: Product & { file: File }) {
+  console.log("Product:", product);
+  
   const formData = new FormData();
   console.log("File:", product.file);
 

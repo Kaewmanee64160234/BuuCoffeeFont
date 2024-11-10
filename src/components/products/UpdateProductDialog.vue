@@ -5,6 +5,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { useCategoryStore } from '@/stores/category.store';
 import { useProductStore } from '@/stores/product.store';
 import Swal from 'sweetalert2';
+import type { Product } from '@/types/product.type';
 
 const form = ref(null);
 const valid = ref(false);
@@ -43,7 +44,7 @@ const submitForm = async () => {
     storeType: productStore.storeName,
     countingPoint: productStore.countingPoint,
     haveTopping: productStore.editedProduct.haveTopping,
-
+    needLinkIngredient: productStore.editedProduct.needLinkIngredient,
     categoryId: categoryStore.categoriesForCreate.find(category => category.categoryName === productStore.selectedCategoryForUpdate)?.categoryId || null,
     category:categoryStore.categoriesForCreate.find(category => category.categoryName === productStore.selectedCategoryForUpdate)!,
     productTypes: [],
@@ -66,6 +67,9 @@ const submitForm = async () => {
       productTypeName: 'ปั่น',
       productTypePrice: productStore.productTypePriceBlend || 0,
     });
+  }
+  if(!productStore.editedProduct.haveTopping){
+    productData.productTypes = productStore.editedProduct.productTypes;
   }
 
   try {
