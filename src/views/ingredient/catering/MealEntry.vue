@@ -283,7 +283,7 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
                       <tr>
                         <th class="text-center">ลำดับ</th>
                         <th class="text-center">ชื่อสินค้า</th>
-                        <th class="text-center">ชื่อคำสั่ง</th>
+                        <th class="text-center">ร้าน</th>
                         <th class="text-center">ราคา/ชิ้น</th>
                         <th class="text-center">ราคารวม</th>
                         <th class="text-center">หน่วย</th>
@@ -299,7 +299,7 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
                           {{ item.product!.productName }}
                         </td>
 
-                        <td>{{ item.product?.productName }}</td>
+                        <td>{{ item.type }}</td>
                         <!-- Display Order Name -->
                         <td>
                           {{
@@ -314,7 +314,7 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
                           {{
                             item.product?.haveTopping
                               ? "ชิ้น"
-                              : "อย่าลืมแก้ code ชิ้น"
+                              : item.product?.ingredient?.ingredientQuantityPerSubUnit
                           }}
                         </td>
                         <!-- Display Unit -->

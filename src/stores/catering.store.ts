@@ -269,6 +269,138 @@ export const useCateringStore = defineStore("catering", () => {
     }
   };
 
+  const checkInventory = async (
+    productId: number,
+    requiredQuantity: number,
+    storeType: string
+  ): Promise<boolean> => {
+    let inventory: any;
+  
+    // Fetch the correct inventory based on the store type
+    if (storeType === "ร้านกาแฟ") {
+      inventory = await cateringService.getSubInventoriesCoffeeByProductId(
+        productId
+      );
+    console.log("Inventory data:", inventory);
+
+    } else if (storeType === "ร้านข้าว") {
+      inventory = await cateringService.getSubInventoriesRiceByProductId(
+        productId
+      );
+    }
+    
+  
+    // Calculate available inventory considering reserved quantity
+    const availableQuantity = inventory.data.quantity - inventory.data.reservedQuantity;
+  
+    // Return true if enough inventory is available, otherwise false
+    return availableQuantity >= requiredQuantity;
+  };
+  
+  const addProductToMeal = async (
+    item: Product,
+    mealIndex: number,
+    quantity: number = 1
+  ) => {
+    console.log("Adding product to meal:", item, mealIndex);
+  
+    // Check conditions for haveTopping and needLinkIngredient
+    if (item.haveTopping === false && item.needLinkIngredient === true) {
+      console.log("Checking inventory for linked ingredient...");
+  
+      if (item.storeType !== "เลี้ยงรับรอง") {
+        // Calculate the total quantity in the meal, including the requested addition
+        const mealProduct = cateringEvent.value.meals![mealIndex].mealProducts.find(
+          (mp) => mp.product!.productName === item.productName
+        );
+        const currentQuantityInMeal = mealProduct ? mealProduct.quantity : 0;
+        const totalRequiredQuantity = currentQuantityInMeal + quantity;
+  
+        // Check if adding this quantity exceeds available inventory
+        const sufficientInventory = await checkInventory(
+          item.productId,
+          totalRequiredQuantity,
+          item.storeType
+        );
+        if (sufficientInventory==false) {
+          alert("Insufficient inventory for this product.");
+          return;
+        }
+      }
+    }
+  
+    const meal = cateringEvent.value.meals![mealIndex];
+  
+    // Ensure the receipt exists in the meal
+    if (!meal.receipt) {
+      meal.receipt = {
+        receiptType: item.storeType,
+        receiptTotalDiscount: 0,
+        receiptNetPrice: 0,
+        receiptStatus: "",
+        createdReceipt: new Date(),
+        receiptItems: [],
+        receiptPromotions: [],
+        receiptTotalPrice: 0,
+        paymentMethod: "",
+        change: 0,
+        receive: 0,
+        customer: {
+          customerId: 0,
+          customerName: "",
+          customerPhone: "",
+          customerNumberOfStamp: 0,
+          createMemberDate: new Date(),
+        },
+      };
+    }
+  
+    const receipt = meal.receipt;
+  
+    // Find existing receipt item for this product
+    const receiptItem = receipt.receiptItems.find(
+      (ri) => ri.product?.productName === item.productName
+    );
+  
+    if (receiptItem) {
+      // Update existing receipt item
+      receiptItem.quantity += quantity;
+      receiptItem.receiptSubTotal += item.productPrice * quantity;
+    } else {
+      // Add a new receipt item
+      receipt.receiptItems.push({
+        receiptItemId: 0,
+        productTypeToppings: [],
+        product: item,
+        quantity: quantity,
+        receiptSubTotal: item.productPrice * quantity,
+      });
+    }
+  
+    // Find or add meal product
+    const mealProduct = meal.mealProducts.find(
+      (mp) => mp.product!.productName === item.productName
+    );
+    if (mealProduct) {
+      mealProduct.quantity += quantity;
+      mealProduct.totalPrice += item.productPrice * quantity;
+    } else {
+      // Add new meal product
+      meal.mealProducts.push({
+        mealId: mealIndex,
+        product: item,
+        quantity: quantity,
+        totalPrice: item.productPrice * quantity,
+        type: item.storeType,
+      });
+    }
+  
+    calculateTotalPrice(mealIndex);
+  
+    console.log("Updated meal and catering event:", meal, cateringEvent.value);
+  };
+  
+
   const addProduct = (item: Product, mealIndex: number, type: string) => {
     if (item.haveTopping) {
       openToppingDialog(item, mealIndex);
@@ -295,83 +427,7 @@ export const useCateringStore = defineStore("catering", () => {
     selectedMealIndex.value = mealIndex; // Store the mealIndex to ensure you update the correct meal
   };
 
-  const addProductToMeal = (
-    item: Product,
-    mealIndex: number,
-    quantity: number = 1
-  ) => {
-    console.log("Adding product to meal:", item, mealIndex);
 
-    const meal = cateringEvent.value.meals![mealIndex];
-
-    // Ensure the receipt exists in the meal
-    if (!meal.receipt) {
-      meal.receipt = {
-        receiptType: item.storeType,
-        receiptTotalDiscount: 0,
-        receiptNetPrice: 0,
-        receiptStatus: "",
-        createdReceipt: new Date(),
-        receiptItems: [],
-        receiptPromotions: [],
-        receiptTotalPrice: 0,
-        paymentMethod: "",
-        change: 0,
-        receive: 0,
-        customer: {
-          customerId: 0,
-          customerName: "",
-          customerPhone: "",
-          customerNumberOfStamp: 0,
-          createMemberDate: new Date(),
-        },
-      };
-    }
-
-    const receipt = meal.receipt;
-
-    // Find existing receipt item for this product
-    const receiptItem = receipt.receiptItems.find(
-      (ri) => ri.product?.productName === item.productName
-    );
-
-    if (receiptItem) {
-      // Update existing receipt item
-      receiptItem.quantity += quantity;
-      receiptItem.receiptSubTotal += item.productPrice * quantity;
-    } else {
-      // Add a new receipt item
-      receipt.receiptItems.push({
-        receiptItemId: 0,
-        productTypeToppings: [],
-        product: item,
-        quantity: quantity,
-        receiptSubTotal: item.productPrice * quantity,
-      });
-    }
-
-    // Find or add meal product
-    const mealProduct = meal.mealProducts.find(
-      (mp) => mp.product!.productName === item.productName
-    );
-    if (mealProduct) {
-      mealProduct.quantity += quantity;
-      mealProduct.totalPrice += item.productPrice * quantity;
-    } else {
-      // Add new meal product
-      meal.mealProducts.push({
-        mealId: mealIndex,
-        product: item,
-        quantity: quantity,
-        totalPrice: item.productPrice * quantity,
-        type: item.storeType,
-      });
-    }
-
-    calculateTotalPrice(mealIndex);
-
-    console.log("Updated meal and catering event:", meal, cateringEvent.value);
-  };
 
   const calculateTotalPrice = (mealIndex: number) => {
     const meal = cateringEvent.value.meals![mealIndex];
@@ -639,14 +695,14 @@ export const useCateringStore = defineStore("catering", () => {
       console.log("associatedReceiptItems", associatedReceiptItems);
       if (associatedReceiptItems.length === 0) {
         const mealContainerProduct = selectedMeal.mealProducts.find((mp) => {
-          return mp.product?.productName === item.product?.productName
+          return mp.product?.productName === item.product?.productName;
         });
         const itemInReceipt = selectedMeal.receipt?.receiptItems.find((ri) => {
-          return ri.product?.productName === item.product?.productName
+          return ri.product?.productName === item.product?.productName;
         });
-        if(!itemInReceipt && mealContainerProduct) {
+        if (!itemInReceipt && mealContainerProduct) {
           const mealProductIndex = selectedMeal.mealProducts.findIndex((mp) => {
-            return mp.product?.productName === item.product?.productName
+            return mp.product?.productName === item.product?.productName;
           });
           selectedMeal.mealProducts.splice(mealProductIndex, 1);
           cateringReceiptItemDialog.value = false;

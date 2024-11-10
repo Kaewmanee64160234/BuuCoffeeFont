@@ -16,12 +16,20 @@ function updateStatusCateringEvent(id: string, status: string) {
 function cancelCateringEvent(id: string) {
     return http.patch(`/catering-events/${id}/cancel`);
   }
-
-  
+// get subinventortRice by productId
+function getSubInventoriesCoffeeByProductId(productId: number) {
+    return http.get(`/sub-inventories-coffee/product/${productId}`);
+  }
+//  getsubinventortCoffee by productId
+function getSubInventoriesRiceByProductId(productId: number) {
+    return http.get(`/sub-inventories-rice/product/${productId}`);
+  }
 
 export
 default {
     createCateringEvent,
     updateStatusCateringEvent,
-    cancelCateringEvent
+    cancelCateringEvent,
+    getSubInventoriesCoffeeByProductId,
+    getSubInventoriesRiceByProductId,
 };
