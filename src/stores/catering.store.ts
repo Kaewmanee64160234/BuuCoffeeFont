@@ -323,7 +323,8 @@ export const useCateringStore = defineStore("catering", () => {
           item.storeType
         );
         if (sufficientInventory==false) {
-          alert("Insufficient inventory for this product.");
+         Swal.fire("สต็อกไม่เพียงพอ", "สต็อกไม่เพียงพอสำหรับการเพิ่มสินค้านี้", "error");
+
           return;
         }
       }
