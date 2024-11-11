@@ -79,7 +79,7 @@ export const useCateringEventStore = defineStore("cateringEvent", () => {
           await fetchCateringEvents();
           Swal.fire("ยกเลิกแล้ว!", "เหตุการณ์นี้ถูกยกเลิก.", "success");
         }
-          await cateringEventPaginate(currentPage.value, itemsPerPage.value);
+          await cateringEventPaginate(currentPage.value, 5);
 
       } catch (error) {
         console.error("Failed to cancel event:", error);
