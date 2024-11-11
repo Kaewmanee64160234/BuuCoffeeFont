@@ -6,7 +6,7 @@ import dialogHistoryCatering from "@/views/ingredient/catering/dialogHistoryCate
 import type { CateringEvent } from "@/types/catering/catering_event.type";
 import { useCategoryStore } from "@/stores/category.store";
 import { useCateringStore } from "@/stores/catering.store";
-
+import router from "@/router";
 const cateringEventStore = useCateringEventStore();
 const cateringStore = useCateringStore();
 const historyCheckDialog = ref(false);
@@ -24,14 +24,10 @@ const loadCateringEvents = async (page: number) => {
   }
 };
 
-// Watch for items per page change to reload data
-watch(itemsPerPage, async (newLimit) => {
-  await loadCateringEvents(cateringEventStore.currentPage); // reload with new limit
-});
 
 // Load events on component mount
-onMounted(() => {
-  loadCateringEvents(cateringEventStore.currentPage);
+onMounted(async () => {
+ await loadCateringEvents(cateringEventStore.currentPage);
 });
 
 // Translate status codes to human-readable text
@@ -62,15 +58,16 @@ const onPageChange = async (page: number) => {
   await loadCateringEvents(page); // Fetch data for the selected page
 };
 
-// Watch for page changes
-watch(
-  () => cateringEventStore.currentPage,
-  async (newValue, oldValue) => {
-    if (newValue !== oldValue) {
-      await loadCateringEvents(newValue);
-    }
-  }
-);
+// editCateringEvent go to poscateringView
+const editCateringEvent = async (eventId: number) => {
+  cateringStore.cateringEvent.cashierId = eventId;
+
+  
+  router.push(`/pos-catering-edit/${eventId}`);
+};
+
+
+
 </script>
 
 
@@ -157,6 +154,14 @@ watch(
               >
                 สำเร็จ
               </v-btn>
+              <!-- แก้ไข -->
+              <v-btn
+                v-if="catering.status === 'pending'"
+                color="yellow-darken-1"
+                class="mr-2"
+                @click="editCateringEvent(catering.eventId)"
+              > แก้ไข </v-btn>
+
               <v-btn
                 v-if="catering.status === 'pending'"
                 color="red"
@@ -182,13 +187,13 @@ watch(
 
       <!-- Pagination Control -->
       <v-pagination
-        :length="cateringEventStore.last_page"
-        :total-visible="7"
-        rounded="circle"
-        :value="cateringEventStore.currentPage"
-        @input="onPageChange"
-        v-model="cateringEventStore.currentPage"
-      />
+  :length="cateringEventStore.last_page"
+  :total-visible="7"
+  rounded="circle"
+  :value="cateringEventStore.currentPage"
+  @input="onPageChange"
+/>
+
     </v-card>
   </v-container>
 </template>

@@ -95,6 +95,12 @@ const router = createRouter({
 
     },
     {
+      path: "/pos-catering-edit/:eventId",
+      name: "pos-catering-edit",
+      component: () => import("../views/pos/PosCateringViewEdit.vue"),
+
+    },
+    {
       path: "/importingredient-history",
       name: "importingredientsHistory",
       component: () =>

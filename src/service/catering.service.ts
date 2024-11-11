@@ -24,7 +24,10 @@ function getSubInventoriesCoffeeByProductId(productId: number) {
 function getSubInventoriesRiceByProductId(productId: number) {
     return http.get(`/sub-inventories-rice/product/${productId}`);
   }
-
+// findCateringEventById
+function findCateringEventById (id: number) {
+    return http.get(`/catering-events/${id}`);
+  }
 export
 default {
     createCateringEvent,
@@ -32,4 +35,5 @@ default {
     cancelCateringEvent,
     getSubInventoriesCoffeeByProductId,
     getSubInventoriesRiceByProductId,
+    findCateringEventById
 };

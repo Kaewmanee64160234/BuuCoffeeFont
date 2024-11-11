@@ -10,6 +10,7 @@ import cateringService from "@/service/catering.service";
 export const useCateringEventStore = defineStore("cateringEvent", () => {
   const historyCateringEvent = ref<HistoryCateringEvent[]>([]);
   const historyCateringitem = ref<HistoryCateringEvent | null>(null);
+  
   const dialogCateringItemDetail  = ref(false);
   const dialogCateringItem = ref(false);
   const totalItems = ref(0);
@@ -32,6 +33,7 @@ export const useCateringEventStore = defineStore("cateringEvent", () => {
       throw error;
     }
   };
+ 
   const updateStatus = async (id: string, status: string) => {
     const result = await Swal.fire({
       title: "ยืนยันการเปลี่ยนสถานะ?",
@@ -129,6 +131,6 @@ export const useCateringEventStore = defineStore("cateringEvent", () => {
     itemsPerPage,
     currentPage,
     last_page,
-    dialogCateringItemDetail
+    dialogCateringItemDetail,
   };
 });

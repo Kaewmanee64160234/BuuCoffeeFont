@@ -158,6 +158,18 @@ export const useCateringStore = defineStore("catering", () => {
     cateringEvent.value.meals!.splice(index, 1);
   }
 
+  // findCateringEventById
+  const findCateringEventById = async (cashierId:number) => {
+    try {
+      const response = await cateringService.findCateringEventById(cashierId);
+      cateringEvent.value = response.data;
+      console.log("Catering event data:", cateringEvent.value);
+      
+    } catch (error) {
+      console.error("Failed to fetch catering event:", error);
+    }
+  };
+
   // Create catering event
   const createCateringEvent = async () => {
     try {
@@ -761,5 +773,6 @@ export const useCateringStore = defineStore("catering", () => {
     syncMealProduct,
     calculateTotalPrice,
     cateringHistory,
+    findCateringEventById
   };
 });

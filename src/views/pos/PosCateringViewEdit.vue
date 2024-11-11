@@ -1,16 +1,22 @@
 <script lang="ts" setup>
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useCateringStore } from "@/stores/catering.store";
-import MealEntry from "@/views/ingredient/catering/MealEntry.vue";
 import Swal from "sweetalert2";
+import { useRoute } from "vue-router";
 
 const cateringStore = useCateringStore();
+const route = useRoute();
+const eventId = ref(route.params.eventId as string);
+
+// Fetch event details only once when `eventId` is available
+onMounted(() => {
+  if (eventId.value) {
+    cateringStore.findCateringEventById(+eventId.value);
+  }
+});
 
 const totalBudget = computed(() => {
-  return cateringStore.cateringEvent.meals!.reduce(
-    (total, meal) => total + meal.totalPrice,
-    0
-  );
+  return cateringStore.cateringEvent.meals?.reduce((total, meal) => total + meal.totalPrice, 0) || 0;
 });
 
 const scrollToTop = () => {
@@ -21,122 +27,47 @@ const scrollToTop = () => {
 };
 
 const createCateringEvent = () => {
-  // validate the catering event
   if (!cateringStore.cateringEvent.eventName) {
-    Swal.fire({
-      icon: "error",
-      title: "กรุณาใส่ชื่องานจัดเลี้ยง",
-      showConfirmButton: false,
-      timer: 1500,
-    });
+    Swal.fire({ icon: "error", title: "กรุณาใส่ชื่องานจัดเลี้ยง", showConfirmButton: false, timer: 1500 });
     return;
   }
-  // charrecter not lessthant 3
+
   if (cateringStore.cateringEvent.eventName.length < 3) {
-    Swal.fire({
-      icon: "error",
-      title: "ชื่องานจัดเลี้ยงต้องมีอย่างน้อย 3 ตัวอักษร",
-      showConfirmButton: false,
-      timer: 1500,
-    });
+    Swal.fire({ icon: "error", title: "ชื่องานจัดเลี้ยงต้องมีอย่างน้อย 3 ตัวอักษร", showConfirmButton: false, timer: 1500 });
     return;
   }
+
   if (!cateringStore.cateringEvent.eventDate) {
-    Swal.fire({
-      icon: "error",
-      title: "กรุณาใส่วันที่จัดงาน",
-      showConfirmButton: false,
-      timer: 1500,
-    });
+    Swal.fire({ icon: "error", title: "กรุณาใส่วันที่จัดงาน", showConfirmButton: false, timer: 1500 });
     return;
   }
+
   const eventDate = new Date(cateringStore.cateringEvent.eventDate);
-const today = new Date();
+  const today = new Date();
+  const diffDays = Math.ceil((eventDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 
-// Calculate the difference in days between the event date and today
-const diffTime = eventDate.getTime() - today.getTime();
-const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-// Allow event dates within 2 days in the past and 2 days in the future
-if (diffDays < -2 || diffDays > 2) {
-  Swal.fire({
-    icon: "error",
-    title: "วันที่จัดงานต้องอยู่ในช่วง 2 วันที่ผ่านมา หรือ 2 วันถัดไป",
-    showConfirmButton: false,
-    timer: 1500,
-  });
-  return;
+  if (diffDays < -2 || diffDays > 2) {
+    Swal.fire({ icon: "error", title: "วันที่จัดงานต้องอยู่ในช่วง 2 วันที่ผ่านมา หรือ 2 วันถัดไป", showConfirmButton: false, timer: 1500 });
+    return;
   }
 
-  if (!cateringStore.cateringEvent.eventLocation) {
-    Swal.fire({
-      icon: "error",
-      title: "กรุณาใส่สถานที่จัดงาน",
-      showConfirmButton: false,
-      timer: 1500,
-    });
+  if (!cateringStore.cateringEvent.eventLocation || cateringStore.cateringEvent.eventLocation.length < 3) {
+    Swal.fire({ icon: "error", title: "สถานที่จัดงานต้องมีอย่างน้อย 3 ตัวอักษร", showConfirmButton: false, timer: 1500 });
     return;
   }
-  // charrecter not lessthant 3
-  if (cateringStore.cateringEvent.eventLocation.length < 3) {
-    Swal.fire({
-      icon: "error",
-      title: "สถานที่จัดงานต้องมีอย่างน้อย 3 ตัวอักษร",
-      showConfirmButton: false,
-      timer: 1500,
-    });
+
+  if (!cateringStore.cateringEvent.attendeeCount || cateringStore.cateringEvent.attendeeCount < 1) {
+    Swal.fire({ icon: "error", title: "จำนวนคนที่เข้าร่วมงานต้องมากกว่า 1 คน", showConfirmButton: false, timer: 1500 });
     return;
   }
-  if (!cateringStore.cateringEvent.attendeeCount) {
-    Swal.fire({
-      icon: "error",
-      title: "กรุณาใส่จำนวนคนที่เข้าร่วมงาน",
-      showConfirmButton: false,
-      timer: 1500,
-    });
+
+  if (!cateringStore.cateringEvent.meals || cateringStore.cateringEvent.meals.length === 0) {
+    Swal.fire({ icon: "error", title: "กรุณาเพิ่มอาหาร", showConfirmButton: false, timer: 1500 });
     return;
   }
-  // morethan 1
-  if (cateringStore.cateringEvent.attendeeCount < 1) {
-    Swal.fire({
-      icon: "error",
-      title: "จำนวนคนที่เข้าร่วมงานต้องมากกว่า 1 คน",
-      showConfirmButton: false,
-      timer: 1500,
-    });
-    return;
-  }
-  // morethan or equal 1
-  if (cateringStore.cateringEvent.meals!.length === 0) {
-    Swal.fire({
-      icon: "error",
-      title: "กรุณาเพิ่มอาหาร",
-      showConfirmButton: false,
-      timer: 1500,
-    });
-    return;
-  }
-  if (
-    cateringStore.cateringEvent.meals!.reduce(
-      (total, meal) => total + meal.totalPrice,
-      0
-    ) <= 0
-  ) {
-    Swal.fire({
-      icon: "error",
-      title: "กรุณาเพิ่มรายการอาหาร",
-      showConfirmButton: false,
-      timer: 1500,
-    });
-    return;
-  }
-  if (cateringStore.cateringEvent.attendeeCount < 1) {
-    Swal.fire({
-      icon: "error",
-      title: "จำนวนคนที่เข้าร่วมงานต้องมากกว่า 1 คน",
-      showConfirmButton: false,
-      timer: 1500,
-    });
+
+  if (totalBudget.value <= 0) {
+    Swal.fire({ icon: "error", title: "กรุณาเพิ่มรายการอาหาร", showConfirmButton: false, timer: 1500 });
     return;
   }
 
