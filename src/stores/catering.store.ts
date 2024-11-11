@@ -309,12 +309,14 @@ export const useCateringStore = defineStore("catering", () => {
       console.log("Checking inventory for linked ingredient...");
   
       if (item.storeType !== "เลี้ยงรับรอง") {
-        // Calculate the total quantity in the meal, including the requested addition
-        const mealProduct = cateringEvent.value.meals![mealIndex].mealProducts.find(
-          (mp) => mp.product!.productName === item.productName
-        );
-        const currentQuantityInMeal = mealProduct ? mealProduct.quantity : 0;
-        const totalRequiredQuantity = currentQuantityInMeal + quantity;
+        // Calculate the total required quantity of the product across all meals
+        const totalQuantityInCateringEvent = cateringEvent.value.meals
+          ?.flatMap((meal) => meal.mealProducts)
+          .filter((mp) => mp.product?.productId === item.productId)
+          .reduce((acc, mp) => acc + mp.quantity, 0) || 0;
+  
+        // Add the requested quantity to the current total
+        const totalRequiredQuantity = totalQuantityInCateringEvent + quantity;
   
         // Check if adding this quantity exceeds available inventory
         const sufficientInventory = await checkInventory(
@@ -322,9 +324,12 @@ export const useCateringStore = defineStore("catering", () => {
           totalRequiredQuantity,
           item.storeType
         );
-        if (sufficientInventory==false) {
-         Swal.fire("สต็อกไม่เพียงพอ", "สต็อกไม่เพียงพอสำหรับการเพิ่มสินค้านี้", "error");
-
+        if (!sufficientInventory) {
+          Swal.fire(
+            "สต็อกไม่เพียงพอ",
+            "สต็อกไม่เพียงพอสำหรับการเพิ่มสินค้านี้",
+            "error"
+          );
           return;
         }
       }
