@@ -58,11 +58,12 @@
                 <v-checkbox label="ปั่น" v-model="productTypes.blend" @change="handleProductTypeChange('ปั่น', productTypes.blend)" />
               </v-col>
             </v-row>
+{{ productStore.selectedIngredientsHot }}
+
 
             <v-col cols="12" sm="6">
               <v-text-field variant="solo" v-model="barcode" label="บาร์โค้ด" />
             </v-col>
-
             
             <!-- Show Price TextFields Based on Selected Product Types -->
             <v-col cols="12" v-if="productTypes.hot && haveTopping">
@@ -146,10 +147,30 @@ const handleImageUpload = (event: Event) => {
 
 const handleProductTypeChange = (type: string, isChecked: boolean) => {
   if (!isChecked) {
-    if (type === 'ร้อน') productTypesPrice.hot = 0;
-    if (type === 'เย็น') productTypesPrice.cold = 0;
-    if (type === 'ปั่น') productTypesPrice.blend = 0;
+    if (type === 'ร้อน') {productTypesPrice.hot = 0;
+      productTypes.hot = false;
+    }
+    if (type === 'เย็น'){ productTypesPrice.cold = 0;
+      productTypes.cold = false;
+    }
+    if (type === 'ปั่น'){ productTypesPrice.blend = 0;
+      productTypes.blend = false;
+    }
+
   }
+  // if isChecked is true
+  if (isChecked) {
+    if (type === 'ร้อน') {productTypesPrice.hot = 0;
+      productTypes.hot = true;
+    }
+    if (type === 'เย็น'){ productTypesPrice.cold = 0;
+      productTypes.cold = true;
+    }
+    if (type === 'ปั่น'){ productTypesPrice.blend = 0;
+      productTypes.blend = true;
+    }
+  // set  value to true
+  
 };
 
 const submitForm = async () => {

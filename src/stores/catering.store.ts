@@ -746,7 +746,22 @@ export const useCateringStore = defineStore("catering", () => {
       cateringEvent.value.meals![selectedMealIndex.value].mealProducts
     );
   };
-
+// updateCateringEvent
+  const updateCateringEvent = async () => {
+    try {
+      const response = await cateringService.updateCateringEvent(
+        cateringEvent.value.cashierId,
+        cateringEvent.value
+      );
+      if (response.status === 200) {
+        console.log("Catering event updated successfully", response.data);
+        Swal.fire("Success", "Catering event updated successfully", "success");
+      }
+    } catch (error) {
+      console.error("Error updating catering event:", error);
+      Swal.fire("Error", "Error updating catering event", "error");
+    }
+  };
   return {
     fetchMeals,
     saveMeals,
@@ -773,6 +788,7 @@ export const useCateringStore = defineStore("catering", () => {
     syncMealProduct,
     calculateTotalPrice,
     cateringHistory,
-    findCateringEventById
+    findCateringEventById,
+    updateCateringEvent
   };
 });

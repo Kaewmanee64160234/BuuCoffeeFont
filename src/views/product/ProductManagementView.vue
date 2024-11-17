@@ -2,7 +2,6 @@
 import { useCategoryStore } from '@/stores/category.store';
 import { useProductStore } from '@/stores/product.store';
 import { onMounted, ref } from 'vue';
-import CreateProductDialog from '../../components/products/CreateProductDialog.vue';
 import UpdateProductDialog from '../../components/products/UpdateProductDialog.vue';
 import { useIngredientStore } from '@/stores/Ingredient.store';
 import type { Product } from '@/types/product.type';

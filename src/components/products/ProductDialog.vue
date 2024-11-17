@@ -139,6 +139,38 @@
             </v-col>
           </v-row>
         </v-card-text>
+        <!-- show textfield input price -->
+        <v-card-text v-if="haveTopping">
+          <v-row>
+            <v-col cols="12" v-if="productTypes.hot">
+              <v-text-field
+                variant="solo"
+                v-model="productTypesPrice.hot"
+                label="ราคาสินค้าร้อน"
+                type="number"
+                required
+              />
+            </v-col>
+            <v-col cols="12" v-if="productTypes.cold">
+              <v-text-field
+                variant="solo"
+                v-model="productTypesPrice.cold"
+                label="ราคาสินค้าเย็น"
+                type="number"
+                required
+              />
+            </v-col>
+            <v-col cols="12" v-if="productTypes.blend">
+              <v-text-field
+                variant="solo"
+                v-model="productTypesPrice.blend"
+                label="ราคาสินค้าปั่น"
+                type="number"
+                required
+              />
+            </v-col>
+          </v-row>
+        </v-card-text>
       </v-form>
       <v-card-text v-if="needLinkIngredient && !haveTopping">
         <v-form ref="form">
