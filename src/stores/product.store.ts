@@ -142,7 +142,7 @@ export const useProductStore = defineStore("product", () => {
       );
       console.log("getProductPaginate", response.data);
       if (response.status === 200) {
-        products.value = response.data.data.map((product: any) =>
+        products.value = response.data.data.map((product: Product) =>
           mapToProduct(product)
         );
         console.log("products", products.value);

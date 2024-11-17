@@ -1,149 +1,106 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from "vue";
-import { useProductStore } from "@/stores/product.store"; // Updated to use Product Store
+import { onMounted, ref, watch } from "vue";
+import { useProductStore } from "@/stores/product.store";
 import type { Product } from "@/types/product.type";
 import { useCateringStore } from "@/stores/catering.store";
-import type { Meal, MealProduct } from "@/types/catering/meal.type";
+import type { MealProduct } from "@/types/catering/meal.type";
 import DrinkSelectionDialog from "@/components/pos/DrinkSelectionDialog.vue";
 import { useToppingStore } from "@/stores/topping.store";
 import type { ReceiptItem } from "@/types/receipt.type";
 import CateringReciptItemDialog from "@/components/pos/CateringReciptItemDialog.vue";
 import ProductCateringDialog from "@/components/pos/ProductCateringDialog.vue";
 
-const productStore = useProductStore(); // New product store
-const activePanelIndex = ref(0);
-const searchQuery = ref("");
-const selectedTab = ref("coffee");
-const productFilters = ref<Product[]>([]); // Updated to handle products
-const totalPrice = ref(0);
-const type = ref("");
+const productStore = useProductStore();
 const cateringStore = useCateringStore();
 const toppingStore = useToppingStore();
-const visibleDetails = ref<number | null>(null); // Stores the index of the visible details row
 
-// Toggle the visibility of the product details row
+const activePanelIndex = ref(0);
+const searchQuery = ref("");
+const selectedTab = ref("ร้านกาแฟ"); // Default tab is coffee
+const productFilters = ref<Product[]>([]);
+const visibleDetails = ref<number | null>(null);
+
+// Toggle visibility of product details
 const toggleDetails = (index: number) => {
-  if (visibleDetails.value === index) {
-    visibleDetails.value = null; // Collapse if already open
-  } else {
-    visibleDetails.value = index; // Expand the selected row
-  }
+  visibleDetails.value = visibleDetails.value === index ? null : index;
 };
 
-// Handle quantity decrease
+// Simplify quantity adjustment without nested reactivity
 const decreaseProductQuantity = (mealIndex: number, item: MealProduct) => {
   if (item.quantity > 1) {
     item.quantity--;
     item.totalPrice = item.product!.productPrice * item.quantity;
-    console.log(item.totalPrice);
-    // update in reciptItem
-    cateringStore.cateringEvent.meals![mealIndex].receipt.receiptItems.forEach(
-      (receiptItem: ReceiptItem) => {
-        if (receiptItem.product!.productName === item.product!.productName) {
-          receiptItem.quantity = item.quantity;
-          receiptItem.receiptSubTotal = item.totalPrice;
-        }
-      }
-    );
-    const totalEventPrice = cateringStore.cateringEvent.meals!.reduce(
-      (sum, meal) => sum + meal.totalPrice,
-      0
-    );
-    cateringStore.cateringEvent.cashierAmount = totalEventPrice;
+    const meal = cateringStore.cateringEvent.meals[mealIndex];
+    meal.totalPrice = meal.mealProducts.reduce((sum, p) => sum + p.totalPrice, 0);
+    cateringStore.calculateTotalPrice(mealIndex);
   }
-  cateringStore.calculateTotalPrice(mealIndex);
-  // Update total price for all meals in the catering event
 };
 
-// Handle removing the product from the meal
-const removeProductFromMeal = (mealIndex: number, productIndex: number) => {
-  cateringStore.cateringEvent.meals![mealIndex].mealProducts.splice(
-    productIndex,
-    1
-  );
-  cateringStore.cateringEvent.meals![mealIndex].totalPrice =
-    cateringStore.cateringEvent.meals![mealIndex].mealProducts.reduce(
-      (sum, item) => {
-        return sum + item.totalPrice;
-      },
-      0
-    );
+// Fetch products based on the selected category
+const fetchProductsByCategory = async () => {
+  const storeType = selectedTab.value === "ร้านกาแฟ" ? "ร้านกาแฟ" : "ร้านข้าว";
+  await productStore.getProductByStoreType(storeType);
+  productFilters.value = productStore.products;
 };
 
-// Watch for tab selection changes and update product filters accordingly
-watch(selectedTab, () => {
-  filterProducts();
-  type.value = selectedTab.value === "coffee" ? "coffee" : "rice";
-});
-
-// Filter products based on the selected tab (coffee or rice)
-async function filterProducts() {
-  if (selectedTab.value === "coffee") {
-    await productStore.getProductByStoreType("ร้านกาแฟ"); // Fetch coffee products
-    productFilters.value = productStore.products;
-  } else if (selectedTab.value === "rice") {
-    await productStore.getProductByStoreType("ร้านข้าว"); // Fetch rice products
-    productFilters.value = productStore.products;
-  }
-}
-
-// Initialize component with coffee products and toppings
+// Initialize with coffee products and toppings
 onMounted(async () => {
-  await productStore.getProductByStoreType("ร้านกาแฟ"); // Fetch coffee products by default
+  await fetchProductsByCategory(); // Fetch coffee products by default
   await toppingStore.getAllToppings();
-  filterProducts();
 });
 
-// Calculate total price for all products in all meals
+// Watch for changes in the selected tab (category) and update products
+watch(selectedTab, async () => {
+  await fetchProductsByCategory();
+});
 
-// setfilteredReceiptItems
-const setFilteredReceiptItems = (
-  mealIndex: number,
-  mealProduct: MealProduct
-) => {
+// Handle removing a product
+const removeProductFromMeal = (mealIndex: number, productIndex: number) => {
+  const meal = cateringStore.cateringEvent.meals[mealIndex];
+  meal.mealProducts.splice(productIndex, 1);
+  meal.totalPrice = meal.mealProducts.reduce((sum, p) => sum + p.totalPrice, 0);
+};
+
+// Select items when meal product has toppings
+const setFilteredReceiptItems = (mealIndex: number, mealProduct: MealProduct) => {
   if (mealProduct.product!.haveTopping) {
-    const receiptItems = cateringStore.cateringEvent.meals![
+    cateringStore.filteredReceiptItems = cateringStore.cateringEvent.meals[
       mealIndex
     ].receipt.receiptItems.filter(
-      (receiptItem: ReceiptItem) =>
-        receiptItem.product!.productName === mealProduct.product!.productName
+      (item) => item.product!.productName === mealProduct.product!.productName
     );
-    cateringStore.filteredReceiptItems = receiptItems;
-    console.log("filteredReceiptItems", cateringStore.filteredReceiptItems);
     cateringStore.selectedMealIndex = mealIndex;
-
     cateringStore.cateringReceiptItemDialog = true;
   }
 };
 
+// Toggle drink selection dialog for items with toppings
 const openDrinkSelectionDialog = (indexMeals: number) => {
   cateringStore.selectedMealIndex = indexMeals;
-
   cateringStore.cateringProductDialog = true;
 };
+
+// Watch for changes in search query to filter products
+watch(searchQuery, (query) => {
+  productFilters.value = productStore.products.filter((product) =>
+    product.productName.toLowerCase().includes(query.toLowerCase())
+  );
+});
 </script>
 
 <template>
   <v-card class="mb-5" style="background-color: #62544a">
     <v-card-text>
-      <v-expansion-panels class="mb-5">
+      <v-expansion-panels>
         <v-expansion-panel
           v-for="(meal, indexMeals) in cateringStore.cateringEvent.meals"
           :key="indexMeals"
-          class="mb-4"
         >
           <v-expansion-panel-header>
             <v-row class="d-flex align-center">
               <v-col class="d-flex align-center justify-space-between">
-                <v-card-title>
-                  รายละเอียดมื้ออาหาร #{{ indexMeals + 1 }}
-                </v-card-title>
-                <v-btn
-                  icon
-                  class="ma-3"
-                  color="#F55050"
-                  @click="cateringStore.removeMeal(indexMeals)"
-                >
+                <v-card-title>รายละเอียดมื้ออาหาร #{{ indexMeals + 1 }}</v-card-title>
+                <v-btn icon color="#F55050" @click="cateringStore.removeMeal(indexMeals)">
                   <v-icon>mdi-delete</v-icon>
                 </v-btn>
               </v-col>
@@ -154,9 +111,8 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
             <v-row>
               <v-col cols="4">
                 <v-text-field
-                  label="ชื่อมื้ออาหาร"
                   v-model="meal.mealName"
-                  class="ml-4"
+                  label="ชื่อมื้ออาหาร"
                   dense
                   hide-details
                   variant="solo"
@@ -164,8 +120,8 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
               </v-col>
               <v-col cols="4">
                 <v-text-field
-                  label="เวลามื้ออาหาร"
                   v-model="meal.mealTime"
+                  label="เวลามื้ออาหาร"
                   type="time"
                   dense
                   hide-details
@@ -174,9 +130,8 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
               </v-col>
               <v-col cols="4">
                 <v-text-field
-                  label="ราคารวม"
                   v-model.number="meal.totalPrice"
-                  class="mr-4"
+                  label="ราคารวม"
                   dense
                   hide-details
                   variant="solo"
@@ -184,6 +139,17 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
                 ></v-text-field>
               </v-col>
             </v-row>
+            
+            <!-- Description Field -->
+            <v-text-field
+              v-model="meal.description"
+              label="รายละเอียด"
+              dense
+              hide-details
+              variant="solo"
+              class="ma-4"
+            ></v-text-field>
+
             <v-card-title>
               <v-row class="d-flex align-center">
                 <v-col cols="9">
@@ -206,64 +172,41 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
                 color="accent"
                 @click="openDrinkSelectionDialog(indexMeals)"
                 style="font-size: 17px;"
-                >เพิ่มสินค้าจัดเลี้ยง</v-btn
               >
+                เพิ่มสินค้าจัดเลี้ยง
+              </v-btn>
             </v-card-title>
 
-
-            <!-- Description Field at the top of the tabs section -->
-            <v-text-field
-              label="รายละเอียด"
-              v-model="meal.description"
-              dense
-              hide-details
-              variant="solo"
-              class="ma-4"
-            ></v-text-field>
-
-            <!-- Tabs Section -->
-            <v-tabs
-              v-model="selectedTab"
-              align-tabs="start"
-              color="brown"
-              background-color="#fff"
-              class="ma-4"
-            >
-              <v-tab value="coffee" style="font-size: 17px;">วัตถุดิบร้านกาแฟ</v-tab>
-              <v-tab value="rice" style="font-size: 17px;">วัตถุดิบร้านข้าว</v-tab>
+            <v-tabs align-tabs="start" color="brown" background-color="#fff" class="ma-4">
+              <v-tab @click="selectedTab = 'ร้านกาแฟ'">วัตถุดิบร้านกาแฟ</v-tab>
+              <v-tab @click="selectedTab = 'ร้านข้าว'">วัตถุดิบร้านข้าว</v-tab>
             </v-tabs>
 
             <v-row class="mt-4">
-              <!-- Product Display -->
               <v-col cols="6">
                 <v-container>
                   <v-row>
                     <v-col
                       cols="3"
-                      style=" white-space: nowrap;text-align: center; padding: 8px"
+                      style="text-align: center; padding: 8px"
                       v-for="(item, index) in productFilters"
                       :key="index"
                     >
                       <v-card
                         width="120%"
-                        height="100%"
                         class="pa-2"
-                        @click="
-                          cateringStore.addProduct(item, indexMeals, type)
-                        "
+                        @click="cateringStore.addProduct(item, indexMeals, item.storeType)"
                       >
                         <v-img
                           :src="`http://localhost:3000/products/${item.productId}/image`"
                           height="100"
                         ></v-img>
-                        <v-card-title style="font-size: 18px">
-                          {{ item.productName }}
-                        </v-card-title>
-                        <v-card-subtitle style="font-size: 15px">
+                        <v-card-title>{{ item.productName }}</v-card-title>
+                        <v-card-subtitle>
                           ราคาต้นทุน
                           {{
                             item.haveTopping
-                              ? item.productTypes![0].productTypePrice
+                              ? item.productTypes[0].productTypePrice
                               : item.productPrice
                           }}
                           บาท
@@ -273,7 +216,6 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
                   </v-row>
                 </v-container>
               </v-col>
-
 
               <!-- Meal Products Table -->
               <v-col cols="6">
@@ -289,85 +231,42 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
                         <th class="text-center">หน่วย</th>
                         <th class="text-center">จำนวน</th>
                         <th class="text-center">แอคชั่น</th>
-
                       </tr>
                     </thead>
                     <tbody>
-                      <tr style="white-space: nowrap;font-size: 18px" v-for="(item, itemIndex) in meal.mealProducts" :key="itemIndex" @click="setFilteredReceiptItems(indexMeals, item)">
-                        <td class="text-center" style="white-space: nowrap;font-size: 18px">{{ itemIndex + 1 }}</td>
-                        <td class="text-center" style="white-space: nowrap;font-size: 18px" @click="toggleDetails(itemIndex)">
-                          {{ item.product!.productName }}
+                      <tr
+                        v-for="(item, itemIndex) in meal.mealProducts"
+                        :key="itemIndex"
+                        @click="setFilteredReceiptItems(indexMeals, item)"
+                      >
+                        <td class="text-center">{{ itemIndex + 1 }}</td>
+                        <td class="text-center">
+                          {{ item.product ? item.product.productName : item.productName }}
                         </td>
-
                         <td>{{ item.type }}</td>
-                        <!-- Display Order Name -->
                         <td>
                           {{
-                            item.product?.haveTopping
-                              ? item.product.productTypes![0].productTypePrice
-                              : item.product?.productPrice
+                            item.product
+                              ? item.product.haveTopping
+                                ? item.product.productTypes[0].productTypePrice
+                                : item.product.productPrice
+                              : item.productPrice
                           }}
                         </td>
-                        <!-- Display Price per Piece -->
                         <td>{{ item.totalPrice }}</td>
                         <td>
                           {{
                             item.product?.haveTopping
                               ? "ชิ้น"
-                              : item.product?.ingredient?.ingredientQuantityPerSubUnit
+                              : item.product?.ingredient?.ingredientQuantityPerSubUnit || "ชิ้น"
                           }}
                         </td>
-                        <!-- Display Unit -->
-                        <td>
-                          <v-row justify="center" align="center">
-                            <v-col
-                              v-if="!item.product!.haveTopping"
-                              cols="4"
-                              class="text-center"
-                            >
-                              <v-btn
-                                icon
-                                @click.stop="
-                                  decreaseProductQuantity(indexMeals, item)
-                                "
-                                size="small"
-                              >
-                                -
-                              </v-btn>
-
-                            </v-col>
-                            <v-col cols="4" class="text-center">
-                              {{ item.quantity }}
-                            </v-col>
-
-                            <v-col
-                              v-if="!item.product!.haveTopping"
-                              cols="4"
-                              class="text-center"
-                            >
-                              <v-btn
-                                icon
-                                @click.stop="
-                                  cateringStore.addProductToMeal(
-                                    item.product!,
-                                    indexMeals
-                                  )
-                                "
-                                size="small"
-                              >
-                                +
-                              </v-btn>
-                            </v-col>
-                          </v-row>
-                        </td>
+                        <td>{{ item.quantity }}</td>
                         <td>
                           <v-btn
                             icon
-                            @click.stop="
-                              removeProductFromMeal(indexMeals, itemIndex)
-                            "
+                            @click.stop="removeProductFromMeal(indexMeals, itemIndex)"
                           >
-
                             <v-icon>mdi-delete</v-icon>
                           </v-btn>
                         </td>
@@ -376,18 +275,22 @@ const openDrinkSelectionDialog = (indexMeals: number) => {
                   </v-table>
                 </v-card>
               </v-col>
-              
             </v-row>
           </v-expansion-panel-content>
         </v-expansion-panel>
       </v-expansion-panels>
+    </v-card-text>
+
+    <!-- Add Meal Button -->
+    <v-card-text>
       <v-btn
-        style="background-color: #ff9642"
+        color="primary"
+        class="mt-4 button-full-width"
         @click="cateringStore.addMeal()"
-        class="button-full-width"
         rounded
       >
-        <v-icon left></v-icon> <strong>เพิ่มมื้อการจัดเลี้ยง</strong>
+        <v-icon left>mdi-plus</v-icon>
+        <strong>เพิ่มมื้ออาหาร</strong>
       </v-btn>
     </v-card-text>
   </v-card>
