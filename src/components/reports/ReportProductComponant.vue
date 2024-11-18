@@ -1,21 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
 import { useProductUsageStore } from '@/stores/report/productUsage.store';
-import { usePromotionsUsageStore } from '@/stores/report/promotionUseage.store';
 import type { ProductUsage } from '@/types/report/productUsage.type';
 import VueApexCharts from 'vue3-apexcharts';
-const promotionUsagestore = usePromotionsUsageStore();
 const productUsageStore = useProductUsageStore();
-const startDate = ref('');
-const endDate = ref('');
-const startDateforpromo = ref('2024-07-01');
-const endDateforpromo = ref('2024-07-31');
-const fetchPromotionsUsage = async () => {
-  await promotionUsagestore.loadPromotionsUsage(startDateforpromo.value, endDateforpromo.value);
-  console.log('Loaded promotions usage:', promotionUsagestore.promotionsUsage.values);
-};
+const startDate = ref(new Date().toISOString().split('T')[0]);
+const endDate = ref(new Date().toISOString().split('T')[0]);
 
-const promotionsUsage = promotionUsagestore.promotionsUsage;
+
 const receiptType = ref('ร้านกาแฟ');
 const receiptOptions = ref([
   { value: 'ร้านกาแฟ', text: 'ร้านกาแฟ' },
@@ -68,25 +60,21 @@ const updateChartData = () => {
 
 
 onMounted(async () => {
-  await fetchPromotionsUsage();
+
   await fetchData();
 });
 
 watch([startDate, endDate, receiptType], async () => {
   await fetchData();
 });
-watch([startDateforpromo, endDateforpromo], async () => {
-  await fetchPromotionsUsage();
-});
+
 
 </script>
 <template>
   <v-container fluid>
     <v-row>
       <v-col cols="12">
-        <v-carousel hide-delimiter-background hide-delimiters style="border-radius: 20px;" show-arrows height="770px">
-          <!-- สินค้าขายดี (Top Selling Products) Section -->
-          <v-carousel-item>
+
             <v-row align="center" class="mb-4">
               <!-- Date Pickers and Load Data Button -->
               <v-col cols="auto">
@@ -164,48 +152,8 @@ watch([startDateforpromo, endDateforpromo], async () => {
                 No data available
               </v-alert>
             </v-row>
-          </v-carousel-item>
 
-          <!-- รายงานโปรโมชั่น (Promotion Report) Section -->
-          <v-carousel-item>
-            <v-row align="center" class="mb-4">
-              <v-col cols="auto">
-                <v-text-field
-                  v-model="startDateforpromo"
-                  label="Start Date"
-                  type="date"
-                  outlined
-                  dense hide-details variant="solo"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="auto">
-                <v-text-field
-                  v-model="endDateforpromo"
-                  label="End Date"
-                  type="date"
-                  outlined
-                  dense hide-details variant="solo"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-            <v-row align="center" justify="center" class="mb-4">
-              <h2>รายงานโปรโมชั่น</h2>
-            </v-row>
-            <v-row v-if="promotionUsagestore.promotionsUsage.length">
-              <v-col cols="12" md="3" v-for="(item, index) in promotionUsagestore.promotionsUsage" :key="index">
-                <v-card class="promotion-card">
-                  <v-card-title>{{ item.promotionName }}</v-card-title>
-                  <v-card-subtitle>
-                    จำนวนครั้งที่ใช้ : {{ item.usageCount }}
-                  </v-card-subtitle>
-                  <v-card-text>
-                    ยอดรวมส่วนลด: {{ item.totalDiscount }}
-                  </v-card-text>
-                </v-card>
-              </v-col>
-            </v-row>
-          </v-carousel-item>
-        </v-carousel>
+       
       </v-col>
     </v-row>
   </v-container>

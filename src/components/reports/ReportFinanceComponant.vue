@@ -95,8 +95,8 @@ const updateLineChartData = () => {
 
 onMounted(async () => {
   try {
-    await ReportFinnceStore.getDailyReport(); //ยอดขายรายวันของร้านกาแฟ
-    await ReportFinnceStore.getDailyReportFood(); //ยอดขายรายวันของข้าว
+    await ReportFinnceStore.getDailyReport(); 
+    await ReportFinnceStore.getDailyReportFood(); 
     await ReportFinnceStore.getcoffeeSummary();
     await expenditureStore.fetchExpenditure();
     await revenueStore.fetchRevenue();
@@ -232,7 +232,7 @@ watch(
       <!-- ยอดขายวันนี้ร้านกาแฟ -->
       <v-carousel-item >
         <v-card-title class="text-center" style="margin-top: 20px; font-weight: bold;"><v-icon size="25px">mdi-coffee-maker</v-icon>ยอดขายร้านกาแฟ</v-card-title>
-        <v-card-title class="text-center">{{ new Date().toLocaleDateString('th-TH', { day: 'numeric', month: 'long' }) }}</v-card-title>
+        <v-card-subtitle class="text-center">{{ new Date().toLocaleDateString('th-TH', { day: 'numeric', month: 'long' }) }}</v-card-subtitle>
         <v-row justify="center" align="center" no-gutters>
           <v-col cols="12" md="8">
             <v-row justify="center" no-gutters>
@@ -274,7 +274,7 @@ watch(
       <!-- ยอดขายวันนี้ร้านอาหาร -->
       <v-carousel-item>
         <v-card-title class="text-center" style="margin-top: 20px; font-weight: bold;"><v-icon size="25px">mdi-pasta</v-icon>ยอดขายร้านข้าว</v-card-title>
-        <v-card-title class="text-center">{{ new Date().toLocaleDateString('th-TH', { day: 'numeric', month: 'long' }) }}</v-card-title>
+        <v-card-subtitle class="text-center">{{ new Date().toLocaleDateString('th-TH', { day: 'numeric', month: 'long' }) }}</v-card-subtitle>
         <v-row justify="center" align="center" no-gutters>
           <v-col cols="12" md="8">
             <v-row justify="center" no-gutters>
@@ -315,46 +315,52 @@ watch(
 
       <!-- กำไร & ต้นทุนร้านกาแฟทั้งหมด -->
       <v-carousel-item>
-        <v-card-title class="text-center" style="margin-top: 20px;">
-          <v-icon size="25px">mdi-chart-histogram</v-icon>
-          กำไร & ต้นทุนร้านกาแฟทั้งหมด
+        <v-card-title class="text-center" style="margin-top: 20px; font-weight: bold;">
+          <v-icon size="25px">mdi-glass-cocktail</v-icon>จัดเลี้ยงรับรอง
         </v-card-title>
+        <v-card-subtitle class="text-center">
+          เดือน{{ new Date().toLocaleDateString('th-TH', { month: 'long' }) }}
+        </v-card-subtitle>
+        
         <v-row justify="center" align="center" no-gutters>
-          <v-col cols="12" md="4" class="pa-2" style="width: fit-content;">
-            <v-card class="d-flex justify-center align-center mt-6">
-              <v-card-title class="text-center">
-                ต้นทุน
-              </v-card-title>
-              <v-card-subtitle class="text-h5">
-                {{ ReportFinnceStore.coffeeSummary.totalCost }} บาท
-              </v-card-subtitle>
-            </v-card>
-            <v-card class="d-flex justify-center align-center mt-2">
-              <v-card-title class="text-center">
-                ยอดขาย
-              </v-card-title>
-              <v-card-subtitle class="text-h5">
-                {{ ReportFinnceStore.coffeeSummary.totalSales }} บาท
-              </v-card-subtitle>
-            </v-card>
-          </v-col>
-          <v-col cols="12" md="4">
-            <v-card class="d-flex justify-center align-center mt-6">
-              <v-card-title class="text-center">
-                ส่วนลด
-              </v-card-title>
-              <v-card-subtitle class="text-h5">
-                {{ ReportFinnceStore.coffeeSummary.totalDiscount }} บาท
-              </v-card-subtitle>
-            </v-card>
-            <v-card class="d-flex justify-center align-center mt-2">
-              <v-card-title class="text-center">
-                จำนวนรายการ
-              </v-card-title>
-              <v-card-subtitle class="text-h5">
-                {{ ReportFinnceStore.coffeeSummary.totalOrders }} รายการ
-              </v-card-subtitle>
-            </v-card>
+          <v-col cols="12" md="8">
+            <v-row justify="center" no-gutters>
+              <v-col cols="12" md="6" class="pa-2">
+                <v-card class="text-center mt-6">
+                  <v-card-title>จำนวนครั้งที่จัดเลี้ยง</v-card-title>
+                  <v-card-subtitle style="font-size: 24px; font-weight: bold; color: #FF7F7F;">
+                    {{ ReportFinnceStore.coffeeSummary.totalCost }} บาท
+                  </v-card-subtitle>
+                </v-card>
+              </v-col>
+              
+              <v-col cols="12" md="6" class="pa-2">
+                <v-card class="text-center mt-6">
+                  <v-card-title>กำไรรวมจัดเลี้ยง</v-card-title>
+                  <v-card-subtitle style="font-size: 24px; font-weight: bold; color: #2E7D32;">
+                    {{ ReportFinnceStore.coffeeSummary.totalSales }} บาท
+                  </v-card-subtitle>
+                </v-card>
+              </v-col>
+
+              <v-col cols="12" md="6" class="pa-2">
+                <v-card class="text-center mt-6">
+                  <v-card-title>รอดำเนินการ</v-card-title>
+                  <v-card-subtitle style="font-size: 24px; font-weight: bold; color: #FF7F7F;">
+                    {{ ReportFinnceStore.coffeeSummary.totalDiscount }} บาท
+                  </v-card-subtitle>
+                </v-card>
+              </v-col>
+
+              <v-col cols="12" md="6" class="pa-2">
+                <v-card class="text-center mt-6">
+                  <v-card-title>เสร็จสิ้น</v-card-title>
+                  <v-card-subtitle style="font-size: 24px; font-weight: bold; color: #2E7D32;">
+                    {{ ReportFinnceStore.coffeeSummary.totalOrders }} รายการ
+                  </v-card-subtitle>
+                </v-card>
+              </v-col>
+            </v-row>
           </v-col>
         </v-row>
       </v-carousel-item>

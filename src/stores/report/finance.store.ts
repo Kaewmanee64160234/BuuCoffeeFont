@@ -81,6 +81,7 @@ export const useReportFinnceStore = defineStore("cashier", () => {
   const getDailyReportFood = async () => {
     try {
       const res = await financeService.getDailyReportFood();
+      console.log('res',res);
       if (res.data) {
         dailyReportFood.value = res.data;
       }
