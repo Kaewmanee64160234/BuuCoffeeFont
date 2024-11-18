@@ -1,12 +1,8 @@
 <script lang="ts" setup>
 import { ref, onMounted, computed, watch } from 'vue';
 import { useReportFinnceStore } from '@/stores/report/finance.store';
-import CreateDialogAddCashier from '../../components/reports/cashier/DialogAddCashier.vue';
-import CreateHistoryDialogCashier from '../../components/reports/cashier/HistoryCashier.vue';
 import { useExpenditureStore } from '@/stores/report/expenditure.store';
 import { useRevenueStore } from '@/stores/report/revenue.store';
-
-import Swal from 'sweetalert2';
 const ReportFinnceStore = useReportFinnceStore();
 const expenditureStore = useExpenditureStore();
 const revenueStore = useRevenueStore();
@@ -230,55 +226,13 @@ watch(
 </script>
 
 <template>
-  <CreateDialogAddCashier />
-  <CreateHistoryDialogCashier />
   <v-container>
     <v-carousel hide-delimiter-background hide-delimiters height="290"
       style="background-color: #C7AE8D; border-radius: 20px;">
       <!-- ยอดขายวันนี้ร้านกาแฟ -->
       <v-carousel-item >
-        <v-card-title class="text-center"  style="margin-top: 20px;">
-
-          <v-icon size="25px">mdi-coffee-maker</v-icon>
-          ยอดขายวันนี้ร้านกาแฟ
-        </v-card-title>
-        <v-row class="px-8">
-          <v-row class="d-flex justify-center mt-10">
-            <v-col cols="12" md="3">
-              <v-card style="height: 100%">
-                <v-card-title class="d-flex justify-space-between align-center">
-                  รายได้
-                </v-card-title>
-                <v-card-subtitle class="text-h5">{{ ReportFinnceStore.dailyReport.totalSales }} บาท</v-card-subtitle>
-              </v-card>
-            </v-col>
-            <v-col cols="12" md="3">
-              <v-card style="height: 100%">
-                <v-card-title class="d-flex justify-space-between align-center">
-                  จำนวนรายการ
-                </v-card-title>
-                <v-card-subtitle class="text-h5">{{ ReportFinnceStore.dailyReport.totalTransactions }} รายการ</v-card-subtitle>
-              </v-card>
-            </v-col>
-            <v-col cols="12" md="3">
-              <v-card style="height: 100%">
-                <v-card-title class="d-flex justify-space-between align-center">
-                  ส่วนลด
-                </v-card-title>
-                <v-card-subtitle class="text-h5">{{ ReportFinnceStore.dailyReport.totalDiscount }} บาท</v-card-subtitle>
-              </v-card>
-            </v-col>
-          </v-row>
-          
-        </v-row>
-      </v-carousel-item>
-
-      <!-- ยอดขายวันนี้ร้านอาหาร -->
-      <v-carousel-item>
-        <v-card-title class="text-center" style="margin-top: 20px;">
-          <v-icon size="25px">mdi-pasta</v-icon>
-          ยอดขายวันนี้ร้านอาหาร
-        </v-card-title>
+        <v-card-title class="text-center" style="margin-top: 20px; font-weight: bold;"><v-icon size="25px">mdi-coffee-maker</v-icon>ยอดขายร้านกาแฟ</v-card-title>
+        <v-card-title class="text-center">{{ new Date().toLocaleDateString('th-TH', { day: 'numeric', month: 'long' }) }}</v-card-title>
         <v-row justify="center" align="center" no-gutters>
           <v-col cols="12" md="8">
             <v-row justify="center" no-gutters>
@@ -287,7 +241,49 @@ watch(
                   <v-card-title>
                     รายได้
                   </v-card-title>
-                  <v-card-subtitle class="text-h4">
+                  <v-card-subtitle style="font-size: 24px; font-weight: bold; color: #2E7D32;">
+                    {{ ReportFinnceStore.dailyReport.totalSales }} บาท
+                  </v-card-subtitle>
+                </v-card>
+              </v-col>
+              <v-col cols="12" md="4" class="pa-2">
+                <v-card class="text-center mt-6">
+                  <v-card-title>
+                    จำนวนรายการ
+                  </v-card-title>
+                  <v-card-subtitle style="font-size: 24px; font-weight: bold; color: #2E7D32;">
+                    {{ ReportFinnceStore.dailyReport.totalTransactions }} รายการ
+                  </v-card-subtitle>
+                </v-card>
+              </v-col>
+              <v-col cols="12" md="4" class="pa-2">
+                <v-card class="text-center mt-6">
+                  <v-card-title>
+                    ส่วนลด
+                  </v-card-title>
+                  <v-card-subtitle  style="font-size: 24px; font-weight: bold; color: #FF7F7F;">
+                    {{ ReportFinnceStore.dailyReport.totalDiscount }} บาท
+                  </v-card-subtitle>
+                </v-card>
+              </v-col>
+            </v-row>
+          </v-col>
+        </v-row>
+      </v-carousel-item>
+
+      <!-- ยอดขายวันนี้ร้านอาหาร -->
+      <v-carousel-item>
+        <v-card-title class="text-center" style="margin-top: 20px; font-weight: bold;"><v-icon size="25px">mdi-pasta</v-icon>ยอดขายร้านข้าว</v-card-title>
+        <v-card-title class="text-center">{{ new Date().toLocaleDateString('th-TH', { day: 'numeric', month: 'long' }) }}</v-card-title>
+        <v-row justify="center" align="center" no-gutters>
+          <v-col cols="12" md="8">
+            <v-row justify="center" no-gutters>
+              <v-col cols="12" md="4" class="pa-2">
+                <v-card class="text-center mt-6">
+                  <v-card-title>
+                    รายได้
+                  </v-card-title>
+                  <v-card-subtitle style="font-size: 24px; font-weight: bold; color: #2E7D32;">
                     {{ ReportFinnceStore.dailyReportFood.totalSales }} บาท
                   </v-card-subtitle>
                 </v-card>
@@ -297,7 +293,7 @@ watch(
                   <v-card-title>
                     จำนวนรายการ
                   </v-card-title>
-                  <v-card-subtitle class="text-h4">
+                  <v-card-subtitle style="font-size: 24px; font-weight: bold; color: #2E7D32;">
                     {{ ReportFinnceStore.dailyReportFood.totalTransactions }} รายการ
                   </v-card-subtitle>
                 </v-card>
@@ -307,7 +303,7 @@ watch(
                   <v-card-title>
                     ส่วนลด
                   </v-card-title>
-                  <v-card-subtitle class="text-h4">
+                  <v-card-subtitle  style="font-size: 24px; font-weight: bold; color: #FF7F7F;">
                     {{ ReportFinnceStore.dailyReportFood.totalDiscount }} บาท
                   </v-card-subtitle>
                 </v-card>
