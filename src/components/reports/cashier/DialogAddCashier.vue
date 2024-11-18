@@ -3,8 +3,7 @@ import { computed, ref } from 'vue';
 import { useReportFinnceStore } from '@/stores/report/finance.store';
 import financeService from '@/service/report/finance.service';
 import { useUserStore } from '@/stores/user.store';
-import CheckIngredientDraft from '@/views/ingredient/check/checkIngredientDraft.vue';
-
+const loading = ref(false);
 const amounts = ref<number[]>(new Array(9).fill(0));
 const valid = ref(false);
 const ReportFinnceStore = useReportFinnceStore();
@@ -54,23 +53,24 @@ const submitForm = async () => {
       };
 
       const items = [
-  { denomination: "1000", quantity: amounts.value[0] },
-  { denomination: "500", quantity: amounts.value[1] },
-  { denomination: "100", quantity: amounts.value[2] },
-  { denomination: "50", quantity: amounts.value[3] },
-  { denomination: "20", quantity: amounts.value[4] },
-  { denomination: "10", quantity: amounts.value[5] },
-  { denomination: "5", quantity: amounts.value[6] },
-  { denomination: "2", quantity: amounts.value[7] },
-  { denomination: "1", quantity: amounts.value[8] },
-];
+        { denomination: "1000", quantity: amounts.value[0] },
+        { denomination: "500", quantity: amounts.value[1] },
+        { denomination: "100", quantity: amounts.value[2] },
+        { denomination: "50", quantity: amounts.value[3] },
+        { denomination: "20", quantity: amounts.value[4] },
+        { denomination: "10", quantity: amounts.value[5] },
+        { denomination: "5", quantity: amounts.value[6] },
+        { denomination: "2", quantity: amounts.value[7] },
+        { denomination: "1", quantity: amounts.value[8] },
+      ];
+      loading.value = true;
 
       try {
- 
+
 
         await financeService.createCashier(cashier, items);
-        await financeStore.checkCashierToday(); 
-  
+        await financeStore.checkCashierToday();
+
         clearData();
       } catch (error) {
         console.error('Error creating cashier:', error);
@@ -91,7 +91,7 @@ const rules = {
       <v-card-title class="text-h5 bg-brown-lighten-4 pa-4 d-flex align-center justify-space-between">
         <div class="d-flex align-center">
           <v-icon class="mr-2">mdi-cash</v-icon>
-          บันทึกยอดเงินสดประจำวัน
+          บันทึกยอดเงินสดก่อนเปิดการขาย
         </div>
         <v-btn icon @click="ReportFinnceStore.createCashierDialog = false">
           <v-icon>mdi-close</v-icon>
@@ -105,24 +105,12 @@ const rules = {
             <v-card-title class="text-subtitle-1 bg-grey-lighten-3 pa-3">
               ใส่จำนวนธนบัตร
             </v-card-title>
-            <v-card-text  class="pt-4">
+            <v-card-text class="pt-4">
               <v-row>
-                <v-col
-                  v-for="(currency, index) in banknotes"
-                  :key="currency.value"
-                  cols="12"
-                  sm="6"
-                >
-                  <v-text-field
-                    v-model="amounts[index]"
-                    :label="`${currency.label} (${currency.value} บาท)`"
-                    type="number"
-                    min="0"
-                    @input="amounts[index] = Math.max(0, amounts[index])"
-                    suffix="ใบ"
-                    variant="outlined"
-                    density="comfortable"
-                  ></v-text-field>
+                <v-col v-for="(currency, index) in banknotes" :key="currency.value" cols="12" sm="6">
+                  <v-text-field v-model="amounts[index]" :label="`${currency.label} (${currency.value} บาท)`"
+                    type="number" min="0" @input="amounts[index] = Math.max(0, amounts[index])" suffix="ใบ"
+                    variant="outlined" density="comfortable"></v-text-field>
                 </v-col>
               </v-row>
             </v-card-text>
@@ -134,22 +122,11 @@ const rules = {
             </v-card-title>
             <v-card-text class="pt-4">
               <v-row>
-                <v-col
-                  v-for="(currency, index) in coins"
-                  :key="currency.value"
-                  cols="12"
-                  sm="6"
-                >
-                  <v-text-field
-                    v-model="amounts[index + banknotes.length]"
-                    :label="`${currency.label} (${currency.value} บาท)`"
-                    type="number"
-                    min="0"
+                <v-col v-for="(currency, index) in coins" :key="currency.value" cols="12" sm="6">
+                  <v-text-field v-model="amounts[index + banknotes.length]"
+                    :label="`${currency.label} (${currency.value} บาท)`" type="number" min="0"
                     @input="amounts[index + banknotes.length] = Math.max(0, amounts[index + banknotes.length])"
-                    suffix="เหรียญ"
-                    variant="outlined"
-                    density="comfortable"
-                  ></v-text-field>
+                    suffix="เหรียญ" variant="outlined" density="comfortable"></v-text-field>
                 </v-col>
               </v-row>
             </v-card-text>
@@ -157,12 +134,7 @@ const rules = {
 
           <v-row>
             <v-col cols="12">
-              <v-alert
-                v-if="totalAmount > 0"
-                type="info"
-                variant="tonal"
-                class="mb-4"
-              >
+              <v-alert v-if="totalAmount > 0" type="info" variant="tonal" class="mb-4">
                 ยอดรวมทั้งหมด: {{ totalAmount }} บาท
               </v-alert>
             </v-col>
@@ -170,13 +142,7 @@ const rules = {
 
           <v-row>
             <v-col cols="12" class="text-center">
-              <v-btn 
-                type="submit" 
-                color="#FF9642" 
-                size="large"
-                block
-                :loading="loading"
-              >
+              <v-btn type="submit" color="#FF9642" size="large" block :loading="loading">
                 ส่งข้อมูล
               </v-btn>
             </v-col>

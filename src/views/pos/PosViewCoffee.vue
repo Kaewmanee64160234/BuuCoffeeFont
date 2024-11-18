@@ -2,7 +2,6 @@
 import { computed, onMounted, ref, watch } from "vue";
 import PromotionCardsCarousel from "@/components/pos/PromotionCardsCarousel.vue";
 import ProductCard from "@/components/pos/ProductCard.vue";
-import SelectedItemsList from "@/components/pos/SelectedItemsListRice.vue";
 import DrinkSelectionDialog from "@/components/pos/DrinkSelectionDialog.vue";
 import ReceiptDialog from "@/components/pos/ReceiptDialog.vue";
 import { useProductStore } from "@/stores/product.store";

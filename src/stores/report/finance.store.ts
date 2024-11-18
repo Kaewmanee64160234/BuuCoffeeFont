@@ -6,6 +6,7 @@ import type { TopSellingProduct } from "@/types/report/top-selling-product.type"
 export const useReportFinnceStore = defineStore("cashier", () => {
   const cashiers = ref<Cashier[]>([]);
   const createCashierDialog = ref(false);
+  const closeCashierDialog = ref(false);
   const createHistoryCashierDialog = ref(false);
   const historycashiers = ref<Cashier[]>([]);
   const selectedType = ref<string | null>(null);
@@ -26,18 +27,7 @@ export const useReportFinnceStore = defineStore("cashier", () => {
     groupedByMonth: {},
     groupedByYear: {},
   });
-  const createCashier = async (cashier: Cashier) => {
-    try {
-      const res = await financeService.createCashier(cashier);
-      if (res.data) {
-        cashiers.value.push(res.data);
-      }
-      window.location.reload();
 
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
 
   const getAll = async () => {
@@ -160,6 +150,7 @@ export const useReportFinnceStore = defineStore("cashier", () => {
   return {
     cashiers,
     createCashierDialog,
+    closeCashierDialog,
     createHistoryCashierDialog,
     historycashiers,
     sumType,
@@ -169,7 +160,6 @@ export const useReportFinnceStore = defineStore("cashier", () => {
     state,
     stateFood,
     topSellingProduct,
-    createCashier,
     selectedType,
     getAll,
     deleteCashier,
