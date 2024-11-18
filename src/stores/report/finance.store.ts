@@ -8,6 +8,7 @@ export const useReportFinnceStore = defineStore("cashier", () => {
   const createCashierDialog = ref(false);
   const createHistoryCashierDialog = ref(false);
   const historycashiers = ref<Cashier[]>([]);
+  const selectedType = ref<string | null>(null);
   const sumType = ref<{ cash: string; qrcode: string }>({ cash: "", qrcode: "" });
   const topSellingProduct = ref<TopSellingProduct[]>([]);
   const dailyReport = ref<{ totalSales: number; totalDiscount: number ; totalTransactions: number}>({ totalSales: 0, totalDiscount: 0, totalTransactions:0});
@@ -169,7 +170,7 @@ export const useReportFinnceStore = defineStore("cashier", () => {
     stateFood,
     topSellingProduct,
     createCashier,
-
+    selectedType,
     getAll,
     deleteCashier,
     getSumType,

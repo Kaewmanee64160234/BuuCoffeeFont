@@ -233,6 +233,7 @@ const showQueue = computed(() => {
 });
 // handleCashierEntry
 const handleCashierEntry = () => {
+  financeStore.selectedType = 'coffee';
   financeStore.createCashierDialog = true;
 };
 </script>

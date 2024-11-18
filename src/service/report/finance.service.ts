@@ -8,7 +8,8 @@ async function getfindToday() {
     return await http.get("/cashiers/today");
  
 }
-export function createCashier(cashier: Cashier, items: { denomination: string; quantity: number }[]) {
+export async function createCashier(cashier: Cashier, items: { denomination: string; quantity: number }[]) {
+  console.log('สร้างรายการเงินสด:', { cashier, items });
   const payload = {
     ...cashier, 
     items, 

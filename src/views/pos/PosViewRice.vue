@@ -197,6 +197,7 @@ const showQueue = computed(() => {
 });
 
 const handleCashierEntry = () => {
+  financeStore.selectedType = 'rice';
   financeStore.createCashierDialog = true;
 };
 //  watch  financeStore.checkTodayCoffee
@@ -564,7 +565,7 @@ watch(
           "
         >
           <v-card-title class="text-h5 text-center">
-            ร้านกาแฟไม่พร้อมใช้งาน
+            ร้านข้าวไม่พร้อมใช้งาน
           </v-card-title>
           <v-card-subtitle class="text-center">
             กรุณากรอกเงินในแคชเชียร์ให้ครบก่อนเริ่มการขาย
