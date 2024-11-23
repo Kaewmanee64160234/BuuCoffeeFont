@@ -376,7 +376,7 @@ const closeSale = () => {
                 <v-col cols="12" md="6">
                   <h3 class="order-summary-title">สรุปรายการ</h3>
                 </v-col>
-                <v-col cols="12" md="6" class="text-end">
+                <v-col cols="12" md="5" class="text-end ml-6">
                   <p @click="cancelReceipt()" class="cancel-order">
                     ยกเลิกรายการ
                   </p>
@@ -404,10 +404,10 @@ const closeSale = () => {
                       :prepend-avatar="`${url}/products/${item.product?.productId}/image`"
                     >
                       <v-row no-gutters>
-                        <v-col cols="6" class="product-name">{{
+                        <v-col cols="6" class="product-name" style="font-size: 16px;">{{
                           item.product?.productName
                         }}</v-col>
-                        <v-col cols="6" class="text-right product-price">
+                        <v-col cols="6" class="text-right product-price" style="font-size: 16px;">
                           <p>{{ item.receiptSubTotal }}</p>
                         </v-col>
                       </v-row>
@@ -415,37 +415,37 @@ const closeSale = () => {
                         <v-col cols="7">
                           <div
                             v-if="item.product?.haveTopping"
-                            class="product-details"
+                            class="product-details" style="font-size: 16px;"
                           >
                             {{ item.productType?.productTypeName }} +{{
                               item.productType?.productTypePrice
                             }}
                             | ความหวาน {{ item.sweetnessLevel }}%
                           </div>
-                          <div v-else class="product-details">
+                          <div v-else class="product-details" style="font-size: 16px;">
                             {{ item.product?.productName }} ({{
                               item.product?.category.categoryName
                             }}) {{ item.product?.productPrice }}.-
                           </div>
                           <ul
                             v-if="item.productTypeToppings?.length"
-                            class="toppings-list"
+                            class="toppings-list" style="font-size: 16px;"
                           >
                             <li
                               v-for="topping in item.productTypeToppings"
                               :key="topping?.topping?.toppingId"
-                              class="topping-item"
+                              class="topping-item" style="font-size: 16px;"
                             >
                               x{{ topping?.quantity }}
                               {{ topping?.topping?.toppingName }}
                               <span
                                 v-if="topping?.topping?.toppingName.length > 3"
-                                >: {{ topping?.topping?.toppingPrice }}.-</span
+                                >: {{ topping?.topping?.toppingPrice }}.-</span 
                               >
                             </li>
                           </ul>
                         </v-col>
-                        <v-col cols="5" class="quantity-controls">
+                        <v-col cols="5" class="quantity-controls" style="font-size: 16px;">
                           <v-btn
                             size="xs-small"
                             color="#C5C5C5"
@@ -482,18 +482,18 @@ const closeSale = () => {
             <div class="order-summary">
               <v-divider class="divider" />
               <h3 class="order-summary-title">สรุปรายการ</h3>
-              <v-card-subtitle class="mt-2">โปรโมชั่น:</v-card-subtitle>
-              <div class="promotion-section mt-2">
-                <div class="promotion-list">
+              <v-card-subtitle class="mt-2" style="font-size: 16px;">โปรโมชั่น:</v-card-subtitle>
+              <div class="promotion-section mt-2" style="font-size: 16px;">
+                <div class="promotion-list" style="font-size: 16px;">
                   <div
                     v-for="promotion in posStore.receipt.receiptPromotions"
                     :key="promotion.receiptPromotionId"
-                    class="promotion-item"
+                    class="promotion-item" style="font-size: 16px;"
                   >
-                    <span class="promotion-name"
+                    <span class="promotion-name" style="font-size: 16px;"
                       >{{ promotion.promotion.promotionName }}:</span
                     >
-                    <span class="red--text">{{ promotion.discount }} $</span>
+                    <span class="red--text" style="font-size: 16px;">{{ promotion.discount }} $</span>
                     <v-btn
                       size="small"
                       icon
@@ -550,6 +550,7 @@ const closeSale = () => {
                   }"
                   class="payment-button"
                   @click="selectPaymentMethod('cash')"
+                  style="font-size: 18px;"
                 >
                   เงินสด
                 </v-btn>
@@ -559,6 +560,7 @@ const closeSale = () => {
                   }"
                   class="payment-button"
                   @click="selectPaymentMethod('qrcode')"
+                  style="font-size: 18px;"
                 >
                   แสกนจ่าย
                 </v-btn>
@@ -627,10 +629,10 @@ const closeSale = () => {
 
           <div class="footer-buttons">
             <v-row class="d-flex justify-center pr-6">
-              <v-btn class="prev-step-btn mt-5" rounded @click="prevStep"
+              <v-btn class="prev-step-btn mt-5" rounded @click="prevStep" style="font-size: 16px;"
                 >ย้อนกลับ</v-btn
               >
-              <v-btn class="save-btn ml-3 mt-5" rounded @click="save"
+              <v-btn class="save-btn ml-3 mt-5" rounded @click="save" style="font-size: 16px;"
                 >ยืนยันการชำระเงิน</v-btn
               >
             </v-row>
@@ -761,37 +763,44 @@ const closeSale = () => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: 16px;
 }
 
 .product-price {
   color: #333;
+  font-size: 16px;
 }
 
 .product-details {
   font-size: 14px;
   color: #555;
+  font-size: 16px;
 }
 
 .toppings-list {
   list-style: none;
   padding-left: 0;
   margin-top: 3px;
+  font-size: 16px;
 }
 
 .topping-item {
   font-size: 12px;
   color: gray;
+  font-size: 16px;
 }
 
 .quantity-controls {
   display: flex;
   align-items: center;
   gap: 5px;
+  font-size: 16px;
 }
 
 .promotion-section {
   overflow-y: auto;
   max-height: 10vh;
+  font-size: 16px;
 }
 
 .promotion-item {
@@ -799,10 +808,12 @@ const closeSale = () => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 5px;
+  font-size: 16px;
 }
 
 .promotion-name {
   font-weight: 600;
+  font-size: 16px;
 }
 
 .red--text {
@@ -813,6 +824,7 @@ const closeSale = () => {
   color: #ff9642;
   font-weight: bold;
   padding-right: 20px;
+  font-size: 16px;
 }
 
 .footer-buttons {

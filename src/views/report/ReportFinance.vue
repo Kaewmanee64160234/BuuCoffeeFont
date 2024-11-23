@@ -19,7 +19,7 @@ function reloadData() {
   <v-container class="d-flex justify-center align-center fill-height">
     <v-card class="fill-width scrollable-card" max-width="1400px">
       <v-card-title class="text-center">
-        <h3>Dashboard</h3>
+        <h3 style="font-size: 30px;">Dashboard</h3>
       </v-card-title>
       <v-card-text>
         <v-row class="d-flex justify-center">

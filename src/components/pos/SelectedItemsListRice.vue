@@ -325,7 +325,7 @@ const closeSale = ()=>{
       ปิดการขาย
     </v-btn>
             </div>
-            <v-divider class="mb-4"></v-divider>
+            <v-divider class="divider"></v-divider>
 
             <!-- Customer Actions -->
             <v-row class="d-flex align-center justify-end customer-actions">
@@ -336,7 +336,7 @@ const closeSale = ()=>{
               </v-col>
             </v-row>
 
-            <v-divider class="my-4"></v-divider>
+            <v-divider class="divider my-2" />
 
             <div>
               <v-row>
@@ -372,10 +372,10 @@ const closeSale = ()=>{
                       class="full-width item-row"
                     >
                       <v-row no-gutters>
-                        <v-col cols="6" class="product-name">
+                        <v-col cols="6" class="product-name" style="font-size: 16px;">
                           {{ item.product?.productName }}
                         </v-col>
-                        <v-col cols="6" class="text-right product-price">
+                        <v-col cols="6" class="text-right product-price" style="font-size: 16px;">
                           <p>{{ item.receiptSubTotal }}</p>
                         </v-col>
                       </v-row>
@@ -383,7 +383,7 @@ const closeSale = ()=>{
                         <v-col cols="7">
                           <div
                             v-if="item.product?.haveTopping"
-                            class="product-details"
+                            class="product-details" style="font-size: 16px;"
                           >
                             {{ item.productType?.productTypeName }} +{{
                               item.productType?.productTypePrice
@@ -391,7 +391,7 @@ const closeSale = ()=>{
                             | ความหวาน {{ item.sweetnessLevel }}%
                           </div>
                           <div v-else>
-                            <div class="product-details">
+                            <div class="product-details" style="font-size: 16px;">
                               {{ item.product?.productName }} ({{
                                 item.product?.category.categoryName
                               }}) {{ item.product?.productPrice }}.-
@@ -403,11 +403,11 @@ const closeSale = ()=>{
                               item.productTypeToppings.length > 0
                             "
                           >
-                            <ul class="toppings-list">
+                            <ul class="toppings-list" style="font-size: 16px;">
                               <li
                                 v-for="topping in item.productTypeToppings"
                                 :key="topping?.topping?.toppingId"
-                                class="topping-item"
+                                class="topping-item" style="font-size: 16px;"
                               >
                                 x{{ topping?.quantity }}
                                 {{ topping?.topping?.toppingName }}
@@ -424,7 +424,7 @@ const closeSale = ()=>{
                           </div>
                         </v-col>
                         <v-col cols="5" class="text-end">
-                          <div class="quantity-controls">
+                          <div class="quantity-controls" style="font-size: 16px;">
                             <v-btn
                               size="xs-small"
                               color="#C5C5C5"
@@ -433,7 +433,7 @@ const closeSale = ()=>{
                             >
                               <v-icon>mdi-minus</v-icon>
                             </v-btn>
-                            <span class="quantity">{{ item.quantity }}</span>
+                            <span class="quantity" style="font-size: 16px;">{{ item.quantity }}</span>
                             <v-btn
                               size="xs-small"
                               color="#FF9642"
@@ -462,18 +462,18 @@ const closeSale = ()=>{
             <div >
               <v-divider class="divider"></v-divider>
               <h3 class="order-summary-title">สรุปรายการ</h3>
-              <v-card-subtitle class="mt-2">โปรโมชั่น:</v-card-subtitle>
+              <v-card-subtitle class="mt-2" style="font-size: 16px;">โปรโมชั่น:</v-card-subtitle>
               <div class="promotion-30">
                 <div class="sub-promotion">
                   <div
                     v-for="promotion in posStore.receipt.receiptPromotions"
                     :key="promotion.receiptPromotionId"
-                    class="promotion-row"
+                    class="promotion-row" style="font-size: 16px;"
                   >
-                    <span class="promotion-name"
+                    <span class="promotion-name" style="font-size: 16px;"
                       >{{ promotion.promotion.promotionName }}:</span
                     >
-                    <span class="promotion-discount red--text"
+                    <span class="promotion-discount red--text" style="font-size: 16px;"
                       >{{ promotion.discount }} $</span
                     >
                     <v-btn
@@ -492,7 +492,7 @@ const closeSale = ()=>{
                 <v-col>
                   <h3>ราคาสุทธิ</h3>
                 </v-col>
-                <v-col class="text-end total-price">
+                <v-col class="text-end total-price" style="font-size: 16px;">
                   <h3>{{ posStore.receipt.receiptNetPrice }}</h3>
                 </v-col>
               </v-row>
@@ -500,7 +500,7 @@ const closeSale = ()=>{
           </div>
           <div class="footer-buttons">
             <v-row class="d-flex justify-center pr-6">
-              <v-btn class="next-step-btn mt-2" rounded @click="nextStep">
+              <v-btn class="next-step-btn mt-2" style="font-size: 16px;" rounded @click="nextStep">
                 ชำระเงิน
               </v-btn>
             </v-row>
@@ -530,6 +530,7 @@ const closeSale = ()=>{
                   }"
                   class="payment-button"
                   @click="selectPaymentMethod('cash')"
+                  style="font-size: 18px;"
                 >
                   เงินสด
                 </v-btn>
@@ -539,6 +540,7 @@ const closeSale = ()=>{
                   }"
                   class="payment-button"
                   @click="selectPaymentMethod('qrcode')"
+                  style="font-size: 18px;"
                 >
                   แสกนจ่าย
                 </v-btn>
@@ -608,9 +610,9 @@ const closeSale = ()=>{
           <div class="footer-buttons">
             <v-row class="d-flex justify-center pr-6">
               <v-btn class="prev-step-btn mt-5" rounded @click="prevStep"
-                >ย้อนกลับ</v-btn
+              style="font-size: 16px;">ย้อนกลับ</v-btn
               >
-              <v-btn class="save-btn mt-5 ml-3" rounded @click="save"
+              <v-btn class="save-btn mt-5 ml-3" rounded @click="save" style="font-size: 16px;"
                 >ยืนยันการชำระเงิน</v-btn
               >
             </v-row>
@@ -622,6 +624,11 @@ const closeSale = ()=>{
 </template>
 
 <style scoped>
+.divider {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
 .app {
   height: 100vh;
   display: flex;
@@ -661,6 +668,7 @@ const closeSale = ()=>{
   color: red;
   cursor: pointer;
   font-weight: bold;
+  transition: color 0.2s ease;
 }
 
 .promotions-section,

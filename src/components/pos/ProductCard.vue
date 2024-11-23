@@ -159,7 +159,7 @@ function decreaseSweetness() {
 
       <v-row v-if="props.product.productTypes && props.product.productTypes.length > 0" class="mt-1">
         <div class="d-flex flex-column " v-if="props.product.haveTopping == true">
-          <span>ตัวเลือก</span>
+          <span style="font-size: 16px;" class="ml-3">ตัวเลือก</span>
           <div class="d-flex flex-wrap">
             <v-chip v-for="type in props.product.productTypes.filter((
               type
@@ -172,7 +172,7 @@ function decreaseSweetness() {
       </v-row>
 
       <div v-if="props.product.haveTopping" class="d-flex flex-column mt-4">
-        <span>ระดับความหวาน</span>
+        <span style="font-size: 16px;">ระดับความหวาน</span>
         <div class="d-flex justify-start align-center">
           <v-btn variant="elevated" color="#C5C5C5" @click="decreaseSweetness" icon="mdi-minus"
             :disabled="selectedSweetness === 0"></v-btn>
@@ -183,7 +183,7 @@ function decreaseSweetness() {
       </div>
 
       <div v-if="props.product.haveTopping" class="d-flex flex-column mt-4">
-        <span>ท็อปปิ้ง</span>
+        <span style="font-size: 16px;">ท็อปปิ้ง</span>
         <v-btn variant="outlined" color="primary" @click="toppingMenu = !toppingMenu" small>
           {{ toppingMenu ? 'ซ้อนท็อปปิ้ง' : 'แสดงท็อปปิ้ง' }}
         </v-btn>
@@ -213,7 +213,7 @@ function decreaseSweetness() {
 
       <div class="quantity-container d-flex justify-space-between align-center mt-2"
         v-if="props.product.haveTopping == true">
-        <p class="pa-2">จำนวนสินค้า</p>
+        <p class="pa-2" style="font-size: 16px;">จำนวนสินค้า</p>
         <v-btn variant="elevated" color="#C5C5C5" @click="decreaseQuantity" icon="mdi-minus" size="x-small"></v-btn>
         <span class="mx-2">{{ quantity }}</span>
         <v-btn variant="elevated" color="#FF9642" @click="increaseQuantity" icon="mdi-plus" size="x-small"></v-btn>
@@ -221,8 +221,8 @@ function decreaseSweetness() {
     </v-card-text>
 
     <v-card-actions style=" width: 100%;">
-      <v-btn variant="elevated" color="#FF9642" rounded="xl" style="width: 100%;"
-        @click="confirmSelection">ยืนยัน</v-btn>
+      <v-btn variant="elevated" color="#FF9642" rounded="xl" style="width: 100%;font-size: 16px;"
+        @click="confirmSelection" >ยืนยัน</v-btn>
     </v-card-actions>
 
   </v-card>
