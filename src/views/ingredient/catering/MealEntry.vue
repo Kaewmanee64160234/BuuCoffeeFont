@@ -30,7 +30,10 @@ const decreaseProductQuantity = (mealIndex: number, item: MealProduct) => {
     item.quantity--;
     item.totalPrice = item.product!.productPrice * item.quantity;
     const meal = cateringStore.cateringEvent.meals[mealIndex];
-    meal.totalPrice = meal.mealProducts.reduce((sum, p) => sum + p.totalPrice, 0);
+    meal.totalPrice = meal.mealProducts.reduce(
+      (sum, p) => sum + p.totalPrice,
+      0
+    );
     cateringStore.calculateTotalPrice(mealIndex);
   }
 };
@@ -61,9 +64,14 @@ const removeProductFromMeal = (mealIndex: number, productIndex: number) => {
 };
 
 // Select items when meal product has toppings
-const setFilteredReceiptItems = (mealIndex: number, mealProduct: MealProduct) => {
+const setFilteredReceiptItems = (
+  mealIndex: number,
+  mealProduct: MealProduct
+) => {
   if (mealProduct.product!.haveTopping) {
-    cateringStore.filteredReceiptItems = cateringStore.cateringEvent.meals[mealIndex].receipt.receiptItems.filter(
+    cateringStore.filteredReceiptItems = cateringStore.cateringEvent.meals[
+      mealIndex
+    ].receipt.receiptItems.filter(
       (item) => item.product!.productName === mealProduct.product!.productName
     );
     cateringStore.selectedMealIndex = mealIndex;
@@ -89,11 +97,20 @@ watch(searchQuery, (query) => {
   <v-card>
     <v-card-text>
       <!-- Iterate over each meal and show all details -->
-      <div v-for="(meal, indexMeals) in cateringStore.cateringEvent.meals" :key="indexMeals">
+      <div
+        v-for="(meal, indexMeals) in cateringStore.cateringEvent.meals"
+        :key="indexMeals"
+      >
         <v-row class="d-flex align-center mb-3">
           <v-col class="d-flex align-center justify-space-between">
-            <v-card-title>รายละเอียดมื้ออาหาร #{{ indexMeals + 1 }}</v-card-title>
-            <v-btn icon color="#F55050" @click="cateringStore.removeMeal(indexMeals)">
+            <v-card-title
+              >รายละเอียดมื้ออาหาร #{{ indexMeals + 1 }}</v-card-title
+            >
+            <v-btn
+              icon
+              color="#F55050"
+              @click="cateringStore.removeMeal(indexMeals)"
+            >
               <v-icon>mdi-delete</v-icon>
             </v-btn>
           </v-col>
@@ -160,12 +177,21 @@ watch(searchQuery, (query) => {
               ></v-text-field>
             </v-col>
           </v-row>
-          <v-btn color="accent" @click="openDrinkSelectionDialog(indexMeals)" style="font-size: 17px;">
+          <v-btn
+            color="accent"
+            @click="openDrinkSelectionDialog(indexMeals)"
+            style="font-size: 17px"
+          >
             เพิ่มสินค้าจัดเลี้ยง
           </v-btn>
         </v-card-title>
 
-        <v-tabs align-tabs="start" color="brown" background-color="#fff" class="ma-4">
+        <v-tabs
+          align-tabs="start"
+          color="brown"
+          background-color="#fff"
+          class="ma-4"
+        >
           <v-tab @click="selectedTab = 'ร้านกาแฟ'">วัตถุดิบร้านกาแฟ</v-tab>
           <v-tab @click="selectedTab = 'ร้านข้าว'">วัตถุดิบร้านข้าว</v-tab>
         </v-tabs>
@@ -183,9 +209,14 @@ watch(searchQuery, (query) => {
                   <v-card
                     width="120%"
                     class="pa-2"
-                    @click="cateringStore.addProduct(item, indexMeals, item.storeType)"
+                    @click="
+                      cateringStore.addProduct(item, indexMeals, item.storeType)
+                    "
                   >
-                    <v-img :src="`http://localhost:3000/products/${item.productId}/image`" height="100"></v-img>
+                    <v-img
+                      :src="`http://localhost:3000/products/${item.productId}/image`"
+                      height="100"
+                    ></v-img>
                     <v-card-title>{{ item.productName }}</v-card-title>
                     <v-card-subtitle>
                       ราคาต้นทุน
@@ -226,29 +257,46 @@ watch(searchQuery, (query) => {
                   >
                     <td class="text-center">{{ itemIndex + 1 }}</td>
                     <td class="text-center">
-                      {{ item.product ? item.product.productName : item.productName }}
-                    </td>
-                    <td>{{ item.type }}</td>
-                    <td>
                       {{
                         item.product
-                          ? item.product.haveTopping && item.product.productTypes
-                            ? item.product.productTypes[0].productTypePrice
-                            : item.product.productPrice
-                          : item.productPrice
+                          ? item.product.productName
+                          : item.productName
                       }}
+                    </td>
+                    <td v-if="item.product?.haveTopping" >{{ item.product.storeType }}</td>
+                    <td v-else>{{ item.type }}</td>
+                    <td
+                      v-if=" item.product!.haveTopping && item.type !='เลี้ยงรับรอง'"
+                    >
+                      {{ item.product.productTypes[0].productTypePrice }}
+                    </td>
+                    <td
+                      v-else-if="!item.product!.haveTopping && item.type !='เลี้ยงรับรอง'"
+                    >
+                      {{ item.product?.productPrice }}
+                    </td>
+                    <td
+                      v-else-if="!item.product!.haveTopping && item.type=='เลี้ยงรับรอง'"
+                    >
+                      {{ item.productPrice }}
                     </td>
                     <td>{{ item.totalPrice }}</td>
                     <td>
                       {{
                         item.product?.haveTopping
                           ? "ชิ้น"
-                          : item.product?.ingredient?.ingredientQuantityPerSubUnit || "ชิ้น"
+                          : item.product?.ingredient
+                              ?.ingredientQuantityPerSubUnit || "ชิ้น"
                       }}
                     </td>
                     <td>{{ item.quantity }}</td>
                     <td>
-                      <v-btn icon @click.stop="removeProductFromMeal(indexMeals, itemIndex)">
+                      <v-btn
+                        icon
+                        @click.stop="
+                          removeProductFromMeal(indexMeals, itemIndex)
+                        "
+                      >
                         <v-icon>mdi-delete</v-icon>
                       </v-btn>
                     </td>
@@ -264,7 +312,12 @@ watch(searchQuery, (query) => {
     <v-card class="mb-5" style="background-color: #62544a">
       <!-- Add Meal Button -->
       <v-card-text>
-        <v-btn color="primary" class="mt-4 button-full-width" @click="cateringStore.addMeal()" rounded>
+        <v-btn
+          color="primary"
+          class="mt-4 button-full-width"
+          @click="cateringStore.addMeal()"
+          rounded
+        >
           <v-icon left>mdi-plus</v-icon>
           <strong>เพิ่มมื้ออาหาร</strong>
         </v-btn>
@@ -276,7 +329,6 @@ watch(searchQuery, (query) => {
     <ProductCateringDialog />
   </v-card>
 </template>
-
 
 <style scoped>
 .button-full-width {
