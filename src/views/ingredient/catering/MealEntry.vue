@@ -263,23 +263,33 @@ watch(searchQuery, (query) => {
                           : item.productName
                       }}
                     </td>
-                    <td v-if="item.product?.haveTopping" >{{ item.product.storeType }}</td>
-                    <td v-else>{{ item.type }}</td>
-                    <td
-                      v-if=" item.product!.haveTopping && item.type !='เลี้ยงรับรอง'"
-                    >
-                      {{ item.product.productTypes[0].productTypePrice }}
+
+
+                    <td class="text-center">
+                      {{
+                        item.product
+                          ? item.product.storeType
+                          : item.type
+                      }}
                     </td>
-                    <td
-                      v-else-if="!item.product!.haveTopping && item.type !='เลี้ยงรับรอง'"
-                    >
-                      {{ item.product?.productPrice }}
+                    <td v-if="item.product">
+                      <p
+                        v-if="item.product!.haveTopping && item.type != 'เลี้ยงรับรอง'"
+                      >
+                        {{ item.product.productTypes[0].productTypePrice }}
+                      </p>
+                      <p
+                        v-else-if="!item.product!.haveTopping && item.type != 'เลี้ยงรับรอง'"
+                      >
+                        {{ item.product?.productPrice }}
+                      </p>
+                   
                     </td>
-                    <td
-                      v-else-if="!item.product!.haveTopping && item.type=='เลี้ยงรับรอง'"
-                    >
+                    <td  v-else >
                       {{ item.productPrice }}
                     </td>
+
+
                     <td>{{ item.totalPrice }}</td>
                     <td>
                       {{
@@ -289,7 +299,33 @@ watch(searchQuery, (query) => {
                               ?.ingredientQuantityPerSubUnit || "ชิ้น"
                       }}
                     </td>
-                    <td>{{ item.quantity }}</td>
+                    <td>
+                      <!-- button nincreate and decreat -->
+                      <v-btn
+                        v-if="!item.product?.haveTopping"
+                        icon
+                        @click.stop="decreaseProductQuantity(indexMeals, item)"
+                      >
+                        <v-icon>mdi-minus</v-icon>
+                      </v-btn>
+
+                      {{ item.quantity }}
+                      <!-- increate -->
+                      <v-btn
+                        icon
+                        v-if="!item.product?.haveTopping"
+                        @click.stop="
+                          item.product &&
+                            cateringStore.addProductToMeal(
+                              item.product,
+                              indexMeals,
+                              1
+                            )
+                        "
+                      >
+                        <v-icon>mdi-plus</v-icon>
+                      </v-btn>
+                    </td>
                     <td>
                       <v-btn
                         icon
