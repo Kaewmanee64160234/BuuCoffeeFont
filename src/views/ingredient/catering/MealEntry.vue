@@ -9,6 +9,7 @@ import { useToppingStore } from "@/stores/topping.store";
 import type { ReceiptItem } from "@/types/receipt.type";
 import CateringReciptItemDialog from "@/components/pos/CateringReciptItemDialog.vue";
 import ProductCateringDialog from "@/components/pos/ProductCateringDialog.vue";
+import router from "@/router";
 
 const productStore = useProductStore();
 const cateringStore = useCateringStore();
@@ -28,6 +29,7 @@ const toggleMealDetails = (index: number) => {
 const decreaseProductQuantity = (mealIndex: number, item: MealProduct) => {
   if (item.quantity > 1) {
     item.quantity--;
+    if(item.product){
     item.totalPrice = item.product!.productPrice * item.quantity;
     const meal = cateringStore.cateringEvent.meals![mealIndex];
     meal.totalPrice = meal.mealProducts.reduce(
@@ -35,6 +37,17 @@ const decreaseProductQuantity = (mealIndex: number, item: MealProduct) => {
       0
     );
     cateringStore.calculateTotalPrice(mealIndex);
+    }
+    else{
+      item.totalPrice = item.productPrice! * item.quantity;
+      const meal = cateringStore.cateringEvent.meals![mealIndex];
+      meal.totalPrice = meal.mealProducts.reduce(
+        (sum, p) => parseFloat(sum+'') + parseFloat( p.totalPrice+''),
+        0
+      );
+      cateringStore.calculateTotalPrice(mealIndex);
+    }
+
   }
 };
 
@@ -47,6 +60,8 @@ const fetchProductsByCategory = async () => {
 
 // Initialize with coffee products and toppings
 onMounted(async () => {
+  // get id from param
+  
   await fetchProductsByCategory(); // Fetch coffee products by default
   await toppingStore.getAllToppings();
 });
@@ -316,10 +331,10 @@ watch(searchQuery, (query) => {
                         v-if="!item.product?.haveTopping"
                         @click.stop="
                           item.product &&
-                            cateringStore.addProductToMeal(
+                            cateringStore.addProduct(
                               item.product,
                               indexMeals,
-                              1
+                              item.product.storeType
                             )
                         "
                       >

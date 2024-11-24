@@ -209,13 +209,13 @@ export const useCateringStore = defineStore("catering", () => {
         // create recipt
         const receiptCoffee: Receipt = {
           receiptTotalPrice: reciptItemCoffee.value.reduce(
-            (sum, item) => sum + item.receiptSubTotal,
+            (sum, item) => parseFloat(sum+'') + parseFloat(item.receiptSubTotal+''),
             0
           ),
           receiptType: "ร้านกาแฟ",
           receiptTotalDiscount: 0,
           receiptNetPrice: reciptItemCoffee.value.reduce(
-            (sum, item) => sum + item.receiptSubTotal,
+            (sum, item) => parseFloat(sum+'') + parseFloat(item.receiptSubTotal+''),
             0
           ),
           receiptStatus: "ร้านจัดเลี้ยง",
@@ -231,13 +231,13 @@ export const useCateringStore = defineStore("catering", () => {
         // rice recipt
         const receiptRice: Receipt = {
           receiptTotalPrice: reciptItemRice.value.reduce(
-            (sum, item) => sum + item.receiptSubTotal,
+            (sum, item) => parseFloat(sum+'') + parseFloat(item.receiptSubTotal+''),
             0
           ),
           receiptType: "ร้านข้าว",
           receiptTotalDiscount: 0,
           receiptNetPrice: reciptItemRice.value.reduce(
-            (sum, item) => sum + item.receiptSubTotal,
+            (sum, item) => parseFloat(sum+'') + parseFloat(item.receiptSubTotal+''),
             0
           ),
           receiptStatus: "ร้านจัดเลี้ยง",
@@ -280,6 +280,9 @@ export const useCateringStore = defineStore("catering", () => {
       Swal.fire("Error", "Error creating catering event", "error");
     }
   };
+
+  // update catering
+
 
   const checkInventory = async (
     productId: number,
@@ -397,11 +400,16 @@ export const useCateringStore = defineStore("catering", () => {
   
     // Find or add meal product
     const mealProduct = meal.mealProducts.find(
-      (mp) => mp.product!.productName === item.productName
+      (mp) => {if(mp.product){
+        return mp.product.productId === item.productId
+      }else{
+        return mp.productName === item.productName
+      }}
+
     );
     if (mealProduct) {
       mealProduct.quantity += quantity;
-      mealProduct.totalPrice += item.productPrice * quantity;
+      mealProduct.totalPrice += parseFloat(item.productPrice+'') * quantity;
     } else {
       // Add new meal product
       meal.mealProducts.push({
@@ -522,14 +530,14 @@ export const useCateringStore = defineStore("catering", () => {
       // Update existing meal product
       existingMealProduct.quantity += parsedQuantity;
       existingMealProduct.totalPrice +=
-        (productPrice + toppingsTotal) * parsedQuantity;
+        parseFloat((productPrice + toppingsTotal)+'') * parsedQuantity;
     } else {
       // Add new meal product
       meal.mealProducts.push({
         mealId: mealIndex,
         product: product,
         quantity: parsedQuantity,
-        totalPrice: (productPrice + toppingsTotal) * parsedQuantity,
+        totalPrice: parseFloat((productPrice + toppingsTotal)+'') * parsedQuantity,
         type: productType.productTypeName,
       });
     }
@@ -563,7 +571,7 @@ export const useCateringStore = defineStore("catering", () => {
 
     // Update total price for the meal
     meal.totalPrice = receiptItems.reduce(
-      (sum, item) => sum + item.receiptSubTotal,
+      (sum, item) => parseFloat(sum+'') + parseFloat(item.receiptSubTotal+''),
       0
     );
 
@@ -731,7 +739,7 @@ export const useCateringStore = defineStore("catering", () => {
           0
         );
         mealProduct.totalPrice = associatedReceiptItems.reduce(
-          (sum, item) => sum + item.receiptSubTotal,
+          (sum, item) => parseFloat(sum+'') + parseFloat(item.receiptSubTotal+''),
           0
         );
       }
@@ -747,21 +755,21 @@ export const useCateringStore = defineStore("catering", () => {
     );
   };
 // updateCateringEvent
-  const updateCateringEvent = async () => {
-    try {
-      const response = await cateringService.updateCateringEvent(
-        cateringEvent.value.cashierId,
-        cateringEvent.value
-      );
-      if (response.status === 200) {
-        console.log("Catering event updated successfully", response.data);
-        Swal.fire("Success", "Catering event updated successfully", "success");
-      }
-    } catch (error) {
-      console.error("Error updating catering event:", error);
-      Swal.fire("Error", "Error updating catering event", "error");
+const updateCateringEvent = async (caterId:number) => {
+  try {
+    const response = await cateringService.updateCateringEvent(
+      caterId,
+      cateringEvent.value
+    );
+    if (response.status === 200) {
+      console.log("Catering event updated successfully", response.data);
+      Swal.fire("Success", "Catering event updated successfully", "success");
     }
-  };
+  } catch (error) {
+    console.error("Error updating catering event:", error);
+    Swal.fire("Error", "Error updating catering event", "error");
+  }
+}
   return {
     fetchMeals,
     saveMeals,
@@ -789,6 +797,7 @@ export const useCateringStore = defineStore("catering", () => {
     calculateTotalPrice,
     cateringHistory,
     findCateringEventById,
-    updateCateringEvent
+    updateCateringEvent,
+    
   };
 });

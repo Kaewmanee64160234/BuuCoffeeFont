@@ -11,6 +11,8 @@ const eventId = ref(route.params.eventId as string);
 
 // Fetch the catering event by ID on mount if editing
 onMounted(() => {
+  // prinr params
+  
   if (eventId.value) {
     cateringStore.findCateringEventById(+eventId.value);
   }
@@ -118,7 +120,9 @@ const saveCateringEvent = () => {
 
   // If `eventId` exists, update the event; otherwise, create a new event
   if (eventId.value) {
-    cateringStore.updateCateringEvent().then(() => {
+    cateringStore.updateCateringEvent(
+      eventId.value ? +eventId.value : 0
+    ).then(() => {
       Swal.fire({
         icon: "success",
         title: "อัพเดทข้อมูลเรียบร้อย",
@@ -134,7 +138,9 @@ const saveCateringEvent = () => {
       });
     });
   } else {
-    cateringStore.createCateringEvent().then(() => {
+    cateringStore.updateCateringEvent(
+      eventId.value ? +eventId.value : 0
+    ).then(() => {
       Swal.fire({
         icon: "success",
         title: "สร้างอีเว้นท์เรียบร้อย",
@@ -185,7 +191,7 @@ const saveCateringEvent = () => {
             <v-col>
               <v-btn class="custom-button button-full-width" rounded style="font-size: 17px;" @click="saveCateringEvent">
                 <v-icon left>mdi-plus</v-icon>
-                <strong>{{ eventId.value ? 'อัพเดทข้อมูล' : 'บันทึกข้อมูล' }}</strong>
+                <strong>{{ eventId ? 'อัพเดทข้อมูล' : 'บันทึกข้อมูล' }}</strong>
               </v-btn>
             </v-col>
           </v-row>
