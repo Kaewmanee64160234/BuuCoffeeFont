@@ -452,13 +452,13 @@ export const useCateringStore = defineStore("catering", () => {
 
     // Calculate total price for the meal based on current mealProducts
     meal.totalPrice = meal.mealProducts.reduce(
-      (sum, item) => sum + item.totalPrice,
+      (sum, item) => parseFloat(sum+'') + parseFloat(item.totalPrice+''),
       0
     );
 
     // Calculate total price for the entire catering event
-    const totalEventPrice = cateringEvent.value.meals.reduce(
-      (sum, meal) => sum + meal.totalPrice,
+    const totalEventPrice = cateringEvent.value.meals!.reduce(
+      (sum, meal) => parseFloat(sum+'') + parseFloat(meal.totalPrice+''),
       0
     );
 

@@ -19,7 +19,7 @@ onMounted(() => {
 // Computed property to calculate the total budget
 const totalBudget = computed(() => {
   return cateringStore.cateringEvent.meals?.reduce(
-    (total, meal) => total + meal.totalPrice,
+    (total, meal) => parseFloat(total+'') + parseFloat( meal.totalPrice+''),
     0
   ) || 0;
 });
@@ -31,9 +31,7 @@ const scrollToTop = () => {
   });
 };
 
-// Function to validate and save (create or update) the catering event
 const saveCateringEvent = () => {
-  // Validate required fields
   if (!cateringStore.cateringEvent.eventName) {
     Swal.fire({
       icon: "error",

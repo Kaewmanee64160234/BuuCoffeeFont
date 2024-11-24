@@ -29,9 +29,9 @@ const decreaseProductQuantity = (mealIndex: number, item: MealProduct) => {
   if (item.quantity > 1) {
     item.quantity--;
     item.totalPrice = item.product!.productPrice * item.quantity;
-    const meal = cateringStore.cateringEvent.meals[mealIndex];
+    const meal = cateringStore.cateringEvent.meals![mealIndex];
     meal.totalPrice = meal.mealProducts.reduce(
-      (sum, p) => sum + p.totalPrice,
+      (sum, p) => parseFloat(sum+'') + parseFloat( p.totalPrice+''),
       0
     );
     cateringStore.calculateTotalPrice(mealIndex);
@@ -60,7 +60,7 @@ watch(selectedTab, async () => {
 const removeProductFromMeal = (mealIndex: number, productIndex: number) => {
   const meal = cateringStore.cateringEvent.meals[mealIndex];
   meal.mealProducts.splice(productIndex, 1);
-  meal.totalPrice = meal.mealProducts.reduce((sum, p) => sum + p.totalPrice, 0);
+  meal.totalPrice = meal.mealProducts.reduce((sum, p) => parseFloat(sum+'') + parseFloat(p.totalPrice+''), 0);
 };
 
 // Select items when meal product has toppings
