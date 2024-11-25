@@ -101,7 +101,7 @@ const handleBarcodeInput = async () => {
         </v-col>
         <v-col cols="auto">
           <v-btn color="success" :to="{ name: 'ingredients_coffee' }">
-            <v-icon left>mdi-arrow-u-left-top-bold</v-icon> ย้อนกลับ
+            <v-icon left style="font-size: 16px;">mdi-arrow-u-left-top-bold</v-icon> ย้อนกลับ
           </v-btn>
         </v-col>
       </v-row>
@@ -114,10 +114,10 @@ const handleBarcodeInput = async () => {
           <v-row>
             <v-col cols="3" style="text-align: center; padding: 8px" v-for="(item, index) in filteredIngredients"
               :key="index">
-              <v-card width="100%" @click="ingredientStore.Addingredienttotable(item)">
+              <v-card width="100%" height="110%" @click="ingredientStore.Addingredienttotable(item)">
                 <v-img :src="`http://localhost:3000/ingredients/${item.ingredientId}/image`" height="100"></v-img>
-                <v-card-title style="font-size: 14px">{{ item.ingredientName }}</v-card-title>
-                <v-card-subtitle style="font-size: 12px">{{ item.ingredientSupplier }}</v-card-subtitle>
+                <v-card-title style="font-size: 18px">{{ item.ingredientName }}</v-card-title>
+                <v-card-subtitle style="font-size: 16px">{{ item.ingredientSupplier }}</v-card-subtitle>
               </v-card>
             </v-col>
           </v-row>
@@ -129,22 +129,22 @@ const handleBarcodeInput = async () => {
           <v-table style="max-height: 100%; overflow-y: auto">
             <thead>
               <tr>
-                <th>ลำดับ</th>
-                <th>ชื่อสินค้า</th>
-                <th>แบรนด์</th>
-                <th>จำนวน</th>
-                <th>แอคชั่น</th>
+                <th style="font-size: 16px;">ลำดับ</th>
+                <th style="font-size: 16px;">ชื่อสินค้า</th>
+                <th style="font-size: 16px;">แบรนด์</th>
+                <th style="font-size: 16px;">จำนวน</th>
+                <th style="font-size: 16px;">แอคชั่น</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="(item, index) in ingredientStore.ingredientCheckList" :key="index">
-                <td>{{ index + 1 }}</td>
-                <td>{{ item.ingredientcheck.ingredientName }}</td>
-                <td>{{ item.ingredientcheck.ingredientSupplier }}</td>
-                <td>
+                <td style="font-size: 16px;">{{ index + 1 }}</td>
+                <td style="font-size: 16px;">{{ item.ingredientcheck.ingredientName }}</td>
+                <td style="font-size: 16px;">{{ item.ingredientcheck.ingredientSupplier }}</td>
+                <td style="font-size: 16px;">
                   <input type="number" v-model.number="item.count" class="styled-input" />
                 </td>
-                <td>
+                <td style="font-size: 16px;">
                   <button @click="ingredientStore.removeCheckIngredient(index)" class="styled-button">
                     ลบ
                   </button>
@@ -156,7 +156,7 @@ const handleBarcodeInput = async () => {
         <v-row>
           <v-col cols="12">
             <v-row>
-              <v-col cols="12">หมายเหตุ</v-col>
+              <v-col cols="12" class="mt-1">หมายเหตุ</v-col>
               <v-col cols="12">
                 <v-text-field v-model="ingredientStore.checkDescription" label="กรุณาระบุหมายเหตุ **ถ้ามี" dense
                   hide-details variant="solo"></v-text-field>

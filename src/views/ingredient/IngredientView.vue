@@ -145,7 +145,7 @@ watch(paginate, async (newValue, oldValue) => {
 
         <v-row>
           <v-col>
-            <v-btn color="success" class="button-full-width" @click="ingredientStore.dialog = true">
+            <v-btn color="success" class="button-full-width" style="font-size: 16px;" @click="ingredientStore.dialog = true">
 
               <v-icon left>mdi-plus</v-icon>
               เพิ่มวัตถุดิบ
@@ -156,17 +156,17 @@ watch(paginate, async (newValue, oldValue) => {
           <v-col>
             <v-menu v-model="menu1">
               <template v-slot:activator="{ props }">
-                <v-btn color="success" class="button-full-width" v-bind="props">
+                <v-btn color="success" class="button-full-width" v-bind="props" style="font-size: 16px;">
                   <v-icon left>mdi-arrow-down-thick</v-icon>
                   นำเข้าวัตถุดิบ
                 </v-btn>
               </template>
               <v-list>
                 <v-list-item @click="navigateTo('importingredient')">
-                  <v-list-item-title>นำเข้าวัตถุดิบ</v-list-item-title>
+                  <v-list-item-title style="font-size: 16px;">นำเข้าวัตถุดิบ</v-list-item-title>
                 </v-list-item>
                 <v-list-item @click="navigateTo('importingredient-history')">
-                  <v-list-item-title>ประวัติการนำเข้าวัตถุดิบ</v-list-item-title>
+                  <v-list-item-title style="font-size: 16px;">ประวัติการนำเข้าวัตถุดิบ</v-list-item-title>
                 </v-list-item>
               </v-list>
             </v-menu>
@@ -175,17 +175,17 @@ watch(paginate, async (newValue, oldValue) => {
           <v-col>
             <v-menu v-model="menu2">
               <template v-slot:activator="{ props }">
-                <v-btn color="red" class="button-full-width" v-bind="props">
+                <v-btn color="red" class="button-full-width" v-bind="props" style="font-size: 16px;"> 
                   <v-icon left>mdi-arrow-up-thick</v-icon>
                   วัตถุดิบหมดอายุ / เสียหาย
                 </v-btn>
               </template>
               <v-list>
                 <v-list-item @click="navigateTo('checkingredient')">
-                  <v-list-item-title> นำออกวัตถุดิบ </v-list-item-title>
+                  <v-list-item-title style="font-size: 16px;" > นำออกวัตถุดิบ </v-list-item-title>
                 </v-list-item>
                 <v-list-item @click="navigateTo('checkingredient-history')">
-                  <v-list-item-title>ประวัตินำออกวัตถุดิบ </v-list-item-title>
+                  <v-list-item-title style="font-size: 16px;">ประวัตินำออกวัตถุดิบ </v-list-item-title>
                 </v-list-item>
               </v-list>
             </v-menu>
@@ -193,20 +193,20 @@ watch(paginate, async (newValue, oldValue) => {
           <v-col>
             <v-menu v-model="menu3">
               <template v-slot:activator="{ props }">
-                <v-btn color="red" class="button-full-width" v-bind="props">
+                <v-btn color="red" class="button-full-width" v-bind="props" style="font-size: 16px;">
                   <v-icon left>mdi-swap-vertical-bold</v-icon>
                   ประวัติเบิกเข้า - เบิกออก
                 </v-btn>
               </template>
               <v-list>
                 <v-list-item @click="navigateTo('history-coffee-store')">
-                  <v-list-item-title> ร้านกาแฟ </v-list-item-title>
+                  <v-list-item-title style="font-size: 16px;"> ร้านกาแฟ </v-list-item-title>
                 </v-list-item>
                 <v-list-item @click="navigateTo('history-rice-store')">
-                  <v-list-item-title>ร้านข้าว </v-list-item-title>
+                  <v-list-item-title style="font-size: 16px;">ร้านข้าว </v-list-item-title>
                 </v-list-item>
                 <v-list-item @click="navigateTo('history-catering-store')">
-                  <v-list-item-title>ร้านเลี้ยงรับรอง </v-list-item-title>
+                  <v-list-item-title style="font-size: 16px;">ร้านเลี้ยงรับรอง </v-list-item-title>
                 </v-list-item>
               </v-list>
             </v-menu>
@@ -217,27 +217,28 @@ watch(paginate, async (newValue, oldValue) => {
       <v-table class="mx-auto" style="width: 97%">
         <thead>
           <tr>
-            <th style="text-align: center;font-weight: bold;">รหัสวัตถุดิบ</th>
-            <th style="text-align: center;font-weight: bold;">รูปภาพ</th>
-            <th style="text-align: center;font-weight: bold;">ชื่อวัตถุดิบ</th>
-            <th style="text-align: center;font-weight: bold;">ผู้จัดจำหน่าย</th>
-            <th style="text-align: center;font-weight: bold;">หน่วยใหญ่</th>
-            <th style="text-align: center;font-weight: bold;">จำนวนที่มีในคลัง</th>
-            <th style="text-align: center;font-weight: bold;">การกระทำ</th>
+            <th style="text-align: center;font-weight: bold;font-size: 16px;">รหัสวัตถุดิบ</th>
+            <th style="text-align: center;font-weight: bold;font-size: 16px;">รูปภาพ</th>
+            <th style="text-align: center;font-weight: bold;font-size: 16px;">ชื่อวัตถุดิบ</th>
+            <th style="text-align: center;font-weight: bold;font-size: 16px;">ผู้จัดจำหน่าย</th>
+            <th style="text-align: center;font-weight: bold;font-size: 16px;">หน่วยใหญ่</th>
+            <th style="text-align: center;font-weight: bold;font-size: 16px;">จำนวนที่มีในคลัง</th>
+            <th style="text-align: center;font-weight: bold;font-size: 16px;">การกระทำ</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(item, index) in ingredientStore.ingredients" :key="index">
-            <td>{{ (page - 1) * take + index + 1 }}</td>
+            <td style="font-size: 16px;">{{ (page - 1) * take + index + 1 }}</td>
             <td>
               <v-img :src="`http://localhost:3000/ingredients/${item.ingredientId}/image`" height="73"></v-img>
             </td>
-            <td>{{ item.ingredientName }}</td>
-            <td>{{ item.ingredientSupplier }}</td>
-            <td>{{ item.ingredientQuantityPerUnit }} {{ item.ingredientQuantityPerSubUnit }} x {{
+            <td style="font-size: 16px;">{{ item.ingredientName }}</td>
+            <td style="font-size: 16px;">{{ item.ingredientSupplier }}</td>
+            <td style="font-size: 16px;">{{ item.ingredientQuantityPerUnit }} {{ item.ingredientQuantityPerSubUnit }} x {{
               item.ingredientVolumeUnit }}
             </td>
-            <td :style="{ color: item.ingredientQuantityInStock <= item.ingredientMinimun ? 'red' : 'black' }">{{
+            <td :style="{ color: item.ingredientQuantityInStock <= item.ingredientMinimun ? 'red' : 'black', 
+            fontSize: '16px' } ">{{
               item.ingredientQuantityInStock }} {{ item.ingredientUnit }}</td>
             <td>
               <v-btn color="#FFDD83" class="mr-5" icon="mdi-pencil"
@@ -310,3 +311,4 @@ td {
   }
 }
 </style>
+

@@ -79,7 +79,7 @@ const findQuantity = (ingredientId: number | undefined): number => {
                         variant="solo" outlined v-model="ingredientStore.search"></v-text-field>
                 </v-col>
                 <v-col cols="auto">
-                    <v-btn color="success" :to="{ name: 'ingredients_rice' }">
+                    <v-btn color="success" :to="{ name: 'ingredients_rice' }" style="font-size: 16px;">
                         <v-icon left>mdi-arrow-u-left-top-bold </v-icon> ย้อนกลับ
                     </v-btn>
                 </v-col>
@@ -97,11 +97,11 @@ const findQuantity = (ingredientId: number | undefined): number => {
                                 @click="ingredientStore.Addingredienttotable(item.ingredient)">
                                 <v-img :src="`http://localhost:3000/ingredients/${item.ingredient.ingredientId}/image`"
                                     height="100"></v-img>
-                                <v-card-title style="font-size: 14px">{{ item.ingredient.ingredientName
+                                <v-card-title style="font-size: 18px">{{ item.ingredient.ingredientName
                                     }}</v-card-title>
-                                <v-card-subtitle style="font-size: 12px">{{ item.ingredient.ingredientSupplier
+                                <v-card-subtitle style="font-size: 16px">{{ item.ingredient.ingredientSupplier
                                     }}</v-card-subtitle>
-                                <v-card-subtitle style="font-size: 12px">จำนวนที่เบิก : {{ item.quantity
+                                <v-card-subtitle style="font-size: 16px">จำนวนที่เบิก : {{ item.quantity
                                     }}</v-card-subtitle>
                             </v-card>
                         </v-col>
@@ -115,25 +115,25 @@ const findQuantity = (ingredientId: number | undefined): number => {
                     <v-table style="max-height: 100%; overflow-y: auto">
                         <thead>
                             <tr>
-                                <th>ลำดับ</th>
-                                <th>ชื่อสินค้า</th>
-                                <th>แบรนด์</th>
-                                <th>จำนวนที่เบิก</th>
-                                <th>จำนวนที่เหลือ</th>
-                                <th>แอคชั่น</th>
+                                <th style="font-size: 16px;">ลำดับ</th>
+                                <th style="font-size: 16px;">ชื่อสินค้า</th>
+                                <th style="font-size: 16px;">แบรนด์</th>
+                                <th style="font-size: 16px;">จำนวนที่เบิก</th>
+                                <th style="font-size: 16px;">จำนวนที่เหลือ</th>
+                                <th style="font-size: 16px;">แอคชั่น</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-for="(item, index) in ingredientStore.ingredientCheckList" :key="index">
-                                <td>{{ index + 1 }}</td>
-                                <td>{{ item.ingredientcheck.ingredientName }}</td>
-                                <td>{{ item.ingredientcheck.ingredientSupplier }}</td>
-                                <td>{{ findQuantity(item.ingredientcheck.ingredientId) }}</td>
-                                <td>
+                                <td style="font-size: 16px;">{{ index + 1 }}</td>
+                                <td style="font-size: 16px;">{{ item.ingredientcheck.ingredientName }}</td>
+                                <td style="font-size: 16px;">{{ item.ingredientcheck.ingredientSupplier }}</td>
+                                <td style="font-size: 16px;">{{ findQuantity(item.ingredientcheck.ingredientId) }}</td>
+                                <td style="font-size: 16px;"> 
                                     <input type="number" v-model.number="item.count" class="styled-input" />
                                 </td>
 
-                                <td>
+                                <td style="font-size: 16px;">
                                     <button @click="ingredientStore.removeCheckIngredient(index)" class="styled-button">
                                         ลบ
                                     </button>
@@ -146,7 +146,7 @@ const findQuantity = (ingredientId: number | undefined): number => {
                 <v-row>
                     <v-col cols="12">
                         <v-row>
-                            <v-col cols="12">หมายเหตุ</v-col>
+                            <v-col cols="12" style="font-size: 16px;">หมายเหตุ</v-col>
                             <v-col cols="12">
                                 <v-text-field v-model="ingredientStore.checkDescription"
                                     label="กรุณาระบุหมายเหตุ **ถ้ามี" dense hide-details variant="solo"></v-text-field>
@@ -155,7 +155,7 @@ const findQuantity = (ingredientId: number | undefined): number => {
                     </v-col>
                 </v-row>
                 <v-row> <v-col>
-                        <v-btn color="success" class="button-full-width" @click="saveCheckData">
+                        <v-btn color="success" class="button-full-width" @click="saveCheckData" style="font-size: 16px;">
                             <v-icon left>mdi-plus</v-icon>
                             บันทึกข้อมูล
                         </v-btn>

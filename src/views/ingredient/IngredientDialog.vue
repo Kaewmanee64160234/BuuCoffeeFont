@@ -97,7 +97,7 @@ const subunits = [
   <v-dialog v-model="ingredientStore.dialog" persistent width="1024">
     <v-card class="rounded-card white-background">
       <!-- <v-card-title > -->
-      <h3 class="text-center mt-2">เพิ่มวัตถุดิบ</h3>
+      <h3 class="text-center mt-1">เพิ่มวัตถุดิบ</h3>
       <!-- </v-card-title> -->
 
       <v-card-text>
@@ -107,11 +107,11 @@ const subunits = [
                 ซอง</strong> ขั้นต่ำในคลัง <strong>100 ซอง</strong> </v-row>
             <v-row>
               <v-col cols="12" sm="12" class="d-flex justify-center align-center">
-                <v-img v-if="imagePreview" :src="imagePreview" width="180" height="180" class="rounded-card"></v-img>
+                <v-img v-if="imagePreview" :src="imagePreview" width="110" height="110" class="rounded-card"></v-img>
                 <v-img v-else-if="ingredientStore.editedIngredient.ingredientId"
                   :src="`http://localhost:3000/ingredients/${ingredientStore.editedIngredient.ingredientId}/image`"
-                  width="180" height="180" class="rounded-card"></v-img>
-                <v-img v-else src="https://via.placeholder.com/200" width="180" height="180"
+                  width="110" height="110" class="rounded-card"></v-img>
+                <v-img v-else src="https://via.placeholder.com/200" width="110" height="110"
                   class="rounded-card"></v-img>
               </v-col>
             </v-row>
@@ -173,7 +173,7 @@ const subunits = [
                   " dense hide-details variant="solo"></v-text-field>
               </v-col>
               <v-col cols="12" sm="6">
-                <v-text-field label="บาร์โคด" v-model.number="ingredientStore.editedIngredient
+                <v-text-field label="บาร์โค้ด" v-model.number="ingredientStore.editedIngredient
                   .ingredientBarcode
                   " dense hide-details variant="solo"></v-text-field>
               </v-col>
