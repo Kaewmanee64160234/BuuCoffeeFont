@@ -12,6 +12,8 @@ export const useUserStore = defineStore("user", () => {
     userRole: '',
     userEmail: '',
     userStatus: '',
+    role: '' as Role,      // เพิ่ม property นี้
+    groups: []     // เพิ่ม property นี้
   });
   const users = ref<User[]>([]);
   const user = ref<User | null>(null);

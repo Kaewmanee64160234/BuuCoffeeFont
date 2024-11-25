@@ -1,6 +1,4 @@
 import type { Cashier } from "@/types/report/cashier.type";
-import type { ProductUsage } from "@/types/report/productUsage.type";
-import axios, { AxiosError } from 'axios';
 import http from "../axios";
 
 async function getfindToday() {
@@ -8,20 +6,22 @@ async function getfindToday() {
     return await http.get("/cashiers/today");
  
 }
-export function createCashier(cashier: Cashier, items: { denomination: string; quantity: number }[]) {
+export async function createCashier(cashier: Cashier, items: { denomination: string; quantity: number }[]) {
+  console.log('สร้างรายการเงินสด:', { cashier, items });
   const payload = {
     ...cashier, 
     items, 
   };
   return http.post("/cashiers", payload);
 }
+
 export function createCloseCashier(cashier: Cashier, items: { denomination: string; quantity: number }[]) {
   const payload = {
     ...cashier,
     items,
   };
 
-  return http.post(`/cashiers/close/${cashier.type}/${cashier.user}`, payload);
+  return http.post(`/cashiers/close/${cashier.type}/${cashier.userId}`, payload);
 }
 
 

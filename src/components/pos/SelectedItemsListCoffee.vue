@@ -6,15 +6,15 @@ import Swal from "sweetalert2";
 import AddCustomerDialog from "../customer/AddCustomerDialog.vue";
 import type { Receipt, ReceiptItem } from "../../types/receipt.type";
 import type { Promotion } from "../../types/promotion.type";
-import { useUserStore } from "@/stores/user.store";
+import { useReportFinnceStore } from '@/stores/report/finance.store';
 import { useReceiptStore } from "@/stores/receipt.store";
 import ReceiptDetailsDialogPos from "../receipts/ReceiptDialogPos.vue";
 import DrinkSelectionDialog from "./DrinkSelectionDialog.vue";
-
+import DialogCloserCashier from "@/components/reports/cashier/DialogCloserCashier.vue";
 const step = ref(1);
 const posStore = usePosStore();
 const customerStore = useCustomerStore();
-const userStore = useUserStore();
+const financeStore = useReportFinnceStore();
 const selectedItems = computed(() => posStore.selectedItems);
 const selectedCustomer = ref("");
 const receiptStore = useReceiptStore();
@@ -295,11 +295,16 @@ const selectReceipt = (receipt: Receipt) => {
 
 // closeSale
 const closeSale = () => {
+
+  financeStore.selectedType = 'coffee';
+  financeStore.closeCashierDialog = true;
+
   console.log("closeSale");
 };
 </script>
 
 <template>
+  <DialogCloserCashier />
   <ReceiptDetailsDialogPos />
   <DrinkSelectionDialog />
   <div>

@@ -42,10 +42,10 @@ async function save() {
         ingredientStore.dialog = false;
 
         Swal.fire({
-          title: "สำเร็จ",
+          title: "สำเร็จ", 
           text: "วัตถุดิบถูกบันทึกเรียบร้อยแล้ว!",
           icon: "success",
-          confirmButtonText: "ตกลง",
+          confirmButtonText: "ตกลง"
         }).then(() => {
           console.log("Reloading page...");
           window.location.reload();
@@ -65,21 +65,20 @@ async function save() {
   }
 }
 
-
-
 function cancel() {
   ingredientStore.dialog = false;
   imagePreview.value = null;
 }
+
 const units = [
   "กล่อง",
-  "แพ็ค",
+  "แพ็ค", 
   "ถุง",
-
 ];
+
 const subunits = [
   "กระปุก",
-  "กระป๋อง",
+  "กระป๋อง", 
   "แก้ว",
   "ขวด",
   "ชิ้น",
@@ -91,6 +90,13 @@ const subunits = [
   "ซอง",
   "ถุง",
 ];
+
+const rules = {
+  required: (v: any) => !!v || 'กรุณากรอกข้อมูล',
+  minLength: (v: string) => v.length >= 3 || 'ความยาวต้องมากกว่า 3 ตัวอักษร',
+  greaterThanZero: (v: number) => v > 0 || 'ค่าต้องมากกว่า 0',
+  notNegative: (v: number) => v >= 0 || 'ค่าต้องไม่ติดลบ'
+};
 </script>
 
 <template>
@@ -98,8 +104,6 @@ const subunits = [
     <v-card class="rounded-card white-background">
       <!-- <v-card-title > -->
       <h3 class="text-center mt-1">เพิ่มวัตถุดิบ</h3>
-      <!-- </v-card-title> -->
-
       <v-card-text>
         <v-form ref="form">
           <v-container>
@@ -120,66 +124,58 @@ const subunits = [
                 <v-file-input v-model="ingredientStore.editedIngredient.file" label="รูปภาพวัตถุดิบ" accept="image/*"
                   dense hide-details variant="solo"></v-file-input>
               </v-col>
-
             </v-row>
             <v-row>
               <v-col cols="12" sm="6">
                 <v-text-field label="ชื่อวัตถุดิบ (ตัวอย่าง : เนสกาแฟ เบลนด์ แอนด์ บรู กาแฟปรุงสำเร็จ ริช อโรมา)"
-                  required v-model="ingredientStore.editedIngredient.ingredientName" :rules="[
-                    (v) => !!v || 'กรุณากรอกชื่อวัตถุดิบ',
-                    (v) => v.length >= 3 || 'ความยาวต้องมากกว่า 3 ตัวอักษร',
-                  ]" dense hide-details variant="solo"></v-text-field>
+                  required v-model="ingredientStore.editedIngredient.ingredientName" 
+                  :rules="[rules.required, rules.minLength]"
+                  dense hide-details variant="solo"></v-text-field>
               </v-col>
               <v-col cols="12" sm="6">
                 <v-text-field label="ชื่อแบรนด์ (ตัวอย่าง : เนสกาแฟ)" required
                   v-model="ingredientStore.editedIngredient.ingredientSupplier"
-                  :rules="[(v) => !!v || 'กรุณากรอกชื่อแบรนด์']" dense hide-details variant="solo"></v-text-field>
+                  :rules="[rules.required]" 
+                  dense hide-details variant="solo"></v-text-field>
               </v-col>
             </v-row>
             <v-row>
               <v-col cols="12" sm="6">
-                <v-text-field label="จุดสั่งซื้อขั้นต่ำ (ตัวอย่าง : 100) สำหรับแจ้งเตือน" v-model.number="ingredientStore.editedIngredient.ingredientMinimun
-                  " :rules="[
-                    (v) => !!v || 'กรุณากรอกขั้นต่ำ',
-                    (v) => v >= 0 || 'ขั้นต่ำต้องมากกว่า 0',
-                  ]" dense hide-details variant="solo"></v-text-field>
+                <v-text-field label="จุดสั่งซื้อขั้นต่ำ (ตัวอย่าง : 100) สำหรับแจ้งเตือน" 
+                  v-model.number="ingredientStore.editedIngredient.ingredientMinimun"
+                  :rules="[rules.required, rules.notNegative]"
+                  dense hide-details variant="solo"></v-text-field>
               </v-col>
               <v-col cols="12" sm="6">
                 <v-autocomplete label="หน่วยใหญ่ (ตัวอย่าง : ถุง)"
-                  v-model="ingredientStore.editedIngredient.ingredientUnit" :items="units" dense hide-details
+                  v-model="ingredientStore.editedIngredient.ingredientUnit" 
+                  :items="units" dense hide-details
                   variant="solo"></v-autocomplete>
               </v-col>
-
-
             </v-row>
             <v-row>
-
-
               <v-col cols="12" sm="6">
-                <v-text-field label="ปริมาณหน่วยย่อย (ตัวอย่าง : 27)" v-model.number="ingredientStore.editedIngredient.ingredientQuantityPerUnit
-                  " :rules="[
-                    (v) => !!v || 'กรุณากรอกปริมาณต่อหน่วย',
-                    (v) => v > 0 || 'ปริมาณต้องมากกว่า 0',
-                  ]" dense hide-details variant="solo"></v-text-field>
+                <v-text-field label="ปริมาณหน่วยย่อย (ตัวอย่าง : 27)" 
+                  v-model.number="ingredientStore.editedIngredient.ingredientQuantityPerUnit"
+                  :rules="[rules.required, rules.greaterThanZero]"
+                  dense hide-details variant="solo"></v-text-field>
               </v-col>
               <v-col cols="12" sm="6">
-                <v-autocomplete label="หน่วย/ย่อย (ตัวอย่าง : ซอง ) " v-model.number="ingredientStore.editedIngredient
-                  .ingredientQuantityPerSubUnit
-                  " :items="subunits" dense hide-details variant="solo"></v-autocomplete>
+                <v-autocomplete label="หน่วย/ย่อย (ตัวอย่าง : ซอง ) " 
+                  v-model="ingredientStore.editedIngredient.ingredientQuantityPerSubUnit"
+                  :items="subunits" dense hide-details variant="solo"></v-autocomplete>
               </v-col>
               <v-col cols="12" sm="6">
-                <v-text-field label="ปริมาณ" v-model.number="ingredientStore.editedIngredient
-                  .ingredientVolumeUnit
-                  " dense hide-details variant="solo"></v-text-field>
+                <v-text-field label="ปริมาณ" 
+                  v-model.number="ingredientStore.editedIngredient.ingredientVolumeUnit"
+                  dense hide-details variant="solo"></v-text-field>
               </v-col>
               <v-col cols="12" sm="6">
-                <v-text-field label="บาร์โค้ด" v-model.number="ingredientStore.editedIngredient
-                  .ingredientBarcode
-                  " dense hide-details variant="solo"></v-text-field>
+                <v-text-field label="บาร์โค้ด" 
+                  v-model="ingredientStore.editedIngredient.ingredientBarcode"
+                  dense hide-details variant="solo"></v-text-field>
               </v-col>
             </v-row>
-
-
 
           </v-container>
 

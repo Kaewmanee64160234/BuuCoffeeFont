@@ -1,5 +1,5 @@
 import receiptService from '@/service/report/receipttype.service';
-import type { CashierReport } from '@/types/report.type';
+import type { CashierReport, CashierShift, ReceiptReport } from '@/types/report.type';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
@@ -12,17 +12,54 @@ export const useReceiptReportStore = defineStore('reportreceipt', () => {
     loading.value = true;
     error.value = null;
 
-    console.log('Fetching receipts...'); // Log before fetching
-
     try {
-      receipts.value = await receiptService.getReceipts();
-      console.log('Receipts fetched successfully:', receipts.value); // Log the fetched receipts
+      const response = await receiptService.getReceipts();
+      console.log('API Response:', response);
+      
+      // แปลง response เป็น CashierReport
+      receipts.value = [{
+        startDate: new Date(response.startDate),
+        endDate: new Date(response.endDate),
+        coffee: {
+          shifts: response.coffee.shifts.map(shift => ({
+            cashierId: shift.cashierId,
+            openedDate: new Date(shift.openedDate),
+            closedDate: shift.closedDate ? new Date(shift.closedDate) : null,
+            cashierAmount: shift.cashierAmount,
+            closedAmount: shift.closedAmount,
+            openedBy: shift.openedBy,
+            closedBy: shift.closedBy,
+            cash: shift.cash,
+            qrcode: shift.qrcode,
+            cashTotal: shift.cashTotal,
+            qrcodeTotal: shift.qrcodeTotal,
+            totalSales: shift.totalSales
+          })),
+          totals: response.coffee.totals
+        },
+        rice: {
+          shifts: response.rice.shifts.map(shift => ({
+            cashierId: shift.cashierId,
+            openedDate: new Date(shift.openedDate),
+            closedDate: shift.closedDate ? new Date(shift.closedDate) : null,
+            cashierAmount: shift.cashierAmount,
+            closedAmount: shift.closedAmount,
+            openedBy: shift.openedBy,
+            closedBy: shift.closedBy,
+            cash: shift.cash,
+            qrcode: shift.qrcode,
+            cashTotal: shift.cashTotal,
+            qrcodeTotal: shift.qrcodeTotal,
+            totalSales: shift.totalSales
+          })),
+          totals: response.rice.totals
+        }
+      }];
     } catch (err) {
-      error.value = (err as Error).message || 'An error occurred while fetching receipts.';
-      console.error('Error fetching receipts:', error.value); // Log the error message
+      error.value = (err as Error).message || 'เกิดข้อผิดพลาดในการดึงข้อมูลใบเสร็จ';
+      console.error('Error fetching receipts:', error.value);
     } finally {
       loading.value = false;
-      console.log('Loading state:', loading.value); // Log the loading state
     }
   };
 
