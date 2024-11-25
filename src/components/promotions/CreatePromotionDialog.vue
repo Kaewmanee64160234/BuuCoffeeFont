@@ -345,7 +345,7 @@ const createPromotion = async () => {
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn v-if="step === items.length" @click="createPromotion">สร้าง</v-btn>
+        <v-btn v-if="step === items.length" @click="createPromotion" style="font-size: 16px;">สร้าง</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

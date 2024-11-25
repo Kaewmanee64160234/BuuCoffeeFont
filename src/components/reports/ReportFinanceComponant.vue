@@ -227,12 +227,12 @@ watch(
 
 <template>
   <v-container>
-    <v-carousel hide-delimiter-background hide-delimiters height="290"
+    <v-carousel hide-delimiter-background hide-delimiters height="360"
       style="background-color: #C7AE8D; border-radius: 20px;">
       <!-- ยอดขายวันนี้ร้านกาแฟ -->
       <v-carousel-item >
         <v-card-title class="text-center" style="margin-top: 20px; font-weight: bold;"><v-icon size="25px">mdi-coffee-maker</v-icon>ยอดขายร้านกาแฟ</v-card-title>
-        <v-card-subtitle class="text-center">{{ new Date().toLocaleDateString('th-TH', { day: 'numeric', month: 'long' }) }}</v-card-subtitle>
+        <v-card-subtitle class="text-center" style="font-size: 18px;">{{ new Date().toLocaleDateString('th-TH', { day: 'numeric', month: 'long' }) }}</v-card-subtitle>
         <v-row justify="center" align="center" no-gutters>
           <v-col cols="12" md="8">
             <v-row justify="center" no-gutters>
@@ -274,7 +274,7 @@ watch(
       <!-- ยอดขายวันนี้ร้านอาหาร -->
       <v-carousel-item>
         <v-card-title class="text-center" style="margin-top: 20px; font-weight: bold;"><v-icon size="25px">mdi-pasta</v-icon>ยอดขายร้านข้าว</v-card-title>
-        <v-card-subtitle class="text-center">{{ new Date().toLocaleDateString('th-TH', { day: 'numeric', month: 'long' }) }}</v-card-subtitle>
+        <v-card-subtitle class="text-center" style="font-size: 18px;">{{ new Date().toLocaleDateString('th-TH', { day: 'numeric', month: 'long' }) }}</v-card-subtitle>
         <v-row justify="center" align="center" no-gutters>
           <v-col cols="12" md="8">
             <v-row justify="center" no-gutters>
@@ -318,7 +318,7 @@ watch(
         <v-card-title class="text-center" style="margin-top: 20px; font-weight: bold;">
           <v-icon size="25px">mdi-glass-cocktail</v-icon>จัดเลี้ยงรับรอง
         </v-card-title>
-        <v-card-subtitle class="text-center">
+        <v-card-subtitle class="text-center" style="font-size: 18px;">
           เดือน{{ new Date().toLocaleDateString('th-TH', { month: 'long' }) }}
         </v-card-subtitle>
         

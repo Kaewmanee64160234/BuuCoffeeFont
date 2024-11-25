@@ -20,7 +20,7 @@
           </v-col>
           <v-spacer></v-spacer>
           <v-col cols="12" md="3" class="d-flex justify-center align-center">
-            <v-btn @click="openCreateDialog" color="success">
+            <v-btn @click="openCreateDialog" color="success" style="font-size: 16px;">
               <v-icon left>mdi-plus</v-icon>
               เพิ่มท็อปปิ้งใหม่
             </v-btn>
@@ -32,17 +32,17 @@
         <v-table class="text-center mt-5">
           <thead>
             <tr>
-              <th style="text-align: center;font-weight: bold;">รหัสท็อปปิ้ง</th>
-              <th style="text-align: center;font-weight: bold;">ชื่อท็อปปิ้ง</th>
-              <th style="text-align: center;font-weight: bold;">ราคาท็อปปิ้ง</th>
-              <th style="text-align: center;font-weight: bold;">การกระทำ</th>
+              <th style="text-align: center;font-weight: bold; font-size: 16px;">รหัสท็อปปิ้ง</th>
+              <th style="text-align: center;font-weight: bold; font-size: 16px;">ชื่อท็อปปิ้ง</th>
+              <th style="text-align: center;font-weight: bold; font-size: 16px;">ราคาท็อปปิ้ง</th>
+              <th style="text-align: center;font-weight: bold; font-size: 16px;">การกระทำ</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(topping,index) in toppingStore.toppings" :key="topping.toppingId" style="text-align: center;">
-              <td>{{index+1 }}</td>
-              <td>{{ topping.toppingName }}</td>
-              <td>{{ topping.toppingPrice }}</td>
+              <td style="font-size: 16px;">{{index+1 }}</td>
+              <td style="font-size: 16px;">{{ topping.toppingName }}</td>
+              <td style="font-size: 16px;">{{ topping.toppingPrice }}</td>
               <td>
                 <v-btn color="#FFDD83" class="mr-5" icon="mdi-pencil" @click="openUpdateDialog(topping)"></v-btn>
                 <v-btn color="#F55050" class="mr-5" icon="mdi-delete" @click="deleteTopping(topping.toppingId)"></v-btn>
@@ -51,7 +51,7 @@
           </tbody>
           <tbody v-if="!toppingStore.toppings || toppingStore.toppings.length === 0">
             <tr>
-              <td colspan="4" class="text-center">ไม่มีข้อมูล</td>
+              <td colspan="4" class="text-center" style="font-size: 16px;">ไม่มีข้อมูล</td>
             </tr>
           </tbody>
         </v-table>

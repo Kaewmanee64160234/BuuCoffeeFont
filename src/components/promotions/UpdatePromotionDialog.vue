@@ -52,7 +52,7 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn v-if="step === items.length" @click="updatePromotion">ยืนยัน</v-btn>
+        <v-btn v-if="step === items.length" @click="updatePromotion" style="font-size: 16px;">ยืนยัน</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

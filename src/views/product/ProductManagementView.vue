@@ -136,7 +136,7 @@ const deleteProduct = async (productId: number) => {
   <v-container>
     <v-card>
       <v-card-title>
-        <v-row style="padding: 20px;"><h3>จัดการสินค้า</h3></v-row>
+        <v-row style="padding: 20px;"><h3>สินค้า</h3></v-row>
 
         <v-row>
           <v-col cols="12" sm="6" md="3">
