@@ -98,7 +98,7 @@ const deleteCustomer = async (customerId: number) => {
             
             <v-spacer></v-spacer>
             <v-col class="mt-4" cols="12" sm="6" md="3">
-              <v-btn color="success" @click="openCreateCustomerDialog">
+              <v-btn color="success" @click="openCreateCustomerDialog" style="font-size: 16px;">
                 <v-icon left>mdi-plus</v-icon>
                 เพิ่มลูกค้าใหม่
               </v-btn>
@@ -113,20 +113,20 @@ const deleteCustomer = async (customerId: number) => {
         <v-table class="mx-auto" style="width: 97%;">
           <thead>
             <tr>
-              <th class="text-center font-weight: bold;">รหัสลูกค้า</th>
-              <th class="text-center font-weight: bold;">ชื่อลูกค้า</th>
-              <th class="text-center font-weight: bold;">เบอร์โทร</th>
-              <th class="text-center font-weight: bold;">แต้มสะสม</th>
-              <th class="text-center font-weight: bold;">การกระทำ</th>
+              <th class="text-center font-weight: bold;" style="font-size: 16px;font-weight: bold;">รหัสลูกค้า</th>
+              <th class="text-center font-weight: bold;" style="font-size: 16px;font-weight: bold;">ชื่อลูกค้า</th>
+              <th class="text-center font-weight: bold;" style="font-size: 16px;font-weight: bold;">เบอร์โทร</th>
+              <th class="text-center font-weight: bold;" style="font-size: 16px;font-weight: bold;">แต้มสะสม</th>
+              <th class="text-center font-weight: bold;" style="font-size: 16px;font-weight: bold;">การกระทำ</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(item, index) in filteredCustomers" :key="index">
-              <td class="text-center">{{ index + 1 + (customerStore.currentPage - 1) * customerStore.itemsPerPage }}</td>
-              <td class="text-center">{{ item.customerName }}</td>
-              <td class="text-center">{{ item.customerPhone }}</td>
-              <td class="text-center">{{ item.customerNumberOfStamp }}</td>
-              <td class="text-center">
+              <td class="text-center" style="font-size: 16px;">{{ index + 1 + (customerStore.currentPage - 1) * customerStore.itemsPerPage }}</td>
+              <td class="text-center" style="font-size: 16px;">{{ item.customerName }}</td>
+              <td class="text-center" style="font-size: 16px;">{{ item.customerPhone }}</td>
+              <td class="text-center" style="font-size: 16px;">{{ item.customerNumberOfStamp }}</td>
+              <td class="text-center" style="font-size: 16px;">
                 <v-btn color="#FFDD83" icon="mdi-pencil" class="mr-2" @click="openEditCustomerDialog(item)">
                 </v-btn>
                 <v-btn color="#F55050" icon="mdi-delete" @click="deleteCustomer(item.customerId)">
@@ -134,7 +134,7 @@ const deleteCustomer = async (customerId: number) => {
               </td>
             </tr>
             <tr v-if="!filteredCustomers.length">
-              <td colspan="5" class="text-center">ไม่มีข้อมูล</td>
+              <td colspan="5" class="text-center" style="font-size: 16px;">ไม่มีข้อมูล</td>
             </tr>
           </tbody>
         </v-table>

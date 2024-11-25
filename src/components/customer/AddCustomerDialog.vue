@@ -100,8 +100,8 @@ async function saveCustomer() {
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn @click="close">ยกเลิก</v-btn>
-        <v-btn color="orange" @click="saveCustomer">บันทึก</v-btn>
+        <v-btn @click="close" style="font-size: 16px;">ยกเลิก</v-btn>
+        <v-btn color="orange" @click="saveCustomer" style="font-size: 16px;">บันทึก</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

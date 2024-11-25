@@ -79,7 +79,7 @@ const filteredUsers = computed(() => {
             
             <v-spacer></v-spacer>
             <v-col class="mt-4" cols="12" sm="6" md="3">
-              <v-btn color="success" @click="userStore.createUserDialog = true">
+              <v-btn color="success" @click="userStore.createUserDialog = true" style="font-size: 16px;">
                 <v-icon left>mdi-plus</v-icon>
                 เพิ่มผู้ใช้งาน
               </v-btn>
@@ -95,22 +95,22 @@ const filteredUsers = computed(() => {
         <v-table class="mx-auto" style="width: 97%;">
           <thead>
             <tr>
-              <th class="text-center font-weight: bold;">รหัสผู้ใช้งาน</th>
-              <th class="text-center font-weight: bold;">ชื่อผู้ใช้</th>
-              <th class="text-center font-weight: bold;">อีเมล</th>
-              <th class="text-center font-weight: bold;">สถานะผู้ใช้งาน</th>
-              <th class="text-center font-weight: bold;">ตำแหน่งผู้ใช้งาน</th>
-              <th class="text-center font-weight: bold;">การกระทำ</th>
+              <th class="text-center" style="font-size: 16px;font-weight: bold;">รหัสผู้ใช้งาน</th>
+              <th class="text-center" style="font-size: 16px; font-weight: bold;">ชื่อผู้ใช้</th>
+              <th class="text-center" style="font-size: 16px; font-weight: bold;">อีเมล</th>
+              <th class="text-center" style="font-size: 16px; font-weight: bold;">สถานะผู้ใช้งาน</th>
+              <th class="text-center" style="font-size: 16px; font-weight: bold;">ตำแหน่งผู้ใช้งาน</th>
+              <th class="text-center" style="font-size: 16px; font-weight: bold;">การกระทำ</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(item, index) in filteredUsers" :key="index">
-              <td class="text-center">{{ index + 1 + (userStore.currentPage - 1) * userStore.itemsPerPage }}</td>
-              <td class="text-center">{{ item.userName }}</td>
-              <td class="text-center">{{ item.userEmail }}</td>
-              <td class="text-center">{{ item.userStatus }}</td>
-              <td class="text-center">{{ item.userRole }}</td>
-              <td class="text-center">
+              <td class="text-center" style="font-size: 16px;">{{ index + 1 + (userStore.currentPage - 1) * userStore.itemsPerPage }}</td>
+              <td class="text-center" style="font-size: 16px;">{{ item.userName }}</td>
+              <td class="text-center" style="font-size: 16px;">{{ item.userEmail }}</td>
+              <td class="text-center" style="font-size: 16px;">{{ item.userStatus }}</td>
+              <td class="text-center" style="font-size: 16px;">{{ item.userRole }}</td>
+              <td class="text-center" style="font-size: 16px;" >
                 <v-btn color="#ed8731 " class="mr-2" icon="mdi-pencil"><v-icon
                   color="white" style="font-size: 20px;" @click="openDetailUserDialog(item)">mdi-eye-circle</v-icon></v-btn>
                 <v-btn color="#FFDD83" icon="mdi-pencil" @click="openEditUserDialog(item)"></v-btn>
@@ -118,7 +118,7 @@ const filteredUsers = computed(() => {
               </td>
             </tr>
             <tr v-if="!filteredUsers.length">
-              <td colspan="6" class="text-center">No data</td>
+              <td colspan="6" class="text-center" style="font-size: 16px;">No data</td>
             </tr>
           </tbody>
         </v-table>

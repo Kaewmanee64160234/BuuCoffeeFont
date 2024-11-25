@@ -210,7 +210,7 @@ const disabled = computed(() => {
       <!-- v-card action -->
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" text @click="closeDialog">ยกเลิก</v-btn>
+        <v-btn color="error" text @click="closeDialog">ยกเลิก</v-btn>
         <v-btn color="blue darken-1" text @click="submitForm">บันทึก</v-btn>
       </v-card-actions>
     </v-card>
