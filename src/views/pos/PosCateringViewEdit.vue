@@ -9,22 +9,28 @@ const cateringStore = useCateringStore();
 const route = useRoute();
 const eventId = ref(route.params.eventId as string);
 
-// Fetch the catering event by ID on mount if editing
 onMounted(() => {
-  // prinr params
   
   if (eventId.value) {
     cateringStore.findCateringEventById(+eventId.value);
   }
 });
 
-// Computed property to calculate the total budget
 const totalBudget = computed(() => {
-  return cateringStore.cateringEvent.meals?.reduce(
-    (total, meal) => parseFloat(total+'') + parseFloat( meal.totalPrice+''),
-    0
-  ) || 0;
+  const meals = cateringStore.cateringEvent.meals || [];
+  const total = meals.reduce((total, meal, index) => {
+    const price = parseFloat(meal.totalPrice) || 0; // Convert to number or default to 0
+    console.log(`Meal ${index + 1}:`, meal); // Log the full meal object
+    console.log(`Meal ${index + 1} Total Price:`, meal.totalPrice);
+    console.log(`Parsed Price:`, price);
+    console.log(`Running Total:`, total + price);
+    return total + price; // Add to running total
+  }, 0);
+  console.log("Computed Total Budget:", total);
+  return total;
 });
+
+
 
 const scrollToTop = () => {
   window.scrollTo({

@@ -30,7 +30,7 @@ const decreaseProductQuantity = (mealIndex: number, item: MealProduct) => {
   if (item.quantity > 1) {
     item.quantity--;
     if(item.product){
-    item.totalPrice = item.product!.productPrice * item.quantity;
+    item.totalPrice = parseFloat(item.product!.productPrice+'') * parseInt(item.quantity+'');
     const meal = cateringStore.cateringEvent.meals![mealIndex];
     meal.totalPrice = meal.mealProducts.reduce(
       (sum, p) => parseFloat(sum+'') + parseFloat( p.totalPrice+''),
@@ -39,7 +39,7 @@ const decreaseProductQuantity = (mealIndex: number, item: MealProduct) => {
     cateringStore.calculateTotalPrice(mealIndex);
     }
     else{
-      item.totalPrice = item.productPrice! * item.quantity;
+      item.totalPrice =parseFloat (item.productPrice!+'') * parseInt(item.quantity+'');
       const meal = cateringStore.cateringEvent.meals![mealIndex];
       meal.totalPrice = meal.mealProducts.reduce(
         (sum, p) => parseFloat(sum+'') + parseFloat( p.totalPrice+''),
@@ -73,7 +73,7 @@ watch(selectedTab, async () => {
 
 // Handle removing a product
 const removeProductFromMeal = (mealIndex: number, productIndex: number) => {
-  const meal = cateringStore.cateringEvent.meals[mealIndex];
+  const meal = cateringStore.cateringEvent.meals![mealIndex];
   meal.mealProducts.splice(productIndex, 1);
   meal.totalPrice = meal.mealProducts.reduce((sum, p) => parseFloat(sum+'') + parseFloat(p.totalPrice+''), 0);
 };
@@ -84,7 +84,7 @@ const setFilteredReceiptItems = (
   mealProduct: MealProduct
 ) => {
   if (mealProduct.product!.haveTopping) {
-    cateringStore.filteredReceiptItems = cateringStore.cateringEvent.meals[
+    cateringStore.filteredReceiptItems = cateringStore.cateringEvent.meals![
       mealIndex
     ].receipt.receiptItems.filter(
       (item) => item.product!.productName === mealProduct.product!.productName
@@ -236,8 +236,8 @@ watch(searchQuery, (query) => {
                     <v-card-subtitle>
                       ราคาต้นทุน
                       {{
-                        item.haveTopping && item.productTypes[0]
-                          ? item.productTypes[0].productTypePrice
+                        item.haveTopping && item.productTypes![0]
+                          ? item.productTypes![0].productTypePrice
                           : item.productPrice
                       }}
                       บาท
@@ -291,7 +291,7 @@ watch(searchQuery, (query) => {
                       <p
                         v-if="item.product!.haveTopping && item.type != 'เลี้ยงรับรอง'"
                       >
-                        {{ item.product.productTypes[0].productTypePrice }}
+                        {{ item.product.productTypes![0].productTypePrice }}
                       </p>
                       <p
                         v-else-if="!item.product!.haveTopping && item.type != 'เลี้ยงรับรอง'"
