@@ -2,7 +2,13 @@ import type { CateringEvent } from "@/types/catering/catering_event.type";
 import http from "./axios";
 
 function createCateringEvent(cateringEvent: CateringEvent) {
-  return http.post("/catering-events", cateringEvent);
+  console.log("cateringEvent", JSON.stringify({...cateringEvent, 
+    mealDto:{...cateringEvent.meals}}));
+  return http.post("/catering-events" , {
+    ...cateringEvent,
+    mealDto:cateringEvent.meals
+  });
+  
 }
 
 // // update status catering event

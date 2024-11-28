@@ -9,8 +9,11 @@ export interface Meal {
   mealTime: string;
   cateringEventId: number;
   mealProducts: MealProduct[];
-  receipt: Receipt; // One receipt for either rice or coffee in this meal
-
+  coffeeReceiptId?: number;
+  riceReceiptId?: number;
+  receipt?: Receipt;
+  riceReceipt?: Receipt; // One receipt for either rice or coffee in this meal
+  coffeeReceipt?: Receipt;
 }
 export interface MealProduct {
   mealId: number;
@@ -19,7 +22,7 @@ export interface MealProduct {
   productPrice?: number;
   quantity: number;
   totalPrice: number;
-  type: string; // riceShop coffeeShop
+  type: string;
+  receiptItems?: ReceiptItem[];
+  receiptItemIds?: number[];
 }
-
- 

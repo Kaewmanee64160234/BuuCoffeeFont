@@ -14,6 +14,5 @@ export interface CateringEvent {
   deletedAt?: string;
   user?: User;
   meals?: Meal[];
-  coffeeReceiptId?: number;
-  riceReceiptId?: number;
+
 }
