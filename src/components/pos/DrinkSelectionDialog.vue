@@ -144,6 +144,7 @@ function confirmSelection() {
     selectedSweetness.value
   );
 
+
   closeDialog(); // Close the dialog only if the conditions are met
 }
 
