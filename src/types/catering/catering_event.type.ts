@@ -9,10 +9,11 @@ export interface CateringEvent {
   attendeeCount?: number;
   // cashierAmount?: number;
   status?: string;
-  totalBudget?: number;
+  totalBudget: number;
   createdDate?: Date;
   deletedAt?: string;
   user?: User;
   meals?: Meal[];
+
 
 }

@@ -165,7 +165,7 @@ if (diffDays < -2 || diffDays > 2) {
             <strong>จำนวนคนที่เข้าร่วม:</strong>
             {{ cateringStore.cateringEvent.attendeeCount }} คน
           </p>
-          <p style="font-size: 17px;"><strong>จำนวนเงินทั้งหมดที่ใช้ในงานจัดเลี้ยง:</strong> {{ totalBudget }} บาท</p>
+          <p style="font-size: 17px;"><strong>จำนวนเงินทั้งหมดที่ใช้ในงานจัดเลี้ยง:</strong> {{ cateringStore.totalBudget }} บาท</p>
           <div
             v-for="(meal, index) in cateringStore.cateringEvent.meals!"
             :key="index"

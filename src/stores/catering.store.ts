@@ -18,7 +18,7 @@ export const useCateringStore = defineStore("catering", () => {
   const meals = ref<Meal[]>([]);
   const userStore = useUserStore();
   const selectedMealIndex = ref<number>(0);
-  const totalBudget = ref<number>(0);
+  const totalBudget = ref(0);
   const cateringReceiptItemDialog = ref<boolean>(false);
   const cateringProductDialog = ref<boolean>(false);
   const filteredReceiptItems = ref<ReceiptItem[]>([]);
@@ -172,6 +172,7 @@ export const useCateringStore = defineStore("catering", () => {
   const createCateringEvent = async () => {
     try {
       cateringEvent.value.user = userStore.currentUser;
+      cateringEvent.value.totalBudget = totalBudget.value;
 
       for (const meal of cateringEvent.value.meals!) {
         // Validate meal requirements
