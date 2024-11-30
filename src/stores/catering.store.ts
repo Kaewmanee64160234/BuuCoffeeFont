@@ -725,6 +725,7 @@ export const useCateringStore = defineStore("catering", () => {
     cateringEvent.value.totalBudget = totalEventPrice;
     cateringEvent.value.meals![selectedMealIndex.value] = meal;
   };
+
   const calculateSubtotal = (item: ReceiptItem) => {
     let subtotal =
       parseFloat(item.productType?.productTypePrice! + "") *
@@ -745,56 +746,67 @@ export const useCateringStore = defineStore("catering", () => {
     }
     return subtotal;
   };
+
   const syncMealProduct = (item: ReceiptItem) => {
     const selectedMeal = cateringEvent.value.meals![selectedMealIndex.value];
-
-    selectedMeal.mealProducts.forEach((mealProduct) => {
-      // find from recipt item
-      const associatedReceiptItems = selectedMeal.receipt?.receiptItems.filter(
-        (receiptItem) =>
-          receiptItem.product?.productName === mealProduct.product?.productName
-      );
-      console.log("associatedReceiptItems", associatedReceiptItems);
-
-      console.log("associatedReceiptItems", associatedReceiptItems);
+  
+    const updateMealProduct = (associatedReceiptItems: ReceiptItem[], mealProduct: any) => {
       if (associatedReceiptItems.length === 0) {
-        const mealContainerProduct = selectedMeal.mealProducts.find((mp) => {
-          return mp.product?.productName === item.product?.productName;
-        });
-        const itemInReceipt = selectedMeal.receipt?.receiptItems.find((ri) => {
-          return ri.product?.productName === item.product?.productName;
-        });
+        const mealContainerProduct = selectedMeal.mealProducts.find(
+          (mp) => mp.product?.productName === item.product?.productName
+        );
+        const itemInReceipt = selectedMeal.receipt?.receiptItems.find(
+          (ri) => ri.product?.productName === item.product?.productName
+        );
         if (!itemInReceipt && mealContainerProduct) {
-          const mealProductIndex = selectedMeal.mealProducts.findIndex((mp) => {
-            return mp.product?.productName === item.product?.productName;
-          });
+          const mealProductIndex = selectedMeal.mealProducts.findIndex(
+            (mp) => mp.product?.productName === item.product?.productName
+          );
           selectedMeal.mealProducts.splice(mealProductIndex, 1);
           cateringReceiptItemDialog.value = false;
         }
       } else {
-        mealProduct.quantity = associatedReceiptItems.reduce(
-          (sum, item) => sum + item.quantity,
-          0
-        );
+        mealProduct.quantity = associatedReceiptItems.reduce((sum, ri) => sum + ri.quantity, 0);
         mealProduct.totalPrice = associatedReceiptItems.reduce(
-          (sum, item) =>
-            parseFloat(sum + "") + parseFloat(item.receiptSubTotal + ""),
+          (sum, ri) => sum + ri.receiptSubTotal,
           0
         );
       }
+    };
+  
+    selectedMeal.mealProducts.forEach((mealProduct) => {
+      let associatedReceiptItems: ReceiptItem[] = [];
+      if (mealProduct.mealId === 0) {
+        associatedReceiptItems = selectedMeal.receipt?.receiptItems.filter(
+          (receiptItem) =>
+            receiptItem.product?.productName === mealProduct.product?.productName
+        ) || [];
+      } else if (item.product?.storeType === "ร้านกาแฟ") {
+        associatedReceiptItems = selectedMeal.coffeeReceipt?.receiptItems.filter(
+          (receiptItem) =>
+            receiptItem.product?.productName === mealProduct.product?.productName
+        ) || [];
+      } else if (item.product?.storeType === "ร้านข้าว") {
+        associatedReceiptItems = selectedMeal.riceReceipt?.receiptItems.filter(
+          (receiptItem) =>
+            receiptItem.product?.productName === mealProduct.product?.productName
+        ) || [];
+      }
+  
+      updateMealProduct(associatedReceiptItems, mealProduct);
     });
-
+  
     selectedMeal.totalPrice = selectedMeal.mealProducts.reduce(
-      (total, mealProduct) =>
-        parseFloat(total + "") + parseFloat(mealProduct.totalPrice + ""),
+      (total, mealProduct) => total + mealProduct.totalPrice,
       0
     );
+  
     console.log(
-      "mealProducts2",
+      "Updated mealProducts:",
       cateringEvent.value.meals![selectedMealIndex.value].mealProducts
     );
   };
-  // updateCateringEvent
+  
   const updateCateringEvent = async (caterId: number) => {
     try {
       const response = await cateringService.updateCateringEvent(

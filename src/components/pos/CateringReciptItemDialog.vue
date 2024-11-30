@@ -48,15 +48,18 @@ const removeItem = (index: number) => {
       receiptItem.product?.productId === item.product!.productId &&
       receiptItem === item
   );
-  
+
+  let isUpdating = false;
 
   if (receiptIndex !== -1) {
     selectedMeal.receipt.receiptItems.splice(receiptIndex, 1);
+    isUpdating = true; // Indicates that an existing receipt was updated
   }
 
   if (!selectedMeal.receipt.receiptItems.length) {
     selectedMeal.totalPrice = 0;
     selectedMeal.mealProducts = [];
+    isUpdating = false; // No items left, resetting the meal
   } else {
     selectedMeal.totalPrice = selectedMeal.receipt.receiptItems.reduce(
       (total, receiptItem) => total + receiptItem.receiptSubTotal,
@@ -64,6 +67,10 @@ const removeItem = (index: number) => {
     );
   }
 
+  // Log the operation type
+  console.log(isUpdating ? "Updating meal" : "Creating a new meal/resetting");
+
+  // Sync meal products and recalculate total price
   cateringStore.syncMealProduct(item);
   cateringStore.calculateTotalPrice(cateringStore.selectedMealIndex);
 };
