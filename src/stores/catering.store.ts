@@ -163,73 +163,7 @@ export const useCateringStore = defineStore("catering", () => {
       // Fetch the main catering event
       const response = await cateringService.findCateringEventById(cashierId);
       cateringEvent.value = response.data;
-
-      console.log("Catering event found:", cateringEvent.value.coffeeReceiptId);
-      console.log("Catering event found:", cateringEvent.value.riceReceiptId);
-
-      // Fetch coffee and rice receipts by ID
-      const resCoffee = await receiptService.getReceiptById(
-        cateringEvent.value!.coffeeReceiptId
-      );
-      const coffeeReceipt = resCoffee.data;
-
-      const resRice = await receiptService.getReceiptById(
-        cateringEvent.value!.riceReceiptId
-      );
-      const riceReceipt = resRice.data;
-      console.log("Coffee receipt found:", coffeeReceipt);
-      console.log("Rice receipt found:", riceReceipt);
-
-      // Map receipts back to meals
-      cateringEvent.value.meals = cateringEvent.value.meals!.map(
-        (meal: Meal) => {
-          // Get relevant receipt items for the current meal
-          const allReceiptItems = [
-            ...coffeeReceipt.receiptItems,
-            ...riceReceipt.receiptItems,
-          ];
-
-          // Split receipt items and match quantities
-          const matchedReceiptItems = allReceiptItems.filter((receiptItem) => {
-            return meal.mealProducts.some((mealProduct) => {
-              return (
-                mealProduct.product.productName ===
-                  receiptItem.product.productName &&
-                mealProduct.quantity === receiptItem.quantity
-              );
-            });
-          });
-
-          // Initialize a new receipt for the meal
-          meal.receipt = matchedReceiptItems.reduce(
-            (receipt, receiptItem) => {
-              if (receiptItem.product?.storeType === "ร้านกาแฟ") {
-                receipt.coffeeReceiptItems.push(receiptItem);
-              } else if (receiptItem.product?.storeType === "ร้านข้าว") {
-                receipt.riceReceiptItems.push(receiptItem);
-              }
-
-              receipt.receiptTotalPrice += receiptItem.receiptSubTotal;
-              receipt.receiptNetPrice += receiptItem.receiptSubTotal;
-              return receipt;
-            },
-            {
-              coffeeReceiptItems: [] as ReceiptItem[],
-              riceReceiptItems: [] as ReceiptItem[],
-              receiptTotalPrice: 0,
-              receiptNetPrice: 0,
-              receiptItems: [],
-            }
-          );
-
-          return meal;
-        }
-      );
-
-      console.log(
-        "Updated catering event with mapped receipts:",
-        cateringEvent.value
-      );
+      console.log("Catering event:", cateringEvent.value);
     } catch (error) {
       console.error("Failed to fetch catering event:", error);
     }
@@ -625,7 +559,7 @@ export const useCateringStore = defineStore("catering", () => {
         product: product,
         quantity: parsedQuantity,
         totalPrice: totalPricePerUnit * parsedQuantity,
-        type: productType.productTypeName,
+        type: product.haveTopping ? product.storeType :"เลี้ยงรับรอง",
       });
     }
 

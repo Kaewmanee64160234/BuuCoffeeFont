@@ -84,11 +84,18 @@ const setFilteredReceiptItems = (
   mealProduct: MealProduct
 ) => {
   if (mealProduct.product!.haveTopping) {
+
     cateringStore.filteredReceiptItems = cateringStore.cateringEvent.meals![
       mealIndex
-    ].receipt.receiptItems.filter(
-      (item) => item.product!.productName === mealProduct.product!.productName
+    ].coffeeReceipt!.receiptItems.filter(
+      (item) => item.product?.productId === mealProduct.product!.productId
     );
+    console.log("reciptItem",cateringStore.cateringEvent.meals![
+      mealIndex
+    ].coffeeReceipt!.receiptItems);
+    
+    
+
     cateringStore.selectedMealIndex = mealIndex;
     cateringStore.cateringReceiptItemDialog = true;
   }
