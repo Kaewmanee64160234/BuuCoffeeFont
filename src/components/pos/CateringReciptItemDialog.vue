@@ -60,9 +60,10 @@ const removeItem = (index: number) => {
     selectedMeal.totalPrice = 0;
     selectedMeal.mealProducts = [];
     isUpdating = false; // No items left, resetting the meal
-  } else {
+  }
+  else {
     selectedMeal.totalPrice = selectedMeal.receipt.receiptItems.reduce(
-      (total, receiptItem) => total + receiptItem.receiptSubTotal,
+      (total, receiptItem) => parseFloat(total+'') + parseFloat(receiptItem.receiptSubTotal+''),
       0
     );
   }

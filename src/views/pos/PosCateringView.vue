@@ -6,13 +6,6 @@ import Swal from "sweetalert2";
 
 const cateringStore = useCateringStore();
 
-const totalBudget = computed(() => {
-  return cateringStore.cateringEvent.meals!.reduce(
-    (total, meal) => total + meal.totalPrice,
-    0
-  );
-});
-
 const scrollToTop = () => {
   window.scrollTo({
     top: 0,
@@ -247,7 +240,7 @@ if (diffDays < -2 || diffDays > 2) {
             <v-col cols="4">
               <v-text-field
                 label="จำนวนเงินทั้งหมดที่ใช้ในงานจัดเลี้ยง"
-                v-model.number="totalBudget"
+                v-model.number="cateringStore.totalBudget"
                 type="number"
                 dense
                 hide-details

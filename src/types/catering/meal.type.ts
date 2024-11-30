@@ -3,6 +3,7 @@ import type { Product } from "../product.type";
 import type { Receipt, ReceiptItem } from "../receipt.type";
 
 export interface Meal {
+  mealId: number;
   mealName: string;
   description: string;
   totalPrice: number;

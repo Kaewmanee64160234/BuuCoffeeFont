@@ -16,20 +16,6 @@ onMounted(() => {
   }
 });
 
-const totalBudget = computed(() => {
-  const meals = cateringStore.cateringEvent.meals || [];
-  const total = meals.reduce((total, meal, index) => {
-    const price = parseFloat(meal.totalPrice) || 0; // Convert to number or default to 0
-    console.log(`Meal ${index + 1}:`, meal); // Log the full meal object
-    console.log(`Meal ${index + 1} Total Price:`, meal.totalPrice);
-    console.log(`Parsed Price:`, price);
-    console.log(`Running Total:`, total + price);
-    return total + price; // Add to running total
-  }, 0);
-  console.log("Computed Total Budget:", total);
-  return total;
-});
-
 
 
 const scrollToTop = () => {
@@ -114,7 +100,7 @@ const saveCateringEvent = () => {
     return;
   }
 
-  if (totalBudget.value <= 0) {
+  if (cateringStore.totalBudget <= 0) {
     Swal.fire({
       icon: "error",
       title: "กรุณาเพิ่มรายการอาหาร",
@@ -180,7 +166,7 @@ const saveCateringEvent = () => {
           <p style="font-size: 17px;"><strong>วันที่จัดอีเว้นท์:</strong> {{ cateringStore.cateringEvent.eventDate }}</p>
           <p style="font-size: 17px;"><strong>สถานที่จัดอีเว้นท์:</strong> {{ cateringStore.cateringEvent.eventLocation }}</p>
           <p style="font-size: 17px;"><strong>จำนวนคนที่เข้าร่วม:</strong> {{ cateringStore.cateringEvent.attendeeCount }} คน</p>
-          <p style="font-size: 17px;"><strong>จำนวนเงินทั้งหมดที่ใช้ในงานจัดเลี้ยง:</strong> {{ totalBudget }} บาท</p>
+          <p style="font-size: 17px;"><strong>จำนวนเงินทั้งหมดที่ใช้ในงานจัดเลี้ยง:</strong> {{ cateringStore.totalBudget }} บาท</p>
           <div v-for="(meal, index) in cateringStore.cateringEvent.meals" :key="index">
             <p style="font-size: 17px;">
               <strong>มื้ออาหารที่ {{ index + 1 }}:</strong> {{ meal.mealName }} เวลา : {{ meal.mealTime }},
@@ -217,7 +203,7 @@ const saveCateringEvent = () => {
               <v-text-field label="จำนวนคนที่เข้าร่วม" v-model.number="cateringStore.cateringEvent.attendeeCount" type="number" dense hide-details variant="solo"></v-text-field>
             </v-col>
             <v-col cols="4">
-              <v-text-field label="จำนวนเงินทั้งหมดที่ใช้ในงานจัดเลี้ยง" :value="totalBudget" type="number" dense hide-details variant="solo" disabled></v-text-field>
+              <v-text-field label="จำนวนเงินทั้งหมดที่ใช้ในงานจัดเลี้ยง" :value="cateringStore.totalBudget" type="number" dense hide-details variant="solo" disabled></v-text-field>
             </v-col>
           </v-row>
         </v-card-text>
