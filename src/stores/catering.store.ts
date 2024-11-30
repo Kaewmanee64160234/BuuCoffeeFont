@@ -163,6 +163,7 @@ export const useCateringStore = defineStore("catering", () => {
       // Fetch the main catering event
       const response = await cateringService.findCateringEventById(cashierId);
       cateringEvent.value = response.data;
+      totalBudget.value = cateringEvent.value.totalBudget;
       console.log("Catering event:", cateringEvent.value);
     } catch (error) {
       console.error("Failed to fetch catering event:", error);
