@@ -1,11 +1,9 @@
 <script lang="ts" setup>
-import { ref, onMounted } from "vue";
+import { onMounted } from "vue";
 import Swal from "sweetalert2";
 import { useIngredientStore } from "@/stores/Ingredient.store";
 const ingredientStore = useIngredientStore();
-const actionTypeField = ref(null);
-const selectedAction = ref<string>("issuing");
-const isVisible = ref<boolean>(true);
+
 
 onMounted(async () => {
   await ingredientStore.getIngredients();
@@ -59,7 +57,7 @@ const saveCheckData = async () => {
     <v-card-title>
       <v-row>
         <v-col cols="9" style="padding: 20px">
-          <h3>วัตถุดิบหมดอายุ</h3>
+          <h3>ปรับคลังสต็อกวัตถุดิบ</h3>
         </v-col>
       </v-row>
       <v-row>

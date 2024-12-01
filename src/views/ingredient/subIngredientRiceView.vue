@@ -15,19 +15,6 @@ onMounted(async () => {
   await subIngredientStore.getSubIngredients_rice();
 });
 
-
-// onMounted(async () => {
-//   await subIngredientStore.getSubIngredients_coffee();
-// });
-
-// watch(
-//   () => subIngredientStore.currentPage, 
-//   async () => {
-//     await subIngredientStore.getIngredientsRicePaginate();
-//   }
-// );
-
-
 const navigateTo = (routeName: string) => {
   router.push({ name: routeName });
 };
@@ -57,14 +44,13 @@ const navigateTo = (routeName: string) => {
               นำเข้าวัตถุดิบ
             </v-btn>
           </v-col>
-
           <v-col>
-            <v-btn color="red" class="button-full-width" @click="navigateTo('returningredientrice')" style="font-size: 16px;">
-              <v-icon left>mdi-arrow-up-thick</v-icon>
-              คืนวัตถุดิบ
+            <v-btn class="button-full-width custom-yellow" @click="navigateTo('returningredientrice')" style="font-size: 16px;">
+              <v-icon left>mdi-inbox</v-icon>
+              ปรับสต็อก
             </v-btn>
-
           </v-col>
+    
 
  
         </v-row>
@@ -152,6 +138,10 @@ th, td {
   .v-table {
     overflow-x: auto;
   }
+}
+.custom-yellow {
+  background-color: rgb(255, 217, 0); 
+  color: black; 
 }
 </style>
 

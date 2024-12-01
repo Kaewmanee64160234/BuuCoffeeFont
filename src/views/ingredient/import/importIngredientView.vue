@@ -310,11 +310,13 @@
 import { ref, watch, onMounted, computed } from "vue";
 import { useIngredientStore } from "@/stores/Ingredient.store";
 import Swal from "sweetalert2";
+
 const ingredientStore = useIngredientStore();
 const searchQuery = ref("");
-const storeField = ref(null);
+const storeField = ref<HTMLInputElement | null>(null);
 const discountField = ref(null);
 const newIngredientName = ref("");
+
 onMounted(async () => {
   await ingredientStore.getIngredients();
 });
@@ -368,6 +370,7 @@ const saveData = () => {
     icon: "success",
     confirmButtonText: "ตกลง",
   });
+  resetForm();
 };
 
 const saveAndClearForm = async () => {
@@ -377,32 +380,24 @@ const saveAndClearForm = async () => {
   }
 };
 
-// const resetForm = () => {
-//   ingredientStore.ingredientList = [];
-//   ingredientStore.store = "";
-//   ingredientStore.discount = 0;
-//   ingredientStore.total = 0;
+function resetForm() {
+  ingredientStore.ingredientList = [];
+  ingredientStore.store = "";
+  ingredientStore.discount = 0;
+  ingredientStore.tax = 0;
+  ingredientStore.total = 0;
+  ingredientStore.importDescription = "";
+  newIngredientName.value = "";
 
-//   // Clear each field's validation and reset value
-//   if (storeField.value) {
-//     storeField.value.$el.querySelector("input").value = "";
-//     storeField.value.resetValidation();
-//   }
-//   if (discountField.value) {
-//     discountField.value.$el.querySelector("input").value = "";
-//     discountField.value.resetValidation();
-//   }
-//   if (totalField.value) {
-//     totalField.value.$el.querySelector("input").value = "";
-//     totalField.value.resetValidation();
-//   }
-// };
+}
+
 watch(
   () => ingredientStore.TypeIngredient,
   (newType) => {
     ingredientStore.ingredientList = [];
   }
 );
+
 const computedTotal = computed(() => {
   let total = 0;
 
@@ -420,8 +415,6 @@ const computedTotal = computed(() => {
   return  total - discountAmount - taxAmount;
 });
 
-
-
 const reversedIndex = (index: number): number => {
   return ingredientStore.ingredientList.length - 1 - index;
 };
@@ -429,15 +422,13 @@ const reversedIndex = (index: number): number => {
 const reversedIngredientList = computed(() => {
   return [...ingredientStore.ingredientList].reverse();
 });
+
 function calculateTotal(item: any) {
   const count = item.count || 0;
   const unitprice = item.unitprice || 0;
   const discount = item.discount || 0;
   const total = (count * unitprice) - discount;
   return total > 0 ? total : 0;
-}
-function resetForm() {
-  throw new Error("Function not implemented.");
 }
 </script>
 
