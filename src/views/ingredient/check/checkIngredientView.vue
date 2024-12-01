@@ -79,7 +79,7 @@ const saveCheckData = async () => {
         </v-col>
         <v-col cols="auto">
           <v-btn color="warning" :to="{ name: 'checkingredientHistory' }" style="font-size: 16px;">
-            ประวัติวัตถุดิบหมดอายุ
+            ประวัติปรับคลังสต็อกวัตถุดิบ
           </v-btn>
         </v-col>
       </v-row>

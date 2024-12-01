@@ -88,9 +88,9 @@ watch([startDate, endDate, receiptType], async () => {
   <v-container fluid>
     <v-row>
       <v-col cols="12">
-      <v-carousel>
+
             <v-row align="center" class="mb-4">
-              <!-- Date Pickers and Load Data Button -->
+
               <v-col cols="auto">
                 <v-text-field
                   v-model="startDate"
@@ -168,30 +168,6 @@ watch([startDate, endDate, receiptType], async () => {
               </v-alert>
             </v-row>
 
-          <!-- รายงานโปรโมชั่น (Promotion Report) Section -->
-          <v-carousel-item>
-            <v-row align="center" class="mb-4">
-              <v-col cols="auto">
-                <v-text-field
-                  v-model="startDateforpromo"
-                  label="Start Date"
-                  type="date"
-                  outlined
-                  dense hide-details variant="solo"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="auto">
-                <v-text-field
-                  v-model="endDateforpromo"
-                  label="End Date"
-                  type="date"
-                  outlined
-                  dense hide-details variant="solo"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-          </v-carousel-item>
-        </v-carousel>
       </v-col>
     </v-row>
   </v-container>

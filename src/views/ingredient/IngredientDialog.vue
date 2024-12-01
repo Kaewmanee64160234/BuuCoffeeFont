@@ -99,6 +99,7 @@ const rules = {
       <v-card-title class="text-h5 text-center primary--text mb-4">
         <v-icon large color="primary" class="mr-2">mdi-plus-circle</v-icon>
         เพิ่มวัตถุดิบ
+        <v-btn color="error" icon="mdi-close" @click="cancel" class="float-right"></v-btn>
       </v-card-title>
       
       <div class="stepper-container">
@@ -337,20 +338,8 @@ const rules = {
         </div>
       </div>
 
-      <v-divider class="my-4"></v-divider>
 
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn
-          color="error"
-          @click="cancel"
-          rounded
-          text
-        >
-          <v-icon left>mdi-close</v-icon>
-          ยกเลิก
-        </v-btn>
-      </v-card-actions>
+ 
     </v-card>
   </v-dialog>
 </template>
