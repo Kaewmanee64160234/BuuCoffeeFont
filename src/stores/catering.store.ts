@@ -895,10 +895,13 @@ export const useCateringStore = defineStore("catering", () => {
   
   const updateCateringEvent = async () => {
     try {
+      
       cateringEvent.value.totalBudget = cateringEvent.value.meals!.reduce(
         (sum, meal) => parseFloat(sum+'') + parseFloat(meal.totalPrice+''),
         0
       );
+      // log json
+      console.log("cateringEvent", JSON.stringify(cateringEvent.value));
       const response = await cateringService.updateCateringEvent(
      
         cateringEvent.value
