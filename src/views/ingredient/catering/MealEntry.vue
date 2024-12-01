@@ -83,7 +83,8 @@ const setFilteredReceiptItems = (
   mealIndex: number,
   mealProduct: MealProduct
 ) => {
-  if (mealProduct.product!.haveTopping) {
+  if(mealProduct.product && mealProduct.product.haveTopping){ 
+   
     // console.log(cateringStore.cateringEvent.eventId);
     
     if(cateringStore.cateringEvent.eventId == 0){
@@ -337,8 +338,8 @@ watch(searchQuery, (query) => {
                       <!-- increate -->
                       <v-btn
                         icon
-                        v-if="!item.product?.haveTopping"
-                        @click.stop="
+                        v-if="!item.product?.haveTopping && item.type != 'เลี้ยงรับรอง'"
+                        @click="
                           item.product &&
                             cateringStore.addProduct(
                               item.product,
@@ -349,6 +350,26 @@ watch(searchQuery, (query) => {
                       >
                         <v-icon>mdi-plus</v-icon>
                       </v-btn>
+                      <v-btn
+                        icon
+                        v-if="!item.product?.haveTopping && item.type == 'เลี้ยงรับรอง'"
+                        @click="
+                          item.type == 'เลี้ยงรับรอง' &&
+                            cateringStore.addProduct(
+                              {
+                                productName: item.productName,
+                                productPrice: item.productPrice,
+                                storeType: item.type,
+                              },
+                              indexMeals,
+                              item.type
+                            )
+                        "
+                      >
+                        <v-icon>mdi-plus</v-icon>
+                      </v-btn>
+
+    
                     </td>
                     <td>
                       <v-btn
