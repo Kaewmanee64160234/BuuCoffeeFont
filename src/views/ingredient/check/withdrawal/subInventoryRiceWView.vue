@@ -31,14 +31,6 @@ const handleBarcodeInput = async () => {
     barcode.value = "";
   }
 };
-// Computed property to filter out ingredients
-const filteredIngredients = computed(() => {
-  const subIngredients = subIngredientStore.subingredients_rice;
-  return ingredientStore.all_ingredients.filter(item => {
-    const subIngredient = subIngredients.find(sub => sub.ingredient.ingredientId === item.ingredientId);
-    return !subIngredient || subIngredient.quantity <= 0;
-  });
-});
 
 const saveCheckData = async () => {
   try {
@@ -121,7 +113,7 @@ const saveCheckData = async () => {
         <v-container>
           <v-row>
             <v-col cols="3" style="text-align: center; padding: 8px"
-              v-for="(item, index) in filteredIngredients" :key="index">
+              v-for="(item, index) in ingredientStore.all_ingredients" :key="index">
               <v-card
                 width="100%"
                 @click="ingredientStore.Addingredienttotable(item)"

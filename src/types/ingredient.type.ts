@@ -13,5 +13,7 @@ export interface Ingredient {
   ingredientRemining?: number; 
   ingredientVolumeUnit?: string;
   ingredientBarcode?: string;
+  categoryId?: number;
+
 
 }

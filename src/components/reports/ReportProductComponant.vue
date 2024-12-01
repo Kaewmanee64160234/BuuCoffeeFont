@@ -190,22 +190,6 @@ watch([startDate, endDate, receiptType], async () => {
                 ></v-text-field>
               </v-col>
             </v-row>
-            <v-row align="center" justify="center" class="mb-4">
-              <h2>รายงานโปรโมชั่น</h2>
-            </v-row>
-            <v-row v-if="promotionUsagestore.promotionsUsage.length">
-              <v-col cols="12" md="3" v-for="(item, index) in promotionUsagestore.promotionsUsage" :key="index">
-                <v-card class="promotion-card">
-                  <v-card-title>{{ item.promotionName }}</v-card-title>
-                  <v-card-subtitle style="font-size: 16px;">
-                    จำนวนครั้งที่ใช้ : {{ item.usageCount }}
-                  </v-card-subtitle>
-                  <v-card-text style="font-size: 16px;">
-                    ยอดรวมส่วนลด: {{ item.totalDiscount }}
-                  </v-card-text>
-                </v-card>
-              </v-col>
-            </v-row>
           </v-carousel-item>
         </v-carousel>
       </v-col>

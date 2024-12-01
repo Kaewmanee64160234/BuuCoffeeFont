@@ -327,19 +327,29 @@ export const useIngredientStore = defineStore("ingredient", () => {
       } else {
         console.log("editedIngredient", JSON.stringify(editedIngredient.value));
         
-        res = await ingredientService.saveIngredient({
-          ...editedIngredient.value,
-          imageFile: editedIngredient.value.file,
-        });
+        // ส่งข้อมูลไปยัง API พร้อมกับ categoryId
+        res = await ingredientService.saveIngredient(
+          {
+            ingredientName: editedIngredient.value.ingredientName,
+            ingredientSupplier: editedIngredient.value.ingredientSupplier,
+            ingredientMinimun: editedIngredient.value.ingredientMinimun,
+            ingredientUnit: editedIngredient.value.ingredientUnit,
+            ingredientVolumeUnit: editedIngredient.value.ingredientVolumeUnit,
+            ingredientQuantityPerUnit: editedIngredient.value.ingredientQuantityPerUnit,
+            ingredientQuantityPerSubUnit: editedIngredient.value.ingredientQuantityPerSubUnit,
+            ingredientBarcode: editedIngredient.value.ingredientBarcode,
+            imageFile: editedIngredient.value.file,
+          },
+          editedIngredient.value.categoryId || 1 // ส่ง categoryId หรือค่าเริ่มต้น
+        );
       }
-      dialog.value = false; 
-      // window.location.reload();
-      await getAllIngredients(); 
+      dialog.value = false;
+      await getAllIngredients();
     } catch (e) {
       console.log(e);
-      messageStore.showError("Cannot save product");
+      messageStore.showError("ไม่สามารถบันทึกวัตถุดิบได้");
     } finally {
-      loadingStore.loading = false; 
+      loadingStore.loading = false;
     }
   }
 

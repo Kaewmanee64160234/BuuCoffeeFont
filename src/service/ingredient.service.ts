@@ -73,7 +73,7 @@ function createReturnWithdrawalIngredients(ingredient: {
 }) {
   return http.post("/checkingredients", ingredient);
 }
-async function saveIngredient(ingredient: Ingredient & { imageFile: File }) {
+async function saveIngredient(ingredient: Ingredient & { imageFile: File }, categoryId: number) {
   console.log("Image file', " + JSON.stringify(ingredient));
 
   const formData = new FormData();
@@ -82,7 +82,7 @@ async function saveIngredient(ingredient: Ingredient & { imageFile: File }) {
   formData.append("ingredientMinimun", `${ingredient.ingredientMinimun}`);
   formData.append("ingredientUnit", ingredient.ingredientUnit || "");
   formData.append(
-    "ingredientQuantityPerUnit",
+    "ingredientQuantityPerUnit", 
     `${ingredient.ingredientQuantityPerUnit || 0}`
   );
   formData.append(
@@ -91,6 +91,7 @@ async function saveIngredient(ingredient: Ingredient & { imageFile: File }) {
   );
   formData.append("ingredientBarcode", ingredient.ingredientBarcode || "");
   formData.append("ingredientVolumeUnit", ingredient.ingredientVolumeUnit || "");
+  formData.append("categoryId", categoryId.toString());
 
   if (ingredient.imageFile) {
     formData.append(

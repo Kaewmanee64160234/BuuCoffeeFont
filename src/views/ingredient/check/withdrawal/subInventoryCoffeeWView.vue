@@ -2,21 +2,13 @@
 import { computed, onMounted, ref } from 'vue';
 import Swal from 'sweetalert2';
 import { useIngredientStore } from '@/stores/Ingredient.store';
-import { useSubIngredientStore } from '@/stores/ingredientSubInventory.store';
 const ingredientStore = useIngredientStore();
-const subIngredientStore = useSubIngredientStore();
 const barcode = ref("");
 onMounted(async () => {
   await ingredientStore.getIngredients();
-  await subIngredientStore.getSubIngredients_coffee();
-
 });
 const filteredIngredients = computed(() => {
-  const subIngredients = subIngredientStore.subingredients_coffee;
-  return ingredientStore.all_ingredients.filter(item => {
-    const subIngredient = subIngredients.find(sub => sub.ingredient.ingredientId === item.ingredientId);
-    return !subIngredient || subIngredient.quantity <= 0;
-  });
+  return ingredientStore.all_ingredients;
 });
 
 const saveCheckData = async () => {
