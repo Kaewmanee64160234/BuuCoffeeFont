@@ -104,8 +104,8 @@
         </div>
       </v-card-text>
       <v-card-actions class="justify-center">
-        <v-btn color="primary" @click="closeDialog">ปิด</v-btn>
-        <v-btn color="secondary" @click="printReceipt">พิมพ์ใบเสร็จ</v-btn>
+        <v-btn color="primary" style="font-size: 16px;" @click="closeDialog">ปิด</v-btn>
+        <v-btn color="secondary" style="font-size: 16px;" @click="printReceipt">พิมพ์ใบเสร็จ</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

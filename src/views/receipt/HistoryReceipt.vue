@@ -184,16 +184,16 @@ const statusText = (status: string) => {
       <v-table class="mx-auto" style="width: 97%">
         <thead>
           <tr>
-            <th class="text-center">#</th>
-            <th class="text-center">วันที่ออกใบเสร็จ</th>
-            <th class="text-center">สถานะใบเสร็จ</th>
-            <th class="text-center">ราคารวมสุทธิ</th>
-            <th class="text-center">ส่วนลด</th>
-            <th class="text-center">สมาชิก</th>
-            <th class="text-center">โปรโมชั่น</th>
-            <th class="text-center">รูปแบบการจ่ายเงิน</th>
-            <th class="text-center">พนักงาน</th>
-            <th class="text-center">ประเภทใบเสร็จ</th>
+            <th class="text-center" style="font-size: 16px;">#</th>
+            <th class="text-center" style="font-size: 16px;">วันที่ออกใบเสร็จ</th>
+            <th class="text-center" style="font-size: 16px;">สถานะใบเสร็จ</th>
+            <th class="text-center" style="font-size: 16px;">ราคารวมสุทธิ</th>
+            <th class="text-center" style="font-size: 16px;">ส่วนลด</th>
+            <th class="text-center" style="font-size: 16px;">สมาชิก</th>
+            <th class="text-center" style="font-size: 16px;">โปรโมชั่น</th>
+            <th class="text-center" style="font-size: 16px;">รูปแบบการจ่ายเงิน</th>
+            <th class="text-center" style="font-size: 16px;">พนักงาน</th>
+            <th class="text-center" style="font-size: 16px;">ประเภทใบเสร็จ</th>
           </tr>
         </thead>
 
@@ -204,16 +204,16 @@ const statusText = (status: string) => {
             style="text-align: center;"
           >
             <!-- Properly calculate the row number considering pagination -->
-            <td class="text-center">{{ index + 1 + (receiptStore.currentPage - 1) * receiptStore.itemsPerPage }}</td>
-            <td class="text-center">{{ formatDate(receipt.createdDate) }}</td>
-            <td :class="statusClass(receipt.receiptStatus)" class="text-center">{{ statusText(receipt.receiptStatus) }}</td>
-            <td class="text-center">{{ receipt.receiptNetPrice }}</td>
-            <td class="text-center">{{ receipt.receiptTotalDiscount }}</td>
-            <td class="text-center">{{ receipt.customer?.customerName }}</td>
-            <td class="text-center">{{ receipt.receiptPromotions?.map(promo => promo.promotionName).join(', ') || '-' }}</td>
-            <td class="text-center">{{ receipt.paymentMethod }}</td>
-            <td class="text-center">{{ receipt.user?.userName }}</td>
-            <td class="text-center">{{ receipt.receiptType }}</td>
+            <td class="text-center" style="font-size: 16px;">{{ index + 1 + (receiptStore.currentPage - 1) * receiptStore.itemsPerPage }}</td>
+            <td class="text-center" style="font-size: 16px;">{{ formatDate(receipt.createdDate) }}</td>
+            <td :class="statusClass(receipt.receiptStatus)" class="text-center" style="font-size: 16px;">{{ statusText(receipt.receiptStatus) }}</td>
+            <td class="text-center" style="font-size: 16px;">{{ receipt.receiptNetPrice }}</td>
+            <td class="text-center" style="font-size: 16px;">{{ receipt.receiptTotalDiscount }}</td>
+            <td class="text-center" style="font-size: 16px;">{{ receipt.customer?.customerName }}</td>
+            <td class="text-center" style="font-size: 16px;">{{ receipt.receiptPromotions?.map(promo => promo.promotionName).join(', ') || '-' }}</td>
+            <td class="text-center" style="font-size: 16px;">{{ receipt.paymentMethod }}</td>
+            <td class="text-center" style="font-size: 16px;">{{ receipt.user?.userName }}</td>
+            <td class="text-center" style="font-size: 16px;">{{ receipt.receiptType }}</td>
           </tr>
         </tbody>
         

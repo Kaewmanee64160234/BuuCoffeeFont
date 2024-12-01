@@ -5,6 +5,7 @@ import ReportIngredientComponant from '@/components/reports/ReportIngredientComp
 import ReportProductComponant from '@/components/reports/ReportProductComponant.vue';
 import ReportTypeFinanceComponant from '@/components/reports/ReportTypeFinanceComponant.vue';
 const activeComponent = ref<string | null>(null);
+const showFinanceMenu = ref(false);
 
 function showComponent(component: string) {
   activeComponent.value = component;
@@ -19,21 +20,34 @@ function reloadData() {
   <v-container class="d-flex justify-center align-center fill-height">
     <v-card class="fill-width scrollable-card" max-width="1400px">
       <v-card-title class="text-center">
-        <h3>Dashboard</h3>
+        <h3 style="font-size: 30px;">Dashboard</h3>
       </v-card-title>
       <v-card-text>
         <v-row class="d-flex justify-center">
           <v-col cols="12" md="3" class="my-1">
-            <v-btn
-              color="success"
-              class="button-full-width"
-              block
-              style="font-size: 16px;"
-              @click="showComponent('finance')"
-            >
-              <v-icon left size="30">mdi-store</v-icon>
-              รายงานยอดขาย
-            </v-btn>
+            <v-menu offset-y>
+              <template v-slot:activator="{ props }">
+                <v-btn
+                  color="success"
+                  class="button-full-width"
+                  block
+                  style="font-size: 16px;"
+                  v-bind="props"
+                  @click="showComponent('finance')"
+                >
+                  <v-icon left size="30">mdi-store</v-icon>
+                  ยอดขาย
+                </v-btn>
+              </template>
+              <v-list>
+                <v-list-item @click="showComponent('typefinance')">
+                  <v-list-item-title>
+                    <v-icon left size="25">mdi-cart-percent</v-icon>
+                    ประเภทยอดขาย
+                  </v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
           </v-col>
           <v-col cols="12" md="3" class="my-1">
             <v-btn
@@ -44,7 +58,7 @@ function reloadData() {
               @click="showComponent('ingredient')"
             >
               <v-icon left size="25">mdi-cart-arrow-down</v-icon>
-              รายงานวัตถุดิบ
+              วัตถุดิบ
             </v-btn>
           </v-col>
           <v-col cols="12" md="3" class="my-1">
@@ -56,19 +70,7 @@ function reloadData() {
               @click="showComponent('product')"
             >
               <v-icon left size="25">mdi-cart-percent</v-icon>
-              รายงานสินค้า และ โปรโมชั่น
-            </v-btn>
-          </v-col>
-          <v-col cols="12" md="3" class="my-1">
-            <v-btn
-              color="success"
-              class="button-full-width"
-              block
-              style="font-size: 16px;"
-              @click="showComponent('typefinance')"
-            >
-              <v-icon left size="25">mdi-cart-percent</v-icon>
-              รายงานยอดขาย
+              สินค้าขายดี
             </v-btn>
           </v-col>
         </v-row>
@@ -131,7 +133,5 @@ html, body {
   overflow-y: auto; /* Add vertical scrollbar inside the card */
   padding: 16px;
 }
-
-
 
 </style>

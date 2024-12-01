@@ -19,7 +19,7 @@
           </v-col>
           <v-spacer></v-spacer>
           <v-col cols="12" md="3" class="d-flex justify-center align-center">
-            <v-btn @click="openCreateDialog" color="success">
+            <v-btn @click="openCreateDialog" color="success" style="font-size: 16px;">
               <v-icon left>mdi-plus</v-icon>
               เพิ่มโปรโมชั่น
             </v-btn>
@@ -31,19 +31,19 @@
         <v-table class="text-center mt-5">
           <thead>
             <tr>
-              <th style="text-align: center;font-weight: bold;">รหัสโปรโมชั่น</th>
-              <th style="text-align: center;font-weight: bold;">ชื่อโปรโมชั่น</th>
-              <th style="text-align: center;font-weight: bold;">ประเภทโปรโมชั่น</th>
-              <th style="text-align: center;font-weight: bold;">มูลค่าส่วนลด</th>
-              <th style="text-align: center;font-weight: bold;">การกระทำ</th>
+              <th style="text-align: center;font-weight: bold;font-size: 16px;">รหัสโปรโมชั่น</th>
+              <th style="text-align: center;font-weight: bold;font-size: 16px;">ชื่อโปรโมชั่น</th>
+              <th style="text-align: center;font-weight: bold;font-size: 16px;">ประเภทโปรโมชั่น</th>
+              <th style="text-align: center;font-weight: bold;font-size: 16px;">มูลค่าส่วนลด</th>
+              <th style="text-align: center;font-weight: bold;font-size: 16px;">การกระทำ</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(promotion,index) in promotionStore.promotions" :key="promotion.promotionId" style="text-align: center;">
-              <td>{{ index+1 }}</td>
-              <td>{{ promotion.promotionName }}</td>
-              <td>{{ promotion.promotionType }}</td>
-              <td>{{ promotion.discountValue === null ? '-' : promotion.discountValue }}</td>
+              <td style="font-size: 16px;">{{ index+1 }}</td>
+              <td style="font-size: 16px;">{{ promotion.promotionName }}</td>
+              <td style="font-size: 16px;">{{ promotion.promotionType }}</td>
+              <td style="font-size: 16px;">{{ promotion.discountValue === null ? '-' : promotion.discountValue }}</td>
               <td>
                 <v-btn color="#FFDD83" icon="mdi-pencil" class="mr-2" @click="openUpdateDialog(promotion)">
                 </v-btn>
@@ -54,7 +54,7 @@
           </tbody>
           <tbody v-if="!promotionStore.promotions || promotionStore.promotions.length === 0">
             <tr>
-              <td colspan="5" class="text-center">ไม่มีข้อมูล</td>
+              <td colspan="5" class="text-center" style="font-size: 16px;">ไม่มีข้อมูล</td>
             </tr>
           </tbody>
         </v-table>

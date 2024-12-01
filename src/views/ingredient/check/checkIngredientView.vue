@@ -75,12 +75,12 @@ const saveCheckData = async () => {
           ></v-text-field>
         </v-col>
         <v-col cols="auto">
-          <v-btn color="success" :to="{ name: 'ingredients' }">
+          <v-btn color="success" :to="{ name: 'ingredients' }" style="font-size: 16px;">
             <v-icon left>mdi-arrow-u-left-top-bold </v-icon> ย้อนกลับ
           </v-btn>
         </v-col>
         <v-col cols="auto">
-          <v-btn color="warning" :to="{ name: 'checkingredientHistory' }">
+          <v-btn color="warning" :to="{ name: 'checkingredientHistory' }" style="font-size: 16px;">
             ประวัติวัตถุดิบหมดอายุ
           </v-btn>
         </v-col>
@@ -119,10 +119,10 @@ const saveCheckData = async () => {
                   :src="`http://localhost:3000/ingredients/${item.ingredientId}/image`"
                   height="100"
                 ></v-img>
-                <v-card-title style="font-size: 14px">{{
+                <v-card-title style="font-size: 18px">{{
                   item.ingredientName
                 }}</v-card-title>
-                <v-card-subtitle style="font-size: 12px">{{
+                <v-card-subtitle style="font-size: 16px">{{
                   item.ingredientSupplier
                 }}</v-card-subtitle>
               </v-card>
@@ -135,11 +135,11 @@ const saveCheckData = async () => {
           <v-table style="max-height: 100%; overflow-y: auto">
             <thead>
               <tr>
-                <th>ลำดับ</th>
-                <th>ชื่อสินค้า</th>
-                <th>แบรนด์</th>
-                <th>จำนวน</th>
-                <th>แอคชั่น</th>
+                <th style="font-size: 16px;">ลำดับ</th>
+                <th style="font-size: 16px;">ชื่อสินค้า</th>
+                <th style="font-size: 16px;">แบรนด์</th>
+                <th style="font-size: 16px;">จำนวน</th>
+                <th style="font-size: 16px;">แอคชั่น</th>
               </tr>
             </thead>
             <tbody>
@@ -147,21 +147,22 @@ const saveCheckData = async () => {
                 v-for="(item, index) in ingredientStore.ingredientCheckList"
                 :key="index"
               >
-                <td>{{ index + 1 }}</td>
-                <td>{{ item.ingredientcheck.ingredientName }}</td>
-                <td>{{ item.ingredientcheck.ingredientSupplier }}</td>
+                <td style="font-size: 16px;">{{ index + 1 }}</td>
+                <td style="font-size: 16px;">{{ item.ingredientcheck.ingredientName }}</td>
+                <td style="font-size: 16px;">{{ item.ingredientcheck.ingredientSupplier }}</td>
                 <td>
                   <input
                     type="number"
                     v-model.number="item.count"
                     class="styled-input"
+                    style="font-size: 16px;"
                   />
                 </td>
 
                 <td>
                   <button
                     @click="ingredientStore.removeCheckIngredient(index)"
-                    class="styled-button"
+                    class="styled-button" style="font-size: 16px;"
                   >
                     ลบ
                   </button>
@@ -174,7 +175,7 @@ const saveCheckData = async () => {
         <v-row>
           <v-col cols="12">
             <v-row>
-              <v-col cols="12">หมายเหตุ</v-col>
+              <v-col cols="12" style="font-size: 16px;">หมายเหตุ</v-col>
               <v-col cols="12">
                 <v-text-field
                   v-model="ingredientStore.checkDescription"
@@ -182,6 +183,7 @@ const saveCheckData = async () => {
                   dense
                   hide-details
                   variant="solo"
+                  style="font-size: 16px;"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -193,6 +195,7 @@ const saveCheckData = async () => {
               color="success"
               class="button-full-width"
               @click="saveCheckData"
+              style="font-size: 16px;"
             >
               <v-icon left>mdi-plus</v-icon>
               บันทึกข้อมูล

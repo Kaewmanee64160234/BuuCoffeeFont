@@ -144,9 +144,9 @@ async function exportToExcel(checkingredient: Checkingredient) {
           </v-col>
         </v-row>
         <v-row>
-          <v-row>
+          <v-row class="mb-3">
             <v-col cols="6">
-              <v-btn block color="success" :to="{ name: 'ingredients' }">
+              <v-btn block color="success" :to="{ name: 'ingredients' }" style="font-size: 16px;">
                 <v-icon left>mdi-arrow-u-left-top-bold</v-icon>
                 ย้อนกลับ
               </v-btn>
@@ -156,6 +156,7 @@ async function exportToExcel(checkingredient: Checkingredient) {
                 color="success"
                 class="button-full-width"
                 :to="{ name: 'checkingredient' }"
+                style="font-size: 16px;"
               >
                 <v-icon left>mdi-plus</v-icon>
                 วัตถุดิบหมดอายุ
@@ -165,15 +166,15 @@ async function exportToExcel(checkingredient: Checkingredient) {
         </v-row>
       </v-card-title>
 
-      <v-table class="mx-auto" style="width: 97%">
+      <v-table class="mx-auto" style="width: 97%;">
         <thead>
           <tr>
-            <th style="text-align: center; font-weight: bold">
+            <th style="text-align: center; font-weight: bold; font-size: 16px;">
               รหัสประวัติการเช็ควัตถุดิบ
             </th>
-            <th style="text-align: center; font-weight: bold">วันที่</th>
-            <th style="text-align: center; font-weight: bold">รูปแบบ</th>
-            <th style="text-align: center; font-weight: bold">การกระทำ</th>
+            <th style="text-align: center; font-weight: bold; font-size: 16px;">วันที่</th>
+            <th style="text-align: center; font-weight: bold; font-size: 16px;">รูปแบบ</th>
+            <th style="text-align: center; font-weight: bold; font-size: 16px;">การกระทำ</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -182,9 +183,9 @@ async function exportToExcel(checkingredient: Checkingredient) {
             v-for="(item, index) in ingredientStore.CheckIngredientsHistory"
             :key="index"
           >
-            <td>{{ index + 1 }}</td>
-            <td>{{ formatDate(item.date) }}</td>
-            <td :style="{ color: item.actionType }">
+            <td style="font-size: 16px;">{{ index + 1 }}</td>
+            <td style="font-size: 16px;">{{ formatDate(item.date) }}</td>
+            <td :style="{ color: item.actionType, fontSize: '16px' }">
               {{
                 item.actionType === "issuing"
                   ? "หมดอายุ"
@@ -200,6 +201,7 @@ async function exportToExcel(checkingredient: Checkingredient) {
                 class="mr-2"
                 icon="mdi-pencil"
                 @click="openHistoryCheckDialog(item)"
+                style="font-size: 16px;"
                 ><v-icon color="white" style="font-size: 20px"
                   >mdi-eye-circle</v-icon
                 ></v-btn

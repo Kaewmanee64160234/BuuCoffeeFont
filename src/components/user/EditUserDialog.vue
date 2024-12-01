@@ -66,8 +66,8 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn @click="closeDialog">ยกเลิก</v-btn>
-        <v-btn color="orange" @click="saveUser">บันทึก</v-btn>
+        <v-btn @click="closeDialog" style="font-size: 16px;">ยกเลิก</v-btn>
+        <v-btn color="orange" @click="saveUser" style="font-size: 16px;">บันทึก</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

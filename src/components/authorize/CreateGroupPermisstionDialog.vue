@@ -14,7 +14,7 @@
         <v-expansion-panels multiple>
           <!-- Group Name and Permissions Section -->
           <v-expansion-panel>
-            <v-expansion-panel-header> ตั้งค่าสิทธิ์ </v-expansion-panel-header>
+            <v-expansion-panel-header class="ma-2" style="margin-top: 5%;"> ตั้งค่าสิทธิ์ </v-expansion-panel-header>
             <v-expansion-panel-content>
               <v-text-field
                 variant="outlined"
@@ -23,13 +23,13 @@
                 :rules="[(v) => v.length >= 3 || 'ตัวอักษรอย่างน้อย 3 ตัว']"
                 outlined
                 dense
-                class="mb-4"
+                class="mb-4 ma-2"
               ></v-text-field>
 
-              <h4 class="text-subtitle-1 mb-2">เลือกสิทธิ์ในการใช้งาน</h4>
+              <h4 class="text-subtitle-1 mb-2 ma-2">เลือกสิทธิ์ในการใช้งาน</h4>
               <div class="d-flex align-center mb-2">
-                <v-btn text small @click="checkAllPermissions">Check All</v-btn>
-                <v-btn text small @click="clearAllPermissions">Clear All</v-btn>
+                <v-btn text small @click="checkAllPermissions" class="ma-2">Check All</v-btn>
+                <v-btn text small @click="clearAllPermissions" class="ma-1">Clear All</v-btn>
               </div>
 
               <v-row class="permission-checklist">
@@ -51,7 +51,7 @@
 
           <!-- Users Selection Section -->
           <v-expansion-panel>
-            <v-expansion-panel-header> เลือกผู้ใช้ </v-expansion-panel-header>
+            <v-expansion-panel-header class="ma-2"> เลือกผู้ใช้ </v-expansion-panel-header>
             <v-expansion-panel-content>
               <v-text-field
                 v-model="searchQuery"
@@ -59,7 +59,7 @@
                 append-icon="mdi-magnify"
                 outlined
                 dense
-                class="mb-4"
+                class="mb-4 ma-2"
               ></v-text-field>
 
               <v-row>
@@ -81,7 +81,7 @@
         </v-expansion-panels>
 
         <v-divider class="my-4"></v-divider>
-        <v-card-actions class="justify-end">
+        <v-card-actions class="justify-end" style="background-color: transparent; padding: 0;">
           <v-btn text @click="closeDialog">Cancel</v-btn>
           <v-btn color="primary" @click="saveGroup">
             {{

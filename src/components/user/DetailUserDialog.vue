@@ -141,7 +141,7 @@ const closeDialog = () => {
       <v-card-actions>
         <v-spacer></v-spacer>
        
-        <v-btn color="red" @click="closeDialog">ปิด</v-btn>
+        <v-btn color="red" @click="closeDialog" style="font-size: 16px;">ปิด</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

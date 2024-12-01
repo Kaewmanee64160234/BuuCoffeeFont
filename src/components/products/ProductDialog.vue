@@ -298,9 +298,9 @@
       <v-card-actions>
         <!-- save abd cancel -->
         <v-spacer></v-spacer>
-        <v-btn color="error" @click="clearData">ยกเลิก</v-btn>
+        <v-btn color="error" @click="clearData" style="font-size: 16px;">ยกเลิก</v-btn>
 
-        <v-btn color="primary" @click="completeProcess">บันทึก</v-btn>
+        <v-btn color="primary" @click="completeProcess" style="font-size: 16px;">บันทึก</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

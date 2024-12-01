@@ -3,7 +3,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user.store";
 import { useLoadingStore } from "@/stores/loading.store";
 import Swal from "sweetalert2";
-import { useAuthorizeStore } from "@/stores/autorize.store";
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [

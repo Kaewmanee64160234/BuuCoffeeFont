@@ -215,11 +215,11 @@ function updateIngredientQuantity(index: number, quantity: number) {
                     <v-list-item :prepend-avatar="`${url}/products/${item.product?.productId}/image`"
                       class="full-width">
                       <v-row no-gutters class="align-center">
-                        <v-col cols="2" class="product-name">
+                        <v-col cols="2" class="product-name" >
                           {{ item.product?.productName }}
                         </v-col>
                         <v-col cols="4" class="text-right pr-2" style="color: black;">
-                          <p>{{ item.receiptSubTotal }}</p>
+                          <p style="font-size: 16px;">{{ item.receiptSubTotal }}</p>
                         </v-col>
                         <v-col cols="4" class="text-right pr-2">
                           <v-btn size="xs-small" color="#C5C5C5" icon @click.stop="decreaseQuantity(index)">
@@ -235,16 +235,16 @@ function updateIngredientQuantity(index: number, quantity: number) {
                         </v-col>
                       </v-row>
                       <v-row no-gutters v-if="item.product!.haveTopping">
-                        <v-col cols="12" class="product-details">
+                        <v-col cols="12" class="product-details" style="font-size: 16px;">
                           {{ item.productType?.productTypeName }} +{{ item.productType?.productTypePrice }} | ความหวาน
                           {{ item.sweetnessLevel }}%
                         </v-col>
                         <v-col cols="12" v-if="item.productTypeToppings && item.productTypeToppings.length > 0">
-                          <ul class="toppings-list">
+                          <ul class="toppings-list" style="font-size: 16px;">
                             <li v-for="topping in item.productTypeToppings" :key="topping?.topping?.toppingId"
-                              class="topping-item">
+                              class="topping-item" style="font-size: 16px;">
                               x{{ topping?.quantity }} {{ topping?.topping?.toppingName }}
-                              <span v-if="topping?.topping?.toppingName && topping.topping.toppingName.length > 3">: {{
+                              <span style="font-size: 16px;" v-if="topping?.topping?.toppingName && topping.topping.toppingName.length > 3">: {{
                                 topping?.topping?.toppingPrice }}.-</span>
                             </li>
                           </ul>
@@ -457,11 +457,12 @@ function updateIngredientQuantity(index: number, quantity: number) {
   overflow: hidden;
   text-overflow: ellipsis;
   font-weight: bold;
+  font-size: 16px;
 }
 
 .product-details,
 .ingredient-details {
-  font-size: 14px;
+  font-size: 16px;
   /* color: gray; */
   font-weight: lighter;
 }
@@ -470,11 +471,13 @@ function updateIngredientQuantity(index: number, quantity: number) {
   list-style: none;
   padding-left: 0;
   margin-top: 5px;
+  font-size: 16px;
 }
 
 .topping-item {
   font-size: 12px;
   color: gray;
+  font-size: 16px;
 }
 
 .quantity-input {
@@ -483,6 +486,7 @@ function updateIngredientQuantity(index: number, quantity: number) {
   border: 1px solid #000000;
   padding: 5px;
   border-radius: 5px;
+  font-size: 16px;
 }
 
 .selected-items-list,

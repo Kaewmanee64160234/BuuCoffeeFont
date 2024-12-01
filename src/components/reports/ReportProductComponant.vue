@@ -1,21 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
 import { useProductUsageStore } from '@/stores/report/productUsage.store';
-import { usePromotionsUsageStore } from '@/stores/report/promotionUseage.store';
 import type { ProductUsage } from '@/types/report/productUsage.type';
 import VueApexCharts from 'vue3-apexcharts';
-const promotionUsagestore = usePromotionsUsageStore();
 const productUsageStore = useProductUsageStore();
-const startDate = ref('');
-const endDate = ref('');
-const startDateforpromo = ref('2024-07-01');
-const endDateforpromo = ref('2024-07-31');
-const fetchPromotionsUsage = async () => {
-  await promotionUsagestore.loadPromotionsUsage(startDateforpromo.value, endDateforpromo.value);
-  console.log('Loaded promotions usage:', promotionUsagestore.promotionsUsage.values);
-};
+const startDate = ref(new Date().toISOString().split('T')[0]);
+const endDate = ref(new Date().toISOString().split('T')[0]);
 
-const promotionsUsage = promotionUsagestore.promotionsUsage;
+
 const receiptType = ref('ร้านกาแฟ');
 const receiptOptions = ref([
   { value: 'ร้านกาแฟ', text: 'ร้านกาแฟ' },
@@ -27,6 +19,19 @@ const chartOptions = ref({
     type: 'pie'
   },
   labels: [] as string[],
+  dataLabels: {
+    style: {
+      fontSize: '16px', 
+    }
+  },
+  legend: {
+    position: 'right',
+    labels: {
+      colors: undefined,
+      useSeriesColors: false,
+      fontSize: '16px'
+    }
+  },
   responsive: [{
     breakpoint: 480,
     options: {
@@ -34,15 +39,13 @@ const chartOptions = ref({
         width: 200
       },
       legend: {
-        position: 'bottom'
+        position: 'right',
+        labels: {
+          fontSize: '16px'
+        }
       }
     }
-  }],
-  legend: {
-    position: 'right',
-    offsetY: 0,
-    height: 230
-  }
+  }]
 });
 
 const chartSeries = ref<number[]>([]);
@@ -61,32 +64,31 @@ const updateChartData = () => {
     .slice(0, 10);
 
 
-  chartOptions.value.labels = topProducts.map(item => `${item.productName} ${item.productTypeName}`);
+  chartOptions.value.labels = topProducts.map(
+    item => `${item.productName} ${item.productTypeName}`
+  );
+  
   chartSeries.value = topProducts.map(item => item.totalQuantity);
 
 };
 
 
 onMounted(async () => {
-  await fetchPromotionsUsage();
+
   await fetchData();
 });
 
 watch([startDate, endDate, receiptType], async () => {
   await fetchData();
 });
-watch([startDateforpromo, endDateforpromo], async () => {
-  await fetchPromotionsUsage();
-});
+
 
 </script>
 <template>
   <v-container fluid>
     <v-row>
       <v-col cols="12">
-        <v-carousel hide-delimiter-background hide-delimiters style="border-radius: 20px;" show-arrows height="770px">
-          <!-- สินค้าขายดี (Top Selling Products) Section -->
-          <v-carousel-item>
+      <v-carousel>
             <v-row align="center" class="mb-4">
               <!-- Date Pickers and Load Data Button -->
               <v-col cols="auto">
@@ -109,7 +111,7 @@ watch([startDateforpromo, endDateforpromo], async () => {
               </v-col>
             </v-row>
             <v-row align="center" justify="center" class="mb-4">
-              <h2>สินค้าขายดี</h2>
+              <h2 style="font-size: 25px;">สินค้าขายดี</h2>
             </v-row>
             <v-row>
               <v-col cols="12" md="4">
@@ -122,6 +124,7 @@ watch([startDateforpromo, endDateforpromo], async () => {
                     :key="option.value"
                     :value="option.value"
                     :label="option.text"
+                    style="font-size: 20px;"
                   ></v-radio>
                 </v-radio-group>
               </v-col>
@@ -145,18 +148,18 @@ watch([startDateforpromo, endDateforpromo], async () => {
               >
                 <thead>
                   <tr>
-                    <th>ลำดับ</th>
-                    <th>ชื่อเมนู</th>
-                    <th>จำนวนออเดอร์ที่สั่ง</th>
-                    <th>จำนวนรวมที่ขายได้</th>
+                    <th style="font-size: 16px;">ลำดับ</th>
+                    <th style="font-size: 16px;">ชื่อเมนู</th>
+                    <th style="font-size: 16px;">จำนวนออเดอร์ที่สั่ง</th>
+                    <th style="font-size: 16px;">จำนวนรวมที่ขายได้</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="(item, index) in productUsageStore.productsUsage" :key="index">
-                    <td>{{ index + 1 }}</td>
-                    <td>{{ item.productName }} {{ item.productTypeName }}</td>
-                    <td>{{ item.usageCount }} รายการ</td>
-                    <td>{{ item.totalQuantity }} แก้ว</td>
+                    <td style="font-size: 16px;">{{ index + 1 }}</td>
+                    <td style="font-size: 16px;">{{ item.productName }} {{ item.productTypeName }}</td>
+                    <td style="font-size: 16px;">{{ item.usageCount }} รายการ</td>
+                    <td style="font-size: 16px;">{{ item.totalQuantity }} แก้ว</td>
                   </tr>
                 </tbody>
               </v-data-table>
@@ -164,7 +167,6 @@ watch([startDateforpromo, endDateforpromo], async () => {
                 No data available
               </v-alert>
             </v-row>
-          </v-carousel-item>
 
           <!-- รายงานโปรโมชั่น (Promotion Report) Section -->
           <v-carousel-item>
@@ -195,10 +197,10 @@ watch([startDateforpromo, endDateforpromo], async () => {
               <v-col cols="12" md="3" v-for="(item, index) in promotionUsagestore.promotionsUsage" :key="index">
                 <v-card class="promotion-card">
                   <v-card-title>{{ item.promotionName }}</v-card-title>
-                  <v-card-subtitle>
+                  <v-card-subtitle style="font-size: 16px;">
                     จำนวนครั้งที่ใช้ : {{ item.usageCount }}
                   </v-card-subtitle>
-                  <v-card-text>
+                  <v-card-text style="font-size: 16px;">
                     ยอดรวมส่วนลด: {{ item.totalDiscount }}
                   </v-card-text>
                 </v-card>

@@ -152,13 +152,13 @@ async function exportToExcel(importingredient: Importingredient) {
         </v-row>
         <v-row>
           <v-col cols="6">
-            <v-btn block color="success" :to="{ name: 'ingredients' }">
+            <v-btn block color="success" :to="{ name: 'ingredients' }" style="font-size: 16px;">
               <v-icon left>mdi-arrow-u-left-top-bold</v-icon>
               ย้อนกลับ
             </v-btn>
           </v-col>
           <v-col cols="6">
-            <v-btn block color="success" :to="{ name: 'importingredients' }">
+            <v-btn block color="success" :to="{ name: 'importingredients' }" style="font-size: 16px;">
               <v-icon left>mdi-plus</v-icon>
               นำเข้าวัตถุดิบ
             </v-btn>
@@ -171,23 +171,23 @@ async function exportToExcel(importingredient: Importingredient) {
         <thead>
 
           <tr>
-            <th style="text-align: center;font-weight: bold;">รหัสประวัตินำเข้าวัตถุดิบ</th>
-            <th style="text-align: center;font-weight: bold;">วันที่</th>
-            <th style="text-align: center;font-weight: bold;">ซัพพาย</th>
-            <th style="text-align: center;font-weight: bold;">ราคารวม</th>
-            <th style="text-align: center;font-weight: bold;">ส่วนลด</th>
-            <th style="text-align: center;font-weight: bold;">รูปแบบ</th>
-            <th style="text-align: center;font-weight: bold;">การกระทำ</th>
+            <th style="text-align: center;font-weight: bold; font-size: 16px;">รหัสประวัตินำเข้าวัตถุดิบ</th>
+            <th style="text-align: center;font-weight: bold; font-size: 16px;">วันที่</th>
+            <th style="text-align: center;font-weight: bold; font-size: 16px;">ซัพพาย</th>
+            <th style="text-align: center;font-weight: bold; font-size: 16px;">ราคารวม</th>
+            <th style="text-align: center;font-weight: bold; font-size: 16px;">ส่วนลด</th>
+            <th style="text-align: center;font-weight: bold; font-size: 16px;">รูปแบบ</th>
+            <th style="text-align: center;font-weight: bold; font-size: 16px;">การกระทำ</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(item, index) in ingredientStore.importIngredientsHistory" :key="index">
-            <td>{{ index + 1 }}</td>
-            <td>{{ formatDate(item.date) }}</td>
-            <td>{{ item.store }}</td>
-            <td>{{ item.total }}</td>
-            <td>{{ item.discount }}</td>
-            <td>{{ item.importStoreType }}</td>
+            <td style="font-size: 16px;">{{ index + 1 }}</td>
+            <td style="font-size: 16px;">{{ formatDate(item.date) }}</td>
+            <td style="font-size: 16px;">{{ item.store }}</td>
+            <td style="font-size: 16px;">{{ item.total }}</td>
+            <td style="font-size: 16px;">{{ item.discount }}</td>
+            <td style="font-size: 16px;">{{ item.importStoreType }}</td>
             <td>
               <v-btn color="#ed8731" class="mr-2" icon="mdi-pencil" @click="openHistoryCheckDialog(item)"><v-icon
                   color="white" style="font-size: 20px;">mdi-eye-circle</v-icon></v-btn>

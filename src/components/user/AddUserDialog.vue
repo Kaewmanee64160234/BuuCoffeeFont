@@ -148,7 +148,7 @@ function closeDialog() {
       <v-card-title>
         <span class="text-h5">เพิ่มผู้ใช้งาน</span>
       </v-card-title>
-      <v-card-subtitle>เกี่ยวกับผู้ใช้งาน</v-card-subtitle>
+      <v-card-subtitle style="font-size: 16px;">เกี่ยวกับผู้ใช้งาน</v-card-subtitle>
       <v-card-text>
         <v-container>
           <!-- Add lazy-validation here -->
@@ -210,8 +210,8 @@ function closeDialog() {
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn @click="closeDialog">ยกเลิก</v-btn>
-        <v-btn color="orange" @click="saveUser">ต่อไป</v-btn>
+        <v-btn @click="closeDialog" style="font-size: 16px;">ยกเลิก</v-btn>
+        <v-btn color="orange" @click="saveUser" style="font-size: 16px;">ต่อไป</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

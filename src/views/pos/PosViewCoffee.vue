@@ -2,7 +2,6 @@
 import { computed, onMounted, ref, watch } from "vue";
 import PromotionCardsCarousel from "@/components/pos/PromotionCardsCarousel.vue";
 import ProductCard from "@/components/pos/ProductCard.vue";
-import SelectedItemsList from "@/components/pos/SelectedItemsListRice.vue";
 import DrinkSelectionDialog from "@/components/pos/DrinkSelectionDialog.vue";
 import ReceiptDialog from "@/components/pos/ReceiptDialog.vue";
 import { useProductStore } from "@/stores/product.store";
@@ -233,6 +232,7 @@ const showQueue = computed(() => {
 });
 // handleCashierEntry
 const handleCashierEntry = () => {
+  financeStore.selectedType = 'coffee';
   financeStore.createCashierDialog = true;
 };
 </script>
@@ -489,6 +489,7 @@ const handleCashierEntry = () => {
                   v-for="category in categoryStore.categoriesForCreate"
                   :key="category.categoryId"
                   :value="category.categoryName"
+                  style="font-size: 16px;"
                 >
                   {{ category.categoryName }}
                 </v-tab>
@@ -563,15 +564,15 @@ const handleCashierEntry = () => {
             border-radius: 12px;
           "
         >
-          <v-card-title class="text-h5 text-center">
+          <v-card-title class="text-h5 text-center" style="font-size: 16px;">
             ร้านกาแฟไม่พร้อมใช้งาน
           </v-card-title>
-          <v-card-subtitle class="text-center">
+          <v-card-subtitle class="text-center" style="font-size: 16px;">
             กรุณากรอกเงินในแคชเชียร์ให้ครบก่อนเริ่มการขาย
           </v-card-subtitle>
           <v-divider></v-divider>
           <v-card-actions class="d-flex justify-center">
-            <v-btn color="primary" @click="handleCashierEntry()">
+            <v-btn color="primary" @click="handleCashierEntry()" style="font-size: 16px;">
               ป้อนเงินในแคชเชียร์
             </v-btn>
           </v-card-actions>

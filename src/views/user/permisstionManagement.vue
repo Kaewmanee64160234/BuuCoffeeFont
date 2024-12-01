@@ -93,11 +93,11 @@ const removeUserFromGroup = async (group: Groups, user: User) => {
       <v-col v-for="group in authorizeStore.groups" :key="group.groupId" cols="12" sm="6" md="4">
         <v-card class="group-card mb-4">
           <v-card-title>{{ group.name }}</v-card-title>
-          <v-card-subtitle>{{ group.description || 'ไม่มีคำอธิบาย' }}</v-card-subtitle>
+          <v-card-subtitle style="font-size: 16px;">{{ group.description || 'ไม่มีคำอธิบาย' }}</v-card-subtitle>
           <v-card-text>
             <h5 class="text-subtitle-1">สิทธิ์ในการใช้งาน:</h5>
             <ul>
-              <li v-for="permission in group.permissions" :key="permission.id">
+              <li v-for="permission in group.permissions" :key="permission.id" class="ma-2" style="font-size: 16px;">
                 {{ permission.name }}
               </li>
             </ul>
@@ -107,7 +107,7 @@ const removeUserFromGroup = async (group: Groups, user: User) => {
                 v-for="user in group.users"
                 :key="user.userId"
                 close
-                @click:close="removeUserFromGroup(group, user)"
+                @click:close="removeUserFromGroup(group, user)" style="font-size: 16px;"
               >
                 {{ user.userName }}
               </v-chip>
@@ -115,8 +115,8 @@ const removeUserFromGroup = async (group: Groups, user: User) => {
           </v-card-text>
 
           <v-card-actions>
-            <v-btn color="primary" @click="openEditDialog(group)">แก้ไข</v-btn>
-            <v-btn color="red" @click="deleteGroup(group)">ลบ</v-btn>
+            <v-btn color="primary" @click="openEditDialog(group)" style="font-size: 16px;">แก้ไข</v-btn>
+            <v-btn color="red" @click="deleteGroup(group)" style="font-size: 16px;">ลบ</v-btn>
           </v-card-actions>
         </v-card>
       </v-col>

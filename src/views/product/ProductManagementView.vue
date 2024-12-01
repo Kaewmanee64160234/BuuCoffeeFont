@@ -152,7 +152,7 @@ const deleteProduct = async (productId: number) => {
           
           <v-row align="center" justify="start">
             <v-col cols="auto">
-              <v-btn @click="openCreateDialog" color="success">
+              <v-btn @click="openCreateDialog" color="success" style="font-size: 16px;">
                 <v-icon left>mdi-plus</v-icon>
                 เพิ่มสินค้า
               </v-btn>
@@ -177,26 +177,26 @@ const deleteProduct = async (productId: number) => {
           <v-table class="text-center " style="width: 97%;">
             <thead>
               <tr>
-                <th style="text-align: center; font-weight: bold;">รหัสสินค้า</th>
-                <th style="text-align: center; font-weight: bold;">รูปภาพ</th>
-                <th style="text-align: center; font-weight: bold;">ชื่อสินค้า</th>
-                <th style="text-align: center; font-weight: bold;">ประเภทสินค้า</th>
-                <th style="text-align: center; font-weight: bold;">ราคา</th>
-                <th style="text-align: center; font-weight: bold;">การกระทำ</th>
+                <th style="text-align: center; font-weight: bold;font-size: 16px;">รหัสสินค้า</th>
+                <th style="text-align: center; font-weight: bold;font-size: 16px;">รูปภาพ</th>
+                <th style="text-align: center; font-weight: bold;font-size: 16px;">ชื่อสินค้า</th>
+                <th style="text-align: center; font-weight: bold;font-size: 16px;">ประเภทสินค้า</th>
+                <th style="text-align: center; font-weight: bold;font-size: 16px;">ราคา</th>
+                <th style="text-align: center; font-weight: bold;font-size: 16px;">การกระทำ</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="(item, index) in productStore.products" :key="index" style="text-align: center">
-                <td>{{ index + 1 + (productStore.currentPage - 1) * productStore.itemsPerPage }}</td>
-                <td>
+                <td style="font-size: 16px;">{{ index + 1 + (productStore.currentPage - 1) * productStore.itemsPerPage }}</td>
+                <td style="font-size: 16px;">
                   <v-avatar size="80">
                     <v-img :src="`${url}/products/${item.productId}/image`"></v-img>
                   </v-avatar>
                 </td>
-                <td>{{ item.productName }}</td>
-                <td>{{ item.category.categoryName }}</td>
-                <td>{{ item.haveTopping ? item.productTypes![0].productTypePrice : item.productPrice }}</td>
-                <td>
+                <td style="font-size: 16px;">{{ item.productName }}</td>
+                <td style="font-size: 16px;">{{ item.category.categoryName }}</td>
+                <td style="font-size: 16px;">{{ item.haveTopping ? item.productTypes![0].productTypePrice : item.productPrice }}</td>
+                <td style="font-size: 16px;">
                   <v-btn color="#FFDD83" icon="mdi-pencil" class="mr-2" @click="openUpdateDialog(item)">
                   </v-btn>
                   <v-btn color="#F55050" icon="mdi-delete" @click="deleteProduct(item.productId)">
@@ -206,7 +206,7 @@ const deleteProduct = async (productId: number) => {
             </tbody>
             <tbody v-if="!productStore.products || productStore.products.length === 0">
               <tr>
-                <td colspan="6" class="text-center">ไม่มีข้อมูล</td>
+                <td colspan="6" class="text-center" style="font-size: 16px;">ไม่มีข้อมูล</td>
               </tr>
             </tbody>
           </v-table>

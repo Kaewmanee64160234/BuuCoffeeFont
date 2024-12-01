@@ -159,6 +159,7 @@ async function exportToExcel(checkingredient: Checkingredient) {
               color="success"
               class="button-full-width"
               :to="{ name: 'ingredients' }"
+              style="font-size: 16px;"
             >
               <v-icon left>mdi-arrow-u-left-top-bold </v-icon> ย้อนกลับ
             </v-btn>
@@ -172,16 +173,16 @@ async function exportToExcel(checkingredient: Checkingredient) {
             <th style="text-align: center; font-weight: bold">
               รหัสประวัติการเช็ควัตถุดิบ
             </th>
-            <th style="text-align: center; font-weight: bold">วันที่</th>
-            <th style="text-align: center; font-weight: bold">รูปแบบ</th>
-            <th style="text-align: center; font-weight: bold">การกระทำ</th>
+            <th style="text-align: center; font-weight: bold; font-size: 16px;">วันที่</th>
+            <th style="text-align: center; font-weight: bold; font-size: 16px;">รูปแบบ</th>
+            <th style="text-align: center; font-weight: bold; font-size: 16px;">การกระทำ</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(item, index) in subIngredientStore.HistoryRice" :key="index">
-            <td>{{ index + 1 }}</td>
-            <td>{{ formatDate(item.date) }}</td>
-            <td>
+            <td style="font-size: 16px;">{{ index + 1 }}</td>
+            <td style="font-size: 16px;">{{ formatDate(item.date) }}</td>
+            <td style="font-size: 16px;">
               <span v-if="item.actionType === 'withdrawal'">
                 เบิกเข้าร้านข้าว
               </span>
@@ -214,7 +215,7 @@ async function exportToExcel(checkingredient: Checkingredient) {
         </tbody>
         <tbody v-if="!subIngredientStore.HistoryRice || subIngredientStore.HistoryRice.length === 0">
             <tr>
-              <td colspan="4" class="text-center">ไม่มีข้อมูล</td>
+              <td colspan="4" class="text-center" style="font-size: 16px;">ไม่มีข้อมูล</td>
             </tr>
           </tbody>
       </v-table>
