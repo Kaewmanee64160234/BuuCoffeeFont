@@ -71,7 +71,7 @@ export const useCateringStore = defineStore("catering", () => {
   const posStore = usePosStore();
 
   const cateringEvent = ref<CateringEvent>({
-    cashierId: 0,
+    eventId: 0,
     meals: [], // Meals with one receipt per meal
     totalBudget: 0,
     createdDate: new Date(),
@@ -158,12 +158,16 @@ export const useCateringStore = defineStore("catering", () => {
   function removeMeal(index: number) {
     cateringEvent.value.meals!.splice(index, 1);
   }
-  const findCateringEventById = async (cashierId: number) => {
+  const findCateringEventById = async (eventId: number) => {
     try {
       // Fetch the main catering event
-      const response = await cateringService.findCateringEventById(cashierId);
+      const response = await cateringService.findCateringEventById(eventId);
       cateringEvent.value = response.data;
-      totalBudget.value = cateringEvent.value.totalBudget;
+      totalBudget.value = cateringEvent.value.meals!.reduce(
+        (sum, meal) => parseFloat(sum+'') + parseFloat( meal.totalPrice+''),
+        0
+      );
+
       console.log("Catering event:", cateringEvent.value);
     } catch (error) {
       console.error("Failed to fetch catering event:", error);
@@ -302,6 +306,8 @@ export const useCateringStore = defineStore("catering", () => {
       Swal.fire("Error", "Error creating catering event", "error");
     }
   };
+
+  
 
   // update catering
 
@@ -447,10 +453,9 @@ export const useCateringStore = defineStore("catering", () => {
     const meal = cateringEvent.value.meals![mealIndex];
 
 
-    // Calculate the meal's total price by summing up its mealProducts' totalPrice
     meal.totalPrice = meal.mealProducts.reduce(
-      (sum, item) => parseFloat(sum + "") + parseFloat(item.totalPrice + ""), // Default to 0 if totalPrice is undefined
-      0 // Initial accumulator value
+      (sum, item) => parseFloat(sum + "") + parseFloat(item.totalPrice + ""), 
+      0 
     );
 
     // Calculate the total event price by summing up all meals' totalPrice
@@ -641,7 +646,7 @@ export const useCateringStore = defineStore("catering", () => {
   // clear data catering
   const clearData = () => {
     cateringEvent.value = {
-      cashierId: 0,
+      eventId: 0,
       totalBudget: 0,
       createdDate: new Date(),
       deletedAt: "",
@@ -756,41 +761,36 @@ export const useCateringStore = defineStore("catering", () => {
     return subtotal;
   };
 
+  
   const syncMealProduct = (item: ReceiptItem) => {
+    if(item.receiptItemId > 0) {
     const selectedMeal = cateringEvent.value.meals![selectedMealIndex.value];
   
-    const updateMealProduct = (associatedReceiptItems: ReceiptItem[], mealProduct: any) => {
+    const updateMealProduct = (
+      associatedReceiptItems: ReceiptItem[],
+      mealProduct: MealProduct
+    ) => {
       if (associatedReceiptItems.length === 0) {
-        const mealContainerProduct = selectedMeal.mealProducts.find(
-          (mp) => mp.product?.productName === item.product?.productName
-        );
-        const itemInReceipt = selectedMeal.receipt?.receiptItems.find(
-          (ri) => ri.product?.productName === item.product?.productName
-        );
-        if (!itemInReceipt && mealContainerProduct) {
-          const mealProductIndex = selectedMeal.mealProducts.findIndex(
-            (mp) => mp.product?.productName === item.product?.productName
-          );
-          selectedMeal.mealProducts.splice(mealProductIndex, 1);
-          cateringReceiptItemDialog.value = false;
-        }
+        // Do not remove the mealProduct; just reset its quantity and total price
+        mealProduct.quantity = 0;
+        mealProduct.totalPrice = 0;
       } else {
-        mealProduct.quantity = associatedReceiptItems.reduce((sum, ri) => sum + ri.quantity, 0);
+        // Update mealProduct quantity and total price based on associated ReceiptItems
+        mealProduct.quantity = associatedReceiptItems.reduce(
+          (sum, ri) => parseInt(sum+"") + parseInt( ri.quantity+''),
+          0
+        );
         mealProduct.totalPrice = associatedReceiptItems.reduce(
-          (sum, ri) => parseFloat(sum+'') + parseFloat( ri.receiptSubTotal+''),
+          (sum, ri) => parseInt(sum+"") + parseInt(ri.receiptSubTotal+''),
           0
         );
       }
     };
   
+    // Iterate through mealProducts to sync with ReceiptItems
     selectedMeal.mealProducts.forEach((mealProduct) => {
       let associatedReceiptItems: ReceiptItem[] = [];
-      if (mealProduct.mealId === 0) {
-        associatedReceiptItems = selectedMeal.receipt?.receiptItems.filter(
-          (receiptItem) =>
-            receiptItem.product?.productName === mealProduct.product?.productName
-        ) || [];
-      } else if (item.product?.storeType === "ร้านกาแฟ") {
+      if (item.product?.storeType === "ร้านกาแฟ") {
         associatedReceiptItems = selectedMeal.coffeeReceipt?.receiptItems.filter(
           (receiptItem) =>
             receiptItem.product?.productName === mealProduct.product?.productName
@@ -800,11 +800,18 @@ export const useCateringStore = defineStore("catering", () => {
           (receiptItem) =>
             receiptItem.product?.productName === mealProduct.product?.productName
         ) || [];
+      } else {
+        associatedReceiptItems = selectedMeal.receipt?.receiptItems.filter(
+          (receiptItem) =>
+            receiptItem.product?.productName === mealProduct.product?.productName
+        ) || [];
       }
   
+      // Update mealProduct based on associated ReceiptItems
       updateMealProduct(associatedReceiptItems, mealProduct);
     });
   
+    // Recalculate the total price of the meal
     selectedMeal.totalPrice = selectedMeal.mealProducts.reduce(
       (total, mealProduct) => parseFloat(total+'') + parseFloat(mealProduct.totalPrice+''),
       0
@@ -813,15 +820,98 @@ export const useCateringStore = defineStore("catering", () => {
     console.log(
       "Updated mealProducts:",
       cateringEvent.value.meals![selectedMealIndex.value].mealProducts
-    );
+    );}
+    else{
+     
+        const selectedMeal = cateringEvent.value.meals![selectedMealIndex.value];
+      
+        const updateMealProduct = (associatedReceiptItems: ReceiptItem[], mealProduct: MealProduct) => {
+          if (associatedReceiptItems.length === 0) {
+            const mealContainerProduct = selectedMeal.mealProducts.find(
+              (mp) => mp.product?.productName === item.product?.productName
+            );
+            const itemInReceipt = selectedMeal.receipt?.receiptItems.find(
+              (ri) => ri.product?.productName === item.product?.productName
+            );
+            if (!itemInReceipt && mealContainerProduct) {
+              const mealProductIndex = selectedMeal.mealProducts.findIndex(
+                (mp) => mp.product?.productName === item.product?.productName
+              );
+              selectedMeal.mealProducts.splice(mealProductIndex, 1);
+              cateringReceiptItemDialog.value = false;
+            }
+          } else {
+            mealProduct.quantity = associatedReceiptItems.reduce((sum, ri) => sum + ri.quantity, 0);
+            mealProduct.totalPrice = associatedReceiptItems.reduce(
+              (sum, ri) => parseFloat(sum+'') + parseFloat( ri.receiptSubTotal+''),
+              0
+            );
+          }
+        };
+      
+        selectedMeal.mealProducts.forEach((mealProduct) => {
+          let associatedReceiptItems: ReceiptItem[] = [];
+          if (mealProduct.mealId === 0) {
+            associatedReceiptItems = selectedMeal.receipt?.receiptItems.filter(
+              (receiptItem) =>
+                receiptItem.product?.productName === mealProduct.product?.productName
+            ) || [];
+          } else if (item.product?.storeType === "ร้านกาแฟ") {
+            associatedReceiptItems = selectedMeal.coffeeReceipt?.receiptItems.filter(
+              (receiptItem) =>
+                receiptItem.product?.productName === mealProduct.product?.productName
+            ) || [];
+          } else if (item.product?.storeType === "ร้านข้าว") {
+            associatedReceiptItems = selectedMeal.riceReceipt?.receiptItems.filter(
+              (receiptItem) =>
+                receiptItem.product?.productName === mealProduct.product?.productName
+            ) || [];
+          }
+      
+          updateMealProduct(associatedReceiptItems, mealProduct);
+        });
+      
+        selectedMeal.totalPrice = selectedMeal.mealProducts.reduce(
+          (total, mealProduct) => parseFloat(total+'') + parseFloat(mealProduct.totalPrice+''),
+          0
+        );
+      
+        console.log(
+          "Updated mealProducts:",
+          cateringEvent.value.meals![selectedMealIndex.value].mealProducts
+        );
+      
+    }
   };
   
-  const updateCateringEvent = async (caterId: number) => {
+  
+  const updateCateringEvent = async () => {
     try {
+      cateringEvent.value.totalBudget = cateringEvent.value.meals!.reduce(
+        (sum, meal) => parseFloat(sum+'') + parseFloat(meal.totalPrice+''),
+        0
+      );
       const response = await cateringService.updateCateringEvent(
-        caterId,
+     
         cateringEvent.value
       );
+      // update recipt coffe and reciptRicew if have
+      for (const meal of cateringEvent.value.meals!) {
+        if (meal.coffeeReceiptId) {
+          const coffeeReceipt = await receiptService.updateReceipt(
+            meal.coffeeReceiptId,
+            meal.coffeeReceipt!
+          );
+          console.log("Updated coffee receipt:", coffeeReceipt.data);
+        }
+        if (meal.riceReceiptId) {
+          const riceReceipt = await receiptService.updateReceipt(
+            meal.riceReceiptId,
+            meal.riceReceipt!
+          );
+          console.log("Updated rice receipt:", riceReceipt.data);
+        }
+      }
       if (response.status === 200) {
         console.log("Catering event updated successfully", response.data);
         Swal.fire("Success", "Catering event updated successfully", "success");

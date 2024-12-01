@@ -84,8 +84,10 @@ const setFilteredReceiptItems = (
   mealProduct: MealProduct
 ) => {
   if (mealProduct.product!.haveTopping) {
-    if(mealProduct.mealId == 0){
-      cateringStore.filteredReceiptItems = cateringStore.cateringEvent.meals![mealIndex].receipt.receiptItems.filter(
+    // console.log(cateringStore.cateringEvent.eventId);
+    
+    if(cateringStore.cateringEvent.eventId == 0){
+      cateringStore.filteredReceiptItems = cateringStore.cateringEvent.meals![mealIndex].receipt!.receiptItems.filter(
         (item) => item.product?.productId === mealProduct.product!.productId
       );
     }else{

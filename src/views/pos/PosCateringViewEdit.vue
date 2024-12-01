@@ -110,44 +110,9 @@ const saveCateringEvent = () => {
     return;
   }
 
-  // If `eventId` exists, update the event; otherwise, create a new event
-  if (eventId.value) {
-    cateringStore.updateCateringEvent(
-      eventId.value ? +eventId.value : 0
-    ).then(() => {
-      Swal.fire({
-        icon: "success",
-        title: "อัพเดทข้อมูลเรียบร้อย",
-        showConfirmButton: false,
-        timer: 1500,
-      });
-    }).catch(error => {
-      Swal.fire({
-        icon: "error",
-        title: "เกิดข้อผิดพลาดในการอัพเดทข้อมูล",
-        text: error.message,
-        showConfirmButton: true,
-      });
-    });
-  } else {
-    cateringStore.updateCateringEvent(
-      eventId.value ? +eventId.value : 0
-    ).then(() => {
-      Swal.fire({
-        icon: "success",
-        title: "สร้างอีเว้นท์เรียบร้อย",
-        showConfirmButton: false,
-        timer: 1500,
-      });
-    }).catch(error => {
-      Swal.fire({
-        icon: "error",
-        title: "เกิดข้อผิดพลาดในการสร้างอีเว้นท์",
-        text: error.message,
-        showConfirmButton: true,
-      });
-    });
-  }
+  cateringStore.updateCateringEvent(
+ 
+  );
 };
 </script>
 

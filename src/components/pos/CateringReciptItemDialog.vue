@@ -6,75 +6,70 @@ import { ref } from "vue";
 const cateringStore = useCateringStore();
 
 const increaseQuantity = (item: ReceiptItem) => {
-  console.log(
-    "mealProducts",
-    cateringStore.cateringEvent.meals![cateringStore.selectedMealIndex]
-      .mealProducts
-  );
-
   item.quantity++;
-  item.receiptSubTotal = cateringStore.calculateSubtotal(item);
-  console.log(
-    "mealProducts1",
-    cateringStore.cateringEvent.meals![cateringStore.selectedMealIndex]
-      .mealProducts
-  );
+  item.receiptSubTotal = calculateSubtotal(item);
 
-  cateringStore.syncMealProduct(item);
-  cateringStore.calculateTotalPrice(cateringStore.selectedMealIndex);
+  cateringStore.syncMealProduct(item); // Sync the updated receipt item
+  cateringStore.calculateTotalPrice(cateringStore.selectedMealIndex); // Recalculate total price
 };
 
 const decreaseQuantity = (item: ReceiptItem, index: number) => {
   if (item.quantity > 1) {
     item.quantity--;
-    item.receiptSubTotal = cateringStore.calculateSubtotal(item);
+    item.receiptSubTotal = calculateSubtotal(item);
   } else {
-    removeItem(index); // If quantity reaches zero, remove the item
+    removeItem(index); // Remove the item if quantity becomes 0
   }
 
-  cateringStore.syncMealProduct(item);
-  cateringStore.calculateTotalPrice(cateringStore.selectedMealIndex);
+  cateringStore.syncMealProduct(item); // Sync the updated receipt item
+  cateringStore.calculateTotalPrice(cateringStore.selectedMealIndex); // Recalculate total price
+};
+
+
+
+const calculateSubtotal = (item: ReceiptItem) => {
+  let subtotal = item.productType?.productTypePrice * item.quantity || 0;
+
+  if (item.product?.haveTopping && item.productTypeToppings) {
+    const toppingsTotal = item.productTypeToppings.reduce(
+      (total, topping) =>
+        total + topping.topping.toppingPrice * topping.quantity,
+      0
+    );
+    subtotal += toppingsTotal * item.quantity;
+  }
+
+  return subtotal;
 };
 
 const removeItem = (index: number) => {
   const item = cateringStore.filteredReceiptItems[index];
   cateringStore.filteredReceiptItems.splice(index, 1);
 
-  const selectedMeal = 
+  const selectedMeal =
     cateringStore.cateringEvent.meals![cateringStore.selectedMealIndex];
 
-  const receiptIndex = selectedMeal.receipt.receiptItems.findIndex(
+  const receiptIndex = selectedMeal.receipt?.receiptItems.findIndex(
     (receiptItem) =>
-      receiptItem.product?.productId === item.product!.productId &&
+      receiptItem.product?.productId === item.product?.productId &&
       receiptItem === item
   );
 
-  let isUpdating = false;
-
   if (receiptIndex !== -1) {
-    selectedMeal.receipt.receiptItems.splice(receiptIndex, 1);
-    isUpdating = true; // Indicates that an existing receipt was updated
+    selectedMeal.receipt?.receiptItems.splice(receiptIndex, 1);
   }
 
-  if (!selectedMeal.receipt.receiptItems.length) {
-    selectedMeal.totalPrice = 0;
-    selectedMeal.mealProducts = [];
-    isUpdating = false; // No items left, resetting the meal
-  }
-  else {
-    selectedMeal.totalPrice = selectedMeal.receipt.receiptItems.reduce(
-      (total, receiptItem) => parseFloat(total+'') + parseFloat(receiptItem.receiptSubTotal+''),
-      0
-    );
-  }
+  selectedMeal.totalPrice = selectedMeal.receipt?.receiptItems.reduce(
+    (total, receiptItem) => total + receiptItem.receiptSubTotal,
+    0
+  );
 
-  // Log the operation type
-  console.log(isUpdating ? "Updating meal" : "Creating a new meal/resetting");
-
-  // Sync meal products and recalculate total price
+  // Sync and recalculate
   cateringStore.syncMealProduct(item);
   cateringStore.calculateTotalPrice(cateringStore.selectedMealIndex);
 };
+
+
 
 const closeDialog = () => {
   cateringStore.cateringProductDialog = false;

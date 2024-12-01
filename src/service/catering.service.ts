@@ -34,8 +34,8 @@ function findCateringEventById(id: number) {
   return http.get(`/catering-events/${id}`);
 }
 // updateCateringEvent
-function updateCateringEvent(id: number, cateringEvent: CateringEvent) {
-  return http.patch(`/catering-events/${id}`, cateringEvent);
+function updateCateringEvent( cateringEvent: CateringEvent) {
+  return http.patch(`/catering-events/${cateringEvent.eventId}`, cateringEvent);
 }
 export default {
   createCateringEvent,
