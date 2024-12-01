@@ -8,8 +8,12 @@ const cateringStore = useCateringStore();
 const increaseQuantity = (item: ReceiptItem) => {
   item.quantity++;
   item.receiptSubTotal = calculateSubtotal(item);
+  console.log("item", cateringStore.filteredReceiptItems);
+  
 
   cateringStore.syncMealProduct(item); // Sync the updated receipt item
+console.log("item", cateringStore.filteredReceiptItems);
+
   cateringStore.calculateTotalPrice(cateringStore.selectedMealIndex); // Recalculate total price
 };
 

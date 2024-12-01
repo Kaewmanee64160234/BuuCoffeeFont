@@ -763,6 +763,7 @@ export const useCateringStore = defineStore("catering", () => {
 
   
   const syncMealProduct = (item: ReceiptItem) => {
+    
     if(item.receiptItemId > 0) {
     const selectedMeal = cateringEvent.value.meals![selectedMealIndex.value];
   
@@ -770,6 +771,10 @@ export const useCateringStore = defineStore("catering", () => {
       associatedReceiptItems: ReceiptItem[],
       mealProduct: MealProduct
     ) => {
+      if (mealProduct.type === "เลี้ยงรับรอง") {
+        // Skip updating mealProducts of type เลี้ยงรับรอง
+        return;
+      }
       if (associatedReceiptItems.length === 0) {
         // Do not remove the mealProduct; just reset its quantity and total price
         mealProduct.quantity = 0;
