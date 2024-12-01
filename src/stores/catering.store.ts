@@ -13,6 +13,7 @@ import receiptService from "@/service/receipt.service";
 import cateringService from "@/service/catering.service";
 import { useCateringEventStore } from "./historycatering.store";
 import { prototype } from "apexcharts";
+import router from "@/router";
 
 export const useCateringStore = defineStore("catering", () => {
   const meals = ref<Meal[]>([]);
@@ -177,30 +178,30 @@ export const useCateringStore = defineStore("catering", () => {
     try {
       cateringEvent.value.user = userStore.currentUser;
       cateringEvent.value.totalBudget = totalBudget.value;
-
+  
       for (const meal of cateringEvent.value.meals!) {
         // Validate meal requirements
         if (!meal.mealProducts || meal.mealProducts.length === 0) {
           Swal.fire("Error", "กรุณาใส่รายการอาหารอย่างน้อย 1 อย่าง", "error");
           return;
         }
-
+  
         if (meal.mealName.length < 3) {
           Swal.fire("Error", "ชื่ออาหารต้องมีอย่างน้อย 3 ตัวอักษร", "error");
           return;
         }
-
+  
         if (meal.mealTime.length < 1) {
           Swal.fire("Error", "กรุณาใส่เวลา", "error");
           return;
         }
-
+  
         // Ensure receipt exists
         if (!meal.receipt || !meal.receipt.receiptItems) {
           Swal.fire("Error", "Receipt data is missing for this meal.", "error");
           return;
         }
-
+  
         // Filter receipt items for coffee and rice
         const coffeeReceiptItems = meal.receipt.receiptItems.filter(
           (item) => item.product?.storeType === "ร้านกาแฟ"
@@ -208,7 +209,7 @@ export const useCateringStore = defineStore("catering", () => {
         const riceReceiptItems = meal.receipt.receiptItems.filter(
           (item) => item.product?.storeType === "ร้านข้าว"
         );
-
+  
         // Helper to create a receipt
         const createReceipt = async (
           receiptItems: ReceiptItem[],
@@ -218,7 +219,7 @@ export const useCateringStore = defineStore("catering", () => {
             (sum, item) => sum + item.receiptSubTotal,
             0
           );
-
+  
           const receipt: Receipt = {
             receiptTotalPrice,
             receiptType,
@@ -233,9 +234,9 @@ export const useCateringStore = defineStore("catering", () => {
             createdDate: cateringEvent.value.createdDate,
             checkIngredientId: 0,
           };
-
+  
           console.log(`Receipt for ${receiptType}:`, receipt);
-
+  
           const response = await receiptService.createReceipt(receipt);
           if (response.status === 201) {
             console.log(
@@ -247,7 +248,7 @@ export const useCateringStore = defineStore("catering", () => {
             throw new Error(`Failed to create ${receiptType} receipt`);
           }
         };
-
+  
         // Create coffee receipt if applicable
         if (coffeeReceiptItems.length > 0) {
           const coffeeReceipt = await createReceipt(
@@ -255,7 +256,7 @@ export const useCateringStore = defineStore("catering", () => {
             "ร้านกาแฟ"
           );
           meal.coffeeReceiptId = coffeeReceipt.receiptId;
-
+  
           // Map receipt items back to meal products
           meal.mealProducts = meal.mealProducts.map((mealProduct) => {
             const matchingReceiptItem = coffeeReceipt.receiptItems.find(
@@ -269,12 +270,12 @@ export const useCateringStore = defineStore("catering", () => {
             return mealProduct;
           });
         }
-
+  
         // Create rice receipt if applicable
         if (riceReceiptItems.length > 0) {
           const riceReceipt = await createReceipt(riceReceiptItems, "ร้านข้าว");
           meal.riceReceiptId = riceReceipt.receiptId;
-
+  
           // Map receipt items back to meal products
           meal.mealProducts = meal.mealProducts.map((mealProduct) => {
             const matchingReceiptItem = riceReceipt.receiptItems.find(
@@ -289,23 +290,39 @@ export const useCateringStore = defineStore("catering", () => {
           });
         }
       }
-
+  
       // Create the catering event
       console.log("Catering event all:", JSON.stringify(cateringEvent.value));
       const responseEvent = await cateringService.createCateringEvent(
         cateringEvent.value
       );
-
+  
       if (responseEvent.status === 201) {
         console.log("Catering event created successfully", responseEvent.data);
         clearData();
         Swal.fire("Success", "Catering event created successfully", "success");
+      } else {
+        throw new Error("Failed to create catering event");
       }
     } catch (error) {
       console.error("Error creating catering event:", error);
+  
+      // Rollback: Remove any created receipts
+      for (const meal of cateringEvent.value.meals!) {
+        if (meal.coffeeReceiptId) {
+          await receiptService.removeReceipt(meal.coffeeReceiptId);
+          console.log(`Coffee receipt ${meal.coffeeReceiptId} removed.`);
+        }
+        if (meal.riceReceiptId) {
+          await receiptService.removeReceipt(meal.riceReceiptId);
+          console.log(`Rice receipt ${meal.riceReceiptId} removed.`);
+        }
+      }
+  
       Swal.fire("Error", "Error creating catering event", "error");
     }
   };
+  
 
   
 
@@ -479,6 +496,8 @@ export const useCateringStore = defineStore("catering", () => {
       totalBudget.value
     );
   };
+
+  
 
   const addProduct = (item: Product, mealIndex: number, type: string) => {
     if (item.haveTopping) {
@@ -895,43 +914,75 @@ export const useCateringStore = defineStore("catering", () => {
   
   const updateCateringEvent = async () => {
     try {
-      
+      // Calculate the total budget
       cateringEvent.value.totalBudget = cateringEvent.value.meals!.reduce(
-        (sum, meal) => parseFloat(sum+'') + parseFloat(meal.totalPrice+''),
+        (sum, meal) => parseFloat(sum + '') + parseFloat(meal.totalPrice + ''),
         0
       );
-      // log json
+  
+      // Log the catering event JSON
       console.log("cateringEvent", JSON.stringify(cateringEvent.value));
-      const response = await cateringService.updateCateringEvent(
-     
-        cateringEvent.value
-      );
-      // update recipt coffe and reciptRicew if have
+  
+      // Iterate over meals to update receipts
       for (const meal of cateringEvent.value.meals!) {
-        if (meal.coffeeReceiptId) {
-          const coffeeReceipt = await receiptService.updateReceipt(
-            meal.coffeeReceiptId,
-            meal.coffeeReceipt!
+        if (meal.coffeeReceipt) {
+          meal.coffeeReceipt.receiptPromotions = [];
+          const coffeeReceiptResponse = await receiptService.updateReceipt(
+            meal.coffeeReceipt.receiptId,
+            meal.coffeeReceipt
           );
-          console.log("Updated coffee receipt:", coffeeReceipt.data);
+  
+          // Check for a non-success status
+          if (coffeeReceiptResponse.status !== 200) {
+            throw new Error("Failed to update coffee receipt");
+          }
+          console.log("Updated coffee receipt:", coffeeReceiptResponse.data);
         }
-        if (meal.riceReceiptId) {
-          const riceReceipt = await receiptService.updateReceipt(
-            meal.riceReceiptId,
-            meal.riceReceipt!
+  
+        if (meal.riceReceipt) {
+          meal.riceReceipt.receiptPromotions = [];
+          const riceReceiptResponse = await receiptService.updateReceipt(
+            meal.riceReceipt.receiptId,
+            meal.riceReceipt
           );
-          console.log("Updated rice receipt:", riceReceipt.data);
+  
+          // Check for a non-success status
+          if (riceReceiptResponse.status !== 200) {
+            throw new Error("Failed to update rice receipt");
+          }
+          console.log("Updated rice receipt:", riceReceiptResponse.data);
         }
       }
-      if (response.status === 200) {
-        console.log("Catering event updated successfully", response.data);
-        Swal.fire("Success", "Catering event updated successfully", "success");
-      }
+  
+      // Log a success message
+      Swal.fire("Success", "Catering event updated successfully", "success");
+      // reset catering data
+      clearData();
+      router.push("/pos-catering");
     } catch (error) {
+      // Log and notify about the error
       console.error("Error updating catering event:", error);
       Swal.fire("Error", "Error updating catering event", "error");
     }
   };
+  
+
+  const removeReceipt = async (receiptId: number) => {
+   try {
+    const response = await receiptService.deleteReceipt(receiptId);
+    if (response.status === 200) {
+    
+      console.log("Receipt removed successfully");
+    }
+    
+   } catch (error) {
+     console.error("Error removing receipt:", error);
+      Swal.fire("Error", "Error removing receipt", "error");
+    
+   }
+  }
+
+
   return {
     fetchMeals,
     saveMeals,

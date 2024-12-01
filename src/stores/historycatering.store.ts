@@ -63,7 +63,7 @@ export const useCateringEventStore = defineStore("cateringEvent", () => {
     }
   };
 
-  const cancelEvent = async (id: string) => {
+  const cancelEvent = async (id: number) => {
     const result = await Swal.fire({
       title: "ยืนยันการยกเลิก?",
       text: "คุณต้องการยกเลิกเหตุการณ์นี้?",
@@ -77,6 +77,8 @@ export const useCateringEventStore = defineStore("cateringEvent", () => {
     if (result.isConfirmed) {
       try {
         const res = await cateringService.cancelCateringEvent(id);
+        console.log(res.data);
+        
         if (res.status === 200) {
           await fetchCateringEvents();
           Swal.fire("ยกเลิกแล้ว!", "เหตุการณ์นี้ถูกยกเลิก.", "success");

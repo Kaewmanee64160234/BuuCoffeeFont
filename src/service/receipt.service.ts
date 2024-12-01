@@ -22,6 +22,11 @@ function updateReceipt(id: number, receipt: Receipt) {
 function deleteReceipt(id: number) {
   return http.delete(`/receipts/cancel/${id}`);
 }
+
+function removeReceipt(id: number) {
+  return http.delete(`/receipts/${id}`);
+}
+
 // cancelReceipt
 
 
@@ -69,5 +74,6 @@ export default {
   cancelReceipt,
   getRecieptIn30Min,
   getRecieptCateringIn24Hours,
-  getReceiptPaginate
+  getReceiptPaginate,
+  removeReceipt
 };

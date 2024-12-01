@@ -165,7 +165,7 @@ const editCateringEvent = async (eventId: number) => {
               <v-btn
                 v-if="catering.status === 'pending'"
                 color="red"
-                @click="cateringEventStore.cancelEvent(catering.eventId)"
+                @click="cateringEventStore.updateStatus(catering.eventId,'canceled')"
               >
                 ยกเลิก
               </v-btn>

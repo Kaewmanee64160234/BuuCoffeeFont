@@ -18,7 +18,7 @@ function updateStatusCateringEvent(id: string, status: string) {
   });
 }
 //   // cancel catering event
-function cancelCateringEvent(id: string) {
+function cancelCateringEvent(id: number) {
   return http.patch(`/catering-events/${id}/cancel`);
 }
 // get subinventortRice by productId
