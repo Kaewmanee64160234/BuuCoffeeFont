@@ -245,6 +245,7 @@ export const useCateringStore = defineStore("catering", () => {
             );
             return response.data;
           } else {
+           await removeReceipt(response.data.receiptId);
             throw new Error(`Failed to create ${receiptType} receipt`);
           }
         };
@@ -302,6 +303,18 @@ export const useCateringStore = defineStore("catering", () => {
         clearData();
         Swal.fire("Success", "Catering event created successfully", "success");
       } else {
+          //  removeall reci[t that fail
+          for (const meal of cateringEvent.value.meals!) {
+            if (meal.coffeeReceiptId) {
+              await receiptService.removeReceipt(meal.coffeeReceiptId);
+              console.log(`Coffee receipt ${meal.coffeeReceiptId} removed.`);
+            }
+            if (meal.riceReceiptId) {
+              await receiptService.removeReceipt(meal.riceReceiptId);
+              console.log(`Rice receipt ${meal.riceReceiptId} removed.`);
+            }
+          }
+
         throw new Error("Failed to create catering event");
       }
     } catch (error) {
@@ -687,6 +700,7 @@ export const useCateringStore = defineStore("catering", () => {
         userStatus: "",
       },
     };
+    totalBudget.value = 0;
   };
 
   const addProductCateringInCaterings = (item: MealProduct) => {
@@ -934,6 +948,7 @@ export const useCateringStore = defineStore("catering", () => {
   
           // Check for a non-success status
           if (coffeeReceiptResponse.status !== 200) {
+         
             throw new Error("Failed to update coffee receipt");
           }
           console.log("Updated coffee receipt:", coffeeReceiptResponse.data);
@@ -948,19 +963,18 @@ export const useCateringStore = defineStore("catering", () => {
   
           // Check for a non-success status
           if (riceReceiptResponse.status !== 200) {
+          
             throw new Error("Failed to update rice receipt");
           }
           console.log("Updated rice receipt:", riceReceiptResponse.data);
         }
       }
-  
-      // Log a success message
+
+      await cateringService.updateCateringEvent(cateringEvent.value);
       Swal.fire("Success", "Catering event updated successfully", "success");
-      // reset catering data
       clearData();
       router.push("/pos-catering");
     } catch (error) {
-      // Log and notify about the error
       console.error("Error updating catering event:", error);
       Swal.fire("Error", "Error updating catering event", "error");
     }
