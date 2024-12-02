@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 import financeService from "@/service/report/finance.service";
 import type { Cashier } from "@/types/report/cashier.type";
 import type { TopSellingProduct } from "@/types/report/top-selling-product.type";
+import type { CateringReport} from "@/types/report/catering.type"
 export const useReportFinnceStore = defineStore("cashier", () => {
   const cashiers = ref<Cashier[]>([]);
   const createCashierDialog = ref(false);
@@ -16,6 +17,14 @@ export const useReportFinnceStore = defineStore("cashier", () => {
   const coffeeSummary = ref<{ totalSales: number; totalCost: number ; totalDiscount: number ; totalOrders:number}>({ totalSales: 0, totalCost: 0, totalDiscount:0,totalOrders:0});
   const dailyReportFood = ref<{ totalSales: number; totalDiscount: number ; totalTransactions: number}>({ totalSales: 0, totalDiscount: 0, totalTransactions:0});
   const checkTodayCoffee = ref(false);
+  const reportcatering = ref<CateringReport>({
+    month: new Date().getMonth() + 1,
+    year: new Date().getFullYear(),
+    totalEvents: 0,
+    pendingEvents: 0,
+    completedEvents: 0,
+    totalProfit: 0
+  });
   const checkTodayRice = ref(false);
   const state = reactive({
     groupedByDay: {},
@@ -147,6 +156,16 @@ export const useReportFinnceStore = defineStore("cashier", () => {
       console.error(error);
     }
   };
+  const getCateringReport = async () => {
+    try {
+      const res = await financeService.getCatering();
+      if (res.data) {
+        reportcatering.value = res.data;
+      }
+    } catch (error) {
+      console.error('Error fetching catering report:', error);
+    }
+  };
 
   return {
     cashiers,
@@ -162,6 +181,7 @@ export const useReportFinnceStore = defineStore("cashier", () => {
     stateFood,
     topSellingProduct,
     selectedType,
+    reportcatering,
     getAll,
     deleteCashier,
     getSumType,
@@ -173,7 +193,8 @@ export const useReportFinnceStore = defineStore("cashier", () => {
     getTopSellingProduct,
     checkTodayCoffee,
     checkTodayRice,
-    checkCashierToday
+    checkCashierToday,
+    getCateringReport
     
   };
 });

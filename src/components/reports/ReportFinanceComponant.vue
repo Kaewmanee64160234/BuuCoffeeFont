@@ -96,6 +96,8 @@ const updateLineChartData = () => {
 onMounted(async () => {
   try {
     await ReportFinnceStore.getDailyReport(); 
+    await ReportFinnceStore.getCateringReport();
+    console.log("เลี้ยงรับรอง",ReportFinnceStore.reportcatering);
     await ReportFinnceStore.getDailyReportFood(); 
     await ReportFinnceStore.getcoffeeSummary();
     await expenditureStore.fetchExpenditure();
@@ -326,40 +328,40 @@ watch(
           <v-col cols="12" md="8">
             <v-row justify="center" no-gutters>
               <v-col cols="12" md="6" class="pa-2">
-                <v-card class="text-center mt-6">
-                  <v-card-title>จำนวนครั้งที่จัดเลี้ยง</v-card-title>
-                  <v-card-subtitle style="font-size: 24px; font-weight: bold; color: #FF7F7F;">
-                    {{ ReportFinnceStore.coffeeSummary.totalCost }} บาท
-                  </v-card-subtitle>
-                </v-card>
-              </v-col>
-              
-              <v-col cols="12" md="6" class="pa-2">
-                <v-card class="text-center mt-6">
-                  <v-card-title>กำไรรวมจัดเลี้ยง</v-card-title>
-                  <v-card-subtitle style="font-size: 24px; font-weight: bold; color: #2E7D32;">
-                    {{ ReportFinnceStore.coffeeSummary.totalSales }} บาท
-                  </v-card-subtitle>
-                </v-card>
-              </v-col>
+  <v-card class="text-center mt-6">
+    <v-card-title>จำนวนครั้งที่จัดเลี้ยง</v-card-title>
+    <v-card-subtitle style="font-size: 24px; font-weight: bold; color: #FF7F7F;">
+      {{ ReportFinnceStore.reportcatering.totalEvents }} ครั้ง
+    </v-card-subtitle>
+  </v-card>
+</v-col>
 
-              <v-col cols="12" md="6" class="pa-2">
-                <v-card class="text-center mt-6">
-                  <v-card-title>รอดำเนินการ</v-card-title>
-                  <v-card-subtitle style="font-size: 24px; font-weight: bold; color: #FF7F7F;">
-                    {{ ReportFinnceStore.coffeeSummary.totalDiscount }} บาท
-                  </v-card-subtitle>
-                </v-card>
-              </v-col>
+<v-col cols="12" md="6" class="pa-2">
+  <v-card class="text-center mt-6">
+    <v-card-title>กำไรรวมจัดเลี้ยง</v-card-title>
+    <v-card-subtitle style="font-size: 24px; font-weight: bold; color: #2E7D32;">
+      {{ ReportFinnceStore.reportcatering.totalProfit }} บาท
+    </v-card-subtitle>
+  </v-card>
+</v-col>
 
-              <v-col cols="12" md="6" class="pa-2">
-                <v-card class="text-center mt-6">
-                  <v-card-title>เสร็จสิ้น</v-card-title>
-                  <v-card-subtitle style="font-size: 24px; font-weight: bold; color: #2E7D32;">
-                    {{ ReportFinnceStore.coffeeSummary.totalOrders }} รายการ
-                  </v-card-subtitle>
-                </v-card>
-              </v-col>
+<v-col cols="12" md="6" class="pa-2">
+  <v-card class="text-center mt-6">
+    <v-card-title>รอดำเนินการ</v-card-title>
+    <v-card-subtitle style="font-size: 24px; font-weight: bold; color: #FF7F7F;">
+      {{ ReportFinnceStore.reportcatering.pendingEvents }} รายการ
+    </v-card-subtitle>
+  </v-card>
+</v-col>
+
+<v-col cols="12" md="6" class="pa-2">
+  <v-card class="text-center mt-6">
+    <v-card-title>เสร็จสิ้น</v-card-title>
+    <v-card-subtitle style="font-size: 24px; font-weight: bold; color: #2E7D32;">
+      {{ ReportFinnceStore.reportcatering.completedEvents }} รายการ
+    </v-card-subtitle>
+  </v-card>
+</v-col>
             </v-row>
           </v-col>
         </v-row>

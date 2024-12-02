@@ -67,6 +67,9 @@ function getRevenue() {
 function getExpenditure() {
   return http.get("/importingredients/expenditure");
 }
+function getCatering() {
+  return http.get("/catering-events/summary");
+}
 
 // http://localhost:3000/catering-event
 function cateringEvent() {
@@ -106,7 +109,7 @@ export default {
   getIngradientsUsage,
   cateringEvent,
   cateringEventPaginate,
-  checkToday
+  checkToday,getCatering
   
 
 };
