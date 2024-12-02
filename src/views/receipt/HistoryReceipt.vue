@@ -1,21 +1,17 @@
 <script lang="ts" setup>
 import { useReceiptStore } from '@/stores/receipt.store';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import type { Receipt } from '@/types/receipt.type';
 import { useReceiptsStore } from '@/stores/report/receiptsStore';
 import * as XLSX from 'xlsx';
 import HistoryReceiptDialog from '@/components/receipts/HistoryReceiptDialog.vue';
 import ReceiptOld from '@/components/receipts/ReceiptOld.vue';
 
+// Store initialization
 const receiptsStore = useReceiptsStore();
 const receiptStore = useReceiptStore();
-// console.log(receiptStore.itemsPerPage)
-// console.log(receiptStore.totalReceipts)
-// console.log(receiptStore.totalReceipts / receiptStore.itemsPerPage)
-// console.log(receiptStore.getReceiptPaginate)
 
-// console.log(receiptStore.receipts)
-// Date Range Setup
+// Date range setup
 const currentDate = new Date();
 const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
 const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
@@ -23,209 +19,228 @@ const startDate = ref(startOfMonth.toISOString().substring(0, 10));
 const endDate = ref(endOfMonth.toISOString().substring(0, 10));
 const receiptType = ref<string>('ร้านกาแฟ');
 
-// Dialog Management
+// Dialog states
 const historyReceiptDialog = ref(false);
 const receiptOld = ref(false);
 const selectedReceipt = ref<Receipt | null>(null);
 
-// Fetching data for receipts
+// Data fetching
 const fetchData = async () => {
   await receiptsStore.fetchReceipts(startDate.value, endDate.value, receiptType.value);
 };
 
+// Watch for filter changes
+watch([startDate, endDate, receiptType], async () => {
+  await fetchData();
+}, { deep: true });
 
-// Export receipts to Excel
+// Excel export functionality
 const exportToExcel = async () => {
   await fetchData();
-  const formattedReceipts = formatReceiptsForExcel(receiptsStore.receipts);
-  const worksheet = XLSX.utils.json_to_sheet(formattedReceipts, {
-    header: [
-      'ราคารวม', 'ส่วนลดรวม', 'ราคารวมสุทธิ', 'สถานะรายการ', 'รูปแบบร้าน', 'เลขคิว', 'รูปแบบชำระเงิน',
-      'วันที่สร้าง', 'วันที่แก้ไข', 'รายการที่สั่งซื้อ', 'พนักงาน', 'ลูกค้า', 'โปรโมชันที่ใช้',
-    ]
-  });
+  const formattedReceipts = receiptsStore.receipts.map(receipt => ({
+    วันที่: formatDate(receipt.createdDate),
+    สถานะ: statusText(receipt.receiptStatus),
+    'ราคารวมสุทธิ': receipt.receiptNetPrice,
+    'ส่วนลด': receipt.receiptTotalDiscount,
+    'สมาชิก': receipt.customer?.customerName || '-',
+    'โปรโมชั่น': receipt.receiptPromotions?.map(p => p.promotion.promotionName).join(', ') || '-',
+    'การชำระเงิน': receipt.paymentMethod,
+    'พนักงาน': receipt.user?.userName || '-',
+    'ประเภท': receipt.receiptType
+  }));
+
+  const worksheet = XLSX.utils.json_to_sheet(formattedReceipts);
   const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'Receipts');
-
-  const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'binary' });
-  const blob = new Blob([s2ab(wbout)], { type: 'application/octet-stream' });
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'รายงานการขาย');
+  
+  const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+  const blob = new Blob([wbout], { type: 'application/octet-stream' });
+  const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = 'receipts.xlsx';
+  link.href = url;
+  link.download = `รายงานการขาย_${formatDate(new Date().toISOString())}.xlsx`;
   link.click();
+  URL.revokeObjectURL(url);
 };
 
-// Utility function for converting string to binary
-const s2ab = (s: string) => {
-  const buf = new ArrayBuffer(s.length);
-  const view = new Uint8Array(buf);
-  for (let i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
-  return buf;
-};
-
-// Lifecycle Hook - Fetch Receipts on Mount
+// Initialize data on mount
 onMounted(async () => {
   await receiptStore.getAllReceipts();
   await receiptStore.getReceiptPaginate();
+  await fetchData(); // เพิ่มการโหลดข้อมูลตามฟิลเตอร์เริ่มต้น
 });
 
-// Open the receipt detail dialog
+// Dialog handlers
 const openHistoryReceiptDialog = (receipt: Receipt) => {
-  selectedReceipt.value = receipt;
-  historyReceiptDialog.value = true;
+  receiptStore.receipt = receipt;
+  receiptStore.historyReceiptDialog = true;
 };
 
-// Open the old receipt dialog
 const openOldReceiptDialog = (receipt: Receipt) => {
   selectedReceipt.value = receipt;
   receiptOld.value = true;
 };
 
-// Filter receipts based on search query
+// Computed properties and utilities
 const filteredReceipts = computed(() => {
-  if (!receiptStore.searchQuery) {
-    return receiptStore.receipts.slice().sort((a, b) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime());
+  const receipts = receiptStore.receipts;
+  if (!receipts?.length) return [];
+  
+  let filtered = [...receipts];
+
+  // กรองตามวันที่
+  filtered = filtered.filter(receipt => {
+    const receiptDate = new Date(receipt.createdDate || 0);
+    const start = new Date(startDate.value);
+    const end = new Date(endDate.value);
+    return receiptDate >= start && receiptDate <= end;
+  });
+
+  // กรองตามประเภท
+  if (receiptType.value !== 'ทั้งหมด') {
+    filtered = filtered.filter(receipt => receipt.receiptType === receiptType.value);
   }
-  return receiptStore.receipts.filter(receipt =>
-    receipt.customer?.customerName?.toLowerCase().includes(receiptStore.searchQuery.toLowerCase()) ||
-    receipt.receiptId?.toString().includes(receiptStore.searchQuery)
-  ).sort((a, b) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime());
+  
+  // เรียงลำดับตามวันที่
+  filtered.sort((a, b) => 
+    new Date(b.createdDate || 0).getTime() - new Date(a.createdDate || 0).getTime()
+  );
+  
+  // ค้นหาตามคำค้น
+  if (receiptStore.searchQuery) {
+    filtered = filtered.filter(receipt => 
+      receipt.customer?.customerName?.toLowerCase().includes(receiptStore.searchQuery.toLowerCase()) ||
+      receipt.receiptId?.toString().includes(receiptStore.searchQuery)
+    );
+  }
+  
+  return filtered;
 });
 
-// Format the date for display
 const formatDate = (date: string) => {
+  if (!date) return '-';
   const jsDate = new Date(date);
   return jsDate.toLocaleDateString('th-TH', {
-    day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Asia/Bangkok'
-  }) + ' เวลา ' + jsDate.toLocaleTimeString('th-TH', {
-    hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok'
+    day: '2-digit',
+    month: '2-digit', 
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Asia/Bangkok'
   });
 };
 
-// Format receipts for Excel export
-const formatReceiptsForExcel = (receipts: Receipt[]) => {
-  return receipts.flatMap(receipt => {
-    return receipt.receiptItems.map(item => ({
-      receiptTotalPrice: receipt.receiptTotalPrice,
-      receiptTotalDiscount: receipt.receiptTotalDiscount,
-      receiptNetPrice: receipt.receiptNetPrice,
-      receiptStatus: receipt.receiptStatus,
-      receiptType: receipt.receiptType,
-      queueNumber: receipt.queueNumber,
-      paymentMethod: receipt.paymentMethod,
-      createdDate: receipt.createdDate,
-      updatedDate: receipt.updatedDate,
-      quantity: item.quantity,
-      receiptSubTotal: item.receiptSubTotal,
-      sweetnessLevel: item.sweetnessLevel,
-      productTypeName: item.productType.productTypeName,
-      productName: item.product.productName,
-      productPrice: item.product.productPrice,
-      categoryName: item.product.category.categoryName,
-      userName: receipt.user?.userName,
-      customer: receipt.customer?.customerName,
-      discount: receipt.receiptPromotions.map(promo => promo.discount).join(', '),
-      promotionNames: receipt.receiptPromotions.map(promo => promo.promotion.promotionName).join(', ')
-    }));
-  });
-};
-
-// Receipt status display logic
 const statusClass = (status: string) => ({
   'text-success': status === 'paid',
-  'text-danger': status === 'cancel',
+  'text-danger': status === 'cancel'
 });
 
 const statusText = (status: string) => {
-  switch (status) {
-    case 'paid':
-      return 'สำเร็จ';
-    case 'cancel':
-      return 'ยกเลิก';
-    default:
-      return status;
-  }
+  const statusMap: Record<string, string> = {
+    paid: 'สำเร็จ',
+    cancel: 'ยกเลิก'
+  };
+  return statusMap[status] || status;
 };
 </script>
 
 <template>
   <ReceiptOld v-model:dialog="receiptOld" :receipt="selectedReceipt" />
-  <HistoryReceiptDialog v-model:dialog="historyReceiptDialog" :receipt="selectedReceipt" />
+  <HistoryReceiptDialog />
 
-  <v-container>
-    <v-card class="flex-container">
-      <v-card-title>
-        <v-row>
-          <v-col cols="12" md="4" style="padding: 20px;">
-            <h3>ประวัติการขาย</h3>
-          </v-col>
-          <v-col cols="12" md="4">
-            <v-text-field v-model="startDate" label="วันเริ่ม" type="date" outlined dense hide-details></v-text-field>
-          </v-col>
-          <v-col cols="12" md="4">
-            <v-text-field v-model="endDate" label="วันสิ้นสุด" type="date" outlined dense hide-details></v-text-field>
-          </v-col>
-          <v-col cols="12" md="2">
-            <v-radio-group v-model="receiptType" row>
-              <v-radio label="ร้านข้าว" value="ร้านข้าว"></v-radio>
-              <v-radio label="ร้านกาแฟ" value="ร้านกาแฟ"></v-radio>
-              <v-radio label="ทั้งหมด" value="ทั้งหมด"></v-radio>
-            </v-radio-group>
-          </v-col>
-          <v-col cols="12" md="2">
-            <v-btn @click="exportToExcel" color="success">
-              <v-icon color="white" style="font-size: 20px;">mdi-file-excel</v-icon>
-            </v-btn>
-          </v-col>
-        </v-row>
-        <v-spacer></v-spacer>
+  <v-container fluid style="padding-left: 80px">
+    <v-card elevation="2" class="pa-4">
+      <v-card-title class="d-flex align-center mb-4">
+        <h2 class="text-h5 font-weight-bold">ประวัติการขาย</h2>
+        <v-spacer />
+        <v-btn
+          color="success"
+          prepend-icon="mdi-file-excel"
+          @click="exportToExcel"
+          class="ml-2"
+        >
+          ส่งออก Excel
+        </v-btn>
       </v-card-title>
 
-      <v-table class="mx-auto" style="width: 97%">
+      <v-row class="mb-4">
+        <v-col cols="12" md="4">
+          <v-text-field
+            v-model="startDate"
+            label="วันเริ่มต้น"
+            type="date"
+            density="comfortable"
+            variant="outlined"
+            hide-details
+          />
+        </v-col>
+        <v-col cols="12" md="4">
+          <v-text-field
+            v-model="endDate"
+            label="วันสิ้นสุด"
+            type="date"
+            density="comfortable"
+            variant="outlined"
+            hide-details
+          />
+        </v-col>
+        <v-col cols="12" md="4">
+          <v-radio-group v-model="receiptType" row class="mt-0">
+            <v-radio label="ร้านข้าว" value="ร้านข้าว" />
+            <v-radio label="ร้านกาแฟ" value="ร้านกาแฟ" />
+            <v-radio label="ทั้งหมด" value="ทั้งหมด" />
+          </v-radio-group>
+        </v-col>
+      </v-row>
+
+      <v-table hover class="elevation-1">
         <thead>
           <tr>
-            <th class="text-center" style="font-size: 16px;">#</th>
-            <th class="text-center" style="font-size: 16px;">วันที่ออกใบเสร็จ</th>
-            <th class="text-center" style="font-size: 16px;">สถานะใบเสร็จ</th>
-            <th class="text-center" style="font-size: 16px;">ราคารวมสุทธิ</th>
-            <th class="text-center" style="font-size: 16px;">ส่วนลด</th>
-            <th class="text-center" style="font-size: 16px;">สมาชิก</th>
-            <th class="text-center" style="font-size: 16px;">โปรโมชั่น</th>
-            <th class="text-center" style="font-size: 16px;">รูปแบบการจ่ายเงิน</th>
-            <th class="text-center" style="font-size: 16px;">พนักงาน</th>
-            <th class="text-center" style="font-size: 16px;">ประเภทใบเสร็จ</th>
+            <th class="text-center">ลำดับ</th>
+            <th class="text-center">วันที่</th>
+            <th class="text-center">สถานะ</th>
+            <th class="text-center">ราคาสุทธิ</th>
+            <th class="text-center">ส่วนลด</th>
+            <th class="text-center">สมาชิก</th>
+            <th class="text-center">โปรโมชั่น</th>
+            <th class="text-center">การชำระเงิน</th>
+            <th class="text-center">พนักงาน</th>
+            <th class="text-center">ประเภท</th>
           </tr>
         </thead>
-
         <tbody>
           <tr
-            v-for="(receipt, index) in receiptStore.receipts"
+            v-for="(receipt, index) in filteredReceipts"
             :key="receipt.receiptId"
-            style="text-align: center;"
+            @click="openHistoryReceiptDialog(receipt)"
+            style="cursor: pointer"
           >
-            <!-- Properly calculate the row number considering pagination -->
-            <td class="text-center" style="font-size: 16px;">{{ index + 1 + (receiptStore.currentPage - 1) * receiptStore.itemsPerPage }}</td>
-            <td class="text-center" style="font-size: 16px;">{{ formatDate(receipt.createdDate) }}</td>
-            <td :class="statusClass(receipt.receiptStatus)" class="text-center" style="font-size: 16px;">{{ statusText(receipt.receiptStatus) }}</td>
-            <td class="text-center" style="font-size: 16px;">{{ receipt.receiptNetPrice }}</td>
-            <td class="text-center" style="font-size: 16px;">{{ receipt.receiptTotalDiscount }}</td>
-            <td class="text-center" style="font-size: 16px;">{{ receipt.customer?.customerName }}</td>
-            <td class="text-center" style="font-size: 16px;">{{ receipt.receiptPromotions?.map(promo => promo.promotionName).join(', ') || '-' }}</td>
-            <td class="text-center" style="font-size: 16px;">{{ receipt.paymentMethod }}</td>
-            <td class="text-center" style="font-size: 16px;">{{ receipt.user?.userName }}</td>
-            <td class="text-center" style="font-size: 16px;">{{ receipt.receiptType }}</td>
+            <td class="text-center">{{ index + 1 + (receiptStore.currentPage - 1) * receiptStore.itemsPerPage }}</td>
+            <td class="text-center">{{ formatDate(receipt.createdDate) }}</td>
+            <td class="text-center" :class="statusClass(receipt.receiptStatus)">
+              {{ statusText(receipt.receiptStatus) }}
+            </td>
+            <td class="text-center">{{ receipt.receiptNetPrice?.toLocaleString() }}</td>
+            <td class="text-center">{{ receipt.receiptTotalDiscount?.toLocaleString() }}</td>
+            <td class="text-center">{{ receipt.customer?.customerName || '-' }}</td>
+            <td class="text-center">
+              {{ receipt.receiptPromotions?.map(p => p.promotion.promotionName).join(', ') || '-' }}
+            </td>
+            <td class="text-center">{{ receipt.paymentMethod }}</td>
+            <td class="text-center">{{ receipt.user?.userName }}</td>
+            <td class="text-center">{{ receipt.receiptType }}</td>
           </tr>
         </tbody>
-        
       </v-table>
-      <v-pagination
-        justify="center"
-        v-model="receiptStore.currentPage"
-        :length="Math.ceil(receiptStore.totalReceipts / receiptStore.itemsPerPage)"
-        @input="receiptStore.getReceiptPaginate "
-        rounded="circle"
-      ></v-pagination>
+
+      <div class="d-flex justify-center mt-4">
+        <v-pagination
+          v-model="receiptStore.currentPage"
+          :length="Math.ceil(receiptStore.totalReceipts / receiptStore.itemsPerPage)"
+          @update:model-value="receiptStore.getReceiptPaginate"
+          rounded="circle"
+        />
+      </div>
     </v-card>
   </v-container>
-  
 </template>

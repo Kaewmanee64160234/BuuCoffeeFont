@@ -1,9 +1,8 @@
-
 <script lang="ts" setup>
 import { computed } from 'vue';
 import { useReceiptStore } from '@/stores/receipt.store';
 
-const reciptStore = useReceiptStore()
+const receiptStore = useReceiptStore()
 
 
 const formatDate = (dateString: string) => {
@@ -12,29 +11,29 @@ const formatDate = (dateString: string) => {
 };
 
 function closeDialog() {
-  reciptStore.receipt = null;
-  reciptStore.historyReceiptDialog = false;
+  receiptStore.receipt = null;
+  receiptStore.historyReceiptDialog = false;
 }
 </script>
 
 <template>
-  <v-dialog v-model="reciptStore.historyReceiptDialog" max-width="1090px">
+  <v-dialog v-model="receiptStore.historyReceiptDialog" max-width="1090px">
     <v-card>
       <v-card-title>
         <!-- 1 -->
         <v-row>
           <v-col cols="6">
             <v-icon color="primary" style="font-size: 30px;">mdi-calendar-month</v-icon>
-            <strong style="font-size: 18px; margin-left: 8px;">บันทึกการสั่งซื้อ{{ reciptStore.receipt?.receiptType }} วันที่ : {{
-              formatDate(reciptStore.receipt?.createdDate) }}</strong>
+            <strong style="font-size: 18px; margin-left: 8px;">บันทึกการสั่งซื้อ{{ receiptStore.receipt?.receiptType }} วันที่ : {{
+              formatDate(receiptStore.receipt?.createdDate) }}</strong>
           </v-col>
           <v-col cols="6" class="text-right">
 
 
-            <span v-if="reciptStore.receipt?.receiptStatus === 'cancel'">
+            <span v-if="receiptStore.receipt?.receiptStatus === 'cancel'">
               <v-icon color="red" style="font-size: 30px;">mdi-calendar-remove-outline</v-icon>
               <strong style="font-size: 18px; margin-left: 8px;">บันทึกการสั่งซื้อ วันที่ : {{
-                formatDate(reciptStore.receipt?.updatedDate) }}</strong>
+                formatDate(receiptStore.receipt?.updatedDate) }}</strong>
             </span>
 
           </v-col>
@@ -49,22 +48,22 @@ function closeDialog() {
             <v-icon color="primary" left style="font-size: 20px;">mdi-account-supervisor-circle</v-icon>
             <strong style="font-size: 16px;"> ลูกค้า : </strong>
             <span style="font-size: 14px;">
-              {{ reciptStore.receipt?.customer?.customerName || 'ไม่มีข้อมูล' }}
+              {{ receiptStore.receipt?.customer?.customerName || 'ไม่มีข้อมูล' }}
             </span>
           </v-col>
 
           <v-col style="padding-top: 4px;" class="text-right" cols="6" >
             <strong style="font-size: 16px;">
               สถานะ :
-              <template v-if="reciptStore.receipt?.receiptStatus === 'paid'">
-                {{ reciptStore.receipt?.receiptStatus }} <v-icon color="primary" left style="font-size: 20px;">mdi-check</v-icon>
+              <template v-if="receiptStore.receipt?.receiptStatus === 'paid'">
+                {{ receiptStore.receipt?.receiptStatus }} <v-icon color="primary" left style="font-size: 20px;">mdi-check</v-icon>
               </template>
-              <template v-if="reciptStore.receipt?.receiptStatus === 'cancel'">
-                {{ reciptStore.receipt?.receiptStatus }} <v-icon color="primary" left style="font-size: 20px;">mdi-cancel</v-icon>
+              <template v-if="receiptStore.receipt?.receiptStatus === 'cancel'">
+                {{ receiptStore.receipt?.receiptStatus }} <v-icon color="primary" left style="font-size: 20px;">mdi-cancel</v-icon>
               </template>
             </strong>
             <strong style="font-size: 16px;"> รูปแบบการชำระ : </strong>
-            <span style="font-size: 14px;">{{ reciptStore.receipt?.paymentMethod }}   </span>
+            <span style="font-size: 14px;">{{ receiptStore.receipt?.paymentMethod }}   </span>
           </v-col>
         </v-row>
          <!-- 3-->
@@ -73,23 +72,23 @@ function closeDialog() {
             <v-icon color="primary" left style="font-size: 20px;">mdi-account-badge</v-icon>
             <strong style="font-size: 16px;"> พนักงาน : </strong>
             <span style="font-size: 14px;">
-              {{ reciptStore.receipt?.user?.userName || 'ไม่มีข้อมูล' }}
+              {{ receiptStore.receipt?.user?.userName || 'ไม่มีข้อมูล' }}
             </span>
           </v-col>
 
           <v-col style="padding-top: 4px;" class="text-right" cols="6" >
             <strong style="font-size: 16px;"> จำนวนเงิน : </strong>
-            <span style="font-size: 14px;">{{ reciptStore.receipt?.receiptTotalPrice || 0 }} บาท  </span>
+            <span style="font-size: 14px;">{{ receiptStore.receipt?.receiptTotalPrice || 0 }} บาท  </span>
             <strong style="font-size: 16px;">  ส่วนลด : </strong>
-            <span style="font-size: 14px;">{{ reciptStore.receipt?.receiptTotalDiscount || 0 }} บาท</span>
+            <span style="font-size: 14px;">{{ receiptStore.receipt?.receiptTotalDiscount || 0 }} บาท</span>
           </v-col>
         </v-row>
           <!-- 4-->
            <v-row> <v-col style="padding-top: 4px;" cols="6" >
             <v-icon color="primary" left style="font-size: 20px;">mdi-decagram-outline</v-icon>
             <strong style="font-size: 16px;"> โปรโมชั่น : </strong>
-            <span v-if="reciptStore.receipt?.receiptPromotions?.length">
-                  <span v-for="promo in reciptStore.receipt?.receiptPromotions" :key="promo.promotion.promotionId">
+            <span v-if="receiptStore.receipt?.receiptPromotions?.length">
+                  <span v-for="promo in receiptStore.receipt?.receiptPromotions" :key="promo.promotion.promotionId">
                     {{ promo.promotion.promotionName }}
                   </span>
                 </span>
@@ -113,32 +112,31 @@ function closeDialog() {
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, index) in reciptStore.receipt?.receiptItems" :key="index">
+            <tr v-if="!receiptStore.receipt?.receiptItems?.length">
+              <td colspan="7" class="text-center">ไม่พบข้อมูล</td>
+            </tr>
+            <tr v-else v-for="(item, index) in receiptStore.receipt?.receiptItems" :key="index">
               <td class="text-center">{{ item.product?.productName || '-' }}</td>
               <td class="text-center">{{ item.sweetnessLevel ? item.sweetnessLevel + '%' : '0%' }}</td>
               <td class="text-center">
-                <ul>
-                  <li v-for="(topping, idx) in item.productTypeToppings" :key="idx">
-                    <span v-if="topping.topping?.toppingName">{{ topping.topping.toppingName }}</span>
-                    <span v-else>-</span>
-                  </li>
-                  <li v-if="item.productTypeToppings.length === 0">-</li>
-                </ul>
+                <template v-if="item.productTypeToppings?.length">
+                  <div v-for="(topping, idx) in item.productTypeToppings" :key="idx">
+                    {{ topping.topping?.toppingName || '-' }}
+                  </div>
+                </template>
+                <template v-else>-</template>
               </td>
               <td class="text-center">
-                <ul>
-                  <li v-for="(topping, idx) in item.productTypeToppings" :key="idx">
+                <template v-if="item.productTypeToppings?.length">
+                  <div v-for="(topping, idx) in item.productTypeToppings" :key="idx">
                     {{ topping.quantity || '0' }}
-                  </li>
-                  <li v-if="item.productTypeToppings.length === 0">0</li>
-                </ul>
+                  </div>
+                </template>
+                <template v-else>0</template>
               </td>
-              <td class="text-center">
-                <span v-if="item.productType?.productTypeName">{{ item.productType.productTypeName }}</span>
-                <span v-else>ไม่มีข้อมูล</span>
-              </td>
+              <td class="text-center">{{ item.productType?.productTypeName || '-' }}</td>
               <td class="text-center">{{ item.quantity || '0' }}</td>
-              <td class="text-center">{{ item.receiptSubTotal || '0' }}</td>
+              <td class="text-center">{{ item.receiptSubTotal?.toLocaleString() || '0' }}</td>
             </tr>
           </tbody>
         </v-table>
