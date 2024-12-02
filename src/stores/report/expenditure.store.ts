@@ -9,6 +9,7 @@ export const useExpenditureStore = defineStore('expenditure', {
     totalExpenditureEndDate: 0,
   }),
   actions: {
+     // ฟังก์ชันดึงข้อมูลรายจ่าย
     async fetchExpenditure() {
       try {
         const res = await financeService.getExpenditure();

@@ -1,3 +1,18 @@
+// Store สำหรับจัดการข้อมูลการเงินและรายงานต่างๆ
+// ประกอบด้วยฟังก์ชันหลักๆ ดังนี้:
+
+// 1. getAll() - ดึงข้อมูลประวัติการทำรายการเงินสดทั้งหมด
+// 2. deleteCashier() - ลบรายการเงินสด
+// 3. getSumType() - ดึงยอดรวมตามประเภทการชำระเงิน (เงินสด/QR)
+// 4. getDailyReport() - ดึงรายงานประจำวันของร้านกาแฟ
+// 5. getcoffeeSummary() - ดึงสรุปยอดขายร้านกาแฟ
+// 6. getDailyReportFood() - ดึงรายงานประจำวันของร้านอาหาร
+// 7. fetchGroupedFinance() - ดึงข้อมูลการเงินแบบจัดกลุ่มตามวัน/เดือน/ปีของร้านกาแฟ
+// 8. fetchGroupedFinanceFood() - ดึงข้อมูลการเงินแบบจัดกลุ่มตามวัน/เดือน/ปีของร้านอาหาร
+// 9. getTopSellingProduct() - ดึงข้อมูลสินค้าขายดี
+// 10. checkCashierToday() - ตรวจสอบการทำรายการเงินสดของวันนี้
+// 11. getCateringReport() - ดึงรายงานการจัดเลี้ยง
+
 import { ref ,reactive} from "vue";
 import { defineStore } from "pinia";
 import financeService from "@/service/report/finance.service";
