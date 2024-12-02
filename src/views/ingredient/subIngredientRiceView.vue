@@ -8,7 +8,7 @@ const subIngredientStore = useSubIngredientStore();
 const router = useRouter(); 
 onMounted(async () => {
   await subIngredientStore.getSubIngredients_rice();
-  await subIngredientStore.getIngredientsRicePaginate(); // โหลดข้อมูลเมื่อคอมโพเนนต์ถูกสร้าง
+  await subIngredientStore.getIngredientsRicePaginate(); 
 });
 
 onMounted(async () => {

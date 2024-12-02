@@ -1,14 +1,21 @@
 <script lang="ts" setup>
+// สคริปต์นี้จัดการการทำงานของหน้าคลังวัตถุดิบร้านกาแฟ
+// - ใช้ store สำหรับจัดการข้อมูลวัตถุดิบ
+// - ดึงข้อมูลวัตถุดิบเมื่อโหลดหน้า
+// - มีฟังก์ชันสำหรับนำทางไปยังหน้าอื่นๆ
+
 import { useSubIngredientStore } from '@/stores/ingredientSubInventory.store';
 import {  onMounted } from "vue";
 import { useRouter } from 'vue-router';
 
 const subIngredientStore = useSubIngredientStore();
 const router = useRouter();
+
 onMounted(async () => {
   await subIngredientStore.getSubIngredients_coffee();
   await subIngredientStore.getIngredientsCoffeePaginate();
 });
+
 const navigateTo = (routeName: string) => {
   router.push({ name: routeName });
 };
@@ -75,12 +82,6 @@ const navigateTo = (routeName: string) => {
         
       </v-table>
 
-      <!-- <v-pagination 
-        justify="center" 
-        v-model="subIngredientStore.currentPage" 
-        :length="Math.ceil(subIngredientStore.totalIngredients / subIngredientStore.itemsPerPage)">
-        rounded="circle">
-      </v-pagination> -->
       <v-pagination
         justify="center"
         v-model="subIngredientStore.currentPage"
@@ -102,8 +103,8 @@ const navigateTo = (routeName: string) => {
 
 .button-full-width {
   width: 100%;
-  
 }
+
 .custom-yellow {
   background-color: rgb(255, 217, 0); 
   color: black; 
@@ -122,7 +123,6 @@ td {
   height: 95vh;
 }
 
-/* Responsive adjustments */
 @media (max-width: 1200px) {
   .v-card-title {
     flex-direction: column;

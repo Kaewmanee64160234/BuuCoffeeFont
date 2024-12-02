@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { useSubIngredientStore } from '@/stores/ingredientSubInventory.store';
-import IngredientDialog from "@/views/ingredient/IngredientDialog.vue";
+import IngredientDialog from "@/components/stock/IngredientDialog.vue";
 import { computed, onMounted, ref, watch } from "vue";
 import { useRouter } from 'vue-router';
 import Swal from 'sweetalert2';

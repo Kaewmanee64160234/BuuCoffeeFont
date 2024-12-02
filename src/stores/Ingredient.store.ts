@@ -1,3 +1,4 @@
+// Store สำหรับจัดการข้อมูลวัตถุดิบ (Ingredient)
 import { ref, computed, watch } from "vue";
 import { defineStore } from "pinia";
 import type { Ingredient } from "@/types/ingredient.type";
@@ -9,8 +10,11 @@ import type { Checkingredient } from "@/types/checkingredientitem.type";
 import { useLoadingStore } from "./loading.store";
 
 export const useIngredientStore = defineStore("ingredient", () => {
+  // Stores
   const loadingStore = useLoadingStore();
   const messageStore = useMessageStore();
+
+  // State
   const ingredient = ref<Ingredient | null>(null);
   const ingredients = ref<Ingredient[]>([]);
   const all_ingredients = ref<Ingredient[]>([]);
@@ -22,6 +26,8 @@ export const useIngredientStore = defineStore("ingredient", () => {
   const checkDescription = ref<string>("");
   const dialog = ref(false);
   const dialogImportItem = ref(false);
+
+  // ข้อมูลสำหรับการแก้ไขวัตถุดิบ
   const editedIngredient = ref<Ingredient & { file: File }>({
     ingredientName: "",
     ingredientSupplier: "",
@@ -31,12 +37,13 @@ export const useIngredientStore = defineStore("ingredient", () => {
     ingredientQuantityPerUnit: 0,
     ingredientQuantityPerSubUnit: "",
     ingredientRemining: 0,
-    ingredientVolumeUnit:"",
-    ingredientBarcode:"",
+    ingredientVolumeUnit: "",
+    ingredientBarcode: "",
     ingredientImage: "no_image.jpg",
     file: new File([""], "filename"),
   });
 
+  // Watch เพื่อ reset ค่าเมื่อปิด dialog
   watch(dialog, (newDialog, oldDialog) => {
     if (!newDialog) {
       editedIngredient.value = {
@@ -48,36 +55,40 @@ export const useIngredientStore = defineStore("ingredient", () => {
         ingredientQuantityPerUnit: 0,
         ingredientQuantityPerSubUnit: "",
         ingredientRemining: 0,
-        ingredientVolumeUnit:"",
-        ingredientBarcode:"",
+        ingredientVolumeUnit: "",
+        ingredientBarcode: "",
         ingredientImage: "no_image.jpg",
         file: new File([""], "filename"),
       };
     }
   });
-  // about pagination
+
+  // State สำหรับ Pagination
   const page = ref(1);
   const take = ref(5);
   const keyword = ref("");
   const order = ref("ASC");
   const orderBy = ref("");
   const lastPage = ref(0);
-  watch(page, async (newPage, oldPage) => {
+
+  // Watch สำหรับ Pagination
+  watch(page, async () => {
     await getAllIngredients();
   });
-  watch(keyword, async (newKey, oldKey) => {
-    if (keyword.value.length >= 3) {
-      await getAllIngredients();
-    }
-    if (keyword.value.length === 0) {
+
+  watch(keyword, async () => {
+    if (keyword.value.length >= 3 || keyword.value.length === 0) {
       await getAllIngredients();
     }
   });
-  watch(lastPage, async (newlastPage, oldlastPage) => {
+
+  watch(lastPage, async (newlastPage) => {
     if (newlastPage < page.value) {
       page.value = 1;
     }
   });
+
+  // ฟังก์ชันดึงข้อมูลวัตถุดิบทั้งหมด
   async function getIngredients() {
     try {
       const response = await ingredientService.getIngredients();
@@ -88,6 +99,8 @@ export const useIngredientStore = defineStore("ingredient", () => {
       console.error("Error fetching ingredients:", error);
     }
   }
+
+  // ฟังก์ชันดึงข้อมูลวัตถุดิบแบบแบ่งหน้า
   async function getAllIngredients() {
     try {
       const res = await ingredientService.getAllIngredients({
@@ -98,7 +111,6 @@ export const useIngredientStore = defineStore("ingredient", () => {
         orderBy: orderBy.value,
       });
       ingredients.value = res.data.data;
-
       lastPage.value = res.data.lastPage;
     } catch (e) {
       console.log(e);
@@ -106,6 +118,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
     }
   }
 
+  // ฟังก์ชันค้นหาวัตถุดิบตามชื่อ
   async function searchIngredients(name: string) {
     try {
       const res = await ingredientService.searchIngredientsByName(name);
@@ -116,6 +129,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
     }
   }
 
+  // State สำหรับรายการวัตถุดิบที่นำเข้า
   const ingredientList = ref<
     {
       ingredient: Ingredient;
@@ -127,10 +141,13 @@ export const useIngredientStore = defineStore("ingredient", () => {
       importType: "piece" | "box";
     }[]
   >([]);
+
+  // State สำหรับรายการตรวจสอบวัตถุดิบ
   const ingredientCheckList = ref<
     { ingredientcheck: Ingredient; count: number }[]
   >([]);
 
+  // State สำหรับข้อมูลการนำเข้า
   const store = ref<string>("");
   const discount = ref<number>(0);
   const tax = ref<number>(0);
@@ -141,6 +158,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
   const actionType = ref<string>("");
   const shopType = ref<string>("");
 
+  // ฟังก์ชันเพิ่มวัตถุดิบประเภทข้าว
   function AddRiceIngredient(item: { ingredientName: string }) {
     const newImportIngredientItem: any = {
       name: item.ingredientName,
@@ -151,6 +169,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
     ingredientList.value.push(newImportIngredientItem);
   }
 
+  // ฟังก์ชันเพิ่มวัตถุดิบทั่วไป
   function Addingredient(item: Ingredient) {
     const exists = ingredientList.value.some(
       (ingredient) => ingredient.ingredient.ingredientId === item.ingredientId
@@ -168,6 +187,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
     }
   }
 
+  // ฟังก์ชันเพิ่มวัตถุดิบลงตาราง
   function Addingredienttotable(item: Ingredient) {
     const exists = ingredientCheckList.value.some(
       (ingredient) =>
@@ -185,12 +205,16 @@ export const useIngredientStore = defineStore("ingredient", () => {
     }
   }
 
+  // ฟังก์ชันลบวัตถุดิบ
   function removeIngredient(index: number) {
     ingredientList.value.splice(index, 1);
   }
+
   function removeCheckIngredient(index: number) {
     ingredientCheckList.value.splice(index, 1);
   }
+
+  // ฟังก์ชันดึงข้อมูลวัตถุดิบที่ใกล้หมด
   async function getIngredientlow() {
     try {
       const response = await ingredientService.getIngredientlow();
@@ -202,6 +226,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
     }
   }
 
+  // ฟังก์ชันดึงประวัติการนำเข้าวัตถุดิบ
   const getAllHistoryImportIngredients = async () => {
     try {
       const response = await ingredientService.getAllHistoryImportIngredients();
@@ -214,6 +239,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
     }
   };
 
+  // ฟังก์ชันบันทึกข้อมูลการนำเข้า
   async function saveImportData() {
     const importingredientitem = ingredientList.value.map((item) => {
       if (importStoreType.value === "ร้านกาแฟ") {
@@ -255,6 +281,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
     }
   }
 
+  // ฟังก์ชันบันทึกข้อมูลการตรวจสอบ
   async function saveCheckData() {
     const ingredientList = ingredientCheckList.value.map((item) => ({
       ingredientId: item.ingredientcheck.ingredientId!,
@@ -282,6 +309,8 @@ export const useIngredientStore = defineStore("ingredient", () => {
       console.error("Error saving check data:", error);
     }
   }
+
+  // ฟังก์ชันสร้างการคืนและเบิกวัตถุดิบ
   async function createReturnWithdrawalIngredients() {
     const ingredientList = ingredientCheckList.value.map((item) => ({
       ingredientId: item.ingredientcheck.ingredientId!,
@@ -311,6 +340,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
     }
   }
 
+  // ฟังก์ชันบันทึกข้อมูลวัตถุดิบ
   async function saveIngredient() {
     loadingStore.loading = true;
 
@@ -326,8 +356,7 @@ export const useIngredientStore = defineStore("ingredient", () => {
         );
       } else {
         console.log("editedIngredient", JSON.stringify(editedIngredient.value));
-        
-        // ส่งข้อมูลไปยัง API พร้อมกับ categoryId
+
         res = await ingredientService.saveIngredient(
           {
             ingredientName: editedIngredient.value.ingredientName,
@@ -335,12 +364,15 @@ export const useIngredientStore = defineStore("ingredient", () => {
             ingredientMinimun: editedIngredient.value.ingredientMinimun,
             ingredientUnit: editedIngredient.value.ingredientUnit,
             ingredientVolumeUnit: editedIngredient.value.ingredientVolumeUnit,
-            ingredientQuantityPerUnit: editedIngredient.value.ingredientQuantityPerUnit,
-            ingredientQuantityPerSubUnit: editedIngredient.value.ingredientQuantityPerSubUnit,
+            ingredientQuantityPerUnit:
+              editedIngredient.value.ingredientQuantityPerUnit,
+            ingredientQuantityPerSubUnit:
+              editedIngredient.value.ingredientQuantityPerSubUnit,
             ingredientBarcode: editedIngredient.value.ingredientBarcode,
+            ingredientQuantityInStock: 0,
             imageFile: editedIngredient.value.file,
           },
-          editedIngredient.value.categoryId || 1 // ส่ง categoryId หรือค่าเริ่มต้น
+          editedIngredient.value.categoryId || 1
         );
       }
       dialog.value = false;
@@ -353,11 +385,13 @@ export const useIngredientStore = defineStore("ingredient", () => {
     }
   }
 
+  // ฟังก์ชันตั้งค่าข้อมูลวัตถุดิบที่ต้องการแก้ไข
   async function setEditedIngredient(ingredient: Ingredient) {
     editedIngredient.value = JSON.parse(JSON.stringify(ingredient));
     dialog.value = true;
   }
 
+  // ฟังก์ชันลบวัตถุดิบ
   const deleteIngredient = async (id: number) => {
     try {
       await ingredientService.deleteIngredient(id);
@@ -367,6 +401,8 @@ export const useIngredientStore = defineStore("ingredient", () => {
       messageStore.showError("Cannot delete Ingredient");
     }
   };
+
+  // Return ค่าที่ต้องการใช้งาน
   return {
     ingredient,
     all_ingredients,
