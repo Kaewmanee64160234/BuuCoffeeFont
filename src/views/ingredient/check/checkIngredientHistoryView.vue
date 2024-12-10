@@ -15,17 +15,7 @@ onMounted(async () => {
   await ingredientStore.getAllHistortIngredients();
 });
 
-// const formatDate = (dateString: string) => {
-//   const options = {
-//     year: "numeric",
-//     month: "long",
-//     day: "numeric",
-//     hour: "numeric",
-//     minute: "numeric",
-//     timeZone: "UTC",
-//   };
-//   return new Date(dateString).toLocaleDateString("th-TH", options);
-// };
+
 
 const navigateTo = (routeName: string) => {
   router.push({ name: routeName });
@@ -132,7 +122,7 @@ async function exportToExcel(checkingredient: Checkingredient) {
     <v-card>
       <v-card-title>
         <v-row>
-          <v-col cols="9"> ประวัตินำออกวัตถุดิบหมดอายุ </v-col>
+          <v-col cols="9"> ประวัติการปรับคลังสต็อกวัตถุดิบ </v-col>
           <v-col cols="3">
             <v-text-field
               variant="solo"
@@ -145,23 +135,13 @@ async function exportToExcel(checkingredient: Checkingredient) {
         </v-row>
         <v-row>
           <v-row class="mb-3">
-            <v-col cols="6">
+            <v-col cols="12">
               <v-btn block color="success" :to="{ name: 'ingredients' }" style="font-size: 16px;">
                 <v-icon left>mdi-arrow-u-left-top-bold</v-icon>
                 ย้อนกลับ
               </v-btn>
             </v-col>
-            <v-col cols="6">
-              <v-btn
-                color="success"
-                class="button-full-width"
-                :to="{ name: 'checkingredient' }"
-                style="font-size: 16px;"
-              >
-                <v-icon left>mdi-plus</v-icon>
-                วัตถุดิบหมดอายุ
-              </v-btn>
-            </v-col>
+       
           </v-row>
         </v-row>
       </v-card-title>
@@ -173,7 +153,7 @@ async function exportToExcel(checkingredient: Checkingredient) {
               รหัสประวัติการเช็ควัตถุดิบ
             </th>
             <th style="text-align: center; font-weight: bold; font-size: 16px;">วันที่</th>
-            <th style="text-align: center; font-weight: bold; font-size: 16px;">รูปแบบ</th>
+            <th style="text-align: center; font-weight: bold; font-size: 16px;">คำอธิบาย</th>
             <th style="text-align: center; font-weight: bold; font-size: 16px;">การกระทำ</th>
           </tr>
         </thead>
@@ -186,13 +166,7 @@ async function exportToExcel(checkingredient: Checkingredient) {
             <td style="font-size: 16px;">{{ index + 1 }}</td>
             <td style="font-size: 16px;">{{ formatDate(item.date) }}</td>
             <td :style="{ color: item.actionType, fontSize: '16px' }">
-              {{
-                item.actionType === "issuing"
-                  ? "หมดอายุ"
-                  : item.actionType === "check"
-                  ? "เช็ควัตถุดิบ"
-                  : "เลี้ยงรับรอง"
-              }}
+              {{ingredientStore.CheckIngredientsHistory?.checkDescription || 'ไม่มีรายละเอียด'}}
             </td>
 
             <td>

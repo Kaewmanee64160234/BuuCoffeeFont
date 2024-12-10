@@ -77,11 +77,7 @@ const saveCheckData = async () => {
             <v-icon left>mdi-arrow-u-left-top-bold </v-icon> ย้อนกลับ
           </v-btn>
         </v-col>
-        <v-col cols="auto">
-          <v-btn color="warning" :to="{ name: 'checkingredientHistory' }" style="font-size: 16px;">
-            ประวัติปรับคลังสต็อกวัตถุดิบ
-          </v-btn>
-        </v-col>
+
       </v-row>
       <v-spacer></v-spacer>
     </v-card-title>

@@ -83,7 +83,7 @@ const navigateTo = (routeName: string) => {
           </v-col>
 
           <v-col cols="3">
-            <v-btn color="warning" class="button-full-width" @click="navigateTo('history-coffee-store')">
+            <v-btn color="warning" class="button-full-width" @click="navigateTo('checkingredient-history')">
               <v-icon left>mdi-history</v-icon>
               ประวัติการทำรายการ
             </v-btn>
